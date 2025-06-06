@@ -1,0 +1,63 @@
+{
+  "sources": [
+    {
+      "name": "1Hosts (Lite)",
+      "categories": "ads, trackers",
+      "license": "MPLv2",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        }
+      ],
+      "url": "https://o0.pages.dev/Lite/domains.txt",
+      "website": "https://github.com/badmojr/1Hosts"
+    },
+    {
+      "name": "StevenBlack_Adhoc_list",
+      "categories": "ads, malware, trackers",
+      "license": "MIT",
+      "types": [
+        {
+          "name": "hostname",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "lite"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/StevenBlack/hosts/master/data/StevenBlack/hosts",
+      "website": "https://github.com/StevenBlack/hosts"
+    },
+    {
+      "name": "youtube_GoodbyeAds",
+      "categories": "ads",
+      "license": "MIT",
+      "types": [
+        {
+          "name": "hostname"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Extension/GoodbyeAds-YouTube-AdBlock.txt",
+      "website": "https://github.com/jerryn70/GoodbyeAds"
+    },
+    {
+      "name": "Yoyo Adservers",
+      "license": "MIT",
+      "types": [
+        {
+          "name": "hostname"
+        }
+      ],
+      "url": "https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext",
+      "website": "https://pgl.yoyo.org/adservers"
+    }
+  ]
+}
