@@ -34,6 +34,12 @@ func validateAndSetDirs() {
 		switch key {
 		case "download":
 			dir = AppConfig.DNSToolkit.Folders.Download
+		case "processed":
+			dir = AppConfig.DNSToolkit.Folders.Processed
+		case "consolidated":
+			dir = AppConfig.DNSToolkit.Folders.Consolidated
+		case "consolidated_groups":
+			dir = AppConfig.DNSToolkit.Folders.ConsolidatedGroups
 		}
 
 		if dir == "" {
@@ -43,6 +49,12 @@ func validateAndSetDirs() {
 		switch key {
 		case "download":
 			constants.DownloadDir = dir
+		case "processed":
+			constants.ProcessedDir = dir
+		case "consolidated":
+			constants.ConsolidatedDir = dir
+		case "consolidated_groups":
+			constants.ConsolidatedGroupsDir = dir
 		}
 	}
 }
@@ -94,4 +106,6 @@ func init() {
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(downloadCmd)
 	rootCmd.AddCommand(processCmd)
+	rootCmd.AddCommand(consolidateCmd)
+	rootCmd.AddCommand(validateSourcesCmd)
 }

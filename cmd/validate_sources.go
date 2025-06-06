@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/phani-kb/dns-toolkit/internal/config"
+	"github.com/spf13/cobra"
 )
 
 var (
@@ -29,4 +30,16 @@ func validateConfig() error {
 	validationPerformed = true
 
 	return nil
+}
+
+var validateSourcesCmd = &cobra.Command{
+	Use:   "validate-sources",
+	Short: "Validate the sources configuration",
+	Run: func(cmd *cobra.Command, args []string) {
+		if err := validateConfig(); err != nil {
+			slog.Error("Validation failed", "error", err)
+			return
+		}
+		Logger.Infof("Successfully loaded and validated configuration")
+	},
 }

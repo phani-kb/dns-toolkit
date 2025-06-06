@@ -44,4 +44,5 @@ func init() {
 		BoolVar(&ignoreAllowlist, "ignore-allowlist", false, "Ignore allowlist during consolidation where applicable")
 	consolidateCmd.PersistentFlags().
 		BoolVar(&includeInvalid, "include-invalid", false, "Include invalid entry(s) during consolidation")
+	consolidateCmd.AddCommand(consolidateGroupsCmd)
 }
