@@ -2,8 +2,9 @@ package constants
 
 // Default directories for various operations
 var (
-	DownloadDir = "data/download"
-	SummaryDir  = "data"
+	DownloadDir  = "data/download"
+	ProcessedDir = "data/processed"
+	SummaryDir   = "data"
 )
 
 // Folders - Map of folder names to their respective directories

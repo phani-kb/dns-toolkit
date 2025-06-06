@@ -93,4 +93,5 @@ func init() {
 
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(downloadCmd)
+	rootCmd.AddCommand(processCmd)
 }
