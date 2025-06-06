@@ -92,4 +92,5 @@ func init() {
 	cobra.OnInitialize(validateAndSetDirs)
 
 	rootCmd.AddCommand(versionCmd)
+	rootCmd.AddCommand(downloadCmd)
 }
