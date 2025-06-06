@@ -2,15 +2,27 @@ package constants
 
 // Default directories for various operations
 var (
-	DownloadDir     = "data/download"
-	ProcessedDir    = "data/processed"
-	ConsolidatedDir = "data/consolidated"
-	SummaryDir      = "data"
+	DownloadDir               = "data/download"
+	ProcessedDir              = "data/processed"
+	ConsolidatedDir           = "data/consolidated"
+	ConsolidatedGroupsDir     = "data/consolidated_groups"
+	ConsolidatedCategoriesDir = "data/consolidated_categories"
+	SummaryDir                = "data"
 )
 
 // Folders - Map of folder names to their respective directories
 var Folders = map[string]string{
-	"download": DownloadDir,
+	"download":     DownloadDir,
+	"processed":    ProcessedDir,
+	"consolidated": ConsolidatedDir,
+}
+
+// DefaultSummaryFiles - Map of summary types to their default file names
+var DefaultSummaryFiles = map[string]string{
+	"download":            "download_summary.json",
+	"processed":           "processed_summary.json",
+	"consolidated":        "consolidated_summary.json",
+	"consolidated_groups": "consolidated_groups_summary.json",
 }
 
 const (

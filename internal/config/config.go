@@ -44,7 +44,10 @@ func (dc *DNSToolkitConfig) Validate() error {
 }
 
 type FoldersConfig struct {
-	Download string `yaml:"download"`
+	Download           string `yaml:"download"`
+	Processed          string `yaml:"processed"`
+	Consolidated       string `yaml:"consolidated"`
+	ConsolidatedGroups string `yaml:"consolidated_groups"`
 }
 
 type AppConfig struct {
