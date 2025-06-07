@@ -5,9 +5,15 @@ application:
 dns_toolkit:
   folders:
     download: data/download
+    processed: data/processed
+    consolidated: data/consolidated
+    summary: data
   source_files:
     - data/config/sources_domain_bl.json
     - data/config/sources_domain_al.json
+    - data/config/sources_local.json
+    - data/config/sources_ip.json
+    - data/config/sources_mis.json
   files_checksum:
     enabled: true
     algorithm: "md5" # md5, sha256
