@@ -1,4 +1,94 @@
 {
   "sources": [
+    {
+      "name": "AlienVault_Reputation",
+      "categories": "anonymizer, botnet, exploit, malicious, malware, phishing, proxy, ransomware, spam, trojan",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist"
+            }
+          ]
+        }
+      ],
+      "url": "https://reputation.alienvault.com/reputation.generic",
+      "website": "https://levelblue.com"
+    },
+    {
+      "name": "BinaryDefense_Banlist",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist"
+            }
+          ]
+        }
+      ],
+      "url": "https://www.binarydefense.com/banlist.txt",
+      "website": "https://www.binarydefense.com"
+    },
+    {
+      "name": "Blackhole_Today",
+      "types": [
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://blackhole.s-e-r-v-e-r.pw/blackhole-today",
+      "website": "https://blackhole.s-e-r-v-e-r.pw"
+    },
+    {
+      "name": "BlockListDE_Brute",
+      "types": [
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://lists.blocklist.de/lists/bruteforcelogin.txt",
+      "website": "https://www.blocklist.de"
+    },
+    {
+      "name": "BlockListDE_Strong",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist"
+            }
+          ]
+        }
+      ],
+      "url": "https://lists.blocklist.de/lists/strongips.txt",
+      "website": "https://www.blocklist.de"
+    },
+    {
+      "name": "URLHaus_Text",
+      "types": [
+        {
+          "name": "domain"
+        },
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://urlhaus.abuse.ch/downloads/text/",
+      "website": "https://urlhaus.abuse.ch"
+    },
+    {
+      "name": "Yoyo AdServers",
+      "license": "MIT",
+      "types": [
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://pgl.yoyo.org/adservers/iplist.php?showintro=1&mimetype=plaintext",
+      "website": "https://pgl.yoyo.org/adservers"
+    }
   ]
 }
