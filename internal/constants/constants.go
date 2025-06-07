@@ -1,5 +1,11 @@
 package constants
 
+const (
+	AppName        = "dns-toolkit"
+	AppVersion     = "1.0.0"
+	AppDescription = "A toolkit for DNS data processing and analysis."
+)
+
 // Default directories for various operations
 var (
 	DownloadDir               = "data/download"
@@ -41,7 +47,8 @@ var ListTypeMap = map[string]string{
 }
 
 const (
-	TimestampFormat = "20060102_150405"
+	TimestampFormat            = "20060102_150405"
+	DefaultRetryDelayInSeconds = 10
 )
 
 // CommentPrefixes Comment prefixes used in various formats
