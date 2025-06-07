@@ -33,4 +33,8 @@ logs/
 
 # coverage files
 coverage/
+# Data directories
 data/download/
+data/processed/
+data/consolidated/
+data/consolidated_groups/

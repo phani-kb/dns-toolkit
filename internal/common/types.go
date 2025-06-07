@@ -37,9 +37,17 @@ func (lt *ListType) Validate() error {
 }
 
 type DownloadFile struct {
-	Name      string `json:"name"`
-	Folder    string `json:"folder"`
-	Filename  string `json:"filename"`
-	IsArchive bool   `json:"is_archive"`
-	URL       string `json:"url"`
+	Name      string           `json:"name"`
+	Folder    string           `json:"folder"`
+	Filename  string           `json:"filename"`
+	IsArchive bool             `json:"is_archive"`
+	URL       string           `json:"url"`
+	Targets   []DownloadTarget `json:"targets"`
+}
+
+type DownloadTarget struct {
+	SourceFolder string `json:"source_folder"`
+	SourceFile   string `json:"source_file"`
+	TargetFolder string `json:"target_folder"`
+	TargetFile   string `json:"target_file"`
 }
