@@ -14,6 +14,8 @@ var (
 	ConsolidatedGroupsDir     = "data/consolidated_groups"
 	ConsolidatedCategoriesDir = "data/consolidated_categories"
 	SummaryDir                = "data"
+	OverlapDir                = "data/overlap"
+	TopDir                    = "data/top"
 )
 
 // Folders - Map of folder names to their respective directories

@@ -27,6 +27,7 @@ type FilesChecksumConfig struct {
 type DNSToolkitConfig struct {
 	Folders     FoldersConfig `yaml:"folders"`
 	SourceFiles []string      `yaml:"source_files"`
+	MaxWorkers  int           `yaml:"max_workers"`
 }
 
 func (dc *DNSToolkitConfig) Validate() error {
@@ -47,6 +48,9 @@ type FoldersConfig struct {
 	Download           string `yaml:"download"`
 	Processed          string `yaml:"processed"`
 	Consolidated       string `yaml:"consolidated"`
+	Summary            string `yaml:"summary"`
+	Overlap            string `yaml:"overlap"`
+	Top                string `yaml:"top"`
 	ConsolidatedGroups string `yaml:"consolidated_groups"`
 }
 
