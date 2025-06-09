@@ -122,8 +122,12 @@ func (d *DefaultDownloader) downloadFile(
 ) (string, bool, error) {
 	filePath := filepath.Join(file.Folder, file.Filename)
 	fileExists := false
-	if _, err := os.Stat(filePath); err == nil {
+	var localModTime time.Time
+	var localFileSize int64
+	if info, err := os.Stat(filePath); err == nil {
 		fileExists = true
+		localModTime = info.ModTime()
+		localFileSize = info.Size()
 	}
 	parsedURL, err := url.Parse(file.URL)
 	if err != nil {
@@ -133,8 +137,9 @@ func (d *DefaultDownloader) downloadFile(
 	client := d.createHTTPClient(logger, skipCertVerify, skipCertHosts, parsedURL)
 	userAgent := u.GetUserAgent(logger, applicationConfig)
 	logger.Debugf("User-Agent: %s", userAgent)
-	if fileExists {
-		return filePath, true, nil
+	if fileExists && d.canSkipDownload(logger, client, userAgent, file, localFileSize, localModTime) {
+		err := d.handleArchiveFile(logger, file, filePath)
+		return filePath, true, err
 	}
 
 	var resp *http.Response
@@ -248,8 +253,8 @@ func (d *DefaultDownloader) downloadFile(
 		return "", false, err
 	}
 	logger.Infof("Downloaded %s", filePath)
-
-	return filePath, false, nil
+	err = d.handleArchiveFile(logger, file, filePath)
+	return filePath, false, err
 }
 
 func (d *DefaultDownloader) createHTTPClient(
@@ -275,6 +280,68 @@ func (d *DefaultDownloader) createHTTPClient(
 	return client
 }
 
+func (d *DefaultDownloader) canSkipDownload(
+	logger *multilog.Logger,
+	client *http.Client,
+	userAgent string,
+	file c.DownloadFile,
+	localFileSize int64,
+	localModTime time.Time,
+) bool {
+
+	summaryFile := filepath.Join(constants.SummaryDir, constants.DefaultSummaryFiles["download"])
+	if !d.ShouldDownload(logger, summaryFile, file) {
+		return true
+	}
+
+	headReq, err := http.NewRequest("HEAD", file.URL, nil)
+	if err != nil {
+		return false
+	}
+	headReq.Header.Set("User-Agent", userAgent)
+	resp, err := client.Do(headReq)
+	if err != nil || resp.StatusCode != http.StatusOK {
+		if resp != nil {
+			u.CloseBody(logger, resp.Body)
+		}
+		return false
+	}
+	defer u.CloseBody(logger, resp.Body)
+
+	filePath := filepath.Join(file.Folder, file.Filename)
+	if contentLength := resp.ContentLength; contentLength != -1 && contentLength == localFileSize {
+		if lastModStr := resp.Header.Get("Last-Modified"); lastModStr != "" {
+			lastMod, err := time.Parse(http.TimeFormat, lastModStr)
+			if err == nil && !lastMod.After(localModTime) {
+				logger.Infof("Skipping download, local file is up-to-date: %s", filePath)
+				return true
+			}
+		} else {
+			logger.Infof("Skipping download, local file exists with same size: %s", filePath)
+			return true
+		}
+	}
+	return false
+}
+
+func (d *DefaultDownloader) handleArchiveFile(logger *multilog.Logger, file c.DownloadFile, filePath string) error {
+	if file.IsArchive {
+		if err := u.ExtractArchive(logger, filePath, file.Folder); err != nil {
+			logger.Errorf("Failed to extract archive: %v", err)
+			return err
+		}
+		logger.Infof("Extracted archive %s", filePath)
+		for _, target := range file.Targets {
+			if err := u.CopySourceToTarget(logger, target); err != nil {
+				logger.Errorf("Failed to copy target file: %v", err)
+				return err
+			}
+		}
+		logger.Infof("Copied target %d file(s)", len(file.Targets))
+		return nil
+	}
+	return nil
+}
 func (d *DefaultDownloader) ShouldDownload(
 	logger *multilog.Logger,
 	summaryFile string,

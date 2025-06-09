@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 
+	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/multilog"
 )
 
@@ -26,7 +27,26 @@ func (sc *SourcesConfig) ValidateWithConfig(appConfig *AppConfig) error {
 }
 
 type Source struct {
-	Name string `json:"name"`
+	Name      string         `json:"name"`
+	URL       string         `json:"url"`
+	Files     []string       `json:"files,omitempty"`
+	TypeCount int            `json:"type_count"`
+	Types     []c.SourceType `json:"types"`
+	License   string         `json:"license,omitempty"`
+	Disabled  bool           `json:"disabled,omitempty"`
+	Website   string         `json:"website,omitempty"`
+}
+
+func (s *Source) Validate() error {
+	return s.ValidateWithConfig(nil)
+}
+
+func (s *Source) ValidateWithConfig(appConfig *AppConfig) error {
+	if s.Name == "" {
+		return fmt.Errorf("name is required")
+	}
+
+	return nil
 }
 
 func LoadSourcesConfig(logger *multilog.Logger, filePath string) (SourcesConfig, error) {

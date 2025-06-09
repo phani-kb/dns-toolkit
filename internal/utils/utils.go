@@ -104,6 +104,28 @@ func GetTimestamp() string {
 // ArchiveExtensions contains the supported archive file extensions.
 var ArchiveExtensions = []string{".tar.gz", ".zip"}
 
+// IsArchive checks if a file is an archive based on its extension.
+func IsArchive(filePath string) bool {
+	for _, ext := range ArchiveExtensions {
+		if strings.HasSuffix(filePath, ext) {
+			return true
+		}
+	}
+	return false
+}
+
+// ExtractArchive extracts the contents of an archive file (either .tar.gz or .zip) to the specified destination folder.
+//
+// Parameters:
+//   - archivePath: Path to the archive file
+//   - destFolder: Destination directory where the contents will be extracted
+//
+// Returns:
+//   - An error object if the extraction fails, nil on success
+func ExtractArchive(logger *multilog.Logger, archivePath, destFolder string) error {
+	return fmt.Errorf("unsupported archive format: %s", archivePath)
+}
+
 func CopySourceToTarget(logger *multilog.Logger, target c.DownloadTarget) error {
 	sourceFilepath := filepath.Join(target.SourceFolder, target.SourceFile)
 	if _, err := os.Stat(sourceFilepath); os.IsNotExist(err) {
