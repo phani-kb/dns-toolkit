@@ -25,9 +25,14 @@ type FilesChecksumConfig struct {
 }
 
 type DNSToolkitConfig struct {
-	Folders     FoldersConfig `yaml:"folders"`
-	SourceFiles []string      `yaml:"source_files"`
-	MaxWorkers  int           `yaml:"max_workers"`
+	Folders                   FoldersConfig       `yaml:"folders"`
+	SourceFiles               []string            `yaml:"source_files"`
+	SourceFilters             SourceFilters       `yaml:"source_filters"`
+	FilesChecksum             FilesChecksumConfig `yaml:"files_checksum"`
+	MaxWorkers                int                 `yaml:"max_workers"`
+	MaxRetries                int                 `yaml:"max_retries"`
+	SkipCertVerification      bool                `yaml:"skip_cert_verification,omitempty"`
+	SkipCertVerificationHosts []string            `yaml:"skip_cert_verification_hosts,omitempty"`
 }
 
 func (dc *DNSToolkitConfig) Validate() error {

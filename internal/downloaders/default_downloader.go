@@ -342,6 +342,7 @@ func (d *DefaultDownloader) handleArchiveFile(logger *multilog.Logger, file c.Do
 	}
 	return nil
 }
+
 func (d *DefaultDownloader) ShouldDownload(
 	logger *multilog.Logger,
 	summaryFile string,
