@@ -1,7 +1,11 @@
 package utils
 
 import (
+	"crypto/md5"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"hash"
 	"io"
 	"os"
 	"path/filepath"
@@ -69,6 +73,45 @@ func CloseFile(logger *multilog.Logger, file *os.File) {
 	if err != nil {
 		logger.Errorf("Closing file error: %v (file: %s)", err, file.Name())
 	}
+}
+
+// CalculateChecksum calculates the checksum of the specified file using the specified algorithm.
+// Supports MD5 and SHA256 algorithms. If the algorithm is empty, it defaults to MD5.
+//
+// Parameters:
+//   - logger: Logger for recording operations and errors
+//   - filePath: Path to the file to calculate the checksum for
+//   - algo: Algorithm to use ("md5" or "sha256")
+//
+// Returns:
+//   - A hex string representation of the checksum or an empty string on error
+func CalculateChecksum(logger *multilog.Logger, filePath string, algo string) string {
+	if algo == "" {
+		algo = constants.DefaultHashAlgorithm
+	}
+	file, err := os.Open(filePath)
+	if err != nil {
+		logger.Errorf("Opening file error: %v (file: %s)", err, filePath)
+		return ""
+	}
+	defer CloseFile(logger, file)
+	var h hash.Hash
+	switch algo {
+	case "md5":
+		h = md5.New()
+	case "sha256":
+		h = sha256.New()
+	default:
+		logger.Errorf("Unsupported algorithm: %s", algo)
+		return ""
+	}
+
+	if _, err := io.Copy(h, file); err != nil {
+		logger.Errorf("Calculating checksum error: %v (file: %s)", err, filePath)
+		return ""
+	}
+
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 // IsComment determines if a line is a comment or an empty line.

@@ -1,5 +1,7 @@
 package constants
 
+import "time"
+
 const (
 	AppName        = "dns-toolkit"
 	AppVersion     = "1.0.0"
@@ -96,6 +98,9 @@ var ListTypeMap = map[string]string{
 
 const (
 	TimestampFormat            = "20060102_150405"
+	DownloadInterval           = 2000 * time.Millisecond
+	DefaultHashAlgorithm       = "md5"
+	DefaultMaxRetries          = 3
 	DefaultRetryDelayInSeconds = 10
 )
 
