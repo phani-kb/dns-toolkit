@@ -8,15 +8,25 @@ dns_toolkit:
     processed: data/processed
     consolidated: data/consolidated
     summary: data
+    consolidated_groups: data/consolidated_groups
+    consolidated_categories: data/consolidated_categories
   source_files:
     - data/config/sources_domain_bl.json
     - data/config/sources_domain_al.json
     - data/config/sources_local.json
     - data/config/sources_ip.json
+    - data/config/sources_domain_top.json
+    - data/config/sources_domain_new.json
     - data/config/sources_mis.json
   files_checksum:
     enabled: true
     algorithm: "md5" # md5, sha256
+  skip_cert_verification: true
+  skip_cert_verification_hosts:
+    - "raw.githubusercontent.com"
+  max_workers: 1
+  max_retries: 3
+  source_filters:
 multilog:
   handlers:
     - type: console
