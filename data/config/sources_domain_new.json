@@ -1,0 +1,20 @@
+{
+  "sources": [
+    {
+      "name": "nrd-14day-mini",
+      "license": "MIT",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "blocklist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/xRuffKez/NRD/refs/heads/main/lists/14-day-mini/domains-only/nrd-14day-mini.txt",
+      "website": "https://github.com/xRuffKez/NRD"
+    }
+  ]
+}

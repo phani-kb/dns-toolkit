@@ -1,0 +1,20 @@
+{
+  "sources": [
+    {
+      "name": "transco",
+      "files": "top-1m.csv",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://tranco-list.eu/top-1m.csv.zip",
+      "website": "https://tranco-list.eu"
+    }
+  ]
+}
