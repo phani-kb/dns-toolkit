@@ -1,6 +1,9 @@
 package constants
 
-import "time"
+import (
+	"regexp"
+	"time"
+)
 
 const (
 	AppName        = "dns-toolkit"
@@ -79,6 +82,7 @@ const (
 	SourceTypeDomain       = "domain"
 	SourceTypeAdguard      = "adguard"
 	SourceTypeIpv4Hostname = "ipv4_hostname"
+	SourceTypeMixed        = "mixed"
 	SourceTypeHostname     = "hostname"
 	SourceTypeUnknown      = "unknown"
 
@@ -96,7 +100,18 @@ var ListTypeMap = map[string]string{
 	ListTypeAllowlist: "AL",
 }
 
+var SourceTypeRegexMap = map[string]*regexp.Regexp{
+	SourceTypeIpv4:     regexp.MustCompile(`\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b`),
+	SourceTypeIpv6:     regexp.MustCompile(`\b([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b`),
+	SourceTypeCidrIpv4: regexp.MustCompile(`\b\d{1,3}(\.\d{1,3}){3}/\d{1,2}\b`),
+	SourceTypeDomain:   regexp.MustCompile(`^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$`),
+	SourceTypeIpv4Hostname: regexp.MustCompile(
+		`^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$`,
+	),
+}
+
 const (
+	MaxSampleLinesToCategorize = 100
 	TimestampFormat            = "20060102_150405"
 	DownloadInterval           = 2000 * time.Millisecond
 	DefaultHashAlgorithm       = "md5"

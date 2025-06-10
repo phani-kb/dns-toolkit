@@ -7,9 +7,11 @@ import (
 	"fmt"
 	"hash"
 	"io"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"time"
 
@@ -18,6 +20,96 @@ import (
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/multilog"
 )
+
+type StringSet map[string]bool
+
+func NewStringSet(entries []string) StringSet {
+	set := make(StringSet, len(entries))
+	for _, entry := range entries {
+		if entry = strings.TrimSpace(entry); entry != "" {
+			set[entry] = false
+		}
+	}
+	return set
+}
+
+func NewStringSetWithCapacity(capacity int) StringSet {
+	return make(StringSet, capacity)
+}
+
+func (s StringSet) Contains(str string) bool {
+	_, found := s[str]
+	return found
+}
+
+func (s StringSet) MustConsider(str string) bool {
+	consider, found := s[str]
+	return found && consider
+}
+
+func (s StringSet) Get(str string) (bool, bool) {
+	consider, found := s[str]
+	return consider, found
+}
+
+func (s StringSet) Add(str string) {
+	s[str] = false
+}
+
+// AddWithConsider adds a string to the set with the specified consider flag.
+// It returns true if the entry was added (not found in the set).
+// If the entry is already in the set, it updates the consider flag.
+func (s StringSet) AddWithConsider(str string, consider bool) bool {
+	_, found := s[str]
+	s[str] = consider
+	return !found
+}
+
+func (s StringSet) Remove(str string) {
+	delete(s, str)
+}
+
+// AddAll adds all entries to the set, optionally considering existing entries.
+// It returns the number of entries that were already in the set.
+func (s StringSet) AddAll(entries []string, consider bool) int {
+	alreadyExist := 0
+	for _, entry := range entries {
+		if !s.AddWithConsider(entry, consider) {
+			alreadyExist++
+		}
+	}
+	return alreadyExist
+}
+
+func (s StringSet) RemoveAll(entries []string) {
+	for _, entry := range entries {
+		s.Remove(entry)
+	}
+}
+
+func (s StringSet) ToSlice() []string {
+	result := make([]string, 0, len(s))
+	for entry := range s {
+		result = append(result, entry)
+	}
+	return result
+}
+
+func (s StringSet) ToSliceSorted() []string {
+	result := s.ToSlice()
+	slices.Sort(result)
+	return result
+}
+
+func RemoveDuplicates(entries []string) []string {
+	if len(entries) == 0 {
+		return entries
+	}
+
+	set := NewStringSet(entries)
+
+	return set.ToSlice()
+}
 
 // SaveFile saves the content from the reader to the specified destination folder and file name.
 // It creates the destination folder if it doesn't exist.
@@ -142,6 +234,63 @@ func IsComment(line string) bool {
 //   - A string representation of the current time
 func GetTimestamp() string {
 	return time.Now().Format(constants.TimestampFormat)
+}
+
+func StringInSlice(str string, slice []string) bool {
+	return NewStringSet(slice).Contains(str)
+}
+
+// PickRandomLines reads a file and returns a specified number of random lines from it.
+// If maxLines is 0, it returns all the lines from the file (excluding comments).
+//
+// Parameters:
+//   - filePath: Path to the file to read
+//   - maxLines: Maximum number of lines to return (0 for all)
+//
+// Returns:
+//   - A slice of strings with the selected lines
+//   - An error object if reading fails, nil on success
+func PickRandomLines(filePath string, maxLines int) ([]string, error) {
+	content, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	lines := strings.Split(string(content), "\n")
+
+	filteredLines := slices.DeleteFunc(slices.Clone(lines), IsComment)
+
+	if maxLines == 0 || len(filteredLines) <= maxLines {
+		return filteredLines, nil
+	}
+
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	selectedLines := make([]string, maxLines)
+	for i := 0; i < maxLines; i++ {
+		selectedLines[i] = filteredLines[r.Intn(len(filteredLines))]
+	}
+
+	return selectedLines, nil
+}
+
+// GetMapKeys returns the keys of a map as a slice.
+// This is a generic function that works with any map that has comparable keys.
+//
+// Type Parameters:
+//   - K: The type of map keys (must be comparable)
+//   - V: The type of map values
+//
+// Parameters:
+//   - m: The map to extract keys from
+//
+// Returns:
+//   - A slice containing all the keys in the map
+func GetMapKeys[K comparable, V any](m map[K]V) []K {
+	keys := make([]K, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
 }
 
 // ArchiveExtensions contains the supported archive file extensions.

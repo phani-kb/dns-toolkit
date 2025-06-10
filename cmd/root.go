@@ -119,6 +119,7 @@ func init() {
 	rootCmd.AddCommand(downloadCmd)
 	rootCmd.AddCommand(processCmd)
 	rootCmd.AddCommand(consolidateCmd)
+	rootCmd.AddCommand(sourceTypesSummaryCmd)
 	rootCmd.AddCommand(validateSourcesCmd)
 	rootCmd.AddCommand(overlapCmd)
 	rootCmd.AddCommand(topEntriesCmd)
