@@ -1,0 +1,13 @@
+{
+    "sources": [
+        {
+            "name": "test_source",
+            "url": "http://test.com",
+            "types": [
+                {
+                    "name": "domain"
+                }
+            ]
+        }
+    ]
+}

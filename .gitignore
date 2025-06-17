@@ -38,3 +38,5 @@ data/download/
 data/processed/
 data/consolidated/
 data/consolidated_groups/
+data/overlap/
+data/top/
