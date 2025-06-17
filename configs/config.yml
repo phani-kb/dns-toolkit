@@ -8,6 +8,7 @@ dns_toolkit:
     processed: data/processed
     consolidated: data/consolidated
     summary: data
+    top: data/top
     consolidated_groups: data/consolidated_groups
     consolidated_categories: data/consolidated_categories
   source_files:
@@ -27,6 +28,9 @@ dns_toolkit:
   max_workers: 1
   max_retries: 3
   source_filters:
+    name:
+      contains:
+        #- "Local"
 multilog:
   handlers:
     - type: console

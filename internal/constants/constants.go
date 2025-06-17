@@ -73,6 +73,11 @@ const (
 	CategoryRansomware     = "ransomware"
 	CategoryBotnet         = "botnet"
 	CategoryExploit        = "exploit"
+
+	GroupMini   = "mini"
+	GroupLite   = "lite"
+	GroupNormal = "normal"
+	GroupBig    = "big"
 )
 
 const (
@@ -88,6 +93,22 @@ const (
 
 	ListTypeBlocklist = "blocklist"
 	ListTypeAllowlist = "allowlist"
+)
+
+var (
+	ValidTypes = map[string]bool{
+		SourceTypeIpv4:         true,
+		SourceTypeIpv6:         true,
+		SourceTypeDomain:       true,
+		SourceTypeAdguard:      true,
+		SourceTypeIpv4Hostname: true,
+		SourceTypeHostname:     true,
+		SourceTypeUnknown:      true,
+	}
+	ValidListTypes = map[string]bool{
+		ListTypeBlocklist: true,
+		ListTypeAllowlist: true,
+	}
 )
 
 var ListTypes = []string{
@@ -109,6 +130,31 @@ var SourceTypeRegexMap = map[string]*regexp.Regexp{
 		`^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$`,
 	),
 }
+
+var (
+	ValidGroups = map[string]bool{
+		GroupMini:   true,
+		GroupLite:   true,
+		GroupNormal: true,
+		GroupBig:    true,
+	}
+
+	DefaultGroup = GroupBig
+
+	GroupIdMap = map[string]int{
+		GroupMini:   0,
+		GroupLite:   1,
+		GroupNormal: 2,
+		GroupBig:    3,
+	}
+
+	SizeGroups = []string{
+		GroupMini,
+		GroupLite,
+		GroupNormal,
+		GroupBig,
+	}
+)
 
 const (
 	MaxSampleLinesToCategorize = 100
