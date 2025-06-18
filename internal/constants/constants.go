@@ -163,6 +163,11 @@ const (
 	DefaultHashAlgorithm       = "md5"
 	DefaultMaxRetries          = 3
 	DefaultRetryDelayInSeconds = 10
+	EntryAverageCharLength     = 30
+	EntryMinCharLength         = 6
+	MaxPreallocEntries         = 10_000_000
+	MinPreallocEntries         = 10_000
+	MaxEntryLength             = 255
 )
 
 // CommentPrefixes Comment prefixes used in various formats

@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"bufio"
 	"crypto/md5"
 	"crypto/sha256"
 	"encoding/hex"
@@ -273,6 +274,91 @@ func PickRandomLines(filePath string, maxLines int) ([]string, error) {
 	return selectedLines, nil
 }
 
+// ReadEntriesFromFile reads entries from a file and returns them as a slice of strings.
+// Comments are ignored, and duplicate entries are removed.
+//
+// Parameters:
+//   - filepath: Path to the file to read
+//
+// Returns:
+//   - A slice of strings containing the unique entries
+//   - Number of duplicate entries found
+//   - An error object if reading fails, nil on success
+func ReadEntriesFromFile(logger *multilog.Logger, filepath string) ([]string, int, error) {
+	return ReadEntriesFromFileWithPool(logger, filepath, nil)
+}
+
+// ReadEntriesFromFileWithPool reads entries from a file using a string intern pool.
+//
+// Parameters:
+//   - logger: Logger for recording operations and errors
+//   - filepath: Path to the file to read
+//   - pool: Optional string intern pool for memory optimization (maybe nil)
+//
+// Returns:
+//   - A slice of strings containing the unique entries
+//   - Number of duplicate entries found
+//   - An error object if reading fails, nil on success
+func ReadEntriesFromFileWithPool(logger *multilog.Logger, filepath string, pool *DTEntryPool) ([]string, int, error) {
+	// Get file info for pre-allocation optimization
+	fileInfo, err := os.Stat(filepath)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	// Estimate number of entries based on average line length
+	estimatedEntries := CapPreallocEntries(int(fileInfo.Size()/constants.EntryAverageCharLength + 1))
+
+	duplicateCount := 0
+	file, err := os.Open(filepath)
+	if err != nil {
+		return nil, duplicateCount, err
+	}
+	defer CloseFile(logger, file)
+
+	// Pre-allocate the set with estimated capacity to reduce reallocations
+	set := make(StringSet, estimatedEntries)
+	scanner := bufio.NewScanner(file)
+
+	const maxScannerBuffer = 4 * 1024 * 1024
+	buf := make([]byte, maxScannerBuffer)
+	scanner.Buffer(buf, maxScannerBuffer)
+
+	lineCount := 0
+	noCommentCount := 0
+
+	// Process the file line by line
+	for scanner.Scan() {
+		lineCount++
+		line := scanner.Text()
+
+		if !IsComment(line) {
+			noCommentCount++
+
+			// Intern the string if a pool is provided
+			if pool != nil {
+				line = pool.Intern(line)
+			}
+
+			if !set.AddWithConsider(line, false) {
+				duplicateCount++
+			}
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, duplicateCount, err
+	}
+
+	// Convert the set to a slice
+	result := make([]string, 0, len(set))
+	for entry := range set {
+		result = append(result, entry)
+	}
+
+	return result, duplicateCount, nil
+}
+
 // GetMapKeys returns the keys of a map as a slice.
 // This is a generic function that works with any map that has comparable keys.
 //
@@ -376,6 +462,18 @@ func GetFileLastModifiedTime(logger *multilog.Logger, filePath string) (string, 
 
 func LogMemStats(logger *multilog.Logger, prefix string) {
 	logger.Perff(prefix)
+}
+
+// CapPreallocEntries limits the estimated entries to avoid excessive or insufficient allocation.
+func CapPreallocEntries(estimated int) int {
+	switch {
+	case estimated > constants.MaxPreallocEntries:
+		return constants.MaxPreallocEntries
+	case estimated < constants.MinPreallocEntries:
+		return constants.MinPreallocEntries
+	default:
+		return estimated
+	}
 }
 
 // EnsureDirectoryExists creates a directory if it doesn't exist
