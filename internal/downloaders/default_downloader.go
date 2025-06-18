@@ -46,13 +46,24 @@ func (e *CertVerificationError) Error() string {
 type DefaultDownloader struct {
 	rnd        *rand.Rand
 	maxRetries int
+	retryDelay time.Duration
 }
 
-// NewDefaultDownloaderWithRetries creates a new DefaultDownloader with custom retry settings
+// NewDefaultDownloaderWithRetries creates a new DefaultDownloader with custom retry
 func NewDefaultDownloaderWithRetries(maxRetries int) *DefaultDownloader {
 	return &DefaultDownloader{
 		rnd:        rand.New(rand.NewSource(time.Now().UnixNano())),
 		maxRetries: maxRetries,
+		retryDelay: retryDelay,
+	}
+}
+
+// NewDefaultDownloaderForTesting creates a new DefaultDownloader with retry
+func NewDefaultDownloaderForTesting(maxRetries int, testRetryDelay time.Duration) *DefaultDownloader {
+	return &DefaultDownloader{
+		rnd:        rand.New(rand.NewSource(time.Now().UnixNano())),
+		maxRetries: maxRetries,
+		retryDelay: testRetryDelay,
 	}
 }
 
@@ -181,7 +192,7 @@ func (d *DefaultDownloader) downloadFile(
 				}
 			}
 
-			time.Sleep(retryDelay * time.Duration(1<<uint(attempt-1)))
+			time.Sleep(d.retryDelay * time.Duration(1<<uint(attempt-1)))
 			continue
 		}
 
@@ -190,7 +201,7 @@ func (d *DefaultDownloader) downloadFile(
 			u.CloseBody(logger, resp.Body)
 
 			// For 429, use exponential backoff with jitter
-			waitTime := retryDelay * time.Duration(1<<uint(attempt))
+			waitTime := d.retryDelay * time.Duration(1<<uint(attempt))
 			// Add jitter to avoid synchronized retries
 			jitter := time.Duration(d.rnd.Intn(1000)) * time.Millisecond
 			backoffTime := waitTime + jitter
