@@ -72,6 +72,11 @@ sort_config_sources() {
   done
 }
 
+print_types_names() {
+  echo "Printing types names..."
+  find data/config -name "sources_[i|d|l]*.json" -type f | xargs jq -r '.sources[] | select(.types != null) | .types[] | select(.name != null) | .name' | sort -u
+}
+
 case "$1" in
 fmt)
   fmt
@@ -85,8 +90,11 @@ clean-tools)
 sort-config-sources)
   sort_config_sources
   ;;
+print-source-types-names)
+  print_types_names
+  ;;
 *)
-  echo "Usage: $0 {fmt|install-tools|clean-tools|sort-config-sources}"
+  echo "Usage: $0 {fmt|install-tools|clean-tools|sort-config-sources|print-source-types-names}"
   exit 1
   ;;
 esac
