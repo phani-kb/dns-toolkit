@@ -1,20 +1,6 @@
 {
   "sources": [
     {
-      "name": "Local Blocklist (AdGuard)",
-      "types": [
-        {
-          "name": "adguard",
-          "list_types": [
-            {
-              "name": "blocklist"
-            }
-          ]
-        }
-      ],
-      "url": "file://data/custom/blocklist_adg.txt"
-    },
-    {
       "name": "Local Allowlist (AdGuard)",
       "types": [
         {
@@ -41,6 +27,20 @@
         }
       ],
       "url": "file://data/custom/allowlist_domain.txt"
+    },
+    {
+      "name": "Local Blocklist (AdGuard)",
+      "types": [
+        {
+          "name": "adguard",
+          "list_types": [
+            {
+              "name": "blocklist"
+            }
+          ]
+        }
+      ],
+      "url": "file://data/custom/blocklist_adg.txt"
     }
   ]
 }

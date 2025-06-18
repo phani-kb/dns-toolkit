@@ -1,0 +1,7 @@
+||logs.roku.com^
+||crashlytics.com^
+||ads.pinterest.com^
+||ads.tiktok.com^
+||ads.youtube.com^
+||ls.cti.roku.com^
+||prod.mobile.roku.com^
