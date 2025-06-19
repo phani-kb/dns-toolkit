@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"os"
 	"path/filepath"
 	"testing"
@@ -11,8 +12,10 @@ import (
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/config"
+	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/multilog"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func setupTestLogger() *multilog.Logger {
@@ -54,18 +57,15 @@ func TestDefaultDownloader_CopyLocalFile(t *testing.T) {
 	testDir := setupTestDir(t)
 	defer os.RemoveAll(testDir)
 
-	// Create a source file
 	sourceContent := "test content"
 	sourceFilename := "source.txt"
 	sourcePath := createTestFile(t, testDir, sourceFilename, sourceContent)
 	sourceURL := fmt.Sprintf("file://%s", sourcePath)
 
-	// Create the destination directory
 	destDir := filepath.Join(testDir, "dest")
 	err := os.MkdirAll(destDir, 0755)
 	assert.NoError(t, err)
 
-	// Test copy local file
 	d := newTestDownloader(1)
 	destPath, exists, err := d.copyLocalFile(logger, sourceURL, destDir, "destination.txt")
 
@@ -121,7 +121,6 @@ func TestDefaultDownloader_Download_RemoteFile(t *testing.T) {
 	testDir := setupTestDir(t)
 	defer os.RemoveAll(testDir)
 
-	// Setup test server
 	content := "test file content"
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "text/plain")
@@ -161,7 +160,6 @@ func TestDefaultDownloader_Download_HTTPError(t *testing.T) {
 	testDir := setupTestDir(t)
 	defer os.RemoveAll(testDir)
 
-	// Setup test server that returns 404
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 	}))
@@ -171,7 +169,7 @@ func TestDefaultDownloader_Download_HTTPError(t *testing.T) {
 	err := os.MkdirAll(destDir, 0755)
 	assert.NoError(t, err)
 
-	d := newTestDownloader(1) // Use fast test downloader
+	d := newTestDownloader(1)
 	file := c.DownloadFile{
 		URL:      server.URL,
 		Folder:   destDir,
@@ -188,7 +186,7 @@ func TestDefaultDownloader_Download_HTTPError(t *testing.T) {
 func TestDefaultDownloader_PostDownloadProcess(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
-	d := newTestDownloader(1) // Use fast test downloader
+	d := newTestDownloader(1)
 
 	// Default implementation returns nil
 	err := d.PostDownloadProcess(logger, "test_path", 10)
@@ -200,7 +198,6 @@ func TestDefaultDownloader_RetryLogic(t *testing.T) {
 	testDir := setupTestDir(t)
 	defer os.RemoveAll(testDir)
 
-	// Setup test server that fails first then succeeds
 	attemptCount := 0
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		attemptCount++
@@ -220,7 +217,6 @@ func TestDefaultDownloader_RetryLogic(t *testing.T) {
 	err := os.MkdirAll(destDir, 0755)
 	assert.NoError(t, err)
 
-	// Test download with retry
 	d := newTestDownloader(2)
 	file := c.DownloadFile{
 		URL:      server.URL,
@@ -261,7 +257,156 @@ func TestShouldDownload(t *testing.T) {
 		Filename: "test_file.txt",
 	}
 
-	// Test the ShouldDownload logic
 	shouldDownload := d.ShouldDownload(logger, summaryPath, file)
 	assert.True(t, shouldDownload, "File should download if force flag is set")
+}
+
+// TestAdditionalShouldDownload tests more scenarios for the ShouldDownload function
+func TestAdditionalShouldDownload(t *testing.T) {
+	t.Parallel()
+
+	logger := setupTestLogger()
+	testDir := setupTestDir(t)
+	defer os.RemoveAll(testDir)
+
+	_ = createTestFile(t, testDir, "existing.txt", "test content")
+
+	d := NewDefaultDownloaderWithRetries(1)
+
+	file := c.DownloadFile{
+		Folder:   testDir,
+		Filename: "existing.txt",
+	}
+	shouldDownload := d.ShouldDownload(logger, "summary.json", file)
+	assert.False(t, shouldDownload, "Should not download existing file")
+
+	file = c.DownloadFile{
+		Folder:   testDir,
+		Filename: "nonexisting.txt",
+	}
+	shouldDownload = d.ShouldDownload(logger, "summary.json", file)
+	assert.True(t, shouldDownload, "Should download non-existing file")
+}
+
+// TestCanSkipDownload tests the canSkipDownload function
+func TestCanSkipDownload(t *testing.T) {
+	t.Parallel()
+
+	logger := setupTestLogger()
+	testDir := setupTestDir(t)
+	defer os.RemoveAll(testDir)
+
+	summaryDir := filepath.Join(testDir, "summary")
+	err := os.MkdirAll(summaryDir, 0755)
+	require.NoError(t, err)
+
+	origSummaryDir := constants.SummaryDir
+	constants.SummaryDir = summaryDir
+	defer func() {
+		constants.SummaryDir = origSummaryDir
+	}()
+
+	constants.DefaultSummaryFiles = map[string]string{
+		"download": "download_summary.json",
+	}
+
+	testFile := createTestFile(t, testDir, "test.txt", "test content")
+	fileInfo, err := os.Stat(testFile)
+	require.NoError(t, err)
+	fileSize := fileInfo.Size()
+	modTime := fileInfo.ModTime()
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodHead {
+			w.Header().Set("Content-Length", "12") // Length of "test content"
+			w.Header().Set("Last-Modified", modTime.Format(http.TimeFormat))
+		}
+		w.WriteHeader(http.StatusOK)
+	}))
+	defer ts.Close()
+
+	d := NewDefaultDownloaderWithRetries(1)
+	file := c.DownloadFile{
+		URL:      ts.URL,
+		Folder:   testDir,
+		Filename: "test.txt",
+	}
+
+	_, err = url.Parse(file.URL)
+	require.NoError(t, err)
+
+	mockDir := filepath.Join(testDir, "mock")
+	err = os.MkdirAll(mockDir, 0755)
+	require.NoError(t, err)
+	
+	mockFilePath := filepath.Join(mockDir, "test.txt")
+	err = os.WriteFile(mockFilePath, []byte("test content"), 0644)
+	require.NoError(t, err)
+	
+	file.Folder = mockDir
+	canSkip := d.canSkipDownload(logger, &http.Client{}, "test-agent", file, fileSize, modTime)
+	assert.True(t, canSkip, "Should skip download for existing files")
+
+	badServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer badServer.Close()
+
+	file.URL = badServer.URL
+	canSkip = d.canSkipDownload(logger, &http.Client{}, "test-agent", file, fileSize, modTime)
+	assert.True(t, canSkip, "Should skip download since ShouldDownload returns false for existing files")
+}
+
+// TestHandleArchiveFile tests the archive file handling
+func TestHandleArchiveFile(t *testing.T) {
+	t.Parallel()
+
+	logger := setupTestLogger()
+	testDir := setupTestDir(t)
+	defer os.RemoveAll(testDir)
+
+	regularFile := c.DownloadFile{
+		Folder:    testDir,
+		Filename:  "regular.txt",
+		IsArchive: false,
+	}
+	filePath := createTestFile(t, testDir, "regular.txt", "test content")
+
+	d := NewDefaultDownloaderWithRetries(1)
+	err := d.handleArchiveFile(logger, regularFile, filePath)
+	assert.NoError(t, err, "Should handle non-archive files without error")
+
+	archiveFile := c.DownloadFile{
+		Folder:    testDir,
+		Filename:  "archive.zip",
+		IsArchive: true,
+		Targets:   []c.DownloadTarget{{SourceFile: "source.txt", TargetFolder: "target"}},
+	}
+	archivePath := createTestFile(t, testDir, "archive.zip", "fake archive")
+
+	err = d.handleArchiveFile(logger, archiveFile, archivePath)
+	assert.Error(t, err, "Should fail with fake archive file")
+}
+
+// TestCreateHTTPClient tests the HTTP client creation
+func TestCreateHTTPClient(t *testing.T) {
+	t.Parallel()
+
+	logger := setupTestLogger()
+	d := NewDefaultDownloaderWithRetries(1)
+
+	parsedURL, err := url.Parse("https://example.com")
+	require.NoError(t, err)
+
+	client := d.createHTTPClient(logger, false, nil, parsedURL)
+	assert.NotNil(t, client, "Should create a default HTTP client")
+
+	clientWithSkip := d.createHTTPClient(logger, true, nil, parsedURL)
+	assert.NotNil(t, clientWithSkip, "Should create a client with TLS verification skipped")
+
+	clientWithHosts := d.createHTTPClient(logger, false, []string{"example.com"}, parsedURL)
+	assert.NotNil(t, clientWithHosts, "Should create a client with skipCertHosts")
+
+	clientWithBoth := d.createHTTPClient(logger, true, []string{"example.com"}, parsedURL)
+	assert.NotNil(t, clientWithBoth, "Should create a client with both skip options")
 }
