@@ -208,9 +208,29 @@ func TestBasicLoadAppConfig(t *testing.T) {
 	validConfigPath := filepath.Join(testDir, "valid_config.yaml")
 
 	// Test loading valid config
-	_, _, err := LoadAppConfig(logger, validConfigPath)
+	appConfig, sourcesConfig, err := LoadAppConfig(logger, validConfigPath)
 	if err != nil {
 		t.Errorf("LoadAppConfig with valid file should not return error: %v", err)
+		return
+	}
+
+	// Validate the config was loaded correctly
+	if appConfig.Application.Name != "TestApp" {
+		t.Errorf("Expected application name to be 'TestApp', got '%s'", appConfig.Application.Name)
+	}
+
+	if len(sourcesConfig) == 0 {
+		t.Error("LoadAppConfig should return non-empty SourcesConfig slice")
+		return
+	}
+
+	if len(sourcesConfig[0].Sources) != 1 {
+		t.Errorf("Expected 1 source, got %d", len(sourcesConfig[0].Sources))
+		return
+	}
+
+	if sourcesConfig[0].Sources[0].Name != "test_source" {
+		t.Errorf("Expected source name to be 'test_source', got '%s'", sourcesConfig[0].Sources[0].Name)
 	}
 
 	// Test loading non-existent config
