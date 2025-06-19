@@ -45,8 +45,6 @@ func newTestDownloader(maxRetries int) *DefaultDownloader {
 	return NewDefaultDownloaderForTesting(maxRetries, 1*time.Millisecond)
 }
 
-// CORE FUNCTIONALITY TESTS
-
 func TestDefaultDownloaderName(t *testing.T) {
 	t.Parallel()
 	d := NewDefaultDownloaderWithRetries(1)
@@ -210,8 +208,6 @@ func TestDefaultDownloader_RetryLogic(t *testing.T) {
 	assert.Contains(t, string(downloadedContent), "success after retry")
 }
 
-// DOWNLOAD DECISION LOGIC TESTS
-
 func TestShouldDownload(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
@@ -332,7 +328,73 @@ func TestCanSkipDownload(t *testing.T) {
 	assert.True(t, canSkip, "Should skip download since ShouldDownload returns false for existing files")
 }
 
-// SPECIAL FILE HANDLING TESTS
+func TestCanSkipDownloadWithBadRequest(t *testing.T) {
+	t.Parallel()
+
+	logger := setupTestLogger()
+	testDir := setupTestDir(t)
+	defer os.RemoveAll(testDir)
+
+	// Setup server that always returns an error
+	badServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodHead {
+			w.WriteHeader(http.StatusInternalServerError)
+		} else {
+			w.WriteHeader(http.StatusOK)
+		}
+	}))
+	defer badServer.Close()
+
+	d := NewDefaultDownloaderWithRetries(1)
+
+	// Test with non-existent file - can never skip
+	nonExistentFile := c.DownloadFile{
+		URL:      badServer.URL,
+		Folder:   testDir,
+		Filename: "does_not_exist.txt",
+	}
+
+	canSkip := d.canSkipDownload(logger, &http.Client{}, "test-agent", nonExistentFile, 0, time.Time{})
+	assert.False(t, canSkip, "Should not skip download when file doesn't exist")
+}
+
+func TestCanSkipDownloadWithErrors(t *testing.T) {
+	t.Parallel()
+
+	logger := setupTestLogger()
+	testDir := setupTestDir(t)
+	defer os.RemoveAll(testDir)
+
+	errorServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusInternalServerError)
+	}))
+	defer errorServer.Close()
+
+	d := NewDefaultDownloaderWithRetries(1)
+	file := c.DownloadFile{
+		URL:      errorServer.URL,
+		Folder:   testDir,
+		Filename: "error_test.txt",
+	}
+
+	// Create test file to have something to compare against
+	testFile := createTestFile(t, testDir, "error_test.txt", "test content")
+	fileInfo, err := os.Stat(testFile)
+	require.NoError(t, err)
+
+	client := &http.Client{Timeout: 1 * time.Second}
+	canSkip := d.canSkipDownload(logger, client, "test-agent", file, fileInfo.Size(), fileInfo.ModTime())
+	assert.True(t, canSkip, "Should skip download when HEAD request fails but file exists")
+
+	// Test with non-existent file
+	nonExistentFile := c.DownloadFile{
+		URL:      errorServer.URL,
+		Folder:   testDir,
+		Filename: "non_existent.txt",
+	}
+	canSkip = d.canSkipDownload(logger, client, "test-agent", nonExistentFile, 0, time.Time{})
+	assert.False(t, canSkip, "Should not skip download when HEAD fails and file does not exist")
+}
 
 func TestHandleArchiveFile(t *testing.T) {
 	t.Parallel()
@@ -364,7 +426,38 @@ func TestHandleArchiveFile(t *testing.T) {
 	assert.Error(t, err, "Should fail with fake archive file")
 }
 
-// HTTP CLIENT CONFIGURATION TESTS
+func TestHandleArchiveFileComprehensive(t *testing.T) {
+	t.Parallel()
+
+	logger := setupTestLogger()
+	testDir := setupTestDir(t)
+	defer os.RemoveAll(testDir)
+
+	// Test with empty targets - but should still error on invalid archive format
+	archiveFileWithNoTargets := c.DownloadFile{
+		Folder:    testDir,
+		Filename:  "empty_targets.zip",
+		IsArchive: true,
+		Targets:   []c.DownloadTarget{},
+	}
+	archivePath := createTestFile(t, testDir, "empty_targets.zip", "fake archive")
+
+	d := NewDefaultDownloaderWithRetries(1)
+	err := d.handleArchiveFile(logger, archiveFileWithNoTargets, archivePath)
+	assert.Error(t, err, "Should error with invalid archive format")
+
+	// Test with archive flag false but targets existing
+	nonArchiveWithTargets := c.DownloadFile{
+		Folder:    testDir,
+		Filename:  "not_archive.txt",
+		IsArchive: false,
+		Targets:   []c.DownloadTarget{{SourceFile: "source.txt", TargetFolder: "target"}},
+	}
+	nonArchivePath := createTestFile(t, testDir, "not_archive.txt", "not an archive")
+
+	err = d.handleArchiveFile(logger, nonArchiveWithTargets, nonArchivePath)
+	assert.NoError(t, err, "Should handle non-archive file with targets without error")
+}
 
 func TestCreateHTTPClient(t *testing.T) {
 	t.Parallel()
@@ -419,8 +512,6 @@ func TestDefaultDownloader_Download_HTTPError(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, httpErr.StatusCode)
 }
 
-// EDGE CASE TESTS
-
 func TestDownloadEdgeCases_Merged(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
@@ -430,10 +521,18 @@ func TestDownloadEdgeCases_Merged(t *testing.T) {
 	downloadDir := filepath.Join(testDir, "download")
 	err := os.MkdirAll(downloadDir, 0755)
 	assert.NoError(t, err)
+	t.Run("MalformedURL", func(t *testing.T) {
+		t.Parallel()
+		d := NewDefaultDownloaderWithRetries(1)
 
-	// Skip the EmptyURL test as it's taking too long and causing issues
-	t.Run("EmptyURL", func(t *testing.T) {
-		t.Skip("Skipping EmptyURL test for faster test runs")
+		file := c.DownloadFile{
+			URL:      "http://a b.com", // URL with space is invalid
+			Folder:   downloadDir,
+			Filename: "malformed_url.txt",
+		}
+
+		_, _, err := d.Download(logger, file, false, nil, config.ApplicationConfig{})
+		assert.Error(t, err, "Download with malformed URL should fail")
 	})
 
 	t.Run("InvalidURL", func(t *testing.T) {
@@ -464,13 +563,11 @@ func TestDownloadEdgeCases_Merged(t *testing.T) {
 
 	t.Run("NonExistentDestinationFolder", func(t *testing.T) {
 		// Don't run this in parallel as it has issues with shared testDir
-		
 		// Create a local test dir for this test
 		localTestDir, err := os.MkdirTemp("", "nonexistent_folder_test")
 		assert.NoError(t, err)
 		defer os.RemoveAll(localTestDir)
-		
-		// Create a source file
+
 		sourceContent := "test content"
 		sourceFilename := "source.txt"
 		sourcePath := createTestFile(t, localTestDir, sourceFilename, sourceContent)
@@ -486,17 +583,32 @@ func TestDownloadEdgeCases_Merged(t *testing.T) {
 		_, _, err = d.Download(logger, file, false, nil, config.ApplicationConfig{})
 		assert.Error(t, err, "Download to non-existent folder should fail")
 	})
+	t.Run("HeadRequestError", func(t *testing.T) {
+		errorServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.Method == http.MethodGet {
+				w.WriteHeader(http.StatusInternalServerError)
+			}
+		}))
+		defer errorServer.Close()
 
-	// Skip the connection timeout test as it was causing issues and adding significant test time
-	t.Run("ConnectionTimeout", func(t *testing.T) {
-		// This test has been skipped as it was adding significant time to the test run
-		// and was causing issues when running in parallel
-		t.Skip("Skipping timeout test for faster test runs")
+		d := NewDefaultDownloaderWithRetries(1)
+		file := c.DownloadFile{
+			URL:      errorServer.URL,
+			Folder:   downloadDir,
+			Filename: "error_response.txt",
+		}
+
+		_, _, err := d.Download(logger, file, false, nil, config.ApplicationConfig{})
+		assert.Error(t, err, "Download should fail with HTTP error")
+
+		var httpErr *HTTPStatusError
+		if assert.ErrorAs(t, err, &httpErr) {
+			assert.Equal(t, http.StatusInternalServerError, httpErr.StatusCode, "Should return correct status code")
+		}
 	})
 
 	t.Run("Redirect", func(t *testing.T) {
 		t.Parallel()
-		// Setup servers for redirect test
 		finalServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if _, err := fmt.Fprintln(w, "final content"); err != nil {
 				fmt.Println("Error writing response:", err)
@@ -526,7 +638,6 @@ func TestDownloadEdgeCases_Merged(t *testing.T) {
 
 	t.Run("LargeFile", func(t *testing.T) {
 		t.Parallel()
-		// Create a server that returns a "large" file (reduced size for testing)
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Set("Content-Length", "102400") // 100KB instead of 1MB
 			w.Header().Set("Content-Type", "application/octet-stream")
@@ -559,8 +670,6 @@ func TestDownloadEdgeCases_Merged(t *testing.T) {
 	})
 }
 
-// CONCURRENCY AND RACE CONDITION TESTS
-
 func TestDownloaderConcurrency_Merged(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
@@ -571,7 +680,6 @@ func TestDownloaderConcurrency_Merged(t *testing.T) {
 	err := os.MkdirAll(downloadDir, 0755)
 	assert.NoError(t, err)
 
-	// Setup test server
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if _, err := fmt.Fprintf(w, "content for request %s", r.URL.Path); err != nil {
 			fmt.Println("Error writing response:", err)
@@ -579,7 +687,7 @@ func TestDownloaderConcurrency_Merged(t *testing.T) {
 	}))
 	defer server.Close()
 
-	// Run multiple downloads concurrently (reduced number for faster tests)
+	// Run multiple downloads concurrently
 	numDownloads := 3
 	results := make(chan error, numDownloads)
 
@@ -597,7 +705,6 @@ func TestDownloaderConcurrency_Merged(t *testing.T) {
 		}(i)
 	}
 
-	// Check all downloads succeeded
 	for i := 0; i < numDownloads; i++ {
 		err := <-results
 		assert.NoError(t, err, "Concurrent download should not fail")
