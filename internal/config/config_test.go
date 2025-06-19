@@ -1,6 +1,8 @@
 package config
 
 import (
+	"encoding/json"
+	"os"
 	"testing"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
@@ -134,40 +136,53 @@ func TestSourceValidate(t *testing.T) {
 		{
 			name: "Valid source",
 			source: Source{
-				Name: "test-source",
-				URL:  "http://example.com",
+				Name:  "test-source",
+				URL:   "http://example.com",
+				Types: []c.SourceType{{Name: "domain"}},
 			},
 			wantErr: false,
 		},
 		{
 			name: "Missing name",
 			source: Source{
-				URL: "http://example.com",
+				URL:   "http://example.com",
+				Types: []c.SourceType{{Name: "domain"}},
 			},
 			wantErr: true,
 		},
 		{
 			name: "Empty name",
 			source: Source{
-				Name: "",
-				URL:  "http://example.com",
+				Name:  "",
+				URL:   "http://example.com",
+				Types: []c.SourceType{{Name: "domain"}},
 			},
 			wantErr: true,
 		},
 		{
-			name: "Missing URL but valid (URL not validated)",
+			name: "Missing URL",
 			source: Source{
-				Name: "test-source",
+				Name:  "test-source",
+				Types: []c.SourceType{{Name: "domain"}},
 			},
-			wantErr: false,
+			wantErr: true,
 		},
 		{
-			name: "Empty URL but valid (URL not validated)",
+			name: "Empty URL",
+			source: Source{
+				Name:  "test-source",
+				URL:   "",
+				Types: []c.SourceType{{Name: "domain"}},
+			},
+			wantErr: true,
+		},
+		{
+			name: "Missing types",
 			source: Source{
 				Name: "test-source",
-				URL:  "",
+				URL:  "http://example.com",
 			},
-			wantErr: false,
+			wantErr: true,
 		},
 	}
 
@@ -203,8 +218,9 @@ func TestSourceValidateWithConfig(t *testing.T) {
 		{
 			name: "Valid source with app config",
 			source: Source{
-				Name: "test-source",
-				URL:  "http://example.com",
+				Name:  "test-source",
+				URL:   "http://example.com",
+				Types: []c.SourceType{{Name: "domain"}},
 			},
 			appConfig: appConfig,
 			wantErr:   false,
@@ -212,8 +228,9 @@ func TestSourceValidateWithConfig(t *testing.T) {
 		{
 			name: "Valid source with nil app config",
 			source: Source{
-				Name: "test-source",
-				URL:  "http://example.com",
+				Name:  "test-source",
+				URL:   "http://example.com",
+				Types: []c.SourceType{{Name: "domain"}},
 			},
 			appConfig: nil,
 			wantErr:   false,
@@ -221,8 +238,9 @@ func TestSourceValidateWithConfig(t *testing.T) {
 		{
 			name: "Invalid source with app config",
 			source: Source{
-				Name: "",
-				URL:  "http://example.com",
+				Name:  "",
+				URL:   "http://example.com",
+				Types: []c.SourceType{{Name: "domain"}},
 			},
 			appConfig: appConfig,
 			wantErr:   true,
@@ -370,4 +388,177 @@ func TestValidateAppConfig(t *testing.T) {
 	err = ValidateAppConfig(invalidConfig)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "application validation error")
+}
+
+func TestSourcesConfigIsEnabled(t *testing.T) {
+	t.Parallel()
+
+	config := SourcesConfig{
+		Sources: []Source{
+			{
+				Name:     "enabled-source",
+				URL:      "http://example.com",
+				Types:    []c.SourceType{{Name: "domain"}},
+				Disabled: false,
+			},
+			{
+				Name:     "disabled-source",
+				URL:      "http://example.com",
+				Types:    []c.SourceType{{Name: "domain"}},
+				Disabled: true,
+			},
+		},
+	}
+
+	assert.True(t, config.IsEnabled("enabled-source"))
+	assert.False(t, config.IsEnabled("disabled-source"))
+	assert.False(t, config.IsEnabled("non-existent"))
+}
+
+func TestSourcesConfigGetSourceByField(t *testing.T) {
+	t.Parallel()
+
+	config := SourcesConfig{
+		Sources: []Source{
+			{
+				Name:      "source1",
+				URL:       "http://example.com",
+				Frequency: "daily",
+				Types: []c.SourceType{
+					{
+						Name: "domain",
+						ListTypes: []c.ListType{
+							{Name: "blocklist"},
+						},
+					},
+				},
+				Categories: []string{"malware"},
+				Countries:  []string{"US"},
+			},
+			{
+				Name:      "source2",
+				URL:       "http://example.org",
+				Frequency: "weekly",
+				Types: []c.SourceType{
+					{
+						Name: "ip",
+					},
+				},
+				Categories: []string{"phishing"},
+				Countries:  []string{"CA"},
+			},
+		},
+	}
+
+	sources := config.GetSourceByField("listType", "blocklist")
+	assert.Len(t, sources, 1)
+	assert.Equal(t, "source1", sources[0].Name)
+
+	sources = config.GetSourceByField("type", "domain")
+	assert.Len(t, sources, 1)
+	assert.Equal(t, "source1", sources[0].Name)
+
+	sources = config.GetSourceByField("frequency", "daily")
+	assert.Len(t, sources, 1)
+	assert.Equal(t, "source1", sources[0].Name)
+
+	sources = config.GetSourceByField("category", "malware")
+	assert.Len(t, sources, 1)
+	assert.Equal(t, "source1", sources[0].Name)
+
+	sources = config.GetSourceByField("country", "US")
+	assert.Len(t, sources, 1)
+	assert.Equal(t, "source1", sources[0].Name)
+
+	// Test no matches
+	sources = config.GetSourceByField("type", "nonexistent")
+	assert.Len(t, sources, 0)
+}
+
+func TestLoadSourcesConfig(t *testing.T) {
+	t.Parallel()
+
+	logger := CreateTestLogger()
+
+	_, err := LoadSourcesConfig(logger, "/nonexistent/file.json")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "error opening sources file")
+
+	// Test with invalid JSON
+	tempFile, err := os.CreateTemp("", "invalid_*.json")
+	assert.NoError(t, err)
+	defer os.Remove(tempFile.Name())
+	defer tempFile.Close()
+
+	_, err = tempFile.WriteString("invalid json")
+	assert.NoError(t, err)
+	tempFile.Close()
+
+	_, err = LoadSourcesConfig(logger, tempFile.Name())
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "error unmarshalling JSON")
+
+	// Test with valid JSON
+	validJSON := `{
+		"sources": [
+			{
+				"name": "test-source",
+				"url": "http://example.com",
+				"types": [
+					{
+						"name": "domain"
+					}
+				]
+			}
+		]
+	}`
+
+	tempFile2, err := os.CreateTemp("", "valid_*.json")
+	assert.NoError(t, err)
+	defer os.Remove(tempFile2.Name())
+	defer tempFile2.Close()
+
+	_, err = tempFile2.WriteString(validJSON)
+	assert.NoError(t, err)
+	tempFile2.Close()
+
+	config, err := LoadSourcesConfig(logger, tempFile2.Name())
+	assert.NoError(t, err)
+	assert.Len(t, config.Sources, 1)
+	assert.Equal(t, "test-source", config.Sources[0].Name)
+}
+
+func TestSourceUnmarshalJSON(t *testing.T) {
+	t.Parallel()
+
+	jsonData := `{
+		"name": "test-source",
+		"url": "http://example.com",
+		"files": "file1.txt, file2.txt ,file3.txt"
+	}`
+
+	var source Source
+	err := json.Unmarshal([]byte(jsonData), &source)
+	assert.NoError(t, err)
+	assert.Equal(t, "test-source", source.Name)
+	assert.Equal(t, "http://example.com", source.URL)
+	assert.Len(t, source.Files, 3)
+	assert.Equal(t, "file2.txt", source.Files[1]) // Should be trimmed
+
+	// Test with missing files field
+	jsonData2 := `{
+		"name": "test-source",
+		"url": "http://example.com"
+	}`
+
+	var source2 Source
+	err = json.Unmarshal([]byte(jsonData2), &source2)
+	assert.NoError(t, err)
+	assert.Len(t, source2.Files, 0)
+
+	// Test invalid JSON
+	invalidJSON := `{invalid json`
+	var source3 Source
+	err = json.Unmarshal([]byte(invalidJSON), &source3)
+	assert.Error(t, err)
 }

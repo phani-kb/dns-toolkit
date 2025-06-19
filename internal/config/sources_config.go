@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
+	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/multilog"
 )
 
@@ -25,6 +26,17 @@ func (sc *SourcesConfig) ValidateWithConfig(appConfig *AppConfig) error {
 		return fmt.Errorf("at least one source is required")
 	}
 
+	sourceNameTracker := make(map[string]bool)
+	for _, source := range sc.Sources {
+		if sourceNameTracker[source.Name] {
+			return fmt.Errorf("duplicate source name: %s", source.Name)
+		}
+		err := source.ValidateWithConfig(appConfig)
+		if err != nil {
+			return fmt.Errorf("source validation error: %w", err)
+		}
+		sourceNameTracker[source.Name] = true
+	}
 	return nil
 }
 
@@ -51,6 +63,126 @@ func (s *Source) ValidateWithConfig(appConfig *AppConfig) error {
 		return fmt.Errorf("name is required")
 	}
 
+	if s.URL == "" {
+		return fmt.Errorf("url is required")
+	}
+
+	if len(s.Types) == 0 {
+		return fmt.Errorf("at least one type is required")
+	}
+	typesTracker := make(map[string]bool)
+	for _, t := range s.Types {
+		if typesTracker[t.Name] {
+			return fmt.Errorf("duplicate type: %s", t.Name)
+		}
+		err := t.Validate()
+		if err != nil {
+			return fmt.Errorf("type validation error: %w", err)
+		}
+		typesTracker[t.Name] = true
+	}
+
+	countryTracker := make(map[string]bool)
+	for _, country := range s.Countries {
+		if countryTracker[country] {
+			return fmt.Errorf("duplicate country: %s", country)
+		}
+		if len(country) != 2 {
+			return fmt.Errorf("invalid country code: %s", country)
+		}
+		countryTracker[country] = true
+	}
+
+	return nil
+}
+
+var defaultValues = map[string]string{
+	"Group":    constants.GroupBig,
+	"ListType": constants.ListTypeBlocklist,
+	"Category": constants.CategoryOthers,
+}
+
+// UnmarshalJSON custom unmarshalling to handle nested list_types within types
+func (s *Source) UnmarshalJSON(data []byte) error {
+	type Alias Source
+	aux := &struct {
+		Types []struct {
+			Name      string `json:"name"`
+			ListTypes []struct {
+				Name         string `json:"name"`
+				Groups       string `json:"groups"`
+				MustConsider bool   `json:"must_consider"`
+				Disabled     bool   `json:"disabled"`
+				Notes        string `json:"notes"`
+			} `json:"list_types,omitempty"`
+		} `json:"types"`
+		Categories string `json:"categories"`
+		Countries  string `json:"countries"`
+		Files      string `json:"files"`
+		*Alias
+	}{
+		Alias: (*Alias)(s),
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	// Handle Types and ListTypes
+	s.Types = make([]c.SourceType, len(aux.Types))
+	for i, t := range aux.Types {
+		listTypes := make([]c.ListType, len(t.ListTypes))
+		for j, lt := range t.ListTypes {
+			var groups []string
+			if lt.Groups != "" {
+				groups = strings.Split(lt.Groups, ",")
+			}
+			listType := c.ListType{
+				Name:         lt.Name,
+				Groups:       groups,
+				Disabled:     lt.Disabled,
+				MustConsider: lt.MustConsider,
+				Notes:        lt.Notes,
+			}
+
+			listTypes[j] = listType
+		}
+		s.Types[i] = c.SourceType{
+			Name:      t.Name,
+			ListTypes: listTypes,
+		}
+	}
+	s.TypeCount = len(s.Types)
+
+	// Handle Categories
+	if aux.Categories != "" {
+		s.Categories = strings.Split(aux.Categories, ",")
+		for i := range s.Categories {
+			s.Categories[i] = strings.TrimSpace(s.Categories[i])
+		}
+	} else {
+		s.Categories = []string{}
+	}
+
+	// Handle Countries
+	if aux.Countries != "" {
+		s.Countries = strings.Split(aux.Countries, ",")
+		for i := range s.Countries {
+			s.Countries[i] = strings.TrimSpace(s.Countries[i])
+		}
+	} else {
+		s.Countries = []string{}
+	}
+
+	// Handle Files
+	if aux.Files != "" {
+		s.Files = strings.Split(aux.Files, ",")
+		for i := range s.Files {
+			s.Files[i] = strings.TrimSpace(s.Files[i])
+		}
+	} else {
+		s.Files = []string{}
+	}
+
 	return nil
 }
 
@@ -60,6 +192,11 @@ func LoadSourcesConfig(logger *multilog.Logger, filePath string) (SourcesConfig,
 	if err != nil {
 		return SourcesConfig{}, fmt.Errorf("error opening sources file: %w", err)
 	}
+	defer func() {
+		if err := file.Close(); err != nil {
+			logger.Errorf("error closing file: %v", err)
+		}
+	}()
 
 	byteValue, err := io.ReadAll(file)
 	if err != nil {
@@ -69,6 +206,47 @@ func LoadSourcesConfig(logger *multilog.Logger, filePath string) (SourcesConfig,
 	var config SourcesConfig
 	if err := json.Unmarshal(byteValue, &config); err != nil {
 		return SourcesConfig{}, fmt.Errorf("error unmarshalling JSON: %w", err)
+	}
+
+	// Set default values for missing fields
+	for _, source := range config.Sources {
+		for j, t := range source.Types {
+			if len(t.ListTypes) == 0 {
+				listType := c.ListType{
+					Name:         defaultValues["ListType"],
+					Groups:       []string{defaultValues["Group"]},
+					MustConsider: false,
+				}
+				source.Types[j].ListTypes = append(t.ListTypes, listType)
+			} else {
+				for k, lt := range t.ListTypes {
+					if len(lt.Groups) == 0 {
+						source.Types[j].ListTypes[k].Groups = []string{defaultValues["Group"]}
+					} else {
+						// Convert group names to IDs and find the lowest (most restrictive) group ID
+						lowestGroupId := len(constants.SizeGroups)
+						for _, group := range lt.Groups {
+							group = strings.TrimSpace(group)
+							if groupId, ok := constants.GroupIdMap[group]; ok {
+								if groupId < lowestGroupId {
+									lowestGroupId = groupId
+								}
+							} else {
+								return SourcesConfig{}, fmt.Errorf("invalid group: %s", group)
+							}
+						}
+
+						// Include all groups with ID >= lowestGroupId (all less restrictive groups)
+						outputGroups := make([]string, 0, len(constants.SizeGroups)-lowestGroupId)
+						for i := lowestGroupId; i < len(constants.SizeGroups); i++ {
+							outputGroups = append(outputGroups, constants.SizeGroups[i])
+						}
+
+						source.Types[j].ListTypes[k].Groups = outputGroups
+					}
+				}
+			}
+		}
 	}
 
 	return config, nil
@@ -91,6 +269,59 @@ func (sc *SourcesConfig) GetEnabledSources(filters SourceFilters) []Source {
 		return strings.ToLower(enabledSources[i].Name) < strings.ToLower(enabledSources[j].Name)
 	})
 	return enabledSources
+}
+
+// IsEnabled returns true if the source is enabled.
+func (sc *SourcesConfig) IsEnabled(name string) bool {
+	source, found := sc.GetSourceByName(name)
+	if !found {
+		return false
+	}
+	return source.IsEnabled()
+}
+
+// GetSourceByField returns a slice of sources with the specified field and value.
+func (sc *SourcesConfig) GetSourceByField(field, value string) []Source {
+	var sources []Source
+	for _, source := range sc.Sources {
+		switch field {
+		case "listType":
+			for _, t := range source.Types {
+				for _, lt := range t.GetListTypes() {
+					if lt.Name == value {
+						sources = append(sources, source)
+						break
+					}
+				}
+			}
+		case "type":
+			for _, t := range source.Types {
+				if t.Name == value {
+					sources = append(sources, source)
+					break
+				}
+			}
+		case "frequency":
+			if source.Frequency == value {
+				sources = append(sources, source)
+			}
+		case "category":
+			for _, category := range source.Categories {
+				if category == value {
+					sources = append(sources, source)
+					break
+				}
+			}
+		case "country":
+			for _, country := range source.Countries {
+				if country == value {
+					sources = append(sources, source)
+					break
+				}
+			}
+		}
+	}
+	return sources
 }
 
 // GetSourceByName returns a source with the specified name.
