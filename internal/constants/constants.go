@@ -36,6 +36,9 @@ var (
 	SummaryDir                = "data"
 	OverlapDir                = "data/overlap"
 	TopDir                    = "data/top"
+	ArchiveDir                = "data/archive"
+	BackupDir                 = "data/backup"
+	OutputDir                 = "data/output"
 )
 
 // Folders - Map of folder names to their respective directories
@@ -55,6 +58,10 @@ var DefaultSummaryFiles = map[string]string{
 	"consolidated":            "consolidated_summary.json",
 	"consolidated_groups":     "consolidated_groups_summary.json",
 	"consolidated_categories": "consolidated_categories_summary.json",
+	"overlap_detailed":        "overlap_detailed_summary.json",
+	"overlap":                 "overlap_summary.json",
+	"top":                     "top_summary.json",
+	"archive":                 "archive_summary.json",
 }
 
 const (

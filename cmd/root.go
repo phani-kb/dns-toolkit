@@ -46,6 +46,12 @@ func validateAndSetDirs() {
 			dir = AppConfig.DNSToolkit.Folders.Top
 		case "consolidated_groups":
 			dir = AppConfig.DNSToolkit.Folders.ConsolidatedGroups
+		case "consolidated_categories":
+			dir = AppConfig.DNSToolkit.Folders.ConsolidatedCategories
+		case "archive":
+			dir = AppConfig.DNSToolkit.Folders.Archive
+		case "output":
+			dir = AppConfig.DNSToolkit.Folders.Output
 		}
 
 		if dir == "" {
@@ -67,6 +73,12 @@ func validateAndSetDirs() {
 			constants.TopDir = dir
 		case "consolidated_groups":
 			constants.ConsolidatedGroupsDir = dir
+		case "consolidated_categories":
+			constants.ConsolidatedCategoriesDir = dir
+		case "archive":
+			constants.ArchiveDir = dir
+		case "output":
+			constants.OutputDir = dir
 		}
 	}
 }
@@ -123,4 +135,6 @@ func init() {
 	rootCmd.AddCommand(validateSourcesCmd)
 	rootCmd.AddCommand(overlapCmd)
 	rootCmd.AddCommand(topEntriesCmd)
+	rootCmd.AddCommand(archiveCmd)
+	rootCmd.AddCommand(generateCmd)
 }

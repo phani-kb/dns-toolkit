@@ -272,6 +272,18 @@ func StringInSlice(str string, slice []string) bool {
 	return NewStringSet(slice).Contains(str)
 }
 
+// IsDomain checks if a string is a valid domain name.
+// It uses the domain regex pattern and also ensures the string is not an IP address.
+//
+// Parameters:
+//   - domain: The string to check
+//
+// Returns:
+//   - true if the string is a valid domain name, false otherwise
+func IsDomain(domain string) bool {
+	return constants.SourceTypeRegexMap[constants.SourceTypeDomain].MatchString(domain)
+}
+
 // PickRandomLines reads a file and returns a specified number of random lines from it.
 // If maxLines is 0, it returns all the lines from the file (excluding comments).
 //

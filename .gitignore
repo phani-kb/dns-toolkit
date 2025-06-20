@@ -33,10 +33,16 @@ logs/
 
 # coverage files
 coverage/
+
 # Data directories
 data/download/
 data/processed/
+data/output/
 data/consolidated/
 data/consolidated_groups/
+data/consolidated_categories/
 data/overlap/
 data/top/
+data/archive/
+data/backup/
+
