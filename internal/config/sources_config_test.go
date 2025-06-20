@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
+	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -691,4 +692,34 @@ func TestGetDownloadFileDetailedCases(t *testing.T) {
 		assert.Equal(t, "target-test-source.txt", target.TargetFile)
 		assert.Equal(t, downloadDir, target.TargetFolder)
 	})
+}
+
+func TestCfgGetUserAgentFunction(t *testing.T) {
+	t.Parallel()
+
+	logFile, err := os.CreateTemp("", "test-logger-*.log")
+	assert.NoError(t, err)
+	defer os.Remove(logFile.Name())
+	defer logFile.Close()
+
+	logger := CreateTestLogger()
+
+	appConfig := ApplicationConfig{
+		Name:        "test-app",
+		Version:     "1.2.3",
+		Description: "Test Description",
+	}
+
+	userAgent := GetUserAgent(logger, appConfig)
+
+	assert.Contains(t, userAgent, "test-app")
+	assert.Contains(t, userAgent, "1.2.3")
+	assert.Contains(t, userAgent, "Test Description")
+
+	emptyConfig := ApplicationConfig{}
+	defaultUserAgent := GetUserAgent(logger, emptyConfig)
+
+	assert.Contains(t, defaultUserAgent, constants.AppName)
+	assert.Contains(t, defaultUserAgent, constants.AppVersion)
+	assert.Contains(t, defaultUserAgent, constants.AppDescription)
 }
