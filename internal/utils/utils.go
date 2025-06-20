@@ -15,12 +15,12 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime"
 	"slices"
 	"strings"
 	"time"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
-	cfg "github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/multilog"
 )
@@ -410,12 +410,9 @@ func GetMapKeys[K comparable, V any](m map[K]V) []K {
 	return keys
 }
 
-// ArchiveExtensions contains the supported archive file extensions.
-var ArchiveExtensions = []string{".tar.gz", ".zip"}
-
 // IsArchive checks if a file is an archive based on its extension.
 func IsArchive(filePath string) bool {
-	for _, ext := range ArchiveExtensions {
+	for _, ext := range constants.ArchiveExtensions {
 		if strings.HasSuffix(filePath, ext) {
 			return true
 		}
@@ -424,7 +421,7 @@ func IsArchive(filePath string) bool {
 }
 
 func GetArchiveExtension(uri string) string {
-	for _, ext := range ArchiveExtensions {
+	for _, ext := range constants.ArchiveExtensions {
 		if strings.HasSuffix(uri, ext) {
 			return ext
 		}
@@ -441,7 +438,7 @@ func GetArchiveExtension(uri string) string {
 // Returns:
 //   - An error object if the extraction fails, nil on success
 func ExtractArchive(logger *multilog.Logger, archivePath, destFolder string) error {
-	for _, ext := range ArchiveExtensions {
+	for _, ext := range constants.ArchiveExtensions {
 		if strings.HasSuffix(archivePath, ext) {
 			switch ext {
 			case ".tar.gz":
@@ -712,20 +709,35 @@ func EnsureDirectoryExists(logger *multilog.Logger, dir string) error {
 	return nil
 }
 
-// GetUserAgent returns a user agent string.
-func GetUserAgent(logger *multilog.Logger, applicationConfig cfg.ApplicationConfig) string {
-	appName := applicationConfig.Name
+// GetUserAgent constructs a User-Agent string for HTTP requests based on application information.
+// If application name or version is not provided, defaults will be used.
+//
+// Parameters:
+//   - logger: Logger for recording operations and errors
+//   - appName: The name of the application
+//   - appVersion: The version of the application
+//   - appDescription: Optional description of the application
+//
+// Returns:
+//   - A formatted User-Agent string
+func GetUserAgent(logger *multilog.Logger, appName string, appVersion string, appDescription string) string {
 	if appName == "" {
 		appName = constants.AppName
 	}
-	appVersion := applicationConfig.Version
 	if appVersion == "" {
 		appVersion = constants.AppVersion
 	}
-	appDesc := applicationConfig.Description
-	if appDesc == "" {
-		appDesc = constants.AppDescription
+
+	osInfo := fmt.Sprintf("%s/%s", runtime.GOOS, runtime.GOARCH)
+
+	userAgent := fmt.Sprintf("%s/%s (%s)", appName, appVersion, osInfo)
+
+	if appDescription == "" {
+		appDescription = constants.AppDescription
 	}
-	userAgent := fmt.Sprintf("%s/%s (%s)", appName, appVersion, appDesc)
+
+	userAgent = fmt.Sprintf("%s; %s", userAgent, appDescription)
+
+	logger.Debugf("User agent: %s", userAgent)
 	return userAgent
 }

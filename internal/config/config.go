@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"runtime"
 
 	"github.com/phani-kb/multilog"
 	"gopkg.in/yaml.v2"
@@ -15,8 +16,13 @@ type NameFilter struct {
 }
 
 type SourceFilters struct {
-	Name NameFilter `yaml:"name,omitempty"`
-	Type string     `yaml:"type,omitempty"`
+	Name      NameFilter `yaml:"name,omitempty"`
+	Type      string     `yaml:"type,omitempty"`
+	Frequency string     `yaml:"frequency,omitempty"`
+	Category  NameFilter `yaml:"category,omitempty"`
+	Group     string     `yaml:"group,omitempty"`
+	ListType  string     `yaml:"list_type,omitempty"`
+	Countries NameFilter `yaml:"countries,omitempty"`
 }
 
 type FilesChecksumConfig struct {
@@ -31,8 +37,10 @@ type DNSToolkitConfig struct {
 	FilesChecksum             FilesChecksumConfig `yaml:"files_checksum"`
 	MaxWorkers                int                 `yaml:"max_workers"`
 	MaxRetries                int                 `yaml:"max_retries"`
+	SkipUnchangedDownloads    bool                `yaml:"skip_unchanged_downloads"`
 	SkipCertVerification      bool                `yaml:"skip_cert_verification,omitempty"`
 	SkipCertVerificationHosts []string            `yaml:"skip_cert_verification_hosts,omitempty"`
+	SkipNameSpecialCharsCheck bool                `yaml:"skip_name_special_chars_check,omitempty"`
 }
 
 func (dc *DNSToolkitConfig) Validate() error {
@@ -44,6 +52,10 @@ func (dc *DNSToolkitConfig) Validate() error {
 			return fmt.Errorf("source file %s not found: %w", sourceFile, err)
 		}
 
+	}
+
+	if dc.MaxWorkers > runtime.GOMAXPROCS(0) {
+		dc.MaxWorkers = runtime.GOMAXPROCS(0)
 	}
 
 	return nil
@@ -103,6 +115,7 @@ func LoadAppConfig(logger *multilog.Logger, configPath string) (AppConfig, []Sou
 	if err != nil {
 		return AppConfig{}, nil, fmt.Errorf("opening config file: %w", err)
 	}
+	defer file.Close()
 
 	var appConfig AppConfig
 	decoder := yaml.NewDecoder(file)
@@ -110,11 +123,20 @@ func LoadAppConfig(logger *multilog.Logger, configPath string) (AppConfig, []Sou
 		return AppConfig{}, nil, fmt.Errorf("decoding config file: %w", err)
 	}
 
+	if err := ValidateAppConfig(appConfig); err != nil {
+		return AppConfig{}, nil, err
+	}
+
 	var sourcesConfigs []SourcesConfig
 	for _, sourceFile := range appConfig.DNSToolkit.SourceFiles {
 		sourcesConfig, err := LoadSourcesConfig(logger, sourceFile)
 		if err != nil {
 			return AppConfig{}, nil, fmt.Errorf("loading sources config: %w", err)
+		}
+
+		// Validate the sources config with the AppConfig
+		if err := sourcesConfig.ValidateWithConfig(&appConfig); err != nil {
+			return AppConfig{}, nil, fmt.Errorf("validating sources config: %w", err)
 		}
 
 		sourcesConfigs = append(sourcesConfigs, sourcesConfig)
