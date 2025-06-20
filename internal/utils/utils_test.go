@@ -1,9 +1,15 @@
 package utils
 
 import (
+	"encoding/json"
+	"fmt"
 	"os"
+	"os/exec"
+	"path/filepath"
+	"runtime"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/phani-kb/multilog"
 	"github.com/stretchr/testify/assert"
@@ -11,6 +17,7 @@ import (
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	cfg "github.com/phani-kb/dns-toolkit/internal/config"
+	"github.com/phani-kb/dns-toolkit/internal/constants"
 )
 
 func createTestLogger() *multilog.Logger {
@@ -98,11 +105,9 @@ func TestRemoveDuplicates(t *testing.T) {
 	result := RemoveDuplicates(entries)
 	assert.Len(t, result, 3)
 
-	// Test with empty slice
 	empty := RemoveDuplicates([]string{})
 	assert.Len(t, empty, 0)
 
-	// Test with single item
 	single := RemoveDuplicates([]string{"apple"})
 	assert.Len(t, single, 1)
 	assert.Equal(t, "apple", single[0])
@@ -119,7 +124,6 @@ func TestSaveFile(t *testing.T) {
 	content := "test content"
 	reader := strings.NewReader(content)
 
-	// Test successful save
 	filePath, err := SaveFile(logger, tempDir, "test.txt", reader)
 	assert.NoError(t, err)
 	assert.Contains(t, filePath, "test.txt")
@@ -128,7 +132,6 @@ func TestSaveFile(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, content, string(savedContent))
 
-	// Test with non-existent directory (should create it)
 	newDir := tempDir + "/newdir"
 	reader2 := strings.NewReader("new content")
 	filePath2, err := SaveFile(logger, newDir, "test2.txt", reader2)
@@ -146,7 +149,6 @@ func TestCloseFile(t *testing.T) {
 
 	CloseFile(logger, tempFile)
 
-	// Test double close (should log error but not panic)
 	CloseFile(logger, tempFile)
 }
 
@@ -163,7 +165,6 @@ func TestCalculateChecksum(t *testing.T) {
 	require.NoError(t, err)
 	tempFile.Close()
 
-	// MD5 (default)
 	md5sum := CalculateChecksum(logger, tempFile.Name(), "")
 	assert.NotEmpty(t, md5sum)
 	assert.Len(t, md5sum, 32) // MD5 is 32 hex chars
@@ -181,6 +182,139 @@ func TestCalculateChecksum(t *testing.T) {
 
 	nonexistent := CalculateChecksum(logger, "/nonexistent/file", "md5")
 	assert.Empty(t, nonexistent)
+}
+
+func TestCalculateChecksumFromContent(t *testing.T) {
+	t.Parallel()
+
+	content := []byte("test content for checksum")
+
+	md5sum := CalculateChecksumFromContent(content, "")
+	assert.NotEmpty(t, md5sum)
+	assert.Len(t, md5sum, 32) // MD5 is 32 hex chars
+
+	md5sum2 := CalculateChecksumFromContent(content, "md5")
+	assert.Equal(t, md5sum, md5sum2)
+
+	sha256sum := CalculateChecksumFromContent(content, "sha256")
+	assert.NotEmpty(t, sha256sum)
+	assert.Len(t, sha256sum, 64) // SHA256 is 64 hex chars
+
+	unsupported := CalculateChecksumFromContent(content, "unsupported")
+	assert.Empty(t, unsupported)
+
+	empty := CalculateChecksumFromContent([]byte{}, "md5")
+	assert.NotEmpty(t, empty) // Even empty content produces a hash
+}
+
+func TestGetArchiveExtension(t *testing.T) {
+	t.Parallel()
+
+	assert.Equal(t, ".tar.gz", GetArchiveExtension("file.tar.gz"))
+	assert.Equal(t, ".zip", GetArchiveExtension("archive.zip"))
+	assert.Equal(t, ".tar.gz", GetArchiveExtension("/path/to/file.tar.gz"))
+	assert.Equal(t, "", GetArchiveExtension("file.txt"))
+	assert.Equal(t, "", GetArchiveExtension("file.tar"))
+	assert.Equal(t, "", GetArchiveExtension(""))
+}
+
+func TestExtractArchive(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger()
+
+	err := ExtractArchive(logger, "file.rar", "/tmp")
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "unsupported archive format")
+
+	err = ExtractArchive(logger, "nonexistent.tar.gz", "/tmp")
+	assert.Error(t, err)
+}
+
+func TestCloseBody(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger()
+
+	tempFile, err := os.CreateTemp("", "test_close_body")
+	require.NoError(t, err)
+	defer os.Remove(tempFile.Name())
+
+	CloseBody(logger, tempFile)
+	CloseBody(logger, tempFile)
+}
+
+func TestShouldDownloadSource(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger()
+
+	result := ShouldDownloadSource(logger, "/nonexistent/file", "test-source")
+	assert.True(t, result) // Should return true when file doesn't exist (no previous download)
+
+	tempFile, err := os.CreateTemp("", "test_summary")
+	require.NoError(t, err)
+	defer os.Remove(tempFile.Name())
+
+	writeSummary := func(lastDownloadTimestamp, frequency string) {
+		summaries := []c.DownloadSummary{
+			{
+				Name:                  "test-source",
+				LastDownloadTimestamp: lastDownloadTimestamp,
+				Frequency:             frequency,
+			},
+		}
+		data, err := json.Marshal(summaries)
+		require.NoError(t, err)
+		err = os.WriteFile(tempFile.Name(), data, 0644)
+		require.NoError(t, err)
+	}
+
+	writeSummary("", constants.FrequencyDaily)
+	result = ShouldDownloadSource(logger, tempFile.Name(), "test-source")
+	assert.True(t, result) // Should download when timestamp is empty
+
+	writeSummary("0001-01-01T00:00:00Z", constants.FrequencyDaily)
+	result = ShouldDownloadSource(logger, tempFile.Name(), "test-source")
+	assert.True(t, result) // Should download when timestamp is zero
+
+	writeSummary("invalid-timestamp", constants.FrequencyDaily)
+	result = ShouldDownloadSource(logger, tempFile.Name(), "test-source")
+	assert.False(t, result) // Should return false when timestamp is invalid
+
+	recentTime := time.Now().Add(-1 * time.Hour).Format(constants.TimestampFormat)
+	writeSummary(recentTime, constants.FrequencyDaily)
+	result = ShouldDownloadSource(logger, tempFile.Name(), "test-source")
+	assert.False(t, result) // Should not download when recent
+
+	oldTime := time.Now().Add(-25 * time.Hour).Format(constants.TimestampFormat)
+	writeSummary(oldTime, constants.FrequencyDaily)
+	result = ShouldDownloadSource(logger, tempFile.Name(), "test-source")
+	assert.True(t, result) // Should download when old enough
+
+	weekOldTime := time.Now().Add(-8 * 24 * time.Hour).Format(constants.TimestampFormat)
+	writeSummary(weekOldTime, constants.FrequencyWeekly)
+	result = ShouldDownloadSource(logger, tempFile.Name(), "test-source")
+	assert.True(t, result) // Should download when week has passed
+
+	monthOldTime := time.Now().Add(-31 * 24 * time.Hour).Format(constants.TimestampFormat)
+	writeSummary(monthOldTime, constants.FrequencyMonthly)
+	result = ShouldDownloadSource(logger, tempFile.Name(), "test-source")
+	assert.True(t, result) // Should download when month has passed
+
+	writeSummary(oldTime, "unknown")
+	result = ShouldDownloadSource(logger, tempFile.Name(), "test-source")
+	assert.True(t, result) // Should download with unknown frequency defaulting to daily
+}
+
+func TestLogMemStats(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger()
+
+	assert.NotPanics(t, func() {
+		LogMemStats(logger, "test-prefix")
+	})
 }
 
 func TestIsComment(t *testing.T) {
@@ -220,7 +354,6 @@ func TestStringInSlice(t *testing.T) {
 func TestPickRandomLines(t *testing.T) {
 	t.Parallel()
 
-	// Create a test file
 	tempFile, err := os.CreateTemp("", "test_random_lines")
 	require.NoError(t, err)
 	defer os.Remove(tempFile.Name())
@@ -249,7 +382,6 @@ func TestReadEntriesFromFile(t *testing.T) {
 
 	logger := createTestLogger()
 
-	// Create a test file with duplicates and comments
 	tempFile, err := os.CreateTemp("", "test_read_entries")
 	require.NoError(t, err)
 	defer os.Remove(tempFile.Name())
@@ -275,7 +407,6 @@ func TestReadEntriesFromFileWithPool(t *testing.T) {
 
 	logger := createTestLogger()
 
-	// Create a test file
 	tempFile, err := os.CreateTemp("", "test_read_entries_pool")
 	require.NoError(t, err)
 	defer os.Remove(tempFile.Name())
@@ -314,7 +445,6 @@ func TestGetMapKeys(t *testing.T) {
 	assert.Contains(t, keys, "banana")
 	assert.Contains(t, keys, "cherry")
 
-	// Test with empty map
 	emptyMap := map[string]int{}
 	emptyKeys := GetMapKeys(emptyMap)
 	assert.Len(t, emptyKeys, 0)
@@ -371,16 +501,248 @@ func TestCopySourceToTarget(t *testing.T) {
 	assert.Contains(t, err.Error(), "source file not found")
 }
 
+func TestCopySourceToTargetComprehensive(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger()
+	tmpDir := t.TempDir()
+
+	sourceFolder := filepath.Join(tmpDir, "source")
+	err := os.MkdirAll(sourceFolder, 0755)
+	require.NoError(t, err)
+
+	sourceFile := "source.txt"
+	sourceContent := "test source content"
+	sourceFilePath := filepath.Join(sourceFolder, sourceFile)
+	err = os.WriteFile(sourceFilePath, []byte(sourceContent), 0644)
+	require.NoError(t, err)
+
+	target := c.DownloadTarget{
+		SourceFolder: sourceFolder,
+		SourceFile:   "nonexistent.txt",
+		TargetFolder: filepath.Join(tmpDir, "target"),
+		TargetFile:   "target.txt",
+	}
+
+	err = CopySourceToTarget(logger, target)
+	assert.Error(t, err)
+
+	targetFolder := filepath.Join(tmpDir, "target", "nested")
+	target = c.DownloadTarget{
+		SourceFolder: sourceFolder,
+		SourceFile:   sourceFile,
+		TargetFolder: targetFolder,
+		TargetFile:   "target.txt",
+	}
+
+	err = CopySourceToTarget(logger, target)
+	assert.NoError(t, err)
+
+	targetContent, err := os.ReadFile(filepath.Join(targetFolder, "target.txt"))
+	assert.NoError(t, err)
+	assert.Equal(t, sourceContent, string(targetContent))
+}
+
+func TestSaveFileErrorCases(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger()
+	tmpDir := t.TempDir()
+
+	if runtime.GOOS != "windows" {
+		reader := strings.NewReader("test content")
+		_, err := SaveFile(logger, "/proc/invalid/path", "test.txt", reader)
+		assert.Error(t, err)
+	}
+
+	reader := strings.NewReader("test content")
+	_, err := SaveFile(logger, tmpDir, "", reader)
+	assert.Error(t, err)
+
+	dirPath := filepath.Join(tmpDir, "directory")
+	err = os.Mkdir(dirPath, 0755)
+	require.NoError(t, err)
+
+	reader = strings.NewReader("test content")
+	_, err = SaveFile(logger, tmpDir, "directory", reader)
+	assert.Error(t, err)
+}
+
+func TestCalculateChecksumFromContentAllAlgorithms(t *testing.T) {
+	t.Parallel()
+
+	testContent := []byte("test content for all algorithms")
+
+	md5Result := CalculateChecksumFromContent(testContent, "md5")
+	sha256Result := CalculateChecksumFromContent(testContent, "sha256")
+	defaultResult := CalculateChecksumFromContent(testContent, "")
+	unsupportedResult := CalculateChecksumFromContent(testContent, "unsupported")
+
+	assert.NotEmpty(t, md5Result)
+	assert.NotEmpty(t, sha256Result)
+	assert.NotEmpty(t, defaultResult)
+	assert.Empty(t, unsupportedResult) // Should be empty for unsupported algorithm
+
+	assert.Equal(t, md5Result, defaultResult)   // Default should be MD5
+	assert.NotEqual(t, md5Result, sha256Result) // Different algorithms should give different results
+
+	emptyMD5 := CalculateChecksumFromContent([]byte{}, "md5")
+	assert.NotEmpty(t, emptyMD5) // Even empty content has a hash
+	assert.Len(t, emptyMD5, 32)  // MD5 is always 32 hex characters
+}
+
+func TestAllRemainingEdgeCases(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger()
+	assert.NotPanics(t, func() {
+		LogMemStats(logger, "")
+		LogMemStats(logger, "test")
+		LogMemStats(logger, "very-long-prefix-string-that-might-cause-issues")
+	})
+
+	assert.True(t, len(ArchiveExtensions) > 0)
+	for _, ext := range ArchiveExtensions {
+		assert.True(t, strings.HasPrefix(ext, "."))
+	}
+
+	commentTestCases := []string{
+		"\r\n",     // Windows line ending
+		"\r",       // Mac classic line ending
+		"   \t   ", // Mixed whitespace
+		"#",        // Just hash
+		"//",       // Just double slash
+		"!",        // Just exclamation
+		"# \t \n",  // Comment with trailing whitespace
+	}
+
+	for _, testCase := range commentTestCases {
+		result := IsComment(testCase)
+		assert.True(t, result, "Should be considered comment: %q", testCase)
+	}
+
+	nonCommentCases := []string{
+		"a",                    // Single character
+		"example.com#comment",  // Domain with hash
+		"192.168.1.1//comment", // IP with double slash
+	}
+
+	for _, testCase := range nonCommentCases {
+		result := IsComment(testCase)
+		assert.False(t, result, "Should not be considered comment: %q", testCase)
+	}
+}
+
+func TestEntryPoolInternBoundaryConditions(t *testing.T) {
+	t.Parallel()
+
+	pool := NewDTEntryPool()
+
+	minLengthString := "123456" // Exactly 6 characters
+	interned := pool.Intern(minLengthString)
+	assert.Equal(t, minLengthString, interned)
+	assert.Equal(t, 1, pool.Size()) // Should be added to pool
+
+	maxLengthString := strings.Repeat("a", 255) // Exactly 255 characters
+	interned = pool.Intern(maxLengthString)
+	assert.Equal(t, maxLengthString, interned)
+	assert.Equal(t, 2, pool.Size()) // Should be added to pool
+
+	belowMinString := "12345" // 5 characters
+	interned = pool.Intern(belowMinString)
+	assert.Equal(t, belowMinString, interned)
+	assert.Equal(t, 2, pool.Size()) // Should not be added to pool
+
+	aboveMaxString := strings.Repeat("a", 256) // 256 characters
+	interned = pool.Intern(aboveMaxString)
+	assert.Equal(t, aboveMaxString, interned)
+	assert.Equal(t, 2, pool.Size()) // Should not be added to pool
+}
+
+func TestSummaryUtilsErrorHandling(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger()
+
+	tempFile, err := os.CreateTemp("", "test_summary_permission")
+	require.NoError(t, err)
+	defer os.Remove(tempFile.Name())
+
+	validJSON := `[{"name": "test", "lastDownloadTimestamp": "20230101_120000"}]`
+	err = os.WriteFile(tempFile.Name(), []byte(validJSON), 0644)
+	require.NoError(t, err)
+
+	summary, err := GetLastSummary[c.DownloadSummary](logger, tempFile.Name(), "test")
+	assert.NoError(t, err)
+	assert.Equal(t, "test", summary.Name)
+
+	summary, err = GetLastSummary[c.DownloadSummary](logger, tempFile.Name(), "nonexistent")
+	assert.NoError(t, err)
+	assert.Equal(t, "", summary.Name) // Should be zero value
+}
+
+func TestCapPreallocEntriesExactBoundaries(t *testing.T) {
+	t.Parallel()
+
+	small1 := CapPreallocEntries(1)
+	small2 := CapPreallocEntries(10)
+	small3 := CapPreallocEntries(100)
+
+	assert.Greater(t, small1, 0)
+	assert.Greater(t, small2, 0)
+	assert.Greater(t, small3, 0)
+
+	// Very large values should be capped to maximum
+	large1 := CapPreallocEntries(1000000000)
+	large2 := CapPreallocEntries(2000000000)
+
+	assert.Greater(t, large1, 0)
+	assert.Greater(t, large2, 0)
+	assert.Equal(t, large1, large2) // Should both be capped to same maximum
+}
+
+func TestExtractArchiveErrorCases(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger()
+
+	err := ExtractArchive(logger, "/non/existent/file.zip", t.TempDir())
+	assert.Error(t, err)
+
+	tmpDir := t.TempDir()
+	invalidPath := filepath.Join(tmpDir, "invalid.xyz")
+	err = os.WriteFile(invalidPath, []byte("not an archive"), 0644)
+	require.NoError(t, err)
+
+	err = ExtractArchive(logger, invalidPath, t.TempDir())
+	assert.Error(t, err)
+
+	invalidZip := filepath.Join(tmpDir, "invalid.zip")
+	err = os.WriteFile(invalidZip, []byte("not a zip file"), 0644)
+	require.NoError(t, err)
+
+	err = ExtractArchive(logger, invalidZip, t.TempDir())
+	assert.Error(t, err)
+
+	invalidTarGz := filepath.Join(tmpDir, "invalid.tar.gz")
+	err = os.WriteFile(invalidTarGz, []byte("not a tar.gz file"), 0644)
+	require.NoError(t, err)
+
+	err = ExtractArchive(logger, invalidTarGz, t.TempDir())
+	assert.Error(t, err)
+}
+
 func TestIsAlphanumericWithUnderscoresAndDashes(t *testing.T) {
 	t.Parallel()
 
-	assert.True(t, IsAlphanumericWithUnderscoresAndDashes("test123"))
-	assert.True(t, IsAlphanumericWithUnderscoresAndDashes("test_123"))
-	assert.True(t, IsAlphanumericWithUnderscoresAndDashes("test-123"))
-	assert.True(t, IsAlphanumericWithUnderscoresAndDashes("ABC_def-123"))
-	assert.False(t, IsAlphanumericWithUnderscoresAndDashes("test.123"))
-	assert.False(t, IsAlphanumericWithUnderscoresAndDashes("test 123"))
-	assert.False(t, IsAlphanumericWithUnderscoresAndDashes("test@123"))
+	assert.True(t, IsAlphanumericWithUnderscoresAndDashes("valid"))
+	assert.True(t, IsAlphanumericWithUnderscoresAndDashes("valid-name"))
+	assert.True(t, IsAlphanumericWithUnderscoresAndDashes("valid_name"))
+	assert.True(t, IsAlphanumericWithUnderscoresAndDashes("valid-name_123"))
+
+	assert.False(t, IsAlphanumericWithUnderscoresAndDashes("invalid!"))
+	assert.False(t, IsAlphanumericWithUnderscoresAndDashes("invalid space"))
+	assert.False(t, IsAlphanumericWithUnderscoresAndDashes("invalid.dot"))
 	assert.False(t, IsAlphanumericWithUnderscoresAndDashes(""))
 }
 
@@ -389,66 +751,161 @@ func TestGetFileLastModifiedTime(t *testing.T) {
 
 	logger := createTestLogger()
 
-	// Create a test file
-	tempFile, err := os.CreateTemp("", "test_mod_time")
+	tmpDir := t.TempDir()
+	filePath := filepath.Join(tmpDir, "test-modified-time.txt")
+	err := os.WriteFile(filePath, []byte("test content"), 0644)
 	require.NoError(t, err)
-	defer os.Remove(tempFile.Name())
-	tempFile.Close()
 
-	// Test getting modification time
-	modTime, err := GetFileLastModifiedTime(logger, tempFile.Name())
+	modTime, err := GetFileLastModifiedTime(logger, filePath)
 	assert.NoError(t, err)
 	assert.NotEmpty(t, modTime)
 
-	_, err = GetFileLastModifiedTime(logger, "/nonexistent/file")
+	nonExistentTime, err := GetFileLastModifiedTime(logger, filepath.Join(tmpDir, "non-existent.txt"))
 	assert.Error(t, err)
-}
-
-func TestCapPreallocEntries(t *testing.T) {
-	t.Parallel()
-
-	assert.Equal(t, 50000, CapPreallocEntries(50000))
-	assert.Equal(t, 10000, CapPreallocEntries(1))
-	assert.Equal(t, 10000000, CapPreallocEntries(999999999))
+	assert.Empty(t, nonExistentTime)
 }
 
 func TestEnsureDirectoryExists(t *testing.T) {
 	t.Parallel()
 
 	logger := createTestLogger()
+	tmpDir := t.TempDir()
 
-	tempDir, err := os.MkdirTemp("", "test_ensure_dir")
+	newDirPath := filepath.Join(tmpDir, "new-dir")
+	err := EnsureDirectoryExists(logger, newDirPath)
+	assert.NoError(t, err)
+
+	dirInfo, err := os.Stat(newDirPath)
 	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	assert.True(t, dirInfo.IsDir())
 
-	newDir := tempDir + "/new/nested/dir"
-	err = EnsureDirectoryExists(logger, newDir)
+	err = EnsureDirectoryExists(logger, newDirPath) // Should be a no-op
 	assert.NoError(t, err)
 
-	_, err = os.Stat(newDir)
-	assert.NoError(t, err)
-
-	err = EnsureDirectoryExists(logger, newDir)
-	assert.NoError(t, err)
+	if runtime.GOOS != "windows" {
+		err = EnsureDirectoryExists(logger, "/proc/invalid/path")
+		assert.Error(t, err)
+	}
 }
 
 func TestGetUserAgent(t *testing.T) {
 	t.Parallel()
 
 	logger := createTestLogger()
-
-	// Complete config
 	appConfig := cfg.ApplicationConfig{
-		Name:        "TestApp",
-		Version:     "1.0.0",
-		Description: "Test Description",
+		Name:        "dns-toolkit-test",
+		Version:     "v1.0.0",
+		Description: "Test Application",
 	}
-	userAgent := GetUserAgent(logger, appConfig)
-	assert.Contains(t, userAgent, "TestApp/1.0.0")
-	assert.Contains(t, userAgent, "Test Description")
 
-	// Empty config (should use defaults)
+	userAgent := GetUserAgent(logger, appConfig)
+	assert.Contains(t, userAgent, "dns-toolkit-test")
+	assert.Contains(t, userAgent, "v1.0.0")
+
 	emptyConfig := cfg.ApplicationConfig{}
-	userAgent2 := GetUserAgent(logger, emptyConfig)
-	assert.NotEmpty(t, userAgent2)
+	defaultUserAgent := GetUserAgent(logger, emptyConfig)
+	assert.Contains(t, defaultUserAgent, "dns-toolkit")
+}
+
+func TestCapPreallocEntriesEdgeCases(t *testing.T) {
+	t.Parallel()
+
+	result := CapPreallocEntries(0)
+	assert.Equal(t, constants.MinPreallocEntries, result)
+
+	result = CapPreallocEntries(-1)
+	assert.Equal(t, constants.MinPreallocEntries, result)
+
+	result = CapPreallocEntries(1000000000)
+	assert.Equal(t, constants.MaxPreallocEntries, result)
+
+	normalValue := constants.MinPreallocEntries + 5000
+	result = CapPreallocEntries(normalValue)
+	assert.Equal(t, normalValue, result)
+}
+
+func TestExtractArchiveTarGz(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger()
+
+	tmpDir := t.TempDir()
+
+	tarGzPath := filepath.Join(tmpDir, "test.tar.gz")
+
+	testContent := "test content for extraction"
+	testDir := filepath.Join(tmpDir, "source")
+	err := os.MkdirAll(testDir, 0755)
+	require.NoError(t, err)
+
+	testFilePath := filepath.Join(testDir, "testfile.txt")
+	err = os.WriteFile(testFilePath, []byte(testContent), 0644)
+	require.NoError(t, err)
+
+	nestedDir := filepath.Join(testDir, "nested")
+	err = os.MkdirAll(nestedDir, 0755)
+	require.NoError(t, err)
+
+	nestedFilePath := filepath.Join(nestedDir, "nestedfile.txt")
+	err = os.WriteFile(nestedFilePath, []byte("nested content"), 0644)
+	require.NoError(t, err)
+
+	cmd := fmt.Sprintf("cd %s && tar -czf %s source/", tmpDir, tarGzPath)
+	_, err = exec.Command("bash", "-c", cmd).Output()
+	require.NoError(t, err)
+
+	outputDir := filepath.Join(tmpDir, "output")
+	err = ExtractArchive(logger, tarGzPath, outputDir)
+	assert.NoError(t, err)
+
+	extractedContent, err := os.ReadFile(filepath.Join(outputDir, "source", "testfile.txt"))
+	assert.NoError(t, err)
+	assert.Equal(t, testContent, string(extractedContent))
+
+	nestedExtractedContent, err := os.ReadFile(filepath.Join(outputDir, "source", "nested", "nestedfile.txt"))
+	assert.NoError(t, err)
+	assert.Equal(t, "nested content", string(nestedExtractedContent))
+}
+
+func TestExtractArchiveZip(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger()
+
+	tmpDir := t.TempDir()
+
+	zipPath := filepath.Join(tmpDir, "test.zip")
+
+	testContent := "test content for extraction"
+	testDir := filepath.Join(tmpDir, "source")
+	err := os.MkdirAll(testDir, 0755)
+	require.NoError(t, err)
+
+	testFilePath := filepath.Join(testDir, "testfile.txt")
+	err = os.WriteFile(testFilePath, []byte(testContent), 0644)
+	require.NoError(t, err)
+
+	nestedDir := filepath.Join(testDir, "nested")
+	err = os.MkdirAll(nestedDir, 0755)
+	require.NoError(t, err)
+
+	nestedFilePath := filepath.Join(nestedDir, "nestedfile.txt")
+	err = os.WriteFile(nestedFilePath, []byte("nested content"), 0644)
+	require.NoError(t, err)
+
+	cmd := fmt.Sprintf("cd %s && zip -r %s source/", tmpDir, zipPath)
+	_, err = exec.Command("bash", "-c", cmd).Output()
+	require.NoError(t, err)
+
+	outputDir := filepath.Join(tmpDir, "output")
+	err = ExtractArchive(logger, zipPath, outputDir)
+	assert.NoError(t, err)
+
+	extractedContent, err := os.ReadFile(filepath.Join(outputDir, "source", "testfile.txt"))
+	assert.NoError(t, err)
+	assert.Equal(t, testContent, string(extractedContent))
+
+	nestedExtractedContent, err := os.ReadFile(filepath.Join(outputDir, "source", "nested", "nestedfile.txt"))
+	assert.NoError(t, err)
+	assert.Equal(t, "nested content", string(nestedExtractedContent))
 }
