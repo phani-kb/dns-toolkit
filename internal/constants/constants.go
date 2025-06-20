@@ -156,6 +156,19 @@ var SourceTypeRegexMap = map[string]*regexp.Regexp{
 		`^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$`,
 	),
 }
+var (
+	GenericSourceTypes = []string{
+		SourceTypeIpv4,
+		SourceTypeIpv6,
+		SourceTypeCidrIpv4,
+		SourceTypeDomain,
+		SourceTypeAdguard,
+	}
+
+	GenericSourceTypeAliases = map[string]string{
+		SourceTypeHostname: SourceTypeDomain,
+	}
+)
 
 var (
 	ValidFrequencies = map[string]bool{

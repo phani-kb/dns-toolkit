@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"strings"
 
+	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/multilog"
 	"gopkg.in/yaml.v2"
 )
@@ -146,4 +148,28 @@ func LoadAppConfig(logger *multilog.Logger, configPath string) (AppConfig, []Sou
 	}
 
 	return appConfig, sourcesConfigs, nil
+}
+
+func GetGenericSourceType(sourceType string) string {
+	if alias, exists := constants.GenericSourceTypeAliases[sourceType]; exists {
+		return alias
+	}
+
+	for _, genericType := range constants.GenericSourceTypes {
+		if strings.HasPrefix(sourceType, genericType) {
+			return genericType
+		}
+	}
+	return sourceType
+}
+
+func IsEnabledSource(sourceName string, sourceConfigs []SourcesConfig, appConfig AppConfig) bool {
+	for _, sourcesConfig := range sourceConfigs {
+		for _, source := range sourcesConfig.GetEnabledSources(appConfig.DNSToolkit.SourceFilters) {
+			if source.Name == sourceName {
+				return true
+			}
+		}
+	}
+	return false
 }
