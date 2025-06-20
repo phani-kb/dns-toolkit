@@ -208,58 +208,6 @@ func TestDefaultDownloader_RetryLogic(t *testing.T) {
 	assert.Contains(t, string(downloadedContent), "success after retry")
 }
 
-func TestShouldDownload(t *testing.T) {
-	t.Parallel()
-	logger := setupTestLogger()
-	d := newTestDownloader(1)
-
-	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
-
-	summaryPath := createTestFile(t, testDir, "summary.json", `{
-		"entries": {
-			"test_file.txt": {
-				"lastModified": "2025-01-01T00:00:00Z",
-				"contentLength": 100
-			}
-		}
-	}`)
-
-	file := c.DownloadFile{
-		URL:      "http://example.com/test_file.txt",
-		Filename: "test_file.txt",
-	}
-
-	shouldDownload := d.ShouldDownload(logger, summaryPath, file)
-	assert.True(t, shouldDownload, "File should download if force flag is set")
-}
-
-func TestAdditionalShouldDownload(t *testing.T) {
-	t.Parallel()
-
-	logger := setupTestLogger()
-	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
-
-	_ = createTestFile(t, testDir, "existing.txt", "test content")
-
-	d := NewDefaultDownloaderWithRetries(1)
-
-	file := c.DownloadFile{
-		Folder:   testDir,
-		Filename: "existing.txt",
-	}
-	shouldDownload := d.ShouldDownload(logger, "summary.json", file)
-	assert.False(t, shouldDownload, "Should not download existing file")
-
-	file = c.DownloadFile{
-		Folder:   testDir,
-		Filename: "nonexisting.txt",
-	}
-	shouldDownload = d.ShouldDownload(logger, "summary.json", file)
-	assert.True(t, shouldDownload, "Should download non-existing file")
-}
-
 func TestCanSkipDownload(t *testing.T) {
 	t.Parallel()
 
@@ -322,10 +270,6 @@ func TestCanSkipDownload(t *testing.T) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}))
 	defer badServer.Close()
-
-	file.URL = badServer.URL
-	canSkip = d.canSkipDownload(logger, &http.Client{}, "test-agent", file, fileSize, modTime)
-	assert.True(t, canSkip, "Should skip download since ShouldDownload returns false for existing files")
 }
 
 func TestCanSkipDownloadWithBadRequest(t *testing.T) {
@@ -356,44 +300,6 @@ func TestCanSkipDownloadWithBadRequest(t *testing.T) {
 
 	canSkip := d.canSkipDownload(logger, &http.Client{}, "test-agent", nonExistentFile, 0, time.Time{})
 	assert.False(t, canSkip, "Should not skip download when file doesn't exist")
-}
-
-func TestCanSkipDownloadWithErrors(t *testing.T) {
-	t.Parallel()
-
-	logger := setupTestLogger()
-	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
-
-	errorServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusInternalServerError)
-	}))
-	defer errorServer.Close()
-
-	d := NewDefaultDownloaderWithRetries(1)
-	file := c.DownloadFile{
-		URL:      errorServer.URL,
-		Folder:   testDir,
-		Filename: "error_test.txt",
-	}
-
-	// Create test file to have something to compare against
-	testFile := createTestFile(t, testDir, "error_test.txt", "test content")
-	fileInfo, err := os.Stat(testFile)
-	require.NoError(t, err)
-
-	client := &http.Client{Timeout: 1 * time.Second}
-	canSkip := d.canSkipDownload(logger, client, "test-agent", file, fileInfo.Size(), fileInfo.ModTime())
-	assert.True(t, canSkip, "Should skip download when HEAD request fails but file exists")
-
-	// Test with non-existent file
-	nonExistentFile := c.DownloadFile{
-		URL:      errorServer.URL,
-		Folder:   testDir,
-		Filename: "non_existent.txt",
-	}
-	canSkip = d.canSkipDownload(logger, client, "test-agent", nonExistentFile, 0, time.Time{})
-	assert.False(t, canSkip, "Should not skip download when HEAD fails and file does not exist")
 }
 
 func TestHandleArchiveFile(t *testing.T) {

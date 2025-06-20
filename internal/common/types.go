@@ -84,6 +84,11 @@ type DownloadSummary struct {
 	LastCheckedTimestamp  string       `json:"last_checked_timestamp"`      // Timestamp when last checked for updates
 }
 
+func (ds *DownloadSummary) ToJSON() string {
+	data, _ := json.Marshal(ds)
+	return string(data)
+}
+
 // GetSourceTypes returns a list of source types that are not disabled.
 func (ds *DownloadSummary) GetSourceTypes() []SourceType {
 	sourceTypes := make([]SourceType, 0)

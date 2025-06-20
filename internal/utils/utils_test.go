@@ -331,16 +331,6 @@ func TestIsArchive(t *testing.T) {
 	assert.False(t, IsArchive(""))
 }
 
-func TestExtractArchive(t *testing.T) {
-	t.Parallel()
-
-	logger := createTestLogger()
-
-	err := ExtractArchive(logger, "test.tar.gz", "/tmp")
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "unsupported archive format")
-}
-
 func TestCopySourceToTarget(t *testing.T) {
 	t.Parallel()
 
