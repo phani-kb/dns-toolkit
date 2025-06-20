@@ -218,17 +218,18 @@ var UrlRegex = regexp.MustCompile(`^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:
 var ArchiveExtensions = []string{".zip", ".tar.gz"}
 
 const (
-	MaxSampleLinesToCategorize = 100
-	TimestampFormat            = "20060102_150405"
-	DownloadInterval           = 2000 * time.Millisecond
-	DefaultHashAlgorithm       = "md5"
-	DefaultMaxRetries          = 3
-	DefaultRetryDelayInSeconds = 10
-	EntryAverageCharLength     = 30
-	EntryMinCharLength         = 6
-	MaxPreallocEntries         = 10_000_000
-	MinPreallocEntries         = 10_000
-	MaxEntryLength             = 255
+	MaxSampleLinesToCategorize    = 100
+	TimestampFormat               = "20060102_150405"
+	DownloadInterval              = 2000 * time.Millisecond
+	DefaultHashAlgorithm          = "md5"
+	DefaultMaxRetries             = 3
+	DefaultRetryDelayInSeconds    = 10
+	DefaultClientTimeoutInSeconds = 30
+	EntryAverageCharLength        = 30
+	EntryMinCharLength            = 6
+	MaxPreallocEntries            = 10_000_000
+	MinPreallocEntries            = 10_000
+	MaxEntryLength                = 255
 )
 
 // CommentPrefixes Comment prefixes used in various formats

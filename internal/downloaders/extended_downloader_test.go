@@ -229,7 +229,7 @@ func TestDownloadFile_ConnectionErrors(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Test with a connection refused scenario (invalid port)
-	d := NewDefaultDownloaderWithRetries(1)
+	d := NewDefaultDownloaderForTesting(1, 10*time.Millisecond)
 	file := c.DownloadFile{
 		URL:      "http://localhost:1", // Using port 1 which should be unavailable
 		Folder:   destDir,
