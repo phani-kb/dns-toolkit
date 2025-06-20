@@ -81,6 +81,9 @@ func (s *Source) ValidateWithConfig(appConfig *AppConfig) error {
 		}
 		typesTracker[t.Name] = true
 	}
+	if s.Frequency != "" && !constants.ValidFrequencies[s.Frequency] {
+		return fmt.Errorf("invalid frequency: %s", s.Frequency)
+	}
 
 	countryTracker := make(map[string]bool)
 	for _, country := range s.Countries {
@@ -97,9 +100,10 @@ func (s *Source) ValidateWithConfig(appConfig *AppConfig) error {
 }
 
 var defaultValues = map[string]string{
-	"Group":    constants.GroupBig,
-	"ListType": constants.ListTypeBlocklist,
-	"Category": constants.CategoryOthers,
+	"Frequency": constants.FrequencyDaily,
+	"Group":     constants.GroupBig,
+	"ListType":  constants.ListTypeBlocklist,
+	"Category":  constants.CategoryOthers,
 }
 
 // UnmarshalJSON custom unmarshalling to handle nested list_types within types
@@ -209,7 +213,10 @@ func LoadSourcesConfig(logger *multilog.Logger, filePath string) (SourcesConfig,
 	}
 
 	// Set default values for missing fields
-	for _, source := range config.Sources {
+	for i, source := range config.Sources {
+		if source.Frequency == "" {
+			config.Sources[i].Frequency = defaultValues["Frequency"]
+		}
 		for j, t := range source.Types {
 			if len(t.ListTypes) == 0 {
 				listType := c.ListType{

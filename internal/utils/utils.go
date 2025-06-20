@@ -1,7 +1,10 @@
 package utils
 
 import (
+	"archive/tar"
+	"archive/zip"
 	"bufio"
+	"compress/gzip"
 	"crypto/md5"
 	"crypto/sha256"
 	"encoding/hex"
@@ -207,6 +210,34 @@ func CalculateChecksum(logger *multilog.Logger, filePath string, algo string) st
 	return hex.EncodeToString(h.Sum(nil))
 }
 
+// CalculateChecksumFromContent calculates the checksum of the provided content using the specified algorithm.
+// Supports MD5 and SHA256 algorithms. If the algorithm is empty, it defaults to MD5.
+//
+// Parameters:
+//   - content: The byte slice to calculate the checksum for
+//   - algo: Algorithm to use ("md5" or "sha256")
+//
+// Returns:
+//   - A hex string representation of the checksum
+func CalculateChecksumFromContent(content []byte, algo string) string {
+	if algo == "" {
+		algo = constants.DefaultHashAlgorithm
+	}
+
+	var h hash.Hash
+	switch algo {
+	case "md5":
+		h = md5.New()
+	case "sha256":
+		h = sha256.New()
+	default:
+		return ""
+	}
+
+	h.Write(content)
+	return hex.EncodeToString(h.Sum(nil))
+}
+
 // IsComment determines if a line is a comment or an empty line.
 // A line is considered a comment if it's empty or starts with any of the common comment prefixes.
 //
@@ -392,6 +423,15 @@ func IsArchive(filePath string) bool {
 	return false
 }
 
+func GetArchiveExtension(uri string) string {
+	for _, ext := range ArchiveExtensions {
+		if strings.HasSuffix(uri, ext) {
+			return ext
+		}
+	}
+	return ""
+}
+
 // ExtractArchive extracts the contents of an archive file (either .tar.gz or .zip) to the specified destination folder.
 //
 // Parameters:
@@ -401,7 +441,160 @@ func IsArchive(filePath string) bool {
 // Returns:
 //   - An error object if the extraction fails, nil on success
 func ExtractArchive(logger *multilog.Logger, archivePath, destFolder string) error {
+	for _, ext := range ArchiveExtensions {
+		if strings.HasSuffix(archivePath, ext) {
+			switch ext {
+			case ".tar.gz":
+				return extractTarGz(logger, archivePath, destFolder)
+			case ".zip":
+				return extractZip(logger, archivePath, destFolder)
+			}
+		}
+	}
 	return fmt.Errorf("unsupported archive format: %s", archivePath)
+}
+
+// extractTarGz extracts a .tar.gz archive to the specified destination folder.
+func extractTarGz(logger *multilog.Logger, archivePath, destFolder string) error {
+	file, err := os.Open(archivePath)
+	if err != nil {
+		return err
+	}
+	defer CloseFile(logger, file)
+
+	gzipReader, err := gzip.NewReader(file)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := gzipReader.Close(); err != nil {
+			logger.Errorf("Closing gzip reader error: %v", err)
+		}
+	}()
+
+	tarReader := tar.NewReader(gzipReader)
+
+	// Get the base name of the archive without extension for potential subfolder creation
+	baseName := filepath.Base(archivePath)
+	baseName = strings.TrimSuffix(baseName, ".tar.gz") // Remove .tar.gz suffix
+
+	for {
+		head, err := tarReader.Next()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+
+		// Determine the correct path for extraction
+		// First try the default path in the destination folder
+		filePath := filepath.Join(destFolder, head.Name)
+
+		// Create the necessary directories
+		if head.Typeflag == tar.TypeDir {
+			if err := os.MkdirAll(filePath, os.ModePerm); err != nil {
+				return err
+			}
+			continue
+		} else if head.Typeflag == tar.TypeReg {
+			// Ensure parent directory exists
+			if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
+				return err
+			}
+
+			// Create and write the file
+			outFile, err := os.Create(filePath)
+			if err != nil {
+				return err
+			}
+
+			if _, err := io.Copy(outFile, tarReader); err != nil {
+				CloseFile(logger, outFile)
+				return err
+			}
+			CloseFile(logger, outFile)
+
+			// For files with no directory structure in the archive (just filenames),
+			// also create a copy in a subdirectory named after the archive base name
+			// This helps with archives that contain files directly at the root
+			if !strings.Contains(head.Name, "/") && !strings.Contains(head.Name, "\\") {
+				subDirPath := filepath.Join(destFolder, baseName)
+				if err := os.MkdirAll(subDirPath, os.ModePerm); err != nil {
+					return err
+				}
+
+				subFilePath := filepath.Join(subDirPath, head.Name)
+				subFile, err := os.Create(subFilePath)
+				if err != nil {
+					return err
+				}
+
+				// Reopen the original file to copy its contents
+				srcFile, err := os.Open(filePath)
+				if err != nil {
+					CloseFile(logger, subFile)
+					return err
+				}
+
+				if _, err := io.Copy(subFile, srcFile); err != nil {
+					CloseFile(logger, subFile)
+					CloseFile(logger, srcFile)
+					return err
+				}
+
+				CloseFile(logger, subFile)
+				CloseFile(logger, srcFile)
+			}
+		}
+	}
+
+	return nil
+}
+
+// extractZip extracts a .zip archive to the specified destination folder.
+func extractZip(logger *multilog.Logger, archivePath, destFolder string) error {
+	r, err := zip.OpenReader(archivePath)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := r.Close(); err != nil {
+			logger.Errorf("Closing zip reader error: %v", err)
+		}
+	}()
+
+	for _, f := range r.File {
+		filePath := filepath.Join(destFolder, f.Name)
+
+		if f.FileInfo().IsDir() {
+			if err := os.MkdirAll(filePath, os.ModePerm); err != nil {
+				return err
+			}
+		} else {
+			if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
+				return err
+			}
+
+			outFile, err := os.Create(filePath)
+			if err != nil {
+				return err
+			}
+			defer CloseFile(logger, outFile)
+
+			rc, err := f.Open()
+			if err != nil {
+				return err
+			}
+			defer CloseBody(logger, rc)
+
+			if _, err := io.Copy(outFile, rc); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 func CopySourceToTarget(logger *multilog.Logger, target c.DownloadTarget) error {
@@ -438,9 +631,40 @@ func CopySourceToTarget(logger *multilog.Logger, target c.DownloadTarget) error 
 
 	return nil
 }
+
 func CloseBody(logger *multilog.Logger, body io.Closer) {
 	if err := body.Close(); err != nil {
 		logger.Errorf("Closing body error: %v", err)
+	}
+}
+
+func ShouldDownloadSource(logger *multilog.Logger, summaryFile string, sourceName string) bool {
+	summary, err := GetLastSummary[c.DownloadSummary](logger, summaryFile, sourceName)
+	if err != nil {
+		logger.Errorf("Getting last download summary error: %v", err)
+		return false
+	}
+
+	lastDownload := summary.LastDownloadTimestamp
+	if lastDownload == "" || lastDownload == "0001-01-01T00:00:00Z" {
+		return true
+	}
+
+	lastDownloadTime, err := time.Parse(constants.TimestampFormat, lastDownload)
+	if err != nil {
+		logger.Errorf("Parsing last download timestamp error: %v", err)
+		return false
+	}
+	now := time.Now()
+	switch summary.Frequency {
+	case constants.FrequencyDaily:
+		return now.Sub(lastDownloadTime) >= 24*time.Hour
+	case constants.FrequencyWeekly:
+		return now.Sub(lastDownloadTime) >= 7*24*time.Hour
+	case constants.FrequencyMonthly:
+		return now.Sub(lastDownloadTime) >= 30*24*time.Hour
+	default:
+		return now.Sub(lastDownloadTime) >= 24*time.Hour
 	}
 }
 

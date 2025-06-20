@@ -11,6 +11,21 @@ const (
 	AppDescription = "A toolkit for DNS data processing and analysis."
 )
 
+// SummaryTypes - Enum-like constants for summary types
+const (
+	SummaryTypeDownload               = "download"
+	SummaryTypeProcessed              = "processed"
+	SummaryTypeConsolidated           = "consolidated"
+	SummaryTypeConsolidatedGroups     = "consolidated_groups"
+	SummaryTypeConsolidatedCategories = "consolidated_categories"
+	SummaryTypeOverlap                = "overlap"
+	SummaryTypeOverlapDetailed        = "overlap_detailed"
+	SummaryTypeTop                    = "top"
+	SummaryTypeArchive                = "archive"
+	SummaryTypeUnknown                = "unknown"
+	SummaryTypeOutput                 = "output"
+)
+
 // Default directories for various operations
 var (
 	DownloadDir               = "data/download"
@@ -43,6 +58,10 @@ var DefaultSummaryFiles = map[string]string{
 }
 
 const (
+	FrequencyDaily   = "daily"
+	FrequencyWeekly  = "weekly"
+	FrequencyMonthly = "monthly"
+
 	CategoryAdult          = "adult"
 	CategoryMalware        = "malware"
 	CategoryAds            = "ads"
@@ -132,6 +151,12 @@ var SourceTypeRegexMap = map[string]*regexp.Regexp{
 }
 
 var (
+	ValidFrequencies = map[string]bool{
+		FrequencyDaily:   true,
+		FrequencyWeekly:  true,
+		FrequencyMonthly: true,
+	}
+
 	ValidGroups = map[string]bool{
 		GroupMini:   true,
 		GroupLite:   true,

@@ -362,7 +362,7 @@ func (d *DefaultDownloader) ShouldDownload(
 	filePath := filepath.Join(file.Folder, file.Filename)
 	if _, err := os.Stat(filePath); err == nil {
 		logger.Debugf("File %s already exists", filePath)
-		return false
+		return u.ShouldDownloadSource(logger, summaryFile, file.Name)
 	}
 	return true
 }
