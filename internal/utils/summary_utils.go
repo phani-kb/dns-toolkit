@@ -1,12 +1,149 @@
 package utils
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"os"
+	"path/filepath"
+	"slices"
+	"strings"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
+	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/multilog"
 )
+
+// SaveSummary saves a single summary object to the specified file.
+// This is a convenience function that calls SaveSummaries with a slice containing only the provided summary.
+//
+// Type Parameters:
+//   - T: The type of the summary object
+//
+// Parameters:
+//   - logger: Logger for recording operations and errors
+//   - summary: The summary object to save
+//   - summaryFile: Path where the summary will be saved
+//   - lessFunc: Function for sorting summaries
+//
+// Returns:
+//   - The number of summaries written to the file
+//   - An error object if the operation failed, nil on success
+func SaveSummary[T any](
+	logger *multilog.Logger,
+	summary T,
+	summaryFile string,
+	lessFunc func(i, j T) bool,
+) (int, error) {
+	summariesCount, err := SaveSummaries(logger, []T{summary}, summaryFile, lessFunc)
+	if err != nil {
+		logger.Errorf("Failed to save summary: %v", err)
+	}
+	return summariesCount, nil
+}
+
+// SaveSummaries saves multiple summary objects to a JSON file.
+// The summaries are sorted using the provided comparison function before being saved.
+// If the summary file already exists, it will be archived with a timestamp suffix.
+// Small elements are written compactly while preserving readability.
+//
+// Type Parameters:
+//   - T: The type of the summary objects
+//
+// Parameters:
+//   - logger: Logger for recording operations and errors
+//   - summaries: Slice of summary objects to save
+//   - summaryFile: Path where the summaries will be saved
+//   - lessFunc: Function for sorting summaries
+//
+// Returns:
+//   - The number of summaries written to the file
+//   - An error object if the operation failed, nil on success
+func SaveSummaries[T any](
+	logger *multilog.Logger,
+	summaries []T,
+	summaryFile string,
+	lessFunc func(i, j T) bool,
+) (int, error) {
+	logger.Debugf("Starting SaveSummaries for file: %s", summaryFile)
+
+	if len(summaries) == 0 {
+		logger.Debugf("No summaries to write")
+		return 0, nil
+	}
+
+	// Backup an existing summary file if it exists
+	if existingSummaryFileInfo, err := os.Stat(summaryFile); err == nil {
+		// File exists, move it to backup directory with timestamp
+		// get timestamp of the file
+
+		backupTimestamp := existingSummaryFileInfo.ModTime().Format(constants.BackupFileTimestampFormat)
+
+		// Get the base filename and extension
+		baseFileName := filepath.Base(summaryFile)
+		fileExt := filepath.Ext(baseFileName)
+		fileNameWithoutExt := strings.TrimSuffix(baseFileName, fileExt)
+
+		// Create backup filename with timestamp before the extension
+		backupFileName := fmt.Sprintf("%s_%s%s", fileNameWithoutExt, backupTimestamp, fileExt)
+
+		// Full path to the backup file
+		backupFilePath := filepath.Join(constants.BackupDir, backupFileName)
+
+		// Create the backup directory if it doesn't exist
+		if err := os.MkdirAll(constants.BackupDir, os.ModePerm); err != nil {
+			logger.Warnf("Failed to create backup directory: %v", err)
+		} else {
+			// Copy the existing file to the backup
+			if err := copyFile(logger, summaryFile, backupFilePath); err != nil {
+				logger.Warnf("Failed to backup summary file: %v", err)
+			} else {
+				logger.Infof("Backed up summary file to: %s", backupFilePath)
+			}
+		}
+	}
+
+	logger.Debugf("Sorting summaries")
+	slices.SortFunc(summaries, func(i, j T) int {
+		if lessFunc(i, j) {
+			return -1
+		}
+		if lessFunc(j, i) {
+			return 1
+		}
+		return 0
+	})
+
+	file, err := os.Create(summaryFile)
+	if err != nil {
+		logger.Errorf("Creating summary file error: %v (file: %s)", err, summaryFile)
+		return 0, err
+	}
+	defer CloseFile(logger, file)
+
+	logger.Debugf("Marshaling summaries to JSON")
+	data, err := json.Marshal(summaries)
+	if err != nil {
+		logger.Errorf("Marshaling summaries error: %v", err)
+		return 0, err
+	}
+
+	logger.Debugf("Formatting JSON output")
+	var buf bytes.Buffer
+	if err := json.Indent(&buf, data, "", "  "); err != nil {
+		logger.Errorf("Formatting JSON error: %v", err)
+		return 0, err
+	}
+
+	logger.Debugf("Writing summaries to file")
+	if _, err := file.Write(buf.Bytes()); err != nil {
+		logger.Errorf("Writing summaries error: %v", err)
+		return 0, err
+	}
+
+	logger.Infof("Successfully wrote summaries to: %s", summaryFile)
+	return len(summaries), nil
+}
 
 func GetLastSummary[T any](logger *multilog.Logger, summaryFile string, sourceName string) (T, error) {
 	var zeroValue T

@@ -66,7 +66,7 @@ var downloadCmd = &cobra.Command{
 		for _, sourcesConfig := range SourcesConfigs {
 			for _, source := range sourcesConfig.GetEnabledSources(AppConfig.DNSToolkit.SourceFilters) {
 				totalSources++
-				source := source
+				source := source // local copy for goroutine
 				workerPool.Submit(func() {
 
 					<-ticker.C
@@ -179,6 +179,9 @@ var downloadCmd = &cobra.Command{
 			constants.SummaryDir,
 			constants.DefaultSummaryFiles["download"],
 		)
-		Logger.Infof("Saved download summaries to %s", summaryFile)
+		_, err := u.SaveSummaries(Logger, summaries, summaryFile, c.DownloadSummaryLessFunc)
+		if err != nil {
+			Logger.Errorf("Saving summaries error: %v", err)
+		}
 	},
 }

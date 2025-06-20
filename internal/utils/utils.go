@@ -268,6 +268,27 @@ func GetTimestamp() string {
 	return time.Now().Format(constants.TimestampFormat)
 }
 
+// copyFile copies a file from src to dst
+func copyFile(logger *multilog.Logger, src, dst string) error {
+	sourceFile, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer CloseFile(logger, sourceFile)
+
+	destFile, err := os.Create(dst)
+	if err != nil {
+		return err
+	}
+	defer CloseFile(logger, destFile)
+
+	_, err = io.Copy(destFile, sourceFile)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
 func StringInSlice(str string, slice []string) bool {
 	return NewStringSet(slice).Contains(str)
 }
