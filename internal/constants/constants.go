@@ -156,6 +156,38 @@ var (
 		FrequencyWeekly:  true,
 		FrequencyMonthly: true,
 	}
+	ValidCategories = map[string]bool{
+		CategoryAdult:          true,
+		CategoryMalware:        true,
+		CategoryAds:            true,
+		CategoryFamily:         true,
+		CategoryOthers:         true,
+		CategorySocial:         true,
+		CategoryFake:           true,
+		CategoryFakeNews:       true,
+		CategoryGambling:       true,
+		CategoryPhishing:       true,
+		CategoryCryptocurrency: true,
+		CategorySpam:           true,
+		CategoryScam:           true,
+		CategoryDns:            true,
+		CategoryDoh:            true,
+		CategoryTrackers:       true,
+		CategoryAnnoyance:      true,
+		CategoryThreat:         true,
+		CategoryPrivacy:        true,
+		CategorySecurity:       true,
+		CategoryMalicious:      true,
+		CategoryAnonymizer:     true,
+		CategoryTopDomains:     true,
+		CategoryNewDomains:     true,
+		CategoryMobile:         true,
+		CategoryProxy:          true,
+		CategoryTrojan:         true,
+		CategoryRansomware:     true,
+		CategoryBotnet:         true,
+		CategoryExploit:        true,
+	}
 
 	ValidGroups = map[string]bool{
 		GroupMini:   true,
@@ -180,6 +212,10 @@ var (
 		GroupBig,
 	}
 )
+
+var UrlRegex = regexp.MustCompile(`^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]`)
+
+var ArchiveExtensions = []string{".zip", ".tar.gz"}
 
 const (
 	MaxSampleLinesToCategorize = 100

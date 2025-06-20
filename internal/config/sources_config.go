@@ -10,6 +10,7 @@ import (
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
+	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
 )
 
@@ -63,10 +64,24 @@ func (s *Source) ValidateWithConfig(appConfig *AppConfig) error {
 		return fmt.Errorf("name is required")
 	}
 
-	if s.URL == "" {
-		return fmt.Errorf("url is required")
+	// Only perform an alphanumeric check if skip_name_special_chars_check is false
+	skipCheck := appConfig != nil && appConfig.DNSToolkit.SkipNameSpecialCharsCheck
+	if !skipCheck && !u.IsAlphanumericWithUnderscoresAndDashes(s.Name) {
+		return fmt.Errorf("name can only contain alphanumeric characters, underscores, and dashes: %s", s.Name)
 	}
 
+	if s.URL == "" {
+		return fmt.Errorf("url is required")
+	} else {
+		for _, ext := range constants.ArchiveExtensions {
+			if strings.HasSuffix(s.URL, ext) {
+				if len(s.Files) == 0 {
+					return fmt.Errorf("files property is required for url ending with %s", ext)
+				}
+				break
+			}
+		}
+	}
 	if len(s.Types) == 0 {
 		return fmt.Errorf("at least one type is required")
 	}
@@ -83,6 +98,11 @@ func (s *Source) ValidateWithConfig(appConfig *AppConfig) error {
 	}
 	if s.Frequency != "" && !constants.ValidFrequencies[s.Frequency] {
 		return fmt.Errorf("invalid frequency: %s", s.Frequency)
+	}
+	for _, category := range s.Categories {
+		if !constants.ValidCategories[category] {
+			return fmt.Errorf("invalid category: %s", category)
+		}
 	}
 
 	countryTracker := make(map[string]bool)
@@ -217,6 +237,10 @@ func LoadSourcesConfig(logger *multilog.Logger, filePath string) (SourcesConfig,
 		if source.Frequency == "" {
 			config.Sources[i].Frequency = defaultValues["Frequency"]
 		}
+		if len(source.Categories) == 0 {
+			config.Sources[i].Categories = []string{defaultValues["Category"]}
+		}
+
 		for j, t := range source.Types {
 			if len(t.ListTypes) == 0 {
 				listType := c.ListType{
@@ -344,24 +368,50 @@ func (sc *SourcesConfig) GetSourceByName(name string) (Source, bool) {
 // GetDownloadFile returns a DownloadFile struct for the source.
 func (s *Source) GetDownloadFile(_ *multilog.Logger, downloadDir string) (c.DownloadFile, error) {
 	downloadFile := c.DownloadFile{
-		Name:    s.Name,
-		URL:     s.URL,
-		Folder:  downloadDir,
-		Targets: make([]c.DownloadTarget, 0, len(s.Files)), // Pre-allocate capacity
+		Name:      s.Name,
+		URL:       s.URL,
+		Folder:    downloadDir,
+		Frequency: s.Frequency,
+		Targets:   make([]c.DownloadTarget, 0, len(s.Files)), // Pre-allocate capacity
 	}
 
-	// Handle non-archive files
-	if len(s.Files) != 0 {
-		return downloadFile, fmt.Errorf("files are not required for url %s", s.URL)
-	}
+	if u.IsArchive(s.URL) {
+		ext := u.GetArchiveExtension(s.URL)
+		if ext == "" {
+			return downloadFile, fmt.Errorf("unknown archive extension for %s", s.URL)
+		}
 
-	downloadFile.Filename = s.Name + ".txt"
-	downloadFile.Targets = append(downloadFile.Targets, c.DownloadTarget{
-		SourceFolder: downloadFile.Folder,
-		SourceFile:   downloadFile.Filename,
-		TargetFile:   downloadFile.Filename,
-		TargetFolder: downloadFile.Folder,
-	})
+		if len(s.Files) == 0 {
+			return downloadFile, fmt.Errorf("files are required for url ending with %s", ext)
+		}
+
+		downloadFile.Filename = s.Name + ext
+		downloadFile.IsArchive = true
+
+		// Process all files in the archive
+		for _, file := range s.Files {
+			filename := fmt.Sprintf("%s-%s", s.Name, strings.ReplaceAll(file, "/", "_"))
+			downloadFile.Targets = append(downloadFile.Targets, c.DownloadTarget{
+				SourceFolder: downloadFile.Folder,
+				SourceFile:   file,
+				TargetFile:   filename,
+				TargetFolder: downloadFile.Folder,
+			})
+		}
+	} else {
+		// Handle non-archive files
+		if len(s.Files) != 0 {
+			return downloadFile, fmt.Errorf("files are not required for url %s", s.URL)
+		}
+
+		downloadFile.Filename = s.Name + ".txt"
+		downloadFile.Targets = append(downloadFile.Targets, c.DownloadTarget{
+			SourceFolder: downloadFile.Folder,
+			SourceFile:   downloadFile.Filename,
+			TargetFile:   downloadFile.Filename,
+			TargetFolder: downloadFile.Folder,
+		})
+	}
 
 	return downloadFile, nil
 }
@@ -369,4 +419,13 @@ func (s *Source) GetDownloadFile(_ *multilog.Logger, downloadDir string) (c.Down
 // IsEnabled returns true if the source is enabled.
 func (s *Source) IsEnabled() bool {
 	return !s.Disabled
+}
+
+// GetUserAgent returns a user agent string using the util function.
+// This is a wrapper to maintain API compatibility while avoiding import cycles.
+func GetUserAgent(logger *multilog.Logger, applicationConfig ApplicationConfig) string {
+	appName := applicationConfig.Name
+	appVersion := applicationConfig.Version
+	appDesc := applicationConfig.Description
+	return u.GetUserAgent(logger, appName, appVersion, appDesc)
 }

@@ -16,7 +16,6 @@ import (
 	"github.com/stretchr/testify/require"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
-	cfg "github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 )
 
@@ -601,8 +600,8 @@ func TestAllRemainingEdgeCases(t *testing.T) {
 		LogMemStats(logger, "very-long-prefix-string-that-might-cause-issues")
 	})
 
-	assert.True(t, len(ArchiveExtensions) > 0)
-	for _, ext := range ArchiveExtensions {
+	assert.True(t, len(constants.ArchiveExtensions) > 0)
+	for _, ext := range constants.ArchiveExtensions {
 		assert.True(t, strings.HasPrefix(ext, "."))
 	}
 
@@ -792,19 +791,15 @@ func TestGetUserAgent(t *testing.T) {
 	t.Parallel()
 
 	logger := createTestLogger()
-	appConfig := cfg.ApplicationConfig{
-		Name:        "dns-toolkit-test",
-		Version:     "v1.0.0",
-		Description: "Test Application",
-	}
 
-	userAgent := GetUserAgent(logger, appConfig)
+	userAgent := GetUserAgent(logger, "dns-toolkit-test", "v1.0.0", "Test Application")
 	assert.Contains(t, userAgent, "dns-toolkit-test")
 	assert.Contains(t, userAgent, "v1.0.0")
+	assert.Contains(t, userAgent, "Test Application")
 
-	emptyConfig := cfg.ApplicationConfig{}
-	defaultUserAgent := GetUserAgent(logger, emptyConfig)
-	assert.Contains(t, defaultUserAgent, "dns-toolkit")
+	defaultUserAgent := GetUserAgent(logger, "", "", "")
+	assert.Contains(t, defaultUserAgent, constants.AppName)
+	assert.Contains(t, defaultUserAgent, constants.AppVersion)
 }
 
 func TestCapPreallocEntriesEdgeCases(t *testing.T) {

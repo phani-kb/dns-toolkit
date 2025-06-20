@@ -146,7 +146,7 @@ func (d *DefaultDownloader) downloadFile(
 		return "", false, err
 	}
 	client := d.createHTTPClient(logger, skipCertVerify, skipCertHosts, parsedURL)
-	userAgent := u.GetUserAgent(logger, applicationConfig)
+	userAgent := cfg.GetUserAgent(logger, applicationConfig)
 	logger.Debugf("User-Agent: %s", userAgent)
 	if fileExists && d.canSkipDownload(logger, client, userAgent, file, localFileSize, localModTime) {
 		err := d.handleArchiveFile(logger, file, filePath)
