@@ -1,0 +1,5 @@
+# {{.AppName}} {{.AppVersion}}
+# File name: {{.FileName}}
+# Last Updated: {{.LastUpdated}}
+# Format: {{.Description}}
+# Count: {{.Count}}
