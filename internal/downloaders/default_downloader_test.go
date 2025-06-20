@@ -616,3 +616,26 @@ func TestDownloaderConcurrency_Merged(t *testing.T) {
 		assert.NoError(t, err, "Concurrent download should not fail")
 	}
 }
+
+func TestNewDefaultDownloaderWithOptions(t *testing.T) {
+	t.Parallel()
+
+	// Test with custom values
+	retryDelay := 500 * time.Millisecond
+	clientTimeout := 5 * time.Second
+	maxRetries := 3
+
+	d := NewDefaultDownloaderWithOptions(maxRetries, retryDelay, clientTimeout)
+
+	// Verify the downloader was created with the correct values
+	assert.NotNil(t, d)
+	assert.Equal(t, maxRetries, d.maxRetries)
+	assert.Equal(t, retryDelay, d.retryDelay)
+	assert.Equal(t, clientTimeout, d.clientTimeout)
+
+	// Verify the random number generator was initialized
+	assert.NotNil(t, d.rnd)
+
+	// Verify the name is as expected
+	assert.Equal(t, defaultDownloaderName, d.Name())
+}

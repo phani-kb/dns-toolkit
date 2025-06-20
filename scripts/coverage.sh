@@ -17,11 +17,16 @@ mkdir -p coverage
 mkdir -p coverage/archive
 
 # Run tests with coverage, excluding mocks directories
-echo -e "${GREEN}Running tests with coverage (excluding mocks directories)...${NC}"
-if ! go test -coverprofile=coverage/coverage.out $(go list ./... | grep -v "/mocks"); then
+echo -e "${GREEN}Running tests with coverage...${NC}"
+PACKAGES=$(go list ./... | grep -v "/mocks")
+if ! go test -coverprofile=coverage/coverage.out $PACKAGES; then
     echo -e "${RED}Tests failed! See output above for details.${NC}"
     exit 1
 fi
+
+echo -e "${GREEN}Filtering coverage report...${NC}"
+grep -v "test_helpers.go" coverage/coverage.out > coverage/filtered_coverage.out
+mv coverage/filtered_coverage.out coverage/coverage.out
 
 # Generate HTML report
 echo -e "${GREEN}Generating HTML coverage report at coverage/coverage.html...${NC}"
@@ -32,16 +37,20 @@ cp coverage/coverage.html coverage/archive/coverage_${TIMESTAMP}.html
 cp coverage/coverage.out coverage/archive/coverage_${TIMESTAMP}.out
 
 # Generate a summary of the coverage
-#echo -e "${YELLOW}Coverage Summary:${NC}"
-#go tool cover -func=coverage/coverage.out | sort -k3 -r
+#echo -e "${YELLOW}Coverage Summary (sorted by coverage):${NC}"
+#go tool cover -func=coverage/coverage.out | grep -v "^total:" | sort -k3 -r | head -n 20
+
+echo -e "${YELLOW}Packages with lowest coverage:${NC}"
+go tool cover -func=coverage/coverage.out | grep -v "^total:" | sort -k3 | head -n 10
 
 # Calculate total coverage
 TOTAL_COVERAGE=$(go tool cover -func=coverage/coverage.out | grep total: | awk '{print $3}')
 COVERAGE_NUM=$(echo "$TOTAL_COVERAGE" | sed 's/%//')
 
+echo ""
 if awk "BEGIN {exit ($COVERAGE_NUM < $THRESHOLD) ? 0 : 1}"; then
     echo -e "${RED}Total coverage (${TOTAL_COVERAGE}) is below the threshold (${THRESHOLD}%)!${NC}"
     exit 1
 else
-    echo -e "${GREEN}Total coverage: ${TOTAL_COVERAGE}${NC}"
+    echo -e "${GREEN}Total coverage: ${TOTAL_COVERAGE} (threshold: ${THRESHOLD}%)${NC}"
 fi
