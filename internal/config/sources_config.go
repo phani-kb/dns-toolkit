@@ -42,17 +42,19 @@ func (sc *SourcesConfig) ValidateWithConfig(appConfig *AppConfig) error {
 }
 
 type Source struct {
-	Name       string         `json:"name"`
-	URL        string         `json:"url"`
-	Files      []string       `json:"files,omitempty"`
-	TypeCount  int            `json:"type_count"`
-	Types      []c.SourceType `json:"types"`
-	Frequency  string         `json:"frequency,omitempty"`
-	Categories []string       `json:"categories,omitempty"`
-	Countries  []string       `json:"countries,omitempty"`
-	License    string         `json:"license,omitempty"`
-	Disabled   bool           `json:"disabled,omitempty"`
-	Website    string         `json:"website,omitempty"`
+	Name            string         `json:"name"`
+	URL             string         `json:"url"`
+	Files           []string       `json:"files,omitempty"`
+	TypeCount       int            `json:"type_count"`
+	Types           []c.SourceType `json:"types"`
+	Frequency       string         `json:"frequency,omitempty"`
+	Categories      []string       `json:"categories,omitempty"`
+	Countries       []string       `json:"countries,omitempty"`
+	License         string         `json:"license,omitempty"`
+	Disabled        bool           `json:"disabled,omitempty"`
+	Website         string         `json:"website,omitempty"`
+	Notes           string         `json:"notes,omitempty"`
+	CountToConsider int            `json:"count_to_consider,omitempty"`
 }
 
 func (s *Source) Validate() error {
