@@ -44,26 +44,40 @@ func (e *CertVerificationError) Error() string {
 }
 
 type DefaultDownloader struct {
-	rnd        *rand.Rand
-	maxRetries int
-	retryDelay time.Duration
+	rnd           *rand.Rand
+	maxRetries    int
+	retryDelay    time.Duration
+	clientTimeout time.Duration
 }
 
 // NewDefaultDownloaderWithRetries creates a new DefaultDownloader with custom retry
 func NewDefaultDownloaderWithRetries(maxRetries int) *DefaultDownloader {
 	return &DefaultDownloader{
-		rnd:        rand.New(rand.NewSource(time.Now().UnixNano())),
-		maxRetries: maxRetries,
-		retryDelay: retryDelay,
+		rnd:           rand.New(rand.NewSource(time.Now().UnixNano())),
+		maxRetries:    maxRetries,
+		retryDelay:    retryDelay,
+		clientTimeout: time.Second * constants.DefaultClientTimeoutInSeconds,
 	}
 }
 
 // NewDefaultDownloaderForTesting creates a new DefaultDownloader with retry
 func NewDefaultDownloaderForTesting(maxRetries int, testRetryDelay time.Duration) *DefaultDownloader {
+	testTimeout := 500 * time.Millisecond
 	return &DefaultDownloader{
-		rnd:        rand.New(rand.NewSource(time.Now().UnixNano())),
-		maxRetries: maxRetries,
-		retryDelay: testRetryDelay,
+		rnd:           rand.New(rand.NewSource(time.Now().UnixNano())),
+		maxRetries:    maxRetries,
+		retryDelay:    testRetryDelay,
+		clientTimeout: testTimeout,
+	}
+}
+
+// NewDefaultDownloaderWithOptions creates a new DefaultDownloader with fully customizable options
+func NewDefaultDownloaderWithOptions(maxRetries int, retryDelay, clientTimeout time.Duration) *DefaultDownloader {
+	return &DefaultDownloader{
+		rnd:           rand.New(rand.NewSource(time.Now().UnixNano())),
+		maxRetries:    maxRetries,
+		retryDelay:    retryDelay,
+		clientTimeout: clientTimeout,
 	}
 }
 
@@ -274,16 +288,20 @@ func (d *DefaultDownloader) createHTTPClient(
 	skipCertHosts []string,
 	parsedURL *url.URL,
 ) *http.Client {
-	client := &http.Client{}
+	client := &http.Client{
+		Timeout: d.clientTimeout,
+	}
+
 	if skipCertVerify {
 		for _, host := range skipCertHosts {
 			if strings.Contains(parsedURL.Host, host) {
 				logger.Debugf("Skipping certificate verification for host: %s", parsedURL.Host)
-				client.Transport = &http.Transport{
+				transport := &http.Transport{
 					TLSClientConfig: &tls.Config{
 						InsecureSkipVerify: true,
 					},
 				}
+				client.Transport = transport
 				break
 			}
 		}
