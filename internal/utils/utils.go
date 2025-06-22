@@ -423,6 +423,41 @@ func ReadEntriesFromFileWithPool(logger *multilog.Logger, filepath string, pool 
 	return result, duplicateCount, nil
 }
 
+// WriteEntriesToFile writes the given entries to the specified file.
+// The entries are sorted before writing, and each entry is written on a separate line.
+//
+// Parameters:
+//   - logger: Logger for recording operations and errors
+//   - filepath: Path to the file to write
+//   - entries: Slice of strings to write
+//
+// Returns:
+//   - An error object if writing fails, nil on success
+func WriteEntriesToFile(logger *multilog.Logger, filepath string, entries []string) error {
+	if len(entries) == 0 {
+		return nil
+	}
+
+	sorted := slices.Clone(entries)
+	slices.Sort(sorted)
+
+	file, err := os.Create(filepath)
+	if err != nil {
+		return err
+	}
+	defer CloseFile(logger, file)
+
+	writer := bufio.NewWriter(file)
+	for _, entry := range sorted {
+		_, err := writer.WriteString(entry + "\n")
+		if err != nil {
+			return err
+		}
+	}
+
+	return writer.Flush()
+}
+
 // GetMapKeys returns the keys of a map as a slice.
 // This is a generic function that works with any map that has comparable keys.
 //
