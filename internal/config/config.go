@@ -1,12 +1,16 @@
 package config
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 
+	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/multilog"
 	"gopkg.in/yaml.v2"
@@ -172,4 +176,86 @@ func IsEnabledSource(sourceName string, sourceConfigs []SourcesConfig, appConfig
 		}
 	}
 	return false
+}
+
+// GetProcessedSummaries reads the processed summaries from the default summary file and returns them along with the generic source types.
+func GetProcessedSummaries(
+	logger *multilog.Logger,
+	sourcesConfigs []SourcesConfig,
+	appConfig AppConfig,
+) ([]c.ProcessedSummary, []string, []c.ProcessedFile) {
+	summaryFile := filepath.Join(constants.SummaryDir, constants.DefaultSummaryFiles["processed"])
+	content, err := os.ReadFile(summaryFile)
+	if err != nil {
+		logger.Errorf("Reading file %s: %v", summaryFile, err)
+		return nil, nil, nil
+	}
+
+	var summaries []c.ProcessedSummary
+	if err := json.Unmarshal(content, &summaries); err != nil {
+		logger.Errorf("Unmarshalling JSON: %v", err)
+		return nil, nil, nil
+	}
+
+	enabledSummaries := filterEnabledSummaries(summaries, sourcesConfigs, appConfig)
+	sort.Slice(enabledSummaries, func(i, j int) bool {
+		return enabledSummaries[i].Name < enabledSummaries[j].Name
+	})
+
+	genericSourceTypes := extractGenericSourceTypes(enabledSummaries)
+	processedFiles := GetAllProcessedFiles(summaries)
+	logger.Infof(
+		"Processed summaries count: %d, generic source types count: %d, files count: %d",
+		len(enabledSummaries),
+		len(genericSourceTypes),
+		len(processedFiles),
+	)
+
+	return enabledSummaries, genericSourceTypes, processedFiles
+}
+
+func GetAllProcessedFiles(
+	processedSummaries []c.ProcessedSummary,
+) []c.ProcessedFile {
+	var processedFiles []c.ProcessedFile
+	for _, summary := range processedSummaries {
+		processedFiles = append(processedFiles, summary.ValidFiles...)
+		processedFiles = append(processedFiles, summary.InvalidFiles...)
+	}
+	return processedFiles
+}
+
+func filterEnabledSummaries(
+	summaries []c.ProcessedSummary,
+	sourcesConfigs []SourcesConfig,
+	appConfig AppConfig,
+) []c.ProcessedSummary {
+	var enabledSummaries []c.ProcessedSummary
+	for _, summary := range summaries {
+		if IsEnabledSource(summary.Name, sourcesConfigs, appConfig) {
+			enabledSummaries = append(enabledSummaries, summary)
+		}
+	}
+	return enabledSummaries
+}
+
+func extractGenericSourceTypes(summaries []c.ProcessedSummary) []string {
+	sourceTypeMap := make(map[string]struct{})
+	for _, summary := range summaries {
+		for _, processedFile := range summary.ValidFiles {
+			genericSourceType := processedFile.GenericSourceType
+			sourceTypeMap[genericSourceType] = struct{}{}
+		}
+		for _, processedFile := range summary.InvalidFiles {
+			genericSourceType := processedFile.GenericSourceType
+			sourceTypeMap[genericSourceType] = struct{}{}
+		}
+	}
+
+	var genericSourceTypes []string
+	for sourceType := range sourceTypeMap {
+		genericSourceTypes = append(genericSourceTypes, sourceType)
+	}
+	sort.Strings(genericSourceTypes)
+	return genericSourceTypes
 }
