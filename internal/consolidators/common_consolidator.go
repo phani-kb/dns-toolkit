@@ -63,3 +63,12 @@ func init() {
 		})
 	}
 }
+
+// InitForTesting replicates the init() function for testing purposes
+func InitForTesting() {
+	for _, st := range commonSourceTypes {
+		RegisterConsolidatorTypes(st, commonSupportedListTypes, func(st, lt string) Consolidator {
+			return NewCommonConsolidator(st, lt)
+		})
+	}
+}
