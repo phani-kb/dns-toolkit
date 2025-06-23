@@ -49,6 +49,8 @@ var Folders = map[string]string{
 	"consolidated_groups":     ConsolidatedGroupsDir,
 	"consolidated_categories": ConsolidatedCategoriesDir,
 	"summary":                 SummaryDir,
+	"overlap":                 OverlapDir,
+	"top":                     TopDir,
 }
 
 // DefaultSummaryFiles - Map of summary types to their default file names
@@ -251,6 +253,7 @@ const (
 	EntryMinCharLength            = 6
 	MaxPreallocEntries            = 10_000_000
 	MinPreallocEntries            = 10_000
+	MinFilesForParallelProcessing = 10
 	MaxEntryLength                = 255
 )
 

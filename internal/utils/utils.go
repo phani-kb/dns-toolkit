@@ -17,7 +17,9 @@ import (
 	"regexp"
 	"runtime"
 	"slices"
+	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
@@ -291,6 +293,127 @@ func copyFile(logger *multilog.Logger, src, dst string) error {
 }
 func StringInSlice(str string, slice []string) bool {
 	return NewStringSet(slice).Contains(str)
+}
+
+// FindOverlap finds the overlap between two files and returns the overlapping content.
+// It reads both files, ignores comments, and identifies common lines.
+//
+// Parameters:
+//   - logger: Logger for recording operations and errors
+//   - file1: Path to the first file
+//   - file2: Path to the second file
+//
+// Returns:
+//   - A slice of strings representing the overlapping content
+//   - The number of non-comment lines in file1
+//   - The number of non-comment lines in file2
+//
+// Optimized FindOverlap: uses bufio.Scanner and fast comment detection for performance
+func FindOverlap(logger *multilog.Logger, file1, file2 string) ([]string, int, int) {
+	set := make(map[string]struct{})
+	count1 := 0
+
+	f1, err := os.Open(file1)
+	if err != nil {
+		logger.Errorf("Reading file error: %v (file: %s)", err, file1)
+		return nil, 0, 0
+	}
+	defer CloseFile(logger, f1)
+
+	scanner1 := bufio.NewScanner(f1)
+	for scanner1.Scan() {
+		line := scanner1.Text()
+		if !isCommentFast(line) {
+			set[line] = struct{}{}
+			count1++
+		}
+	}
+	if err := scanner1.Err(); err != nil {
+		logger.Errorf("Reading file error: %v (file: %s)", err, file1)
+		return nil, 0, 0
+	}
+
+	var overlap []string
+	count2 := 0
+	f2, err := os.Open(file2)
+	if err != nil {
+		logger.Errorf("Reading file error: %v (file: %s)", err, file2)
+		return nil, 0, 0
+	}
+	defer CloseFile(logger, f2)
+
+	scanner2 := bufio.NewScanner(f2)
+	for scanner2.Scan() {
+		line := scanner2.Text()
+		if !isCommentFast(line) {
+			if _, ok := set[line]; ok {
+				overlap = append(overlap, line)
+			}
+			count2++
+		}
+	}
+	if err := scanner2.Err(); err != nil {
+		logger.Errorf("Reading file error: %v (file: %s)", err, file2)
+		return nil, 0, 0
+	}
+
+	return overlap, count1, count2
+}
+
+// Precompute fast lookup tables for comment prefixes
+var (
+	singleCharCommentPrefixes map[byte]struct{}
+	twoCharCommentPrefixes    map[string]struct{}
+	longCommentPrefixes       []string
+	commentPrefixInit         sync.Once
+)
+
+func initCommentPrefixTables() {
+	singleCharCommentPrefixes = make(map[byte]struct{})
+	twoCharCommentPrefixes = make(map[string]struct{})
+	for _, prefix := range constants.CommentPrefixes {
+		if len(prefix) == 1 {
+			singleCharCommentPrefixes[prefix[0]] = struct{}{}
+		} else if len(prefix) == 2 {
+			twoCharCommentPrefixes[prefix] = struct{}{}
+		} else if len(prefix) > 2 {
+			longCommentPrefixes = append(longCommentPrefixes, prefix)
+		}
+	}
+}
+
+// isCommentFast checks for all comment prefixes in constants.CommentPrefixes after a fast path
+func isCommentFast(line string) bool {
+	commentPrefixInit.Do(initCommentPrefixTables)
+	// Fast path: skip leading spaces, check for empty or comment prefix
+	i := 0
+	for i < len(line) && (line[i] == ' ' || line[i] == '\t') {
+		i++
+	}
+	if i == len(line) {
+		return true // empty or all whitespace
+	}
+	ch := line[i:]
+	if len(ch) == 0 {
+		return true
+	}
+	// Single-char prefix
+	if _, ok := singleCharCommentPrefixes[ch[0]]; ok {
+		return true
+	}
+	// Two-char prefix
+	if len(ch) > 1 {
+		if _, ok := twoCharCommentPrefixes[ch[:2]]; ok {
+			return true
+		}
+	}
+	// Long prefix fallback
+	for _, prefix := range longCommentPrefixes {
+		if strings.HasPrefix(ch, prefix) {
+			return true
+		}
+	}
+	return false
 }
 
 // IsDomain checks if a string is a valid domain name.
@@ -630,36 +753,39 @@ func extractZip(logger *multilog.Logger, archivePath, destFolder string) error {
 	}()
 
 	for _, f := range r.File {
-		filePath := filepath.Join(destFolder, f.Name)
-
-		if f.FileInfo().IsDir() {
-			if err := os.MkdirAll(filePath, os.ModePerm); err != nil {
-				return err
-			}
-		} else {
-			if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
-				return err
-			}
-
-			outFile, err := os.Create(filePath)
-			if err != nil {
-				return err
-			}
-			defer CloseFile(logger, outFile)
-
-			rc, err := f.Open()
-			if err != nil {
-				return err
-			}
-			defer CloseBody(logger, rc)
-
-			if _, err := io.Copy(outFile, rc); err != nil {
-				return err
-			}
+		if err := extractZipFile(logger, f, destFolder); err != nil {
+			return err
 		}
 	}
 
 	return nil
+}
+
+// extractZipFile extracts a single file from the zip archive
+func extractZipFile(logger *multilog.Logger, f *zip.File, destFolder string) error {
+	filePath := filepath.Join(destFolder, f.Name)
+	if f.FileInfo().IsDir() {
+		return os.MkdirAll(filePath, os.ModePerm)
+	}
+
+	if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
+		return err
+	}
+
+	outFile, err := os.Create(filePath)
+	if err != nil {
+		return err
+	}
+	defer CloseFile(logger, outFile)
+
+	rc, err := f.Open()
+	if err != nil {
+		return err
+	}
+	defer CloseBody(logger, rc)
+
+	_, err = io.Copy(outFile, rc)
+	return err
 }
 
 func CopySourceToTarget(logger *multilog.Logger, target c.DownloadTarget) error {
@@ -765,6 +891,17 @@ func CapPreallocEntries(estimated int) int {
 	}
 }
 
+// ParsePercent converts a percentage string to a float64 for comparison
+func ParsePercent(percentStr string) float64 {
+	// Try to parse the percentage string
+	percent, err := strconv.ParseFloat(percentStr, 64)
+	if err != nil {
+		// Return 0 if parsing fails
+		return 0.0
+	}
+	return percent
+}
+
 // EnsureDirectoryExists creates a directory if it doesn't exist
 func EnsureDirectoryExists(logger *multilog.Logger, dir string) error {
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
@@ -778,7 +915,7 @@ func EnsureDirectoryExists(logger *multilog.Logger, dir string) error {
 }
 
 // GetUserAgent constructs a User-Agent string for HTTP requests based on application information.
-// If application name or version is not provided, defaults will be used.
+// If the application name or version is not provided, defaults will be used.
 //
 // Parameters:
 //   - logger: Logger for recording operations and errors
