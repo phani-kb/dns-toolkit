@@ -240,6 +240,11 @@ var UrlRegex = regexp.MustCompile(`^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:
 var ArchiveExtensions = []string{".zip", ".tar.gz"}
 
 const (
+	SearchProcessedFile    = "processed"
+	SearchConsolidatedFile = "consolidated"
+)
+
+const (
 	MaxSampleLinesToCategorize    = 100
 	TimestampFormat               = "20060102_150405"
 	ArchiveFileTimestampFormat    = "20060102_150405"

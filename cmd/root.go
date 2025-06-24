@@ -135,6 +135,7 @@ func init() {
 	rootCmd.AddCommand(validateSourcesCmd)
 	rootCmd.AddCommand(overlapCmd)
 	rootCmd.AddCommand(topEntriesCmd)
+	rootCmd.AddCommand(searchCmd)
 	rootCmd.AddCommand(archiveCmd)
 	rootCmd.AddCommand(generateCmd)
 }
