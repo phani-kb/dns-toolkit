@@ -829,6 +829,14 @@ func CloseBody(logger *multilog.Logger, body io.Closer) {
 	}
 }
 
+func IsSkipIP(_ *multilog.Logger, ip string) bool {
+	if ip != "0.0.0.0" && !strings.HasPrefix(ip, "127.") &&
+		!strings.HasPrefix(ip, "169.254.") && !strings.HasPrefix(ip, "224.") {
+		return true
+	}
+	return false
+}
+
 func ShouldDownloadSource(logger *multilog.Logger, summaryFile string, sourceName string) bool {
 	summary, err := GetLastSummary[c.DownloadSummary](logger, summaryFile, sourceName)
 	if err != nil {

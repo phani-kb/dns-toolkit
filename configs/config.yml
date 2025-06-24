@@ -1,6 +1,6 @@
 application:
   name: dns-toolkit
-  version: 1.0.0
+  version: 0.1.0
   description: A toolkit for DNS data processing and analysis.
 dns_toolkit:
   folders:
