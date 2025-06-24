@@ -90,7 +90,7 @@ func TestGetSummaryFiles(t *testing.T) {
 	logger := multilog.NewLogger()
 
 	// Test with non-existent file
-	files, err := GetSummaryFiles[c.DownloadSummary](
+	files, err := GetSummaryFiles(
 		logger,
 		"domain",
 		"/nonexistent/file",
@@ -121,7 +121,7 @@ func TestGetSummaryFiles(t *testing.T) {
 	err = os.WriteFile(tempFile.Name(), data, 0644)
 	require.NoError(t, err)
 
-	files, err = GetSummaryFiles[c.DownloadSummary](
+	files, err = GetSummaryFiles(
 		logger,
 		"domain",
 		tempFile.Name(),
@@ -134,7 +134,7 @@ func TestGetSummaryFiles(t *testing.T) {
 	assert.Contains(t, files, "test-source1_domain.txt")
 	assert.Contains(t, files, "test-source2_domain.txt")
 
-	files, err = GetSummaryFiles[c.DownloadSummary](
+	files, err = GetSummaryFiles(
 		logger,
 		"ipv4",
 		tempFile.Name(),
@@ -148,7 +148,7 @@ func TestGetSummaryFiles(t *testing.T) {
 	err = os.WriteFile(tempFile.Name(), []byte("invalid json"), 0644)
 	require.NoError(t, err)
 
-	files, err = GetSummaryFiles[c.DownloadSummary](
+	files, err = GetSummaryFiles(
 		logger,
 		"domain",
 		tempFile.Name(),

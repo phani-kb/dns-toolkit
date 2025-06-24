@@ -66,7 +66,7 @@ var consolidateGroupsCmd = &cobra.Command{
 				continue
 			}
 
-			// Create a map for allowlisted entries by source type
+			// Create a map of allowlisted entries by source type
 			allowlistEntriesByType := make(map[string]u.StringSet)
 
 			// First process allowlists for each group and source type
@@ -261,7 +261,7 @@ func consolidateByGroup(
 		entriesToIgnore,
 	)
 
-	// Create summary with group information
+	// Create a summary with group information
 	consolidatedSummary := c.ConsolidatedSummary{
 		Type:                      genericSourceType,
 		FilesCount:                len(fileInfos),

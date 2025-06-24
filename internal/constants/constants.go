@@ -39,6 +39,11 @@ var (
 	ArchiveDir                = "data/archive"
 	BackupDir                 = "data/backup"
 	OutputDir                 = "data/output"
+	OutputGroupsDir           = OutputDir + "/groups"
+	OutputCategoriesDir       = OutputDir + "/categories"
+	OutputIgnoredDir          = OutputDir + "/ignored"
+	OutputTopDir              = OutputDir + "/top"
+	OutputSummariesDir        = OutputDir + "/summaries"
 )
 
 // Folders - Map of folder names to their respective directories
@@ -51,6 +56,11 @@ var Folders = map[string]string{
 	"summary":                 SummaryDir,
 	"overlap":                 OverlapDir,
 	"top":                     TopDir,
+	"output_ignored":          OutputIgnoredDir,
+	"output_groups":           OutputGroupsDir,
+	"output_categories":       OutputCategoriesDir,
+	"output_top":              OutputTopDir,
+	"output_summaries":        OutputSummariesDir,
 }
 
 // DefaultSummaryFiles - Map of summary types to their default file names
@@ -279,4 +289,87 @@ var CommentPrefixes = []string{
 	"*/",
 	"<",
 	">",
+}
+
+const ContentSeparator = "###\n"
+
+// SummaryTypesMap maps summary type constants to their string values
+var SummaryTypesMap = map[string]string{
+	SummaryTypeDownload:               SummaryTypeDownload,
+	SummaryTypeProcessed:              SummaryTypeProcessed,
+	SummaryTypeConsolidated:           SummaryTypeConsolidated,
+	SummaryTypeConsolidatedGroups:     SummaryTypeConsolidatedGroups,
+	SummaryTypeConsolidatedCategories: SummaryTypeConsolidatedCategories,
+	SummaryTypeOverlap:                SummaryTypeOverlap,
+	SummaryTypeOverlapDetailed:        SummaryTypeOverlapDetailed,
+	SummaryTypeTop:                    SummaryTypeTop,
+	SummaryTypeArchive:                SummaryTypeArchive,
+	SummaryTypeOutput:                 SummaryTypeOutput,
+}
+
+// SummaryTypesWithTemplateMap SummaryTypes with template strings
+var SummaryTypesWithTemplateMap = map[string]string{
+	SummaryTypeConsolidated:           DefaultSummaryFiles[SummaryTypeConsolidated],
+	SummaryTypeConsolidatedGroups:     DefaultSummaryFiles[SummaryTypeConsolidatedGroups],
+	SummaryTypeConsolidatedCategories: DefaultSummaryFiles[SummaryTypeConsolidatedCategories],
+	SummaryTypeTop:                    DefaultSummaryFiles[SummaryTypeTop],
+}
+
+// SummaryTypesDirMap maps summary types to their respective directories
+var SummaryTypesDirMap = map[string]string{
+	SummaryTypeDownload:               DownloadDir,
+	SummaryTypeProcessed:              ProcessedDir,
+	SummaryTypeOverlap:                OverlapDir,
+	SummaryTypeConsolidated:           ConsolidatedDir,
+	SummaryTypeConsolidatedGroups:     ConsolidatedGroupsDir,
+	SummaryTypeConsolidatedCategories: ConsolidatedCategoriesDir,
+	SummaryTypeTop:                    TopDir,
+	SummaryTypeArchive:                ArchiveDir,
+	SummaryTypeOutput:                 OutputDir,
+}
+
+// SummaryTypesOutputDirMap maps summary types to their output directories
+var SummaryTypesOutputDirMap = map[string]string{
+	SummaryTypeConsolidated:           OutputDir,
+	SummaryTypeConsolidatedGroups:     OutputGroupsDir,
+	SummaryTypeConsolidatedCategories: OutputCategoriesDir,
+	SummaryTypeTop:                    OutputTopDir,
+	SummaryTypeOutput:                 OutputDir,
+}
+
+var SummaryTypesOutputToSkipMap = map[string]bool{
+	SummaryTypeDownload:  true,
+	SummaryTypeProcessed: true,
+	SummaryTypeOverlap:   true,
+	SummaryTypeArchive:   true,
+	SummaryTypeOutput:    false,
+}
+
+// SummaryTypesOutputSummaryFileMap maps summary types to their output file names
+var SummaryTypesOutputSummaryFileMap = map[string]string{
+	SummaryTypeDownload:               DefaultSummaryFiles[SummaryTypeDownload],
+	SummaryTypeProcessed:              DefaultSummaryFiles[SummaryTypeProcessed],
+	SummaryTypeConsolidated:           DefaultSummaryFiles[SummaryTypeConsolidated],
+	SummaryTypeConsolidatedGroups:     DefaultSummaryFiles[SummaryTypeConsolidatedGroups],
+	SummaryTypeConsolidatedCategories: DefaultSummaryFiles[SummaryTypeConsolidatedCategories],
+	SummaryTypeOverlap:                DefaultSummaryFiles[SummaryTypeOverlap],
+	SummaryTypeTop:                    DefaultSummaryFiles[SummaryTypeTop],
+	SummaryTypeArchive:                DefaultSummaryFiles[SummaryTypeArchive],
+}
+
+// SummaryTypesOutputSummaryFileToSkipMap maps summary types to their output file names that should be skipped
+var SummaryTypesOutputSummaryFileToSkipMap = map[string]bool{
+	SummaryTypeOutput:  true,
+	SummaryTypeArchive: true,
+}
+
+var SummaryTypesToDeleteAfterOutputGenerationMap = map[string]bool{
+	SummaryTypeDownload:               false,
+	SummaryTypeProcessed:              true,
+	SummaryTypeConsolidated:           true,
+	SummaryTypeConsolidatedGroups:     true,
+	SummaryTypeConsolidatedCategories: true,
+	SummaryTypeOverlap:                true,
+	SummaryTypeTop:                    true,
+	SummaryTypeArchive:                false,
 }

@@ -34,7 +34,7 @@ var searchCmd = &cobra.Command{
 
 		isIP := net.ParseIP(query) != nil
 
-		// Collect IP addresses and CNAMEs based on query
+		// Collect IP addresses and CNAMEs based on a query
 		ipAddresses, cnames := collectQueryData(query, isIP)
 
 		// Search for the query in files
@@ -140,7 +140,7 @@ func searchInAllFiles(
 func searchInFileType(query string, isIP bool, ipAddresses u.StringSet, cnames []string,
 	fileType string, mu *sync.Mutex, domainResults, ipResults, cnameResults map[string][]string) {
 
-	// Search for domain if query is not an IP
+	// Search for domain if a query is not an IP
 	if !isIP {
 		results := searchInFiles(query, constants.SourceTypeDomain, fileType, exactMatch)
 		mu.Lock()
@@ -185,7 +185,7 @@ func displaySearchResults(query string, isIP bool, domainResults, ipResults, cna
 	// Display IP results
 	displayIpResults(ipAddresses, ipResults)
 
-	// Show "no matches" message if nothing was found
+	// Show a "no matches" message if nothing was found
 	if !isIP && len(ipAddresses) == 0 && len(domainResults) == 0 && len(cnameResults) == 0 {
 		Logger.Infof("No matches found for '%s'", query)
 	}

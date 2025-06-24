@@ -218,3 +218,29 @@ func GetSummaryFiles[T any](
 	}
 	return files, nil
 }
+
+func GetFilesFromSummaries[T any](summaries []T, summaryType string) map[string]T {
+	files := make(map[string]T)
+	for _, summary := range summaries {
+		if file := getFilePathForSummary(summary, summaryType); file != "" {
+			files[file] = summary
+		}
+	}
+	return files
+}
+
+func getFilePathForSummary[T any](summary T, summaryType string) string {
+	switch summaryType {
+	case constants.SummaryTypeConsolidated,
+		constants.SummaryTypeConsolidatedGroups,
+		constants.SummaryTypeConsolidatedCategories:
+		if s, ok := any(summary).(c.ConsolidatedSummary); ok {
+			return s.Filepath
+		}
+	case constants.SummaryTypeTop:
+		if s, ok := any(summary).(c.TopSummary); ok {
+			return s.Filepath
+		}
+	}
+	return ""
+}
