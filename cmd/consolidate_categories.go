@@ -216,7 +216,7 @@ func getUniqueCategories(processedFiles []c.ProcessedFile) []string {
 		}
 	}
 
-	// Convert map to slice
+	// Convert the map to a slice
 	categories := make([]string, 0, len(categoriesSet))
 	for category := range categoriesSet {
 		categories = append(categories, category)

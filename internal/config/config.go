@@ -124,7 +124,12 @@ func LoadAppConfig(logger *multilog.Logger, configPath string) (AppConfig, []Sou
 	if err != nil {
 		return AppConfig{}, nil, fmt.Errorf("opening config file: %w", err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			logger.Errorf("Error closing config file: %v", err)
+		}
+	}(file)
 
 	var appConfig AppConfig
 	decoder := yaml.NewDecoder(file)
