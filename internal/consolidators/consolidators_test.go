@@ -7,7 +7,6 @@ import (
 
 	"github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/consolidators"
-	"github.com/phani-kb/dns-toolkit/internal/consolidators/mocks"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
@@ -20,19 +19,17 @@ func TestConsolidatorRegistry(t *testing.T) {
 	registry := consolidators.NewConsolidatorRegistry()
 	assert.NotNil(t, registry, "Registry should not be nil")
 
-	mockConsolidator := mocks.NewConsolidator(t)
 	sourceType := "test-source"
 	listType := "blocklist"
-	mockConsolidator.On("GetSourceType").Return(sourceType).Maybe()
-	mockConsolidator.On("GetListType").Return(listType).Maybe()
+	testConsolidator := consolidators.NewBaseConsolidator(sourceType, listType)
 
-	registry.RegisterConsolidator(sourceType, listType, mockConsolidator)
+	registry.RegisterConsolidator(sourceType, listType, &testConsolidator)
 
 	retrievedConsolidator, exists := registry.GetConsolidator(sourceType, listType)
 	assert.True(t, exists, "Consolidator should exist in registry")
 	assert.Equal(
 		t,
-		mockConsolidator,
+		&testConsolidator,
 		retrievedConsolidator,
 		"Retrieved consolidator should match registered consolidator",
 	)
@@ -49,7 +46,7 @@ func TestConsolidatorRegistry(t *testing.T) {
 	assert.True(t, exists, "Consolidator should exist in the map with the correct key")
 	assert.Equal(
 		t,
-		mockConsolidator,
+		&testConsolidator,
 		listedConsolidator,
 		"Listed consolidator should match registered consolidator",
 	)
@@ -67,10 +64,8 @@ func TestGlobalHelperFunctions(t *testing.T) {
 	listType := "blocklist"
 
 	consolidatorFactory := func(srcType, lstType string) consolidators.Consolidator {
-		mockConsolidator := mocks.NewConsolidator(t)
-		mockConsolidator.On("GetSourceType").Return(srcType)
-		mockConsolidator.On("GetListType").Return(lstType)
-		return mockConsolidator
+		baseConsolidator := consolidators.NewBaseConsolidator(srcType, lstType)
+		return &baseConsolidator
 	}
 
 	consolidators.RegisterConsolidator(sourceType, listType, consolidatorFactory)
