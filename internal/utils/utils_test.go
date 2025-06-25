@@ -904,3 +904,24 @@ func TestExtractArchiveZip(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "nested content", string(nestedExtractedContent))
 }
+
+func TestFindProjectRoot(t *testing.T) {
+	projectRoot, err := FindProjectRoot("")
+	assert.NoError(t, err)
+	assert.True(t, strings.HasSuffix(projectRoot, "dns-toolkit"),
+		"Project root should end with 'dns-toolkit', got: %s", projectRoot)
+
+	goModPath := filepath.Join(projectRoot, "go.mod")
+	_, err = os.Stat(goModPath)
+	assert.NoError(t, err, "go.mod should exist in project root")
+
+	wd, err := os.Getwd()
+	require.NoError(t, err)
+
+	projectRoot2, err := FindProjectRoot(wd)
+	assert.NoError(t, err)
+	assert.Equal(t, projectRoot, projectRoot2, "Should find same project root")
+
+	_, err = FindProjectRoot("/nonexistent/path/that/does/not/exist")
+	assert.Error(t, err)
+}

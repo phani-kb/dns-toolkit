@@ -16,13 +16,19 @@ echo -e "${GREEN}Creating coverage directory...${NC}"
 mkdir -p coverage
 mkdir -p coverage/archive
 
-# Run tests with coverage, excluding mocks directories
 echo -e "${GREEN}Running tests with coverage...${NC}"
-PACKAGES=$(go list ./... | grep -v "/mocks")
+
+export DNS_TOOLKIT_TEST_MODE=true
+export DNS_TOOLKIT_TEST_CONFIG_PATH=$(pwd)/testdata/config.yml
+
+PACKAGES=$(go list ./... | grep -v "/mocks" | grep -v "constants")
 if ! go test -coverprofile=coverage/coverage.out $PACKAGES; then
     echo -e "${RED}Tests failed! See output above for details.${NC}"
     exit 1
 fi
+
+unset DNS_TOOLKIT_TEST_CONFIG_PATH
+unset DNS_TOOLKIT_TEST_MODE
 
 echo -e "${GREEN}Filtering coverage report...${NC}"
 grep -v "test_helpers.go" coverage/coverage.out > coverage/filtered_coverage.out

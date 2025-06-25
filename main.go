@@ -1,18 +1,19 @@
 package main
 
 import (
-	"os"
-
 	"github.com/phani-kb/dns-toolkit/cmd"
 )
 
-func main() {
-
-	for _, arg := range os.Args {
+// isHelpRequested checks if help is requested in the command line arguments
+func isHelpRequested(args []string) bool {
+	for _, arg := range args {
 		if arg == "--help" || arg == "-h" || arg == "help" {
-			cmd.Execute()
-			return
+			return true
 		}
 	}
+	return false
+}
+
+func main() {
 	cmd.Execute()
 }

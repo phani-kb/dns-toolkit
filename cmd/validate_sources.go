@@ -3,18 +3,14 @@ package cmd
 import (
 	"fmt"
 	"log/slog"
-	"path/filepath"
 
 	"github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/spf13/cobra"
 )
 
-var (
-	validationPerformed bool
-	configPath          = filepath.Join("configs", "config.yml")
-)
+var validationPerformed bool
 
-func validateConfig() error {
+func validateConfig(configPath string) error {
 	if validationPerformed {
 		slog.Debug("Skipping validation as it has already been performed")
 		return nil
@@ -36,7 +32,12 @@ var validateSourcesCmd = &cobra.Command{
 	Use:   "validate-sources",
 	Short: "Validate the sources configuration",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := validateConfig(); err != nil {
+		configPath, err := GetConfigPath()
+		if err != nil {
+			slog.Error("Failed to get config path", "error", err)
+			return
+		}
+		if err := validateConfig(configPath); err != nil {
 			slog.Error("Validation failed", "error", err)
 			return
 		}
