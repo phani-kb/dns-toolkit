@@ -1,0 +1,33 @@
+# This is a test config file for the unit tests
+application:
+  name: DNS-Toolkit-Test
+  version: test-version
+  description: A test configuration for DNS Toolkit unit tests.
+dns_toolkit:
+  max_retries: 3
+  skip_name_special_chars_check: true
+  folders:
+    download: testdata/download
+    processed: testdata/processed
+    consolidated: testdata/consolidated
+    summary: testdata/summary
+    overlap: testdata/overlap
+    top: testdata/top
+    consolidated_groups: testdata/consolidated_groups
+    consolidated_categories: testdata/consolidated_categories
+    archive: testdata/archive
+    backup: testdata/backup
+    output: testdata/output
+  source_files:
+    - testdata/config/sources.json
+multilog:
+  handlers:
+    - type: console
+      level: debug
+      enabled: true
+      use_single_letter_level: true
+    - type: file
+      subtype: text
+      level: debug
+      enabled: true
+      file: testdata/logs/dns-toolkit.log

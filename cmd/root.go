@@ -9,6 +9,7 @@ import (
 
 	"github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
+	"github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -52,10 +53,22 @@ func validateAndSetDirs() {
 			dir = AppConfig.DNSToolkit.Folders.Archive
 		case "output":
 			dir = AppConfig.DNSToolkit.Folders.Output
+		case "summaries":
+			dir = AppConfig.DNSToolkit.Folders.Summaries
+		case "backup":
+			dir = AppConfig.DNSToolkit.Folders.Backup
 		}
 
 		if dir == "" {
 			dir = defaultDir
+		}
+
+		// In test mode, if a path is relative, make it relative to project root
+		// instead of current working directory
+		if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" && !filepath.IsAbs(dir) {
+			if projectRoot, err := utils.FindProjectRoot(""); err == nil {
+				dir = filepath.Join(projectRoot, dir)
+			}
 		}
 
 		switch key {
@@ -79,8 +92,15 @@ func validateAndSetDirs() {
 			constants.ArchiveDir = dir
 		case "output":
 			constants.OutputDir = dir
+		case "backup":
+			constants.BackupDir = dir
 		}
 	}
+}
+
+// InitForTesting initializes directories for testing when cobra.OnInitialize is not called
+func InitForTesting() {
+	validateAndSetDirs()
 }
 
 var rootCmd = &cobra.Command{
@@ -114,12 +134,17 @@ func Execute() {
 }
 
 func init() {
-	configPath := filepath.Join("configs", "config.yml")
+	configPath, err := GetConfigPath()
+	if err != nil {
+		slog.Error("Failed to get config path", "error", err)
+		os.Exit(1)
+	}
+
 	Logger = common.InitLogger(configPath)
 
-	// Skip validation for the help command
+	// Skip validation for help commands
 	if len(os.Args) <= 1 || (os.Args[1] != "help" && os.Args[1] != "--help" && os.Args[1] != "-h") {
-		if err := validateConfig(); err != nil {
+		if err := validateConfig(configPath); err != nil {
 			slog.Error("Config validation failed", "error", err)
 			os.Exit(1)
 		}

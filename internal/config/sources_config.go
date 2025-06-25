@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -212,9 +213,37 @@ func (s *Source) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
+// resolveFilePath resolves file paths, handling relative paths in test mode
+func resolveFilePath(filePath string) string {
+	// If a path is absolute, return as-is
+	if filepath.IsAbs(filePath) {
+		return filePath
+	}
+
+	if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
+		wd, err := os.Getwd()
+		if err != nil {
+			return filePath
+		}
+
+		projectRoot, err := u.FindProjectRoot(wd)
+		if err == nil && projectRoot != "" {
+			resolvedPath := filepath.Join(projectRoot, filePath)
+			if _, err := os.Stat(resolvedPath); err == nil {
+				return resolvedPath
+			}
+		}
+	}
+
+	return filePath
+}
+
 func LoadSourcesConfig(logger *multilog.Logger, filePath string) (SourcesConfig, error) {
 	logger.Debugf("Loading sources config from %s", filePath)
-	file, err := os.Open(filePath)
+
+	resolvedPath := resolveFilePath(filePath)
+
+	file, err := os.Open(resolvedPath)
 	if err != nil {
 		return SourcesConfig{}, fmt.Errorf("error opening sources file: %w", err)
 	}

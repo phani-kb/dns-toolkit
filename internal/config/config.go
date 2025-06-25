@@ -54,10 +54,9 @@ func (dc *DNSToolkitConfig) Validate() error {
 		return errors.New("at least one source file is required")
 	}
 	for _, sourceFile := range dc.SourceFiles {
-		if _, err := os.Stat(sourceFile); err != nil {
+		if err := validateSourceFile(sourceFile); err != nil {
 			return fmt.Errorf("source file %s not found: %w", sourceFile, err)
 		}
-
 	}
 
 	if dc.MaxWorkers > runtime.GOMAXPROCS(0) {
@@ -65,6 +64,13 @@ func (dc *DNSToolkitConfig) Validate() error {
 	}
 
 	return nil
+}
+
+// validateSourceFile checks if a source file exists, handling relative paths in test mode
+func validateSourceFile(sourceFile string) error {
+	resolvedPath := resolveFilePath(sourceFile)
+	_, err := os.Stat(resolvedPath)
+	return err
 }
 
 type FoldersConfig struct {
@@ -78,6 +84,8 @@ type FoldersConfig struct {
 	ConsolidatedCategories string `yaml:"consolidated_categories"`
 	Archive                string `yaml:"archive"`
 	Output                 string `yaml:"output"`
+	Summaries              string `yaml:"summaries"`
+	Backup                 string `yaml:"backup"`
 }
 
 type AppConfig struct {

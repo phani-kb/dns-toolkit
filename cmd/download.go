@@ -9,6 +9,7 @@ import (
 	"time"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
+	cfg "github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	d "github.com/phani-kb/dns-toolkit/internal/downloaders"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
@@ -32,7 +33,7 @@ var downloadCmd = &cobra.Command{
 		}
 
 		maxRetries := defaultMaxRetries
-		if AppConfig.DNSToolkit.MaxRetries > 0 {
+		if AppConfig != nil && AppConfig.DNSToolkit.MaxRetries > 0 {
 			maxRetries = AppConfig.DNSToolkit.MaxRetries
 		}
 
@@ -49,9 +50,11 @@ var downloadCmd = &cobra.Command{
 		summaries := make([]c.DownloadSummary, 0)
 		var mu sync.Mutex
 
-		maxWorkers := AppConfig.DNSToolkit.MaxWorkers
-		if maxWorkers <= 0 {
-			maxWorkers = runtime.GOMAXPROCS(0)
+		maxWorkers := runtime.GOMAXPROCS(0)
+		if AppConfig != nil {
+			if AppConfig.DNSToolkit.MaxWorkers > 0 {
+				maxWorkers = AppConfig.DNSToolkit.MaxWorkers
+			}
 		}
 		Logger.Infof("Using worker pool with %d worker(s) for downloads", maxWorkers)
 		workerPool := c.NewDTWorkerPool(maxWorkers)
@@ -64,7 +67,11 @@ var downloadCmd = &cobra.Command{
 		var statsMutex sync.Mutex
 
 		for _, sourcesConfig := range SourcesConfigs {
-			for _, source := range sourcesConfig.GetEnabledSources(AppConfig.DNSToolkit.SourceFilters) {
+			var sourceFilters cfg.SourceFilters
+			if AppConfig != nil {
+				sourceFilters = AppConfig.DNSToolkit.SourceFilters
+			}
+			for _, source := range sourcesConfig.GetEnabledSources(sourceFilters) {
 				totalSources++
 				source := source // local copy for goroutine
 				workerPool.Submit(func() {
@@ -99,12 +106,22 @@ var downloadCmd = &cobra.Command{
 						Logger.Debugf("Using default downloader with %d retries for %s", maxRetries, source.Name)
 					}
 
+					var skipCertVerification bool
+					var skipCertVerificationHosts []string
+					var applicationConfig cfg.ApplicationConfig
+
+					if AppConfig != nil {
+						skipCertVerification = AppConfig.DNSToolkit.SkipCertVerification
+						skipCertVerificationHosts = AppConfig.DNSToolkit.SkipCertVerificationHosts
+						applicationConfig = AppConfig.Application
+					}
+
 					filePath, fetchSkipped, err := downloader.Download(
 						Logger,
 						downloadFile,
-						AppConfig.DNSToolkit.SkipCertVerification,
-						AppConfig.DNSToolkit.SkipCertVerificationHosts,
-						AppConfig.Application,
+						skipCertVerification,
+						skipCertVerificationHosts,
+						applicationConfig,
 					)
 
 					for _, target := range downloadFile.Targets {
@@ -156,7 +173,7 @@ var downloadCmd = &cobra.Command{
 							if err := downloader.PostDownloadProcess(Logger, targetFilePath, summary.CountToConsider); err != nil {
 								Logger.Errorf("Post download process error for %s: %v", source.Name, err)
 								summary.Error = fmt.Sprintf("Post-download processing error: %v", err)
-							} else if AppConfig.DNSToolkit.FilesChecksum.Enabled {
+							} else if AppConfig != nil && AppConfig.DNSToolkit.FilesChecksum.Enabled {
 								checksum := u.CalculateChecksum(Logger, filePath, AppConfig.DNSToolkit.FilesChecksum.Algorithm)
 								summary.Checksum = checksum
 							}

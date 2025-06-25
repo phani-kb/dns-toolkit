@@ -27,6 +27,30 @@ import (
 	"github.com/phani-kb/multilog"
 )
 
+// FindProjectRoot walks up the directory tree to find the project root (containing go.mod)
+// If startDir is empty, it uses the current working directory
+func FindProjectRoot(startDir string) (string, error) {
+	if startDir == "" {
+		wd, err := os.Getwd()
+		if err != nil {
+			return "", err
+		}
+		startDir = wd
+	}
+
+	dir := startDir
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "go.mod")); err == nil {
+			return dir, nil
+		}
+		parent := filepath.Dir(dir)
+		if parent == dir {
+			return "", fmt.Errorf("go.mod not found from starting directory: %s", startDir)
+		}
+		dir = parent
+	}
+}
+
 type StringSet map[string]bool
 
 func NewStringSet(entries []string) StringSet {

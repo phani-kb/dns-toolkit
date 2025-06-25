@@ -1,0 +1,32 @@
+{
+  "sources": [
+    {
+      "name": "Local Allowlist (Domain)",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "file://testdata/custom/allowlist_domain.txt"
+    },
+    {
+      "name": "Local Blocklist (Domain)",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "blocklist"
+            }
+          ]
+        }
+      ],
+      "url": "file://testdata/custom/blocklist_domain.txt"
+    }
+  ]
+}
