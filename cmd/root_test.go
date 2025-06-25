@@ -50,7 +50,11 @@ func TestValidateAndSetDirs(t *testing.T) {
 	os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
 	validateAndSetDirs()
 	assert.True(t, filepath.IsAbs(constants.DownloadDir))
-	assert.True(t, filepath.Base(filepath.Dir(constants.DownloadDir)) == "test" && filepath.Base(constants.DownloadDir) == "download")
+	assert.True(
+		t,
+		filepath.Base(filepath.Dir(constants.DownloadDir)) == "test" &&
+			filepath.Base(constants.DownloadDir) == "download",
+	)
 
 	os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
 	validateAndSetDirs()
@@ -145,25 +149,66 @@ func TestValidateAndSetDirsAllCases(t *testing.T) {
 
 	// Verify all constants are set as absolute paths with correct suffixes
 	assert.True(t, filepath.IsAbs(constants.DownloadDir))
-	assert.True(t, filepath.Base(filepath.Dir(constants.DownloadDir)) == "custom" && filepath.Base(constants.DownloadDir) == "download")
+	assert.True(
+		t,
+		filepath.Base(filepath.Dir(constants.DownloadDir)) == "custom" &&
+			filepath.Base(constants.DownloadDir) == "download",
+	)
 	assert.True(t, filepath.IsAbs(constants.ProcessedDir))
-	assert.True(t, filepath.Base(filepath.Dir(constants.ProcessedDir)) == "custom" && filepath.Base(constants.ProcessedDir) == "processed")
+	assert.True(
+		t,
+		filepath.Base(filepath.Dir(constants.ProcessedDir)) == "custom" &&
+			filepath.Base(constants.ProcessedDir) == "processed",
+	)
 	assert.True(t, filepath.IsAbs(constants.ConsolidatedDir))
-	assert.True(t, filepath.Base(filepath.Dir(constants.ConsolidatedDir)) == "custom" && filepath.Base(constants.ConsolidatedDir) == "consolidated")
+	assert.True(
+		t,
+		filepath.Base(filepath.Dir(constants.ConsolidatedDir)) == "custom" &&
+			filepath.Base(constants.ConsolidatedDir) == "consolidated",
+	)
 	assert.True(t, filepath.IsAbs(constants.SummaryDir))
-	assert.True(t, filepath.Base(filepath.Dir(constants.SummaryDir)) == "custom" && filepath.Base(constants.SummaryDir) == "summary")
+	assert.True(
+		t,
+		filepath.Base(filepath.Dir(constants.SummaryDir)) == "custom" &&
+			filepath.Base(constants.SummaryDir) == "summary",
+	)
 	assert.True(t, filepath.IsAbs(constants.OverlapDir))
-	assert.True(t, filepath.Base(filepath.Dir(constants.OverlapDir)) == "custom" && filepath.Base(constants.OverlapDir) == "overlap")
+	assert.True(
+		t,
+		filepath.Base(filepath.Dir(constants.OverlapDir)) == "custom" &&
+			filepath.Base(constants.OverlapDir) == "overlap",
+	)
 	assert.True(t, filepath.IsAbs(constants.TopDir))
-	assert.True(t, filepath.Base(filepath.Dir(constants.TopDir)) == "custom" && filepath.Base(constants.TopDir) == "top")
+	assert.True(
+		t,
+		filepath.Base(filepath.Dir(constants.TopDir)) == "custom" && filepath.Base(constants.TopDir) == "top",
+	)
 	assert.True(t, filepath.IsAbs(constants.ConsolidatedGroupsDir))
-	assert.True(t, filepath.Base(filepath.Dir(constants.ConsolidatedGroupsDir)) == "custom" && filepath.Base(constants.ConsolidatedGroupsDir) == "consolidated_groups")
+	assert.True(
+		t,
+		filepath.Base(filepath.Dir(constants.ConsolidatedGroupsDir)) == "custom" &&
+			filepath.Base(constants.ConsolidatedGroupsDir) == "consolidated_groups",
+	)
 	assert.True(t, filepath.IsAbs(constants.ConsolidatedCategoriesDir))
-	assert.True(t, filepath.Base(filepath.Dir(constants.ConsolidatedCategoriesDir)) == "custom" && filepath.Base(constants.ConsolidatedCategoriesDir) == "consolidated_categories")
+	assert.True(
+		t,
+		filepath.Base(filepath.Dir(constants.ConsolidatedCategoriesDir)) == "custom" &&
+			filepath.Base(constants.ConsolidatedCategoriesDir) == "consolidated_categories",
+	)
 	assert.True(t, filepath.IsAbs(constants.ArchiveDir))
-	assert.True(t, filepath.Base(filepath.Dir(constants.ArchiveDir)) == "custom" && filepath.Base(constants.ArchiveDir) == "archive")
+	assert.True(
+		t,
+		filepath.Base(filepath.Dir(constants.ArchiveDir)) == "custom" &&
+			filepath.Base(constants.ArchiveDir) == "archive",
+	)
 	assert.True(t, filepath.IsAbs(constants.OutputDir))
-	assert.True(t, filepath.Base(filepath.Dir(constants.OutputDir)) == "custom" && filepath.Base(constants.OutputDir) == "output")
+	assert.True(
+		t,
+		filepath.Base(filepath.Dir(constants.OutputDir)) == "custom" && filepath.Base(constants.OutputDir) == "output",
+	)
 	assert.True(t, filepath.IsAbs(constants.BackupDir))
-	assert.True(t, filepath.Base(filepath.Dir(constants.BackupDir)) == "custom" && filepath.Base(constants.BackupDir) == "backup")
+	assert.True(
+		t,
+		filepath.Base(filepath.Dir(constants.BackupDir)) == "custom" && filepath.Base(constants.BackupDir) == "backup",
+	)
 }
