@@ -57,15 +57,15 @@ func validateAndSetDirs() {
 			dir = AppConfig.DNSToolkit.Folders.Summaries
 		case "backup":
 			dir = AppConfig.DNSToolkit.Folders.Backup
+		case "output_ignored", "output_groups", "output_categories", "output_top", "output_summaries":
+			continue
 		}
 
 		if dir == "" {
 			dir = defaultDir
 		}
 
-		// In test mode, if a path is relative, make it relative to project root
-		// instead of current working directory
-		if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" && !filepath.IsAbs(dir) {
+		if !filepath.IsAbs(dir) {
 			if projectRoot, err := utils.FindProjectRoot(""); err == nil {
 				dir = filepath.Join(projectRoot, dir)
 			}
@@ -96,6 +96,13 @@ func validateAndSetDirs() {
 			constants.BackupDir = dir
 		}
 	}
+
+	// Update computed output subdirectories after OutputDir is set
+	constants.OutputGroupsDir = constants.OutputDir + "/groups"
+	constants.OutputCategoriesDir = constants.OutputDir + "/categories"
+	constants.OutputIgnoredDir = constants.OutputDir + "/ignored"
+	constants.OutputTopDir = constants.OutputDir + "/top"
+	constants.OutputSummariesDir = constants.OutputDir + "/summaries"
 }
 
 // InitForTesting initializes directories for testing when cobra.OnInitialize is not called

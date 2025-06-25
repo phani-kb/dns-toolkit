@@ -5,18 +5,31 @@ import (
 
 	"github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/spf13/cobra"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestVersionCommand(t *testing.T) {
-	if AppConfig == nil {
-		AppConfig = &config.AppConfig{}
-		AppConfig.Application.Name = "DNS-Toolkit"
-		AppConfig.Application.Version = "test-version"
+	oldConfig := AppConfig
+	defer func() { AppConfig = oldConfig }()
+
+	AppConfig = &config.AppConfig{
+		Application: config.ApplicationConfig{
+			Name:    "DNS-Toolkit",
+			Version: "test-version",
+		},
 	}
 
-	runFunc := versionCmd.Run
+	assert.Equal(t, "version", versionCmd.Use)
+	assert.Equal(t, "Print the version number of DNS Toolkit", versionCmd.Short)
+	assert.NotNil(t, versionCmd.Run)
 
+	runFunc := versionCmd.Run
 	runFunc(versionCmd, []string{})
+}
+
+func TestVersionCommandStructure(t *testing.T) {
+	assert.Equal(t, "version", versionCmd.Use)
+	assert.Contains(t, versionCmd.Short, "version")
 }
 
 func TestVersionCommandNoArgs(t *testing.T) {

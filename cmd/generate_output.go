@@ -63,8 +63,17 @@ func prepareDirectories() error {
 
 // loadTemplates loads and parses template files
 func loadTemplates() (*template.Template, []byte, error) {
-	staticTemplatePath := filepath.Join("configs", "templates", "static_template.txt")
-	dynamicTemplatePath := filepath.Join("configs", "templates", "dynamic_template.txt")
+	configsDir := "configs"
+
+	// In test mode, resolve relative paths to project root
+	if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
+		if projectRoot, err := u.FindProjectRoot(""); err == nil {
+			configsDir = filepath.Join(projectRoot, "configs")
+		}
+	}
+
+	staticTemplatePath := filepath.Join(configsDir, "templates", "static_template.txt")
+	dynamicTemplatePath := filepath.Join(configsDir, "templates", "dynamic_template.txt")
 
 	staticTemplate, err := os.ReadFile(staticTemplatePath)
 	if err != nil {

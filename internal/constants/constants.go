@@ -310,6 +310,38 @@ var SummaryTypesMap = map[string]string{
 	SummaryTypeOutput:                 SummaryTypeOutput,
 }
 
+// AllSummaryTypes contains all valid summary types as a slice
+var AllSummaryTypes = []string{
+	SummaryTypeDownload,
+	SummaryTypeProcessed,
+	SummaryTypeConsolidated,
+	SummaryTypeConsolidatedGroups,
+	SummaryTypeConsolidatedCategories,
+	SummaryTypeOverlap,
+	SummaryTypeOverlapDetailed,
+	SummaryTypeTop,
+	SummaryTypeArchive,
+	SummaryTypeOutput,
+}
+
+// FolderToSummaryTypeMap maps folder names to their corresponding summary types
+var FolderToSummaryTypeMap = map[string]string{
+	"download":                SummaryTypeDownload,
+	"processed":               SummaryTypeProcessed,
+	"consolidated":            SummaryTypeConsolidated,
+	"consolidated_groups":     SummaryTypeConsolidatedGroups,
+	"consolidated_categories": SummaryTypeConsolidatedCategories,
+	"overlap":                 SummaryTypeOverlap,
+	"top":                     SummaryTypeTop,
+	"archive":                 SummaryTypeArchive,
+	"output":                  SummaryTypeOutput,
+	"output_ignored":          SummaryTypeOutput,
+	"output_groups":           SummaryTypeConsolidatedGroups,
+	"output_categories":       SummaryTypeConsolidatedCategories,
+	"output_top":              SummaryTypeTop,
+	"output_summaries":        SummaryTypeOutput,
+}
+
 // SummaryTypesWithTemplateMap SummaryTypes with template strings
 var SummaryTypesWithTemplateMap = map[string]string{
 	SummaryTypeConsolidated:           DefaultSummaryFiles[SummaryTypeConsolidated],
