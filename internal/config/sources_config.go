@@ -318,7 +318,7 @@ func LoadSourcesConfig(logger *multilog.Logger, filePath string) (SourcesConfig,
 func (sc *SourcesConfig) GetEnabledSources(filters SourceFilters) []Source {
 	uniqueSources := make(map[string]Source)
 	for _, source := range sc.Sources {
-		if source.IsEnabled() {
+		if source.IsEnabled() && matchesFilters(source, filters) {
 			key := fmt.Sprintf("%s_%s", source.Name, source.Types[0].Name)
 			uniqueSources[key] = source
 		}
@@ -331,6 +331,140 @@ func (sc *SourcesConfig) GetEnabledSources(filters SourceFilters) []Source {
 		return strings.ToLower(enabledSources[i].Name) < strings.ToLower(enabledSources[j].Name)
 	})
 	return enabledSources
+}
+
+func matchesFilters(source Source, filters SourceFilters) bool {
+	// Check Name filter
+	if len(filters.Name.Contains) > 0 {
+		matches := false
+		for _, substr := range filters.Name.Contains {
+			if strings.Contains(source.Name, substr) {
+				matches = true
+				break
+			}
+		}
+		if !matches {
+			return false
+		}
+	}
+	if len(filters.Name.NotContains) > 0 {
+		for _, substr := range filters.Name.NotContains {
+			if strings.Contains(source.Name, substr) {
+				return false
+			}
+		}
+	}
+
+	// Check Type filter
+	if filters.Type != "" {
+		typeMatches := false
+		for _, t := range source.Types {
+			if t.Name == filters.Type {
+				typeMatches = true
+				break
+			}
+		}
+		if !typeMatches {
+			return false
+		}
+	}
+
+	// Check Frequency filter
+	if filters.Frequency != "" && source.Frequency != filters.Frequency {
+		return false
+	}
+
+	// Check Category filter
+	if len(filters.Category.Contains) > 0 {
+		matches := false
+		for _, substr := range filters.Category.Contains {
+			for _, category := range source.Categories {
+				if strings.Contains(category, substr) {
+					matches = true
+					break
+				}
+			}
+			if matches {
+				break
+			}
+		}
+		if !matches {
+			return false
+		}
+	}
+	if len(filters.Category.NotContains) > 0 {
+		for _, substr := range filters.Category.NotContains {
+			for _, category := range source.Categories {
+				if strings.Contains(category, substr) {
+					return false
+				}
+			}
+		}
+	}
+
+	// Check ListType filter
+	if filters.ListType != "" {
+		listTypeMatches := false
+		for _, t := range source.Types {
+			for _, lt := range t.GetListTypes() {
+				if lt.Name == filters.ListType {
+					listTypeMatches = true
+					break
+				}
+			}
+			if listTypeMatches {
+				break
+			}
+		}
+		if !listTypeMatches {
+			return false
+		}
+	}
+
+	// Check Countries filter
+	if len(filters.Countries.Contains) > 0 {
+		matches := false
+		for _, substr := range filters.Countries.Contains {
+			for _, country := range source.Countries {
+				if strings.Contains(country, substr) {
+					matches = true
+					break
+				}
+			}
+			if matches {
+				break
+			}
+		}
+		if !matches {
+			return false
+		}
+	}
+	if len(filters.Countries.NotContains) > 0 {
+		for _, substr := range filters.Countries.NotContains {
+			for _, country := range source.Countries {
+				if strings.Contains(country, substr) {
+					return false
+				}
+			}
+		}
+	}
+
+	// Check Group filter
+	if filters.Group != "" {
+		//groupMatches := false
+		for _, t := range source.Types {
+			for _, lt := range t.GetListTypes() {
+				for _, group := range lt.Groups {
+					if group == filters.Group {
+						return true
+					}
+				}
+			}
+		}
+		return false
+	}
+
+	return true
 }
 
 // IsEnabled returns true if the source is enabled.

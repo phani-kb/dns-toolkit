@@ -92,6 +92,16 @@ func validateAndSetDirs() {
 			constants.ArchiveDir = dir
 		case "output":
 			constants.OutputDir = dir
+		case "output_ignored":
+			constants.OutputIgnoredDir = dir
+		case "output_groups":
+			constants.OutputGroupsDir = dir
+		case "output_categories":
+			constants.OutputCategoriesDir = dir
+		case "output_top":
+			constants.OutputTopDir = dir
+		case "output_summaries":
+			constants.OutputSummariesDir = dir
 		case "backup":
 			constants.BackupDir = dir
 		}
