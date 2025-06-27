@@ -45,6 +45,7 @@ data/overlap/
 data/top/
 data/archive/
 data/backup/
+data/profiles/
 
 # Test files
 testdata/**/*.json
