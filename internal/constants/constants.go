@@ -403,6 +403,20 @@ var SummaryTypesOutputSummaryFileToSkipMap = map[string]bool{
 	SummaryTypeArchive: true,
 }
 
+// ArchiveFoldersToSkipMap contains top level folders that should be skipped during archiving
+var ArchiveFoldersToSkipMap = map[string]bool{
+	DownloadDir:               true,
+	ProcessedDir:              true,
+	ConsolidatedDir:           true,
+	ConsolidatedGroupsDir:     true,
+	ConsolidatedCategoriesDir: true,
+	OverlapDir:                true,
+	TopDir:                    true,
+	ArchiveDir:                true,
+	BackupDir:                 true,
+	ProfilesDir:               true,
+}
+
 var SummaryTypesToDeleteAfterOutputGenerationMap = map[string]bool{
 	SummaryTypeDownload:               false,
 	SummaryTypeProcessed:              true,
