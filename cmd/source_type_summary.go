@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/phani-kb/dns-toolkit/internal/constants"
+	r "github.com/phani-kb/dns-toolkit/internal/processors"
 
 	"github.com/phani-kb/dns-toolkit/internal/config"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
@@ -111,6 +112,23 @@ func processSource(
 					mu.Lock()
 					counts[sourceType]++
 					mu.Unlock()
+				}
+			} else {
+				for _, listTypeObj := range sourceTypeObj.GetListTypes() {
+					listType := listTypeObj.Name
+					_, exists := r.Processors.GetProcessor(sourceType, listType)
+					if exists {
+						actualType = sourceType
+						logger.Infof("%s -> %s", source.Name, sourceType)
+						mu.Lock()
+						counts[sourceType]++
+						mu.Unlock()
+					} else {
+						logger.Warnf("%s: unknown source type %s", source.Name, sourceType)
+						mu.Lock()
+						counts[constants.SourceTypeUnknown]++
+						mu.Unlock()
+					}
 				}
 			}
 

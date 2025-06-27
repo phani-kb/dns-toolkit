@@ -39,6 +39,7 @@ var (
 	ArchiveDir                = "data/archive"
 	BackupDir                 = "data/backup"
 	OutputDir                 = "data/output"
+	ProfilesDir               = "data/profiles"
 	OutputGroupsDir           = OutputDir + "/groups"
 	OutputCategoriesDir       = OutputDir + "/categories"
 	OutputIgnoredDir          = OutputDir + "/ignored"
@@ -59,6 +60,7 @@ var Folders = map[string]string{
 	"archive":                 ArchiveDir,
 	"backup":                  BackupDir,
 	"output":                  OutputDir,
+	"profiles":                ProfilesDir,
 	"output_ignored":          OutputIgnoredDir,
 	"output_groups":           OutputGroupsDir,
 	"output_categories":       OutputCategoriesDir,
@@ -271,9 +273,12 @@ const (
 	EntryMinCharLength            = 6
 	MaxPreallocEntries            = 10_000_000
 	MinPreallocEntries            = 10_000
+	DefaultBlockProfileRate       = 1000
 	MinFilesForParallelProcessing = 10
 	MaxEntryLength                = 255
 )
+
+var DefaultMinSourcesRange = []int{3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
 
 // CommentPrefixes Comment prefixes used in various formats
 var CommentPrefixes = []string{
