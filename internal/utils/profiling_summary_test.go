@@ -109,6 +109,7 @@ func TestAnalyzeProfiles(t *testing.T) {
 	defer os.RemoveAll(tempDir)
 
 	err = AnalyzeProfiles(logger, ProfileOptions{OutputDir: "/non/existent/directory"})
+	assert.NoError(t, err)
 
 	err = AnalyzeProfiles(logger, ProfileOptions{OutputDir: tempDir})
 	assert.NoError(t, err)

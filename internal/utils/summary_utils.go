@@ -219,6 +219,52 @@ func GetSummaryFiles[T any](
 	return files, nil
 }
 
+// DetermineSummaryTypeFromPath determines the summary type based on a file path
+func DetermineSummaryTypeFromPath(path string) string {
+	filename := filepath.Base(path)
+
+	// Check if the filename starts with any of the known summary type prefixes
+	for _, summaryType := range constants.AllSummaryTypes {
+		if strings.HasPrefix(filename, summaryType) {
+			// Special case for consolidated_groups vs. consolidated
+			if summaryType == constants.SummaryTypeConsolidated &&
+				strings.HasPrefix(filename, constants.SummaryTypeConsolidatedGroups) {
+				return constants.SummaryTypeConsolidatedGroups
+			}
+			return summaryType
+		}
+	}
+
+	return constants.SummaryTypeUnknown
+}
+
+// GetSummaryTypeFromFolder determines the summary type based on the folder name
+func GetSummaryTypeFromFolder(folderName string) string {
+	// Check direct mapping
+	if summaryType, exists := constants.FolderToSummaryTypeMap[folderName]; exists {
+		return summaryType
+	}
+
+	return constants.SummaryTypeUnknown
+}
+
+// GetFoldersToArchive returns a map of folders that should be archived
+func GetFoldersToArchive(logger *multilog.Logger, folders map[string]string) map[string]string {
+	result := make(map[string]string)
+	// Add folders based on summary types
+	for folderKey, folderPath := range folders {
+		summaryType := GetSummaryTypeFromFolder(folderKey)
+		logger.Debugf("Processing folder: %s, Summary Type: %s, Path: %s", folderKey, summaryType, folderPath)
+		if summaryType != constants.SummaryTypeUnknown && !constants.ArchiveFoldersToSkipMap[folderPath] {
+			result[folderPath] = summaryType
+		} else {
+			logger.Debugf("Skipping folder %s for summary type %s", folderPath, summaryType)
+		}
+	}
+
+	return result
+}
+
 func GetFilesFromSummaries[T any](summaries []T, summaryType string) map[string]T {
 	files := make(map[string]T)
 	for _, summary := range summaries {

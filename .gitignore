@@ -49,3 +49,4 @@ data/profiles/
 
 # Test files
 testdata/**/*.json
+testdata/**/*.tgz
