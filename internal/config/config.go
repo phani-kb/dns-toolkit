@@ -86,6 +86,7 @@ type FoldersConfig struct {
 	Output                 string `yaml:"output"`
 	Summaries              string `yaml:"summaries"`
 	Backup                 string `yaml:"backup"`
+	Profiles               string `yaml:"profiles"`
 }
 
 type AppConfig struct {
