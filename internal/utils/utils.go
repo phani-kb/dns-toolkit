@@ -12,6 +12,7 @@ import (
 	"hash"
 	"io"
 	"math/rand"
+	"net"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -286,6 +287,32 @@ func IsComment(line string) bool {
 	return false
 }
 
+// IsIP checks if a string is a valid IP address (IPv4 or IPv6).
+//
+// Parameters:
+//   - line: The string to check
+//
+// Returns:
+//   - true if the string is a valid IP address, false otherwise
+func IsIP(line string) bool {
+	return net.ParseIP(line) != nil
+}
+
+// IsCIDR checks if a string is a valid CIDR notation address.
+//
+// Parameters:
+//   - line: The string to check
+//
+// Returns:
+//   - true if the string is a valid CIDR address, false otherwise
+func IsCIDR(line string) bool {
+	ipAddr, ipNet, err := net.ParseCIDR(line)
+	if err != nil {
+		return false
+	}
+	return ipAddr != nil && ipNet != nil
+}
+
 // GetTimestamp returns the current time formatted according to the application's standard timestamp format.
 //
 // Returns:
@@ -438,6 +465,23 @@ func isCommentFast(line string) bool {
 		}
 	}
 	return false
+}
+
+// GetSourceTypeFromStr determines the source type from a string by checking if it
+// begins with any of the known source type prefixes.
+//
+// Parameters:
+//   - str: The string to analyze
+//
+// Returns:
+//   - The identified source type or SourceTypeUnknown if no match is found
+func GetSourceTypeFromStr(str string) string {
+	for sourceType := range constants.SourceTypeRegexMap {
+		if strings.HasPrefix(str, sourceType) {
+			return sourceType
+		}
+	}
+	return constants.SourceTypeUnknown
 }
 
 // IsDomain checks if a string is a valid domain name.

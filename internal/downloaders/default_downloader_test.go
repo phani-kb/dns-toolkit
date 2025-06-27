@@ -387,8 +387,6 @@ func TestCreateHTTPClient(t *testing.T) {
 	assert.NotNil(t, clientWithBoth, "Should create a client with both skip options")
 }
 
-// ERROR HANDLING AND RETRY TESTS
-
 func TestDefaultDownloader_Download_HTTPError(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
