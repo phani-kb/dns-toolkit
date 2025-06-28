@@ -83,7 +83,7 @@ func (p *AdGuardAllowlistProcessor) Process(_ *multilog.Logger, content string) 
 	return validEntries, invalidEntries
 }
 
-func extractAllowlistDomains(logger *multilog.Logger, content string) ([]string, []string) {
+func ExtractAllowlistDomains(logger *multilog.Logger, content string) ([]string, []string) {
 	var validEntries, invalidEntries []string
 	lines := strings.Split(content, "\n")
 
@@ -114,7 +114,7 @@ func extractAllowlistDomains(logger *multilog.Logger, content string) ([]string,
 	return validEntries, invalidEntries
 }
 
-func extractBlocklistDomains(logger *multilog.Logger, content string) ([]string, []string) {
+func ExtractBlocklistDomains(logger *multilog.Logger, content string) ([]string, []string) {
 	var validEntries, invalidEntries []string
 	lines := strings.Split(content, "\n")
 
@@ -159,6 +159,6 @@ func init() {
 		},
 	)
 
-	RegisterGenericProcessor(adguardSourceTypeDomain, extractAllowlistDomains, false, true)
-	RegisterGenericProcessor(adguardSourceTypeDomain, extractBlocklistDomains, true, false)
+	RegisterGenericProcessor(adguardSourceTypeDomain, ExtractAllowlistDomains, false, true)
+	RegisterGenericProcessor(adguardSourceTypeDomain, ExtractBlocklistDomains, true, false)
 }
