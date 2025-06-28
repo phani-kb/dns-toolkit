@@ -46,6 +46,7 @@ data/top/
 data/archive/
 data/backup/
 data/profiles/
+data/*.json
 
 # Test files
 testdata/**/*.json
