@@ -19,8 +19,9 @@ import (
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 )
 
-func createTestLogger() *multilog.Logger {
-	return multilog.NewLogger()
+func createTestLogger(t *testing.T) *multilog.Logger {
+	logger, _ := multilog.NewTestLogger(t)
+	return logger
 }
 
 func TestNewStringSet(t *testing.T) {
@@ -115,7 +116,7 @@ func TestRemoveDuplicates(t *testing.T) {
 func TestSaveFile(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 	tempDir, err := os.MkdirTemp("", "test_save_file")
 	require.NoError(t, err)
 	defer os.RemoveAll(tempDir)
@@ -141,7 +142,7 @@ func TestSaveFile(t *testing.T) {
 func TestCloseFile(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 	tempFile, err := os.CreateTemp("", "test_close")
 	require.NoError(t, err)
 	defer os.Remove(tempFile.Name())
@@ -154,7 +155,7 @@ func TestCloseFile(t *testing.T) {
 func TestCalculateChecksum(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 	tempFile, err := os.CreateTemp("", "test_checksum")
 	require.NoError(t, err)
 	defer os.Remove(tempFile.Name())
@@ -220,7 +221,7 @@ func TestGetArchiveExtension(t *testing.T) {
 func TestExtractArchive(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	err := ExtractArchive(logger, "file.rar", "/tmp")
 	assert.Error(t, err)
@@ -233,7 +234,7 @@ func TestExtractArchive(t *testing.T) {
 func TestCloseBody(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tempFile, err := os.CreateTemp("", "test_close_body")
 	require.NoError(t, err)
@@ -246,7 +247,7 @@ func TestCloseBody(t *testing.T) {
 func TestShouldDownloadSource(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	result := ShouldDownloadSource(logger, "/nonexistent/file", "test-source")
 	assert.True(t, result) // Should return true when file doesn't exist (no previous download)
@@ -309,7 +310,7 @@ func TestShouldDownloadSource(t *testing.T) {
 func TestLogMemStats(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	assert.NotPanics(t, func() {
 		LogMemStats(logger, "test-prefix")
@@ -379,7 +380,7 @@ func TestPickRandomLines(t *testing.T) {
 func TestReadEntriesFromFile(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tempFile, err := os.CreateTemp("", "test_read_entries")
 	require.NoError(t, err)
@@ -404,7 +405,7 @@ func TestReadEntriesFromFile(t *testing.T) {
 func TestReadEntriesFromFileWithPool(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tempFile, err := os.CreateTemp("", "test_read_entries_pool")
 	require.NoError(t, err)
@@ -463,7 +464,7 @@ func TestIsArchive(t *testing.T) {
 func TestCopySourceToTarget(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	sourceDir, err := os.MkdirTemp("", "test_copy_source")
 	require.NoError(t, err)
@@ -503,7 +504,7 @@ func TestCopySourceToTarget(t *testing.T) {
 func TestCopySourceToTargetComprehensive(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 	tmpDir := t.TempDir()
 
 	sourceFolder := filepath.Join(tmpDir, "source")
@@ -545,7 +546,7 @@ func TestCopySourceToTargetComprehensive(t *testing.T) {
 func TestSaveFileErrorCases(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 	tmpDir := t.TempDir()
 
 	if runtime.GOOS != "windows" {
@@ -593,7 +594,7 @@ func TestCalculateChecksumFromContentAllAlgorithms(t *testing.T) {
 func TestAllRemainingEdgeCases(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 	assert.NotPanics(t, func() {
 		LogMemStats(logger, "")
 		LogMemStats(logger, "test")
@@ -661,7 +662,7 @@ func TestEntryPoolInternBoundaryConditions(t *testing.T) {
 func TestSummaryUtilsErrorHandling(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tempFile, err := os.CreateTemp("", "test_summary_permission")
 	require.NoError(t, err)
@@ -703,7 +704,7 @@ func TestCapPreallocEntriesExactBoundaries(t *testing.T) {
 func TestExtractArchiveErrorCases(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	err := ExtractArchive(logger, "/non/existent/file.zip", t.TempDir())
 	assert.Error(t, err)
@@ -748,7 +749,7 @@ func TestIsAlphanumericWithUnderscoresAndDashes(t *testing.T) {
 func TestGetFileLastModifiedTime(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tmpDir := t.TempDir()
 	filePath := filepath.Join(tmpDir, "test-modified-time.txt")
@@ -767,7 +768,7 @@ func TestGetFileLastModifiedTime(t *testing.T) {
 func TestEnsureDirectoryExists(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 	tmpDir := t.TempDir()
 
 	newDirPath := filepath.Join(tmpDir, "new-dir")
@@ -790,7 +791,7 @@ func TestEnsureDirectoryExists(t *testing.T) {
 func TestGetUserAgent(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	userAgent := GetUserAgent(logger, "dns-toolkit-test", "v1.0.0", "Test Application")
 	assert.Contains(t, userAgent, "dns-toolkit-test")
@@ -822,7 +823,7 @@ func TestCapPreallocEntriesEdgeCases(t *testing.T) {
 func TestExtractArchiveTarGz(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tmpDir := t.TempDir()
 
@@ -865,7 +866,7 @@ func TestExtractArchiveTarGz(t *testing.T) {
 func TestExtractArchiveZip(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tmpDir := t.TempDir()
 
@@ -924,4 +925,96 @@ func TestFindProjectRoot(t *testing.T) {
 
 	_, err = FindProjectRoot("/nonexistent/path/that/does/not/exist")
 	assert.Error(t, err)
+}
+
+func TestIsIP(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected bool
+	}{
+		{"Valid IPv4 - basic", "192.168.1.1", true},
+		{"Valid IPv4 - localhost", "127.0.0.1", true},
+		{"Valid IPv4 - all zeros", "0.0.0.0", true},
+		{"Valid IPv4 - all 255s", "255.255.255.255", true},
+		{"Valid IPv4 - edge case", "10.0.0.1", true},
+
+		{"Valid IPv6 - localhost", "::1", true},
+		{"Valid IPv6 - full notation", "2001:0db8:85a3:0000:0000:8a2e:0370:7334", true},
+		{"Valid IPv6 - compressed", "2001:db8:85a3::8a2e:370:7334", true},
+		{"Valid IPv6 - all zeros", "::", true},
+		{"Valid IPv6 - mixed case", "2001:DB8:85A3::8A2E:370:7334", true},
+
+		{"Invalid - empty string", "", false},
+		{"Invalid - domain name", "example.com", false},
+		{"Invalid - IPv4 with port", "192.168.1.1:8080", false},
+		{"Invalid - IPv4 out of range", "256.1.1.1", false},
+		{"Invalid - IPv4 negative", "-1.1.1.1", false},
+		{"Invalid - IPv4 incomplete", "192.168.1", false},
+		{"Invalid - IPv4 too many octets", "192.168.1.1.1", false},
+		{"Invalid - IPv6 with port", "[::1]:8080", false},
+		{"Invalid - IPv6 invalid format", "2001:0db8:85a3::8a2e::7334", false},
+		{"Invalid - text", "not-an-ip", false},
+		{"Invalid - CIDR notation", "192.168.1.0/24", false},
+		{"Invalid - IPv6 CIDR", "2001:db8::/32", false},
+		{"Invalid - spaces", " 192.168.1.1 ", false},
+		{"Invalid - alphanumeric", "192.168.abc.1", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := IsIP(tt.input)
+			if result != tt.expected {
+				t.Errorf("IsIP(%q) = %v, want %v", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
+
+func TestIsCIDR(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected bool
+	}{
+		{"Valid IPv4 CIDR - /24", "192.168.1.0/24", true},
+		{"Valid IPv4 CIDR - /32", "192.168.1.1/32", true},
+		{"Valid IPv4 CIDR - /0", "0.0.0.0/0", true},
+		{"Valid IPv4 CIDR - /16", "10.0.0.0/16", true},
+		{"Valid IPv4 CIDR - /8", "172.16.0.0/8", true},
+		{"Valid IPv4 CIDR - localhost", "127.0.0.1/32", true},
+
+		{"Valid IPv6 CIDR - /64", "2001:db8::/64", true},
+		{"Valid IPv6 CIDR - /128", "::1/128", true},
+		{"Valid IPv6 CIDR - /0", "::/0", true},
+		{"Valid IPv6 CIDR - /32", "2001:db8:85a3::/32", true},
+		{"Valid IPv6 CIDR - full notation", "2001:0db8:85a3:0000:0000:8a2e:0370:7334/128", true},
+
+		{"Invalid - empty string", "", false},
+		{"Invalid - just IP without prefix", "192.168.1.1", false},
+		{"Invalid - IPv6 without prefix", "::1", false},
+		{"Invalid - invalid IP", "256.1.1.1/24", false},
+		{"Invalid - negative prefix", "192.168.1.0/-1", false},
+		{"Invalid - IPv4 prefix too large", "192.168.1.0/33", false},
+		{"Invalid - IPv6 prefix too large", "::1/129", false},
+		{"Invalid - no IP before slash", "/24", false},
+		{"Invalid - no prefix after slash", "192.168.1.0/", false},
+		{"Invalid - multiple slashes", "192.168.1.0/24/8", false},
+		{"Invalid - text prefix", "192.168.1.0/abc", false},
+		{"Invalid - domain with CIDR", "example.com/24", false},
+		{"Invalid - IPv4 with port and CIDR", "192.168.1.1:8080/24", false},
+		{"Invalid - IPv6 with brackets", "[::1]/128", false},
+		{"Invalid - spaces", " 192.168.1.0/24 ", false},
+		{"Invalid - decimal prefix", "192.168.1.0/24.5", false},
+		{"Invalid - invalid IPv6", "2001:0db8:85a3::8a2e::7334/64", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := IsCIDR(tt.input)
+			if result != tt.expected {
+				t.Errorf("IsCIDR(%q) = %v, want %v", tt.input, result, tt.expected)
+			}
+		})
+	}
 }

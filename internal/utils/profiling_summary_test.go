@@ -15,7 +15,7 @@ import (
 func TestStartProfiling(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tempDir, err := os.MkdirTemp("", "test_profiling_*")
 	require.NoError(t, err)
@@ -102,7 +102,7 @@ func TestStartProfiling(t *testing.T) {
 func TestAnalyzeProfiles(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tempDir, err := os.MkdirTemp("", "test_analyze_*")
 	require.NoError(t, err)
@@ -130,7 +130,7 @@ func TestAnalyzeProfiles(t *testing.T) {
 func TestSaveSummary(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tempDir, err := os.MkdirTemp("", "test_save_summary_*")
 	require.NoError(t, err)
@@ -172,7 +172,7 @@ func TestSaveSummary(t *testing.T) {
 func TestSaveSummaries(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tempDir, err := os.MkdirTemp("", "test_save_summaries_*")
 	require.NoError(t, err)
