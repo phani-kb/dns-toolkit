@@ -549,7 +549,7 @@ func TestLoadingSourcesWithDefaultValues(t *testing.T) {
 	err = os.WriteFile(sourcesPath, []byte(minimalSourceContent), 0644)
 	require.NoError(t, err)
 
-	logger := CreateTestLogger()
+	logger := createTestLogger(t)
 	config, err := LoadSourcesConfig(logger, sourcesPath)
 	require.NoError(t, err)
 
@@ -589,7 +589,7 @@ func TestGetDownloadFileWithExtensions(t *testing.T) {
 	err = os.MkdirAll(downloadDir, 0755)
 	require.NoError(t, err)
 
-	logger := CreateTestLogger()
+	logger := createTestLogger(t)
 
 	testCases := []struct {
 		name          string
@@ -652,7 +652,7 @@ func TestGetDownloadFileDetailedCases(t *testing.T) {
 	err = os.MkdirAll(downloadDir, 0755)
 	require.NoError(t, err)
 
-	logger := CreateTestLogger()
+	logger := createTestLogger(t)
 
 	t.Run("Source with files specified causes error", func(t *testing.T) {
 		source := Source{
@@ -702,7 +702,7 @@ func TestCfgGetUserAgentFunction(t *testing.T) {
 	defer os.Remove(logFile.Name())
 	defer logFile.Close()
 
-	logger := CreateTestLogger()
+	logger := createTestLogger(t)
 
 	appConfig := ApplicationConfig{
 		Name:        "test-app",

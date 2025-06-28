@@ -13,7 +13,7 @@ import (
 func TestCopyFile(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tempDir, err := os.MkdirTemp("", "test_copy_*")
 	require.NoError(t, err)
@@ -43,7 +43,7 @@ func TestCopyFile(t *testing.T) {
 func TestFindOverlap(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tempDir, err := os.MkdirTemp("", "test_overlap_*")
 	require.NoError(t, err)
@@ -188,7 +188,7 @@ func TestIsDomain(t *testing.T) {
 func TestWriteEntriesToFile(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tempDir, err := os.MkdirTemp("", "test_write_*")
 	require.NoError(t, err)
@@ -228,7 +228,7 @@ func TestWriteEntriesToFile(t *testing.T) {
 func TestIsSkipIP(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tests := []struct {
 		ip       string
@@ -285,7 +285,7 @@ func TestParsePercent(t *testing.T) {
 func TestExtractTarGzErrorCases(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tempDir, err := os.MkdirTemp("", "test_extract_*")
 	require.NoError(t, err)
@@ -312,7 +312,7 @@ func TestExtractTarGzErrorCases(t *testing.T) {
 func TestExtractZipErrorCases(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	tempDir, err := os.MkdirTemp("", "test_extract_zip_*")
 	require.NoError(t, err)

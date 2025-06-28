@@ -15,8 +15,9 @@ import (
 )
 
 // createTestLogger creates a logger for testing
-func createTestLogger() *multilog.Logger {
-	return multilog.NewLogger()
+func createTestLogger(t *testing.T) *multilog.Logger {
+	logger, _ := multilog.NewTestLogger(t)
+	return logger
 }
 
 // setupTestDirs creates temporary directories for testing
@@ -147,7 +148,7 @@ func TestOverlapService_GetOverlapFilename(t *testing.T) {
 func TestOverlapService_SaveOverlap(t *testing.T) {
 	overlapDir, _ := setupTestDirs(t)
 	service := overlap.NewDefaultService(overlapDir, "")
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	t.Run("Save valid overlap", func(t *testing.T) {
 		ol := []string{"example.com", "malicious.org"}
@@ -195,7 +196,7 @@ func TestOverlapService_SaveOverlap_ErrorCase(t *testing.T) {
 	}(nonWritableDir, 0755)
 
 	service := overlap.NewDefaultService(nonWritableDir, "")
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	ol := []string{"example.com", "malicious.org"}
 	filename := "test_overlap.txt"
@@ -214,7 +215,7 @@ func TestOverlapService_FindOverlap(t *testing.T) {
 	tmpDir := t.TempDir()
 	overlapDir, summaryDir := setupTestDirs(t)
 	service := overlap.NewDefaultService(overlapDir, summaryDir)
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	processedFiles, _ := createTestFiles(t, tmpDir)
 
@@ -255,7 +256,7 @@ func TestOverlapService_WriteCompactOverlapSummaries(t *testing.T) {
 	tmpDir := t.TempDir()
 	overlapDir, summaryDir := setupTestDirs(t)
 	service := overlap.NewDefaultService(overlapDir, summaryDir)
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	processedFiles, _ := createTestFiles(t, tmpDir)
 
@@ -290,7 +291,7 @@ func TestOverlapService_WriteCompactOverlapSummaries_EmptySourceTypes(t *testing
 	tmpDir := t.TempDir()
 	overlapDir, summaryDir := setupTestDirs(t)
 	service := overlap.NewDefaultService(overlapDir, summaryDir)
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	processedFiles, _ := createTestFiles(t, tmpDir)
 
@@ -425,7 +426,7 @@ func TestOverlapService_FindOverlap_InvalidFiles(t *testing.T) {
 	tmpDir := t.TempDir()
 	overlapDir, summaryDir := setupTestDirs(t)
 	service := overlap.NewDefaultService(overlapDir, summaryDir)
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	processedFiles, _ := createTestFiles(t, tmpDir)
 
@@ -472,7 +473,7 @@ func TestOverlapService_WriteCompactOverlapSummaries_ErrorCase(t *testing.T) {
 	require.NoError(t, err)
 
 	service := overlap.NewDefaultService(overlapDir, nonWritableDir)
-	logger := createTestLogger()
+	logger := createTestLogger(t)
 
 	processedFiles, _ := createTestFiles(t, tmpDir)
 

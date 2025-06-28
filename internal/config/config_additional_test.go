@@ -109,7 +109,7 @@ func TestIsEnabledSource(t *testing.T) {
 func TestGetProcessedSummaries(t *testing.T) {
 	t.Parallel()
 
-	logger := CreateTestLogger()
+	logger := createTestLogger(t)
 
 	tempDir, err := os.MkdirTemp("", "test_summaries_*")
 	require.NoError(t, err)
@@ -370,7 +370,7 @@ func TestDNSToolkitConfigValidateEdgeCases(t *testing.T) {
 func TestLoadAppConfigEdgeCases(t *testing.T) {
 	t.Parallel()
 
-	logger := CreateTestLogger()
+	logger := createTestLogger(t)
 
 	_, _, err := LoadAppConfig(logger, "/non/existent/config.yml")
 	assert.Error(t, err)
