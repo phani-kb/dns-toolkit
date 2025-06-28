@@ -54,3 +54,37 @@ func RegisterGenericProcessor(
 		)
 	}
 }
+
+// SpecialProcessorRegistry provides a way to register processors with special conditions different handling
+// for blocklists vs. allowlists
+type SpecialProcessorRegistry struct {
+	processorFactories map[string]map[string]ProcessorFactory
+}
+
+// NewSpecialProcessorRegistry creates a new registry for special processors
+func NewSpecialProcessorRegistry() *SpecialProcessorRegistry {
+	return &SpecialProcessorRegistry{
+		processorFactories: make(map[string]map[string]ProcessorFactory),
+	}
+}
+
+// Register adds a processor factory for a specific source and list type
+func (r *SpecialProcessorRegistry) Register(sourceType, listType string, factory ProcessorFactory) {
+	if _, exists := r.processorFactories[sourceType]; !exists {
+		r.processorFactories[sourceType] = make(map[string]ProcessorFactory)
+	}
+	r.processorFactories[sourceType][listType] = factory
+}
+
+// GetProcessor returns a processor for the requested source and list types
+func (r *SpecialProcessorRegistry) GetProcessor(sourceType, listType string) (Processor, bool) {
+	if factories, exists := r.processorFactories[sourceType]; exists {
+		if factory, exists := factories[listType]; exists {
+			return factory(sourceType, listType), true
+		}
+	}
+	return nil, false
+}
+
+// SpecialProcessors Global instance of the special processor registry
+var SpecialProcessors = NewSpecialProcessorRegistry()
