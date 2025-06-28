@@ -4,6 +4,9 @@ import (
 	"strings"
 	"testing"
 
+	con "github.com/phani-kb/dns-toolkit/internal/consolidators"
+	u "github.com/phani-kb/dns-toolkit/internal/utils"
+
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/multilog"
 	"github.com/stretchr/testify/assert"
@@ -179,4 +182,82 @@ func TestGenerateFileName(t *testing.T) {
 			assert.True(t, strings.HasSuffix(result, ".txt"), "Result should end with .txt")
 		})
 	}
+}
+
+type mockConsolidator struct {
+	mockEntries     u.StringSet
+	mockFiles       []c.FileInfo
+	filteredEntries u.StringSet
+	ignoredEntries  u.StringSet
+}
+
+func (m *mockConsolidator) Consolidate(_ *multilog.Logger, _ []c.ProcessedFile) (u.StringSet, []c.FileInfo) {
+	return m.mockEntries, m.mockFiles
+}
+
+func (m *mockConsolidator) FilterEntries(_ *multilog.Logger, entries, _ u.StringSet) (u.StringSet, u.StringSet) {
+	return m.filteredEntries, m.ignoredEntries
+}
+
+func (m *mockConsolidator) SaveEntries(_ *multilog.Logger, _ u.StringSet, _ string) error {
+	return nil
+}
+
+func (m *mockConsolidator) IsValid(_ c.ProcessedFile) bool {
+	return true
+}
+
+func (m *mockConsolidator) GetSourceType() string {
+	return "domain"
+}
+
+func (m *mockConsolidator) GetListType() string {
+	return "blocklist"
+}
+
+func TestConsolidateFilesBasedOnSTLT(t *testing.T) {
+	var (
+		mockEntries     = u.NewStringSet([]string{"a.com", "b.com"})
+		mockFiles       = []c.FileInfo{{Name: "file1.txt", Filepath: "/tmp/file1.txt"}}
+		filteredEntries = u.NewStringSet([]string{"a.com"})
+		ignoredEntries  = u.NewStringSet([]string{"b.com"})
+	)
+
+	mock := &mockConsolidator{
+		mockEntries:     mockEntries,
+		mockFiles:       mockFiles,
+		filteredEntries: filteredEntries,
+		ignoredEntries:  ignoredEntries,
+	}
+
+	var _ con.Consolidator = mock
+
+	testRegistry := con.NewConsolidatorRegistry()
+	testRegistry.RegisterConsolidator("domain", "blocklist", mock)
+
+	origRegistry := con.Consolidators
+	con.Consolidators = testRegistry
+	defer func() { con.Consolidators = origRegistry }()
+
+	logger := multilog.NewLogger()
+	processedFiles := []c.ProcessedFile{
+		{Valid: true},
+		{Valid: false},
+	}
+	entriesToIgnore := u.NewStringSet([]string{})
+
+	gotEntries, gotSummary := consolidateFilesBasedOnSTLT(
+		logger,
+		"domain",
+		"blocklist",
+		true,
+		entriesToIgnore,
+		processedFiles,
+	)
+
+	assert.ElementsMatch(t, filteredEntries.ToSlice(), gotEntries.ToSlice())
+	assert.Equal(t, "domain", gotSummary.Type)
+	assert.Equal(t, "blocklist", gotSummary.ListType)
+	assert.Equal(t, len(mockFiles), gotSummary.FilesCount)
+	assert.Equal(t, len(filteredEntries), gotSummary.Count)
 }

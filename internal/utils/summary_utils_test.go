@@ -159,3 +159,47 @@ func TestGetSummaryFiles(t *testing.T) {
 	assert.Error(t, err)
 	assert.Nil(t, files)
 }
+
+func TestGetSummaryTypeFromFolder(t *testing.T) {
+	tests := []struct {
+		folderName   string
+		expectedType string
+	}{
+		{"download", "download"},
+		{"processed", "processed"},
+		{"consolidated", "consolidated"},
+		{"consolidated_groups", "consolidated_groups"},
+		{"consolidated_categories", "consolidated_categories"},
+		{"top", "top"},
+		{"unknown_folder", "unknown"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.folderName, func(t *testing.T) {
+			got := GetSummaryTypeFromFolder(tt.folderName)
+			assert.Equal(t, tt.expectedType, got)
+		})
+	}
+}
+
+func TestDetermineSummaryTypeFromPath(t *testing.T) {
+	tests := []struct {
+		path         string
+		expectedType string
+	}{
+		{"/tmp/download_summary.json", "download"},
+		{"/tmp/processed_summary.json", "processed"},
+		{"/tmp/consolidated_summary.json", "consolidated"},
+		{"/tmp/consolidated_groups_summary.json", "consolidated_groups"},
+		{"/tmp/consolidated_categories_summary.json", "consolidated_categories"},
+		{"/tmp/top_summary.json", "top"},
+		{"/tmp/unknown_summary.json", "unknown"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.path, func(t *testing.T) {
+			got := DetermineSummaryTypeFromPath(tt.path)
+			assert.Equal(t, tt.expectedType, got)
+		})
+	}
+}
