@@ -69,7 +69,8 @@ func (pr *ProcessorRegistry) GetProcessor(sourceType, listType string) (Processo
 	key := createRegistryKey(sourceType, listType)
 	processor, ok := pr.customProcessorRegistry[key]
 	if !ok {
-		return nil, false
+		// check for special processor
+		processor, ok = SpecialProcessors.GetProcessor(sourceType, listType)
 	}
 	return processor, ok
 }

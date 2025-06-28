@@ -128,11 +128,13 @@ const (
 	SourceTypeIpv6         = "ipv6"
 	SourceTypeCidrIpv4     = "cidr_ipv4"
 	SourceTypeDomain       = "domain"
+	SourceTypeDomainFinder = "domain_finder"
 	SourceTypeAdguard      = "adguard"
 	SourceTypeIpv4Hostname = "ipv4_hostname"
 	SourceTypeMixed        = "mixed"
 	SourceTypeHostname     = "hostname"
 	SourceTypeUnknown      = "unknown"
+	SourceTypeTopDomains   = "domain_top"
 
 	ListTypeBlocklist = "blocklist"
 	ListTypeAllowlist = "allowlist"
@@ -143,10 +145,12 @@ var (
 		SourceTypeIpv4:         true,
 		SourceTypeIpv6:         true,
 		SourceTypeDomain:       true,
+		SourceTypeDomainFinder: true,
 		SourceTypeAdguard:      true,
 		SourceTypeIpv4Hostname: true,
 		SourceTypeHostname:     true,
 		SourceTypeUnknown:      true,
+		SourceTypeTopDomains:   true,
 	}
 	ValidListTypes = map[string]bool{
 		ListTypeBlocklist: true,
