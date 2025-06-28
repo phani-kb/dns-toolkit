@@ -4,6 +4,8 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+
+	"github.com/phani-kb/multilog"
 )
 
 func createTestConfigFiles(t *testing.T) string {
@@ -47,6 +49,12 @@ multilog:
 	}
 
 	return testDir
+}
+
+// createTestLogger creates a logger for testing
+func createTestLogger(t *testing.T) *multilog.Logger {
+	logger, _ := multilog.NewTestLogger(t)
+	return logger
 }
 
 func TestBasicApplicationConfigValidate(t *testing.T) {
@@ -204,7 +212,7 @@ func TestBasicLoadAppConfig(t *testing.T) {
 	testDir := createTestConfigFiles(t)
 	defer os.RemoveAll(testDir)
 
-	logger := CreateTestLogger()
+	logger := createTestLogger(t)
 	validConfigPath := filepath.Join(testDir, "valid_config.yaml")
 
 	// Test loading valid config

@@ -232,7 +232,7 @@ func TestMatchesFilters(t *testing.T) {
 func TestGetDownloadFileEdgeCases(t *testing.T) {
 	t.Parallel()
 
-	logger := CreateTestLogger()
+	logger := createTestLogger(t)
 
 	tests := []struct {
 		name        string
