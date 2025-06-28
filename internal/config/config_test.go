@@ -315,7 +315,7 @@ func TestSourceGetDownloadFile(t *testing.T) {
 		URL:  "http://example.com/file.txt",
 	}
 
-	logger := CreateTestLogger()
+	logger := createTestLogger(t)
 	downloadDir := "/tmp/downloads"
 
 	downloadFile, err := source.GetDownloadFile(logger, downloadDir)
@@ -478,7 +478,7 @@ func TestSourcesConfigGetSourceByField(t *testing.T) {
 func TestLoadSourcesConfig(t *testing.T) {
 	t.Parallel()
 
-	logger := CreateTestLogger()
+	logger := createTestLogger(t)
 
 	_, err := LoadSourcesConfig(logger, "/nonexistent/file.json")
 	assert.Error(t, err)
