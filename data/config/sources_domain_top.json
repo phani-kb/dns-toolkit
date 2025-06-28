@@ -7,7 +7,7 @@
       "frequency": "monthly",
       "types": [
         {
-          "name": "domain",
+          "name": "domain_top",
           "list_types": [
             {
               "name": "allowlist",

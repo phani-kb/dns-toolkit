@@ -162,18 +162,13 @@ func categorizeFileContent(logger *multilog.Logger, lines []string) string {
 		// NOTE: change in the order of regex checks may affect the results
 		if constants.SourceTypeRegexMap[constants.SourceTypeIpv4Hostname].MatchString(line) {
 			regexCounts[constants.SourceTypeIpv4Hostname]++
-		}
-		if constants.SourceTypeRegexMap[constants.SourceTypeIpv6].MatchString(line) {
+		} else if constants.SourceTypeRegexMap[constants.SourceTypeIpv6].MatchString(line) {
 			regexCounts[constants.SourceTypeIpv6]++
-		}
-		if constants.SourceTypeRegexMap[constants.SourceTypeCidrIpv4].MatchString(line) {
+		} else if constants.SourceTypeRegexMap[constants.SourceTypeCidrIpv4].MatchString(line) {
 			regexCounts[constants.SourceTypeCidrIpv4]++
-		}
-		if constants.SourceTypeRegexMap[constants.SourceTypeDomain].MatchString(line) {
+		} else if constants.SourceTypeRegexMap[constants.SourceTypeDomain].MatchString(line) {
 			regexCounts[constants.SourceTypeDomain]++
-		}
-		// always check for ipv4 last
-		if constants.SourceTypeRegexMap[constants.SourceTypeIpv4].MatchString(line) {
+		} else if constants.SourceTypeRegexMap[constants.SourceTypeIpv4].MatchString(line) {
 			regexCounts[constants.SourceTypeIpv4]++
 		}
 	}
