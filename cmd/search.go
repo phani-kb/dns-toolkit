@@ -68,7 +68,7 @@ func collectQueryData(query string, isIP bool) (u.StringSet, []string) {
 			lookupDomains = append(lookupDomains, cnames...)
 
 			for _, domain := range lookupDomains {
-				resolveDomainToIPs(domain, ipAddresses)
+				resolveDomainToIPs(domain, ipAddresses, net.LookupIP)
 			}
 		}
 	}
@@ -77,8 +77,8 @@ func collectQueryData(query string, isIP bool) (u.StringSet, []string) {
 }
 
 // resolveDomainToIPs resolves a domain name to its IP addresses
-func resolveDomainToIPs(domain string, ipAddresses u.StringSet) {
-	ips, err := net.LookupIP(domain)
+func resolveDomainToIPs(domain string, ipAddresses u.StringSet, lookupIPFunc func(string) ([]net.IP, error)) {
+	ips, err := lookupIPFunc(domain)
 	if err != nil {
 		Logger.Warnf("Could not resolve IP for domain '%s': %v", domain, err)
 		return

@@ -227,9 +227,12 @@ func DetermineSummaryTypeFromPath(path string) string {
 	for _, summaryType := range constants.AllSummaryTypes {
 		if strings.HasPrefix(filename, summaryType) {
 			// Special case for consolidated_groups vs. consolidated
-			if summaryType == constants.SummaryTypeConsolidated &&
-				strings.HasPrefix(filename, constants.SummaryTypeConsolidatedGroups) {
-				return constants.SummaryTypeConsolidatedGroups
+			if summaryType == constants.SummaryTypeConsolidated {
+				if strings.HasPrefix(filename, constants.SummaryTypeConsolidatedGroups) {
+					return constants.SummaryTypeConsolidatedGroups
+				} else if strings.HasPrefix(filename, constants.SummaryTypeConsolidatedCategories) {
+					return constants.SummaryTypeConsolidatedCategories
+				}
 			}
 			return summaryType
 		}
