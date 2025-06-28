@@ -234,3 +234,91 @@ example.domain.com
 	assert.Equal(t, expectedAllowlistValid, allowlistValid, "Allowlist valid entries should match")
 	assert.Equal(t, expectedAllowlistInvalid, allowlistInvalid, "Allowlist invalid entries should match")
 }
+
+func Test_ExtractBlocklistDomains(t *testing.T) {
+	logger := multilog.NewLogger()
+
+	tests := []struct {
+		name            string
+		content         string
+		expectedValid   []string
+		expectedInvalid []string
+	}{
+		{
+			name:            "valid adguard block entries",
+			content:         "||example.com^\n||test.org^\n",
+			expectedValid:   []string{"example.com", "test.org"},
+			expectedInvalid: nil,
+		},
+		{
+			name:            "invalid block entry",
+			content:         "example.com\n||notadomain^\n",
+			expectedValid:   nil,
+			expectedInvalid: []string{"example.com", "||notadomain^"},
+		},
+		{
+			name:            "mixed valid and invalid",
+			content:         "||good.com^\nbadline\n||bad^\n",
+			expectedValid:   []string{"good.com"},
+			expectedInvalid: []string{"badline", "||bad^"},
+		},
+		{
+			name:            "comments and whitespace",
+			content:         "# comment\n  ||space.com^  \n! another\n",
+			expectedValid:   []string{"space.com"},
+			expectedInvalid: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			valid, invalid := processors.ExtractBlocklistDomains(logger, tt.content)
+			assert.Equal(t, tt.expectedValid, valid)
+			assert.Equal(t, tt.expectedInvalid, invalid)
+		})
+	}
+}
+
+func Test_ExtractAllowlistDomains(t *testing.T) {
+	logger := multilog.NewLogger()
+
+	tests := []struct {
+		name            string
+		content         string
+		expectedValid   []string
+		expectedInvalid []string
+	}{
+		{
+			name:            "valid adguard allow entries",
+			content:         "@@example.com\n@@test.org\n",
+			expectedValid:   []string{"example.com", "test.org"},
+			expectedInvalid: nil,
+		},
+		{
+			name:            "invalid allow entry",
+			content:         "example.com\n@@notadomain\n",
+			expectedValid:   nil,
+			expectedInvalid: []string{"example.com", "@@notadomain"},
+		},
+		{
+			name:            "mixed valid and invalid",
+			content:         "@@good.com\nbadline\n@@bad\n",
+			expectedValid:   []string{"good.com"},
+			expectedInvalid: []string{"badline", "@@bad"},
+		},
+		{
+			name:            "comments and whitespace",
+			content:         "# comment\n  @@space.com  \n! another\n",
+			expectedValid:   []string{"space.com"},
+			expectedInvalid: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			valid, invalid := processors.ExtractAllowlistDomains(logger, tt.content)
+			assert.Equal(t, tt.expectedValid, valid)
+			assert.Equal(t, tt.expectedInvalid, invalid)
+		})
+	}
+}

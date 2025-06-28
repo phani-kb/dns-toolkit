@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	"net"
 	"os"
 	"path/filepath"
 	"testing"
+
+	u "github.com/phani-kb/dns-toolkit/internal/utils"
 
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/multilog"
@@ -216,6 +219,63 @@ func TestCategorizeFileContent(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := categorizeFileContent(logger, tt.lines)
 			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func Test_resolveDomainToIPs(t *testing.T) {
+	tests := []struct {
+		name         string
+		domain       string
+		lookupResult []net.IP
+		wantIPs      []string
+	}{
+		{
+			name:   "single IPv4",
+			domain: "example.com",
+			lookupResult: []net.IP{
+				net.ParseIP("1.2.3.4"),
+			},
+			wantIPs: []string{"1.2.3.4"},
+		},
+		{
+			name:   "IPv4 and IPv6",
+			domain: "mixed.com",
+			lookupResult: []net.IP{
+				net.ParseIP("5.6.7.8"),
+				net.ParseIP("2001:db8::1"),
+			},
+			wantIPs: []string{"5.6.7.8"},
+		},
+		{
+			name:   "no IPv4",
+			domain: "ipv6only.com",
+			lookupResult: []net.IP{
+				net.ParseIP("2001:db8::2"),
+			},
+			wantIPs: nil,
+		},
+		{
+			name:   "multiple IPv4",
+			domain: "multi.com",
+			lookupResult: []net.IP{
+				net.ParseIP("8.8.8.8"),
+				net.ParseIP("8.8.4.4"),
+			},
+			wantIPs: []string{"8.8.8.8", "8.8.4.4"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			mockLookup := func(host string) ([]net.IP, error) {
+				return tt.lookupResult, nil
+			}
+
+			ipSet := u.NewStringSet(nil)
+			resolveDomainToIPs(tt.domain, ipSet, mockLookup)
+			got := ipSet.ToSlice()
+			assert.ElementsMatch(t, tt.wantIPs, got)
 		})
 	}
 }

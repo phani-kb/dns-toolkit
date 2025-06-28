@@ -76,18 +76,19 @@ func TestGenerateDescription(t *testing.T) {
 func TestPrepareDirectories(t *testing.T) {
 	t.Parallel()
 
-	// Create a temporary directory for the test
 	tempDir, err := os.MkdirTemp("", "dns-toolkit-test")
 	assert.NoError(t, err)
 	defer os.RemoveAll(tempDir)
 
-	// Change to the temp directory
 	oldWd, err := os.Getwd()
 	assert.NoError(t, err)
 	defer os.Chdir(oldWd)
 
 	err = os.Chdir(tempDir)
 	assert.NoError(t, err)
+
+	origIncludeIgnored := includeIgnored
+	defer func() { includeIgnored = origIncludeIgnored }()
 
 	includeIgnored = false
 	_ = prepareDirectories()
@@ -262,4 +263,65 @@ func TestProcessIgnoredFiles(t *testing.T) {
 	assert.Contains(t, contentStr, "Header: ignored.txt")
 	assert.Contains(t, contentStr, "STATIC HEADER")
 	assert.Contains(t, contentStr, ignoredContent)
+}
+
+func TestProcessFilesForSummaryType(t *testing.T) {
+	tests := []struct {
+		name        string
+		summaryType string
+		summaryData string
+		wantType    map[string]string
+		wantCount   map[string]int
+		wantIgnored map[string]int
+	}{
+		{
+			name:        "consolidated summary",
+			summaryType: "consolidated",
+			summaryData: `[{"filepath":"file1.txt","list_type":"blocklist","count":10,"ignored_entries_count":2,"ignored_filepath":"file1_ignored.txt"}]`,
+			wantType:    map[string]string{"file1.txt": "blocklist"},
+			wantCount:   map[string]int{"file1.txt": 10},
+			wantIgnored: map[string]int{"file1_ignored.txt": 2},
+		},
+		{
+			name:        "consolidated_groups summary",
+			summaryType: "consolidated_groups",
+			summaryData: `[{"consolidated_summaries":[{"filepath":"file2.txt","list_type":"allowlist","count":5,"ignored_entries_count":0,"ignored_filepath":""}]}]`,
+			wantType:    map[string]string{"file2.txt": "allowlist"},
+			wantCount:   map[string]int{"file2.txt": 5},
+			wantIgnored: map[string]int{},
+		},
+		{
+			name:        "consolidated_categories summary",
+			summaryType: "consolidated_categories",
+			summaryData: `[{"consolidated_summaries":[{"filepath":"file3.txt","list_type":"blocklist","count":7,"ignored_entries_count":1,"ignored_filepath":"file3_ignored.txt"}]}]`,
+			wantType:    map[string]string{"file3.txt": "blocklist"},
+			wantCount:   map[string]int{"file3.txt": 7},
+			wantIgnored: map[string]int{"file3_ignored.txt": 1},
+		},
+		{
+			name:        "top summary",
+			summaryType: "top",
+			summaryData: `[{"filepath":"file4.txt","list_type":"blocklist","count":3}]`,
+			wantType:    map[string]string{"file4.txt": "blocklist"},
+			wantCount:   map[string]int{"file4.txt": 3},
+			wantIgnored: map[string]int{},
+		},
+		{
+			name:        "unknown summary type",
+			summaryType: "unknown",
+			summaryData: `[]`,
+			wantType:    map[string]string{},
+			wantCount:   map[string]int{},
+			wantIgnored: map[string]int{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			gotType, gotCount, gotIgnored := processFilesForSummaryType(tt.summaryType, []byte(tt.summaryData))
+			assert.Equal(t, tt.wantType, gotType)
+			assert.Equal(t, tt.wantCount, gotCount)
+			assert.Equal(t, tt.wantIgnored, gotIgnored)
+		})
+	}
 }
