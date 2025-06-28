@@ -5,6 +5,7 @@ import (
 
 	"github.com/phani-kb/multilog"
 
+	"github.com/phani-kb/dns-toolkit/internal/constants"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 )
 
@@ -82,5 +83,82 @@ func (p *AdGuardAllowlistProcessor) Process(_ *multilog.Logger, content string) 
 	return validEntries, invalidEntries
 }
 
+func extractAllowlistDomains(logger *multilog.Logger, content string) ([]string, []string) {
+	var validEntries, invalidEntries []string
+	lines := strings.Split(content, "\n")
+
+	domainRegex := constants.SourceTypeRegexMap[constants.SourceTypeDomainFinder]
+	if domainRegex == nil {
+		logger.Errorf("Regex not found for source type: %s", adguardSourceTypeDomain)
+		return nil, nil
+	}
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if u.IsComment(line) {
+			continue
+		}
+
+		if strings.HasPrefix(line, adguardExceptionPrefix) {
+			domain := domainRegex.FindString(line)
+			if u.IsDomain(domain) {
+				validEntries = append(validEntries, domain)
+			} else {
+				invalidEntries = append(invalidEntries, line)
+			}
+		} else {
+			// Non-matching format for allowlist
+			invalidEntries = append(invalidEntries, line)
+		}
+	}
+	return validEntries, invalidEntries
+}
+
+func extractBlocklistDomains(logger *multilog.Logger, content string) ([]string, []string) {
+	var validEntries, invalidEntries []string
+	lines := strings.Split(content, "\n")
+
+	domainRegex := constants.SourceTypeRegexMap[constants.SourceTypeDomainFinder]
+	if domainRegex == nil {
+		logger.Errorf("Regex not found for source type: %s", adguardSourceTypeDomain)
+		return nil, nil
+	}
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if u.IsComment(line) {
+			continue
+		}
+
+		// extract domain between || and ^
+		if strings.HasPrefix(line, adguardBlockPrefix) && strings.HasSuffix(line, adguardBlockSuffix) {
+			domain := domainRegex.FindString(line)
+			if u.IsDomain(domain) {
+				validEntries = append(validEntries, domain)
+			} else {
+				invalidEntries = append(invalidEntries, line)
+			}
+		} else {
+			// Non-matching format for blocklist
+			invalidEntries = append(invalidEntries, line)
+		}
+	}
+	return validEntries, invalidEntries
+}
+
 func init() {
+	SpecialProcessors.Register(sourceTypeAdguard, constants.ListTypeBlocklist,
+		func(st string, lt string) Processor {
+			return NewAdGuardBlocklistProcessor(st, lt)
+		},
+	)
+
+	SpecialProcessors.Register(sourceTypeAdguard, constants.ListTypeAllowlist,
+		func(st string, lt string) Processor {
+			return NewAdGuardAllowlistProcessor(st, lt)
+		},
+	)
+
+	RegisterGenericProcessor(adguardSourceTypeDomain, extractAllowlistDomains, false, true)
+	RegisterGenericProcessor(adguardSourceTypeDomain, extractBlocklistDomains, true, false)
 }
