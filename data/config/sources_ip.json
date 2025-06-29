@@ -5,10 +5,12 @@
       "categories": "anonymizer, botnet, exploit, malicious, malware, phishing, proxy, ransomware, spam, trojan",
       "types": [
         {
-          "name": "ipv4",
+          "name": "ipv4_find",
           "list_types": [
             {
-              "name": "blocklist"
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "mini"
             }
           ]
         }
@@ -18,12 +20,15 @@
     },
     {
       "name": "BinaryDefense_Banlist",
+      "notes": "This is for public use only.",
       "types": [
         {
           "name": "ipv4",
           "list_types": [
             {
-              "name": "blocklist"
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "mini"
             }
           ]
         }
@@ -33,6 +38,8 @@
     },
     {
       "name": "Blackhole_Today",
+      "disabled": true,
+      "notes": "Download fails frequently due to network instability or potential blocking.",
       "types": [
         {
           "name": "ipv4"
@@ -43,6 +50,8 @@
     },
     {
       "name": "BlockListDE_Brute",
+      "disabled": true,
+      "notes": "100% overlap with Firehol_level2",
       "types": [
         {
           "name": "ipv4"
@@ -58,7 +67,9 @@
           "name": "ipv4",
           "list_types": [
             {
-              "name": "blocklist"
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "mini"
             }
           ]
         }
@@ -67,13 +78,82 @@
       "website": "https://www.blocklist.de"
     },
     {
-      "name": "URLHaus_Text",
+      "name": "DoH_IP_blocklists",
+      "categories": "dns",
+      "exclude": true,
+      "license": "GPL-3.0",
       "types": [
         {
-          "name": "domain"
+          "name": "domain_comment"
         },
         {
           "name": "ipv4"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/dibdot/DoH-IP-blocklists/refs/heads/master/doh-ipv4.txt",
+      "website": "https://github.com/dibdot/DoH-IP-blocklists"
+    },
+    {
+      "name": "DShield",
+      "disabled": true,
+      "notes": "100% overlap with Firehol_level2/Firehol_level3",
+      "types": [
+        {
+          "name": "ipv4_range_expand"
+        }
+      ],
+      "url": "https://opendbl.net/lists/dshield.list",
+      "website": "https://opendbl.net"
+    },
+    {
+      "name": "Firehol_abusers_30d",
+      "license": "GPL-2.0",
+      "types": [
+        {
+          "name": "ipv4"
+        },
+        {
+          "name": "ipv4_cidr_expand"
+        }
+      ],
+      "url": "https://iplists.firehol.org/files/firehol_abusers_30d.netset",
+      "website": "https://iplists.firehol.org"
+    },
+    {
+      "name": "MyIP_MS_Blocklist",
+      "types": [
+        {
+          "name": "ipv4_find"
+        },
+        {
+          "name": "ipv6_htaccess"
+        }
+      ],
+      "url": "https://myip.ms/files/blacklist/htaccess/latest_blacklist.txt",
+      "website": "https://myip.ms/browse/blacklist"
+    },
+    {
+      "name": "Sentinel_Greylist",
+      "license": "CC BY-NC-SA 4.0",
+      "types": [
+        {
+          "name": "ipv4_find"
+        },
+        {
+          "name": "ipv6_find"
+        }
+      ],
+      "url": "https://view.sentinel.turris.cz/greylist-data/greylist-latest.csv",
+      "website": "https://view.sentinel.turris.cz"
+    },
+    {
+      "name": "URLHaus_Text",
+      "types": [
+        {
+          "name": "domain_http_url"
+        },
+        {
+          "name": "ipv4_http_url"
         }
       ],
       "url": "https://urlhaus.abuse.ch/downloads/text/",

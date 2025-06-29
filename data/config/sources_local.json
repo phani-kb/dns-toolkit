@@ -7,7 +7,9 @@
           "name": "adguard",
           "list_types": [
             {
-              "name": "allowlist"
+              "name": "allowlist",
+              "must_consider": true,
+              "groups": "mini"
             }
           ]
         }
@@ -21,7 +23,9 @@
           "name": "domain",
           "list_types": [
             {
-              "name": "allowlist"
+              "name": "allowlist",
+              "must_consider": true,
+              "groups": "mini"
             }
           ]
         }
