@@ -77,6 +77,17 @@ func consolidateGeneric(
 		entriesToIgnore,
 	)
 
+	if len(allEntries) <= 0 {
+		logger.Infof(
+			"No entry(s) to consolidate for %s %s in %s %s",
+			params.ListType,
+			params.GenericSourceType,
+			params.IdentifierField,
+			params.Identifier,
+		)
+		return u.NewStringSet([]string{}), c.ConsolidatedSummary{}
+	}
+
 	// Create a summary with identifier information
 	consolidatedSummary := c.ConsolidatedSummary{
 		Type:                      params.GenericSourceType,
@@ -117,17 +128,6 @@ func consolidateGeneric(
 		} else {
 			consolidatedSummary.IgnoredFilepath = ignoredFilePath
 		}
-	}
-
-	if len(allEntries) <= 0 {
-		logger.Infof(
-			"No entry(s) to consolidate for %s %s in %s %s",
-			params.ListType,
-			params.GenericSourceType,
-			params.IdentifierField,
-			params.Identifier,
-		)
-		return u.NewStringSet([]string{}), c.ConsolidatedSummary{}
 	}
 
 	// Use identifier-specific filename
