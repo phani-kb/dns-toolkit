@@ -1,13 +1,11 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	cfg "github.com/phani-kb/dns-toolkit/internal/config"
-	con "github.com/phani-kb/dns-toolkit/internal/consolidators"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
@@ -48,83 +46,17 @@ var consolidateGroupsCmd = &cobra.Command{
 
 		// Process each size group and create consolidated lists
 		for _, group := range constants.SizeGroups {
-			Logger.Infof("Processing size group: %s", group)
-
-			// Filter processed files by group
-			var groupFiles []c.ProcessedFile
-			for _, file := range processedFiles {
-				for _, fileGroup := range file.Groups {
-					if fileGroup == group && file.Valid {
-						groupFiles = append(groupFiles, file)
-						break
-					}
-				}
-			}
-
-			if len(groupFiles) == 0 {
-				Logger.Infof("No files found for group: %s", group)
-				continue
-			}
-
-			// Create a map of allowlisted entries by source type
-			allowlistEntriesByType := make(map[string]u.StringSet)
-
-			// First process allowlists for each group and source type
-			for _, gst := range genericSourceTypes {
-				var allowlistFiles []c.ProcessedFile
-				for _, file := range groupFiles {
-					if file.GenericSourceType == gst &&
-						file.ListType == constants.ListTypeAllowlist {
-						allowlistFiles = append(allowlistFiles, file)
-					}
-				}
-
-				if len(allowlistFiles) > 0 {
-					entries, allowlistSummary := consolidateByGroup(
-						Logger,
-						gst,
-						constants.ListTypeAllowlist,
-						group,
-						u.NewStringSet([]string{}),
-						allowlistFiles,
-					)
-					allowlistEntriesByType[gst] = entries
-					allowlistSummary.Group = group
-					consolidatedSummariesByGroup[group] = append(
-						consolidatedSummariesByGroup[group],
-						allowlistSummary,
-					)
-				} else {
-					allowlistEntriesByType[gst] = u.NewStringSet([]string{})
-				}
-			}
-
-			// Then process blocklists using the allowlists from above
-			for _, gst := range genericSourceTypes {
-				var blocklistFiles []c.ProcessedFile
-				for _, file := range groupFiles {
-					if file.GenericSourceType == gst &&
-						file.ListType == constants.ListTypeBlocklist {
-						blocklistFiles = append(blocklistFiles, file)
-					}
-				}
-
-				if len(blocklistFiles) > 0 {
-					allowlistEntries := allowlistEntriesByType[gst]
-					_, blocklistSummary := consolidateByGroup(
-						Logger,
-						gst,
-						constants.ListTypeBlocklist,
-						group,
-						allowlistEntries,
-						blocklistFiles,
-					)
-					blocklistSummary.Group = group
-					consolidatedSummariesByGroup[group] = append(
-						consolidatedSummariesByGroup[group],
-						blocklistSummary,
-					)
-				}
+			groupResults := processGroupConsolidation(
+				Logger,
+				group,
+				processedFiles,
+				genericSourceTypes,
+			)
+			for identifier, summaries := range groupResults {
+				consolidatedSummariesByGroup[identifier] = append(
+					consolidatedSummariesByGroup[identifier],
+					summaries...,
+				)
 			}
 		}
 
@@ -208,6 +140,39 @@ var consolidateGroupsCmd = &cobra.Command{
 	},
 }
 
+// getFilesForGroup filters processed files by group
+func getFilesForGroup(processedFiles []c.ProcessedFile, group string) []c.ProcessedFile {
+	var groupFiles []c.ProcessedFile
+	for _, file := range processedFiles {
+		for _, fileGroup := range file.Groups {
+			if fileGroup == group && file.Valid {
+				groupFiles = append(groupFiles, file)
+				break
+			}
+		}
+	}
+	return groupFiles
+}
+
+// processGroupConsolidation processes consolidation for a specific group
+func processGroupConsolidation(
+	logger *multilog.Logger,
+	group string,
+	processedFiles []c.ProcessedFile,
+	genericSourceTypes []string,
+) map[string][]c.ConsolidatedSummary {
+	config := ProcessingConfig{
+		Identifier:         group,
+		IdentifierField:    "Group",
+		ProcessedFiles:     processedFiles,
+		GenericSourceTypes: genericSourceTypes,
+		GetFilesFunc:       getFilesForGroup,
+		ConsolidateFunc:    consolidateByGroup,
+	}
+
+	return processIdentifierConsolidation(logger, config)
+}
+
 // consolidateByGroup consolidates files for a specific size group
 func consolidateByGroup(
 	logger *multilog.Logger,
@@ -215,119 +180,13 @@ func consolidateByGroup(
 	entriesToIgnore u.StringSet,
 	processedFiles []c.ProcessedFile,
 ) (u.StringSet, c.ConsolidatedSummary) {
-	logger.Debugf(
-		"Starting consolidation for %s %s in group %s",
-		listType,
-		genericSourceType,
-		group,
-	)
-
-	if len(processedFiles) == 0 {
-		logger.Debugf(
-			"No processed files found for %s %s in group %s",
-			listType,
-			genericSourceType,
-			group,
-		)
-		return u.NewStringSet([]string{}), c.ConsolidatedSummary{}
+	params := ConsolidationParams{
+		GenericSourceType: genericSourceType,
+		ListType:          listType,
+		Identifier:        group,
+		OutputDir:         constants.ConsolidatedGroupsDir,
+		IdentifierField:   "Group",
 	}
 
-	consolidator, exists := con.Consolidators.GetConsolidator(genericSourceType, listType)
-	if !exists {
-		logger.Warnf(
-			"No consolidator found for generic source type: %s, list type: %s",
-			genericSourceType,
-			listType,
-		)
-		return u.NewStringSet([]string{}), c.ConsolidatedSummary{}
-	}
-
-	consolidatedEntries, fileInfos := consolidator.Consolidate(logger, processedFiles)
-	consolidatedFileStrings := getFileStrings(fileInfos)
-
-	if len(consolidatedEntries) > 0 {
-		logger.Infof(
-			"Consolidated %s %s %d entry(s) for group %s",
-			listType,
-			genericSourceType,
-			len(consolidatedEntries),
-			group,
-		)
-	}
-
-	allEntries, ignoredEntries := consolidator.FilterEntries(
-		logger,
-		consolidatedEntries,
-		entriesToIgnore,
-	)
-
-	// Create a summary with group information
-	consolidatedSummary := c.ConsolidatedSummary{
-		Type:                      genericSourceType,
-		FilesCount:                len(fileInfos),
-		Files:                     consolidatedFileStrings,
-		Valid:                     true,
-		Count:                     len(allEntries),
-		IgnoredEntriesCount:       len(ignoredEntries),
-		ListType:                  listType,
-		Group:                     group,
-		LastConsolidatedTimestamp: u.GetTimestamp(),
-	}
-
-	if len(ignoredEntries) > 0 {
-		logger.Infof(
-			"Ignored %s %s %d entry(s) for group %s",
-			listType,
-			genericSourceType,
-			len(ignoredEntries),
-			group,
-		)
-		filenamePrefix := fmt.Sprintf("%s_%s_%s", group, genericSourceType, listType)
-		ignoredFilePath := filepath.Join(
-			constants.ConsolidatedGroupsDir,
-			filenamePrefix+"_ignored.txt",
-		)
-		err := consolidator.SaveEntries(logger, ignoredEntries, ignoredFilePath)
-		if err != nil {
-			logger.Errorf("Error writing ignored entry(s) to file %s: %v", ignoredFilePath, err)
-		} else {
-			consolidatedSummary.IgnoredFilepath = ignoredFilePath
-		}
-	}
-
-	if len(allEntries) <= 0 {
-		logger.Infof(
-			"No entry(s) to consolidate for %s %s in group %s",
-			listType,
-			genericSourceType,
-			group,
-		)
-		return u.NewStringSet([]string{}), c.ConsolidatedSummary{}
-	}
-
-	// Use group-specific filename
-	filenamePrefix := fmt.Sprintf("%s_%s_%s", group, genericSourceType, listType)
-	consolidatedFilePath := filepath.Join(constants.ConsolidatedGroupsDir, filenamePrefix+".txt")
-	consolidatedSummary.Filepath = consolidatedFilePath
-
-	err := consolidator.SaveEntries(logger, allEntries, consolidatedSummary.Filepath)
-	if err != nil {
-		logger.Errorf("Error writing entry(s) to file %s: %v", consolidatedSummary.Filepath, err)
-	} else {
-		if calculateChecksum || AppConfig.DNSToolkit.FilesChecksum.Enabled {
-			consolidatedSummary.Checksum = u.CalculateChecksum(
-				logger,
-				consolidatedSummary.Filepath,
-				AppConfig.DNSToolkit.FilesChecksum.Algorithm,
-			)
-		}
-	}
-
-	logger.Debugf(
-		"Finished consolidation for %s %s in group %s",
-		listType,
-		genericSourceType,
-		group,
-	)
-	return allEntries, consolidatedSummary
+	return consolidateGeneric(logger, params, entriesToIgnore, processedFiles)
 }

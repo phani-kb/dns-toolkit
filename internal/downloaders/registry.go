@@ -6,8 +6,8 @@ import (
 )
 
 type registry struct {
-	mu          sync.RWMutex
 	downloaders map[string]Downloader
+	mu          sync.RWMutex
 }
 
 type Register interface {

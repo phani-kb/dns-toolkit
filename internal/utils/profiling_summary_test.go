@@ -118,11 +118,9 @@ func TestAnalyzeProfiles(t *testing.T) {
 		}
 	}()
 
-	err = AnalyzeProfiles(logger, ProfileOptions{OutputDir: "/non/existent/directory"})
-	assert.NoError(t, err)
+	AnalyzeProfiles(logger, ProfileOptions{OutputDir: "/non/existent/directory"})
 
-	err = AnalyzeProfiles(logger, ProfileOptions{OutputDir: tempDir})
-	assert.NoError(t, err)
+	AnalyzeProfiles(logger, ProfileOptions{OutputDir: tempDir})
 
 	cpuProfile := filepath.Join(tempDir, "cpu.prof")
 	memProfile := filepath.Join(tempDir, "mem.prof")
@@ -133,8 +131,7 @@ func TestAnalyzeProfiles(t *testing.T) {
 	err = os.WriteFile(memProfile, []byte("fake memory profile data"), 0644)
 	require.NoError(t, err)
 
-	err = AnalyzeProfiles(logger, ProfileOptions{OutputDir: tempDir})
-	assert.NoError(t, err)
+	AnalyzeProfiles(logger, ProfileOptions{OutputDir: tempDir})
 }
 
 func TestSaveSummary(t *testing.T) {
@@ -167,8 +164,7 @@ func TestSaveSummary(t *testing.T) {
 		return i.Name < j.Name
 	}
 
-	count, err := SaveSummary(logger, summary, summaryFile, lessFunc)
-	assert.NoError(t, err)
+	count := SaveSummary(logger, summary, summaryFile, lessFunc)
 	assert.Equal(t, 1, count)
 
 	assert.FileExists(t, summaryFile)

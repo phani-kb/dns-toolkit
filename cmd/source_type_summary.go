@@ -17,16 +17,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var sourceTypesSummaryCmd = &cobra.Command{
-	Use:   "sts",
-	Short: "Prints the source types summary",
-	Run: func(cmd *cobra.Command, args []string) {
-		printSourceTypeSummary(Logger, SourcesConfigs)
-	},
-}
-
-func printSourceTypeSummary(logger *multilog.Logger, sourcesConfigs []config.SourcesConfig) {
-	counts := map[string]int{
+// initializeSourceTypeCounts creates and returns a new map with all source types initialized to 0
+func initializeSourceTypeCounts() map[string]int {
+	return map[string]int{
 		constants.SourceTypeIpv4:                     0,
 		constants.SourceTypeIpv4RangeExpand:          0,
 		constants.SourceTypeIpv6:                     0,
@@ -53,6 +46,18 @@ func printSourceTypeSummary(logger *multilog.Logger, sourcesConfigs []config.Sou
 		constants.SourceTypeIpv6Find:                 0,
 		constants.SourceTypeIpv6Htaccess:             0,
 	}
+}
+
+var sourceTypesSummaryCmd = &cobra.Command{
+	Use:   "sts",
+	Short: "Prints the source types summary",
+	Run: func(cmd *cobra.Command, args []string) {
+		printSourceTypeSummary(Logger, SourcesConfigs)
+	},
+}
+
+func printSourceTypeSummary(logger *multilog.Logger, sourcesConfigs []config.SourcesConfig) {
+	counts := initializeSourceTypeCounts()
 
 	// Initialize a slice to keep track of mismatches
 	var mismatches []string
@@ -164,33 +169,7 @@ func processSource(
 }
 
 func categorizeFileContent(logger *multilog.Logger, lines []string) string {
-	regexCounts := map[string]int{
-		constants.SourceTypeIpv4:                     0,
-		constants.SourceTypeIpv4RangeExpand:          0,
-		constants.SourceTypeIpv6:                     0,
-		constants.SourceTypeCidrIpv4:                 0,
-		constants.SourceTypeIpv4CidrExpand:           0,
-		constants.SourceTypeDomain:                   0,
-		constants.SourceTypeDomainFinder:             0,
-		constants.SourceTypeAdguard:                  0,
-		constants.SourceTypeIpv4Hostname:             0,
-		constants.SourceTypeHostname:                 0,
-		constants.SourceTypeUnknown:                  0,
-		constants.SourceTypeDomainAdguard:            0,
-		constants.SourceTypeDomainCsvHttpUrlFind:     0,
-		constants.SourceTypeDomainCustomCsvBlackbook: 0,
-		constants.SourceTypeDomainCustomCsvMaltrail:  0,
-		constants.SourceTypeDomainCustomHtmlCcam:     0,
-		constants.SourceTypeDomainHttpUrl:            0,
-		constants.SourceTypeDomainUrl:                0,
-		constants.SourceTypeDomainWithCommentSuffix:  0,
-		constants.SourceTypeIpv4CustomHtmlCcam:       0,
-		constants.SourceTypeIpv4Find:                 0,
-		constants.SourceTypeIpv4HttpUrl:              0,
-		constants.SourceTypeIpv4Url:                  0,
-		constants.SourceTypeIpv6Find:                 0,
-		constants.SourceTypeIpv6Htaccess:             0,
-	}
+	regexCounts := initializeSourceTypeCounts()
 
 	for _, line := range lines {
 		// NOTE: change in the order of regex checks may affect the results

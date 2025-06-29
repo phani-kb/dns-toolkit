@@ -639,8 +639,6 @@ func TestCreateProcessedFile(t *testing.T) {
 	name := "test-source"
 	sourceType := "domain"
 	listType := "blocklist"
-	mustConsider := true
-	valid := true
 	groups := []string{"group1"}
 	categories := []string{"cat1"}
 
@@ -651,8 +649,8 @@ func TestCreateProcessedFile(t *testing.T) {
 		sourceType,
 		listType,
 		entries,
-		mustConsider,
-		valid,
+		true,
+		true,
 		groups,
 		categories,
 	)
@@ -668,11 +666,11 @@ func TestCreateProcessedFile(t *testing.T) {
 	if pf.NumberOfEntries != len(entries) {
 		t.Errorf("Expected NumberOfEntries %d, got %d", len(entries), pf.NumberOfEntries)
 	}
-	if pf.Valid != valid {
-		t.Errorf("Expected Valid %v, got %v", valid, pf.Valid)
+	if pf.Valid != true {
+		t.Errorf("Expected Valid %v, got %v", true, pf.Valid)
 	}
-	if pf.MustConsider != mustConsider {
-		t.Errorf("Expected MustConsider %v, got %v", mustConsider, pf.MustConsider)
+	if pf.MustConsider != true {
+		t.Errorf("Expected MustConsider %v, got %v", true, pf.MustConsider)
 	}
 }
 
