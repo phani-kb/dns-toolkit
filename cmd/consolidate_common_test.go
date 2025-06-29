@@ -31,7 +31,10 @@ func (m *mockConsolidatorCommon) Consolidate(_ *multilog.Logger, _ []c.Processed
 	return m.mockEntries, m.mockFiles
 }
 
-func (m *mockConsolidatorCommon) FilterEntries(_ *multilog.Logger, entries, filterEntries u.StringSet) (u.StringSet, u.StringSet) {
+func (m *mockConsolidatorCommon) FilterEntries(
+	_ *multilog.Logger,
+	entries, filterEntries u.StringSet,
+) (u.StringSet, u.StringSet) {
 	if m.filteredEntries != nil && m.ignoredEntries != nil {
 		return m.filteredEntries, m.ignoredEntries
 	}
@@ -702,7 +705,11 @@ type mockConsolidatorWithCustomSave struct {
 	customSaveFunc func(*multilog.Logger, u.StringSet, string) error
 }
 
-func (m *mockConsolidatorWithCustomSave) SaveEntries(logger *multilog.Logger, entries u.StringSet, filePath string) error {
+func (m *mockConsolidatorWithCustomSave) SaveEntries(
+	logger *multilog.Logger,
+	entries u.StringSet,
+	filePath string,
+) error {
 	if m.customSaveFunc != nil {
 		return m.customSaveFunc(logger, entries, filePath)
 	}

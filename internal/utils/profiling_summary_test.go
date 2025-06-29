@@ -84,10 +84,10 @@ func TestStartProfiling(t *testing.T) {
 			},
 		},
 		{
-			name: "Invalid output directory",
+			name: "Empty output directory",
 			opts: ProfileOptions{
 				CPUProfile: true,
-				OutputDir:  "/invalid/directory/path",
+				OutputDir:  "",
 			},
 		},
 	}
