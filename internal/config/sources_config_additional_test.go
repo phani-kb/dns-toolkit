@@ -22,13 +22,23 @@ func TestResolveFilePath(t *testing.T) {
 	assert.Equal(t, relPath, result)
 
 	originalTestMode := os.Getenv("DNS_TOOLKIT_TEST_MODE")
-	defer os.Setenv("DNS_TOOLKIT_TEST_MODE", originalTestMode)
+	defer func() {
+		err := os.Setenv("DNS_TOOLKIT_TEST_MODE", originalTestMode)
+		if err != nil {
+			t.Logf("Failed to restore DNS_TOOLKIT_TEST_MODE: %v", err)
+		}
+	}()
 
-	os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	err := os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	require.NoError(t, err)
 
 	tempDir, err := os.MkdirTemp("", "test_resolve_*")
 	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func() {
+		if err := os.RemoveAll(tempDir); err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}()
 
 	goModFile := filepath.Join(tempDir, "go.mod")
 	err = os.WriteFile(goModFile, []byte("module test"), 0644)
@@ -40,7 +50,12 @@ func TestResolveFilePath(t *testing.T) {
 
 	originalWd, err := os.Getwd()
 	require.NoError(t, err)
-	defer os.Chdir(originalWd)
+	defer func() {
+		err := os.Chdir(originalWd)
+		if err != nil {
+			t.Logf("Failed to change directory back: %v", err)
+		}
+	}()
 
 	err = os.Chdir(tempDir)
 	require.NoError(t, err)

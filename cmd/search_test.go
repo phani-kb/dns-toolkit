@@ -17,7 +17,8 @@ import (
 func TestEntryContains(t *testing.T) {
 	t.Parallel()
 
-	os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	err := os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	assert.NoError(t, err)
 	configPath := os.Getenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
 	if configPath == "" {
 		t.Skip("DNS_TOOLKIT_TEST_CONFIG_PATH is not set, skipping test")
@@ -25,7 +26,10 @@ func TestEntryContains(t *testing.T) {
 	}
 
 	defer func() {
-		os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
+		err := os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
+		if err != nil {
+			t.Logf("Failed to unset DNS_TOOLKIT_TEST_MODE: %v", err)
+		}
 	}()
 
 	logger := multilog.NewLogger()
@@ -130,7 +134,9 @@ func TestEntryContains(t *testing.T) {
 				assert.Equal(t, tt.expected, result)
 			}
 
-			os.Remove(testFile)
+			if err := os.Remove(testFile); err != nil {
+				t.Logf("Failed to remove test file: %v", err)
+			}
 		})
 	}
 }

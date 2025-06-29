@@ -288,7 +288,12 @@ func TestSaveEntries(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}(tempDir)
 
 	tests := []struct {
 		name              string
@@ -424,7 +429,12 @@ func TestSaveToFile(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tempDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}(tempDir)
 
 	tests := []struct {
 		name            string
@@ -468,8 +478,14 @@ func TestSaveToFile(t *testing.T) {
 			filePath: filepath.Join(tempDir, "readonly", "test.txt"),
 			setupFunc: func() {
 				roDir := filepath.Join(tempDir, "readonly")
-				os.MkdirAll(roDir, 0755)
-				os.Chmod(roDir, 0444) // Read-only
+				err := os.MkdirAll(roDir, 0755)
+				if err != nil {
+					t.Fatalf("Failed to create readonly directory: %v", err)
+				}
+				err = os.Chmod(roDir, 0444) // Read-only
+				if err != nil {
+					t.Fatalf("Failed to change directory permissions: %v", err)
+				}
 			},
 			expectError: true,
 		},
@@ -481,7 +497,10 @@ func TestSaveToFile(t *testing.T) {
 			expectedContent: []string{"nested.com"},
 			setupFunc: func() {
 				nestedDir := filepath.Join(tempDir, "level1", "level2")
-				os.MkdirAll(nestedDir, 0755)
+				err := os.MkdirAll(nestedDir, 0755)
+				if err != nil {
+					t.Fatalf("Failed to create nested directory: %v", err)
+				}
 			},
 		},
 		{
@@ -492,7 +511,10 @@ func TestSaveToFile(t *testing.T) {
 			expectedContent: []string{"new.com"},
 			setupFunc: func() {
 				existingPath := filepath.Join(tempDir, "overwrite.txt")
-				os.WriteFile(existingPath, []byte("old.com\n"), 0644)
+				err := os.WriteFile(existingPath, []byte("old.com\n"), 0644)
+				if err != nil {
+					t.Fatalf("Failed to write to existing file: %v", err)
+				}
 			},
 		},
 	}
@@ -559,7 +581,10 @@ func TestSaveToFile(t *testing.T) {
 			if tt.setupFunc != nil {
 				roDir := filepath.Join(tempDir, "readonly")
 				if _, err := os.Stat(roDir); err == nil {
-					os.Chmod(roDir, 0755)
+					err := os.Chmod(roDir, 0755)
+					if err != nil {
+						t.Logf("Failed to restore directory permissions: %v", err)
+					}
 				}
 			}
 		})
@@ -573,7 +598,10 @@ func TestProcessSourceFile(t *testing.T) {
 	// Fake download summary and file
 	fileContent := "example.com\ninvalid_domain\n"
 	filePath := filepath.Join(tempDir, "test.txt")
-	os.WriteFile(filePath, []byte(fileContent), 0644)
+	err := os.WriteFile(filePath, []byte(fileContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to write to file: %v", err)
+	}
 
 	summary := c.DownloadSummary{
 		Name:     "test-source",
@@ -674,9 +702,18 @@ func TestProcessAllSources(t *testing.T) {
 	processedDir := filepath.Join(tempDir, "processed")
 	summaryDir := filepath.Join(tempDir, "summary")
 
-	os.MkdirAll(downloadDir, 0755)
-	os.MkdirAll(processedDir, 0755)
-	os.MkdirAll(summaryDir, 0755)
+	err := os.MkdirAll(downloadDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create download directory: %v", err)
+	}
+	err = os.MkdirAll(processedDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create processed directory: %v", err)
+	}
+	err = os.MkdirAll(summaryDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create summary directory: %v", err)
+	}
 
 	// Set constants for testing
 	originalProcessedDir := constants.ProcessedDir
@@ -727,9 +764,18 @@ func TestProcessAllSources(t *testing.T) {
 				},
 			},
 			setupFunc: func() {
-				// Create test files
-				os.WriteFile(filepath.Join(downloadDir, "test1.txt"), []byte("example.com\ninvalid_domain\n"), 0644)
-				os.WriteFile(filepath.Join(downloadDir, "test2.txt"), []byte("google.com\nfacebook.com\n"), 0644)
+				err := os.WriteFile(
+					filepath.Join(downloadDir, "test1.txt"),
+					[]byte("example.com\ninvalid_domain\n"),
+					0644,
+				)
+				if err != nil {
+					t.Fatalf("Failed to write test file: %v", err)
+				}
+				err = os.WriteFile(filepath.Join(downloadDir, "test2.txt"), []byte("google.com\nfacebook.com\n"), 0644)
+				if err != nil {
+					t.Fatalf("Failed to write test file: %v", err)
+				}
 			},
 			expectedProcessed: 2,
 		},
@@ -763,7 +809,10 @@ func TestProcessAllSources(t *testing.T) {
 				},
 			},
 			setupFunc: func() {
-				os.WriteFile(filepath.Join(downloadDir, "valid.txt"), []byte("test.com\n"), 0644)
+				err := os.WriteFile(filepath.Join(downloadDir, "valid.txt"), []byte("test.com\n"), 0644)
+				if err != nil {
+					t.Fatalf("Failed to write test file: %v", err)
+				}
 			},
 			expectedProcessed: 1,
 		},
@@ -780,7 +829,10 @@ func TestProcessAllSources(t *testing.T) {
 			downloadSummaries: nil, // Will create invalid JSON manually
 			setupFunc: func() {
 				summaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"])
-				os.WriteFile(summaryFile, []byte("invalid json content"), 0644)
+				err := os.WriteFile(summaryFile, []byte("invalid json content"), 0644)
+				if err != nil {
+					t.Fatalf("Failed to write summary file: %v", err)
+				}
 			},
 			expectError: true,
 		},
@@ -801,7 +853,10 @@ func TestProcessAllSources(t *testing.T) {
 				},
 			},
 			setupFunc: func() {
-				os.WriteFile(filepath.Join(downloadDir, "cancelled.txt"), []byte("example.com\n"), 0644)
+				err := os.WriteFile(filepath.Join(downloadDir, "cancelled.txt"), []byte("example.com\n"), 0644)
+				if err != nil {
+					t.Fatalf("Failed to write test file: %v", err)
+				}
 			},
 			contextCancelled: true,
 		},
@@ -839,7 +894,10 @@ func TestProcessAllSources(t *testing.T) {
 			if tt.downloadSummaries != nil {
 				summaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"])
 				summaryData, _ := json.Marshal(tt.downloadSummaries)
-				os.WriteFile(summaryFile, summaryData, 0644)
+				err := os.WriteFile(summaryFile, summaryData, 0644)
+				if err != nil {
+					t.Fatalf("Failed to write summary file: %v", err)
+				}
 			}
 
 			// Create context
@@ -867,10 +925,9 @@ func TestProcessAllSources(t *testing.T) {
 						content, err := os.ReadFile(processedSummaryFile)
 						if err == nil {
 							var processedSummaries []c.ProcessedSummary
-							if err := json.Unmarshal(content, &processedSummaries); err == nil {
-								// Allow some flexibility in the count due to merging logic and error handling
-								// The actual count may be less than expected due to file read errors, etc.
-							}
+							_ = json.Unmarshal(content, &processedSummaries)
+							// Allow some flexibility in the count due to merging logic and error handling
+							// The actual count may be less than expected due to file read errors, etc.
 						}
 					}
 					// Note: In some test cases, the file may not be created due to errors, which is expected
@@ -878,10 +935,22 @@ func TestProcessAllSources(t *testing.T) {
 			}
 
 			// Cleanup for next test
-			os.RemoveAll(filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"]))
-			os.RemoveAll(filepath.Join(summaryDir, constants.DefaultSummaryFiles["processed"]))
-			os.RemoveAll(processedDir)
-			os.MkdirAll(processedDir, 0755)
+			err := os.RemoveAll(filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"]))
+			if err != nil {
+				t.Logf("Failed to remove download summary file: %v", err)
+			}
+			err = os.RemoveAll(filepath.Join(summaryDir, constants.DefaultSummaryFiles["processed"]))
+			if err != nil {
+				t.Logf("Failed to remove processed summary file: %v", err)
+			}
+			err = os.RemoveAll(processedDir)
+			if err != nil {
+				t.Logf("Failed to remove processed directory: %v", err)
+			}
+			err = os.MkdirAll(processedDir, 0755)
+			if err != nil {
+				t.Logf("Failed to create processed directory: %v", err)
+			}
 		})
 	}
 }
@@ -1067,7 +1136,10 @@ func TestCreateProcessedFileWithChecksum(t *testing.T) {
 	tempDir := t.TempDir()
 	testFile := filepath.Join(tempDir, "test.txt")
 	testContent := "example.com\ntest.org\n"
-	os.WriteFile(testFile, []byte(testContent), 0644)
+	err := os.WriteFile(testFile, []byte(testContent), 0644)
+	if err != nil {
+		t.Fatalf("Failed to write test file: %v", err)
+	}
 
 	// Save original config
 	originalChecksumEnabled := AppConfig.DNSToolkit.FilesChecksum.Enabled
@@ -1271,8 +1343,14 @@ func TestProcessAllSourcesEdgeCases(t *testing.T) {
 	summaryDir := filepath.Join(tempDir, "summary")
 	processedDir := filepath.Join(tempDir, "processed")
 
-	os.MkdirAll(summaryDir, 0755)
-	os.MkdirAll(processedDir, 0755)
+	err := os.MkdirAll(summaryDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create summary directory: %v", err)
+	}
+	err = os.MkdirAll(processedDir, 0755)
+	if err != nil {
+		t.Fatalf("Failed to create processed directory: %v", err)
+	}
 
 	// Set constants for testing
 	originalSummaryDir := constants.SummaryDir
@@ -1291,7 +1369,10 @@ func TestProcessAllSourcesEdgeCases(t *testing.T) {
 			setupFunc: func() {
 				summaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"])
 				summaryData, _ := json.Marshal([]c.DownloadSummary{})
-				os.WriteFile(summaryFile, summaryData, 0644)
+				err := os.WriteFile(summaryFile, summaryData, 0644)
+				if err != nil {
+					t.Fatalf("Failed to write summary file: %v", err)
+				}
 			},
 		},
 		{
@@ -1299,7 +1380,10 @@ func TestProcessAllSourcesEdgeCases(t *testing.T) {
 			setupFunc: func() {
 				summaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"])
 				summaryData, _ := json.Marshal(nil)
-				os.WriteFile(summaryFile, summaryData, 0644)
+				err := os.WriteFile(summaryFile, summaryData, 0644)
+				if err != nil {
+					t.Fatalf("Failed to write summary file: %v", err)
+				}
 			},
 		},
 		{
@@ -1322,10 +1406,16 @@ func TestProcessAllSourcesEdgeCases(t *testing.T) {
 				}
 				summaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"])
 				summaryData, _ := json.Marshal(downloadSummaries)
-				os.WriteFile(summaryFile, summaryData, 0644)
+				err := os.WriteFile(summaryFile, summaryData, 0644)
+				if err != nil {
+					t.Fatalf("Failed to write summary file: %v", err)
+				}
 
-				// Create the file but it won't be processed due to disabled source
-				os.WriteFile(filepath.Join(tempDir, "disabled.txt"), []byte("example.com\n"), 0644)
+				// Create the file, but it won't be processed due to disabled source
+				err = os.WriteFile(filepath.Join(tempDir, "disabled.txt"), []byte("example.com\n"), 0644)
+				if err != nil {
+					t.Fatalf("Failed to write test file: %v", err)
+				}
 			},
 		},
 	}
@@ -1341,8 +1431,14 @@ func TestProcessAllSourcesEdgeCases(t *testing.T) {
 			processAllSources(ctx, logger, processedDir)
 
 			// Cleanup for next test
-			os.RemoveAll(filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"]))
-			os.RemoveAll(filepath.Join(summaryDir, constants.DefaultSummaryFiles["processed"]))
+			err := os.RemoveAll(filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"]))
+			if err != nil {
+				t.Logf("Failed to remove download summary file: %v", err)
+			}
+			err = os.RemoveAll(filepath.Join(summaryDir, constants.DefaultSummaryFiles["processed"]))
+			if err != nil {
+				t.Logf("Failed to remove processed summary file: %v", err)
+			}
 		})
 	}
 }

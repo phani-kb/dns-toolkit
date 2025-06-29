@@ -119,7 +119,12 @@ func TestSaveFile(t *testing.T) {
 	logger := createTestLogger(t)
 	tempDir, err := os.MkdirTemp("", "test_save_file")
 	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}(tempDir)
 
 	content := "test content"
 	reader := strings.NewReader(content)
@@ -145,7 +150,11 @@ func TestCloseFile(t *testing.T) {
 	logger := createTestLogger(t)
 	tempFile, err := os.CreateTemp("", "test_close")
 	require.NoError(t, err)
-	defer os.Remove(tempFile.Name())
+	defer func() {
+		if err := os.Remove(tempFile.Name()); err != nil {
+			t.Logf("Failed to remove temp file: %v", err)
+		}
+	}()
 
 	CloseFile(logger, tempFile)
 
@@ -158,12 +167,17 @@ func TestCalculateChecksum(t *testing.T) {
 	logger := createTestLogger(t)
 	tempFile, err := os.CreateTemp("", "test_checksum")
 	require.NoError(t, err)
-	defer os.Remove(tempFile.Name())
+	defer func() {
+		if err := os.Remove(tempFile.Name()); err != nil {
+			t.Logf("Failed to remove temp file: %v", err)
+		}
+	}()
 
 	content := "test content for checksum"
 	_, err = tempFile.WriteString(content)
 	require.NoError(t, err)
-	tempFile.Close()
+	err = tempFile.Close()
+	require.NoError(t, err)
 
 	md5sum := CalculateChecksum(logger, tempFile.Name(), "")
 	assert.NotEmpty(t, md5sum)
@@ -238,7 +252,11 @@ func TestCloseBody(t *testing.T) {
 
 	tempFile, err := os.CreateTemp("", "test_close_body")
 	require.NoError(t, err)
-	defer os.Remove(tempFile.Name())
+	defer func() {
+		if err := os.Remove(tempFile.Name()); err != nil {
+			t.Logf("Failed to remove temp file: %v", err)
+		}
+	}()
 
 	CloseBody(logger, tempFile)
 	CloseBody(logger, tempFile)
@@ -254,7 +272,11 @@ func TestShouldDownloadSource(t *testing.T) {
 
 	tempFile, err := os.CreateTemp("", "test_summary")
 	require.NoError(t, err)
-	defer os.Remove(tempFile.Name())
+	defer func() {
+		if err := os.Remove(tempFile.Name()); err != nil {
+			t.Logf("Failed to remove temp file: %v", err)
+		}
+	}()
 
 	writeSummary := func(lastDownloadTimestamp, frequency string) {
 		summaries := []c.DownloadSummary{
@@ -356,12 +378,17 @@ func TestPickRandomLines(t *testing.T) {
 
 	tempFile, err := os.CreateTemp("", "test_random_lines")
 	require.NoError(t, err)
-	defer os.Remove(tempFile.Name())
+	defer func() {
+		if err := os.Remove(tempFile.Name()); err != nil {
+			t.Logf("Failed to remove temp file: %v", err)
+		}
+	}()
 
 	content := "line1\n# comment\nline2\n\nline3\n! another comment\nline4"
 	_, err = tempFile.WriteString(content)
 	require.NoError(t, err)
-	tempFile.Close()
+	err = tempFile.Close()
+	require.NoError(t, err)
 
 	lines, err := PickRandomLines(tempFile.Name(), 0)
 	assert.NoError(t, err)
@@ -384,12 +411,17 @@ func TestReadEntriesFromFile(t *testing.T) {
 
 	tempFile, err := os.CreateTemp("", "test_read_entries")
 	require.NoError(t, err)
-	defer os.Remove(tempFile.Name())
+	defer func() {
+		if err := os.Remove(tempFile.Name()); err != nil {
+			t.Logf("Failed to remove temp file: %v", err)
+		}
+	}()
 
 	content := "example.com\n# comment\nexample.com\n192.168.1.1\n\nexample.org\nexample.com"
 	_, err = tempFile.WriteString(content)
 	require.NoError(t, err)
-	tempFile.Close()
+	err = tempFile.Close()
+	require.NoError(t, err)
 
 	entries, duplicates, err := ReadEntriesFromFile(logger, tempFile.Name())
 	assert.NoError(t, err)
@@ -409,12 +441,17 @@ func TestReadEntriesFromFileWithPool(t *testing.T) {
 
 	tempFile, err := os.CreateTemp("", "test_read_entries_pool")
 	require.NoError(t, err)
-	defer os.Remove(tempFile.Name())
+	defer func() {
+		if err := os.Remove(tempFile.Name()); err != nil {
+			t.Logf("Failed to remove temp file: %v", err)
+		}
+	}()
 
 	content := "example.com\nexample.org\nexample.com"
 	_, err = tempFile.WriteString(content)
 	require.NoError(t, err)
-	tempFile.Close()
+	err = tempFile.Close()
+	require.NoError(t, err)
 
 	entries, duplicates, err := ReadEntriesFromFileWithPool(logger, tempFile.Name(), nil)
 	assert.NoError(t, err)
@@ -468,7 +505,12 @@ func TestCopySourceToTarget(t *testing.T) {
 
 	sourceDir, err := os.MkdirTemp("", "test_copy_source")
 	require.NoError(t, err)
-	defer os.RemoveAll(sourceDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}(sourceDir)
 
 	sourceFile := sourceDir + "/source.txt"
 	err = os.WriteFile(sourceFile, []byte("test content"), 0644)
@@ -476,7 +518,12 @@ func TestCopySourceToTarget(t *testing.T) {
 
 	targetDir, err := os.MkdirTemp("", "test_copy_target")
 	require.NoError(t, err)
-	defer os.RemoveAll(targetDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove target directory: %v", err)
+		}
+	}(targetDir)
 
 	target := c.DownloadTarget{
 		SourceFolder: sourceDir,
@@ -666,7 +713,11 @@ func TestSummaryUtilsErrorHandling(t *testing.T) {
 
 	tempFile, err := os.CreateTemp("", "test_summary_permission")
 	require.NoError(t, err)
-	defer os.Remove(tempFile.Name())
+	defer func() {
+		if err := os.Remove(tempFile.Name()); err != nil {
+			t.Logf("Failed to remove temp file: %v", err)
+		}
+	}()
 
 	validJSON := `[{"name": "test", "lastDownloadTimestamp": "20230101_120000"}]`
 	err = os.WriteFile(tempFile.Name(), []byte(validJSON), 0644)

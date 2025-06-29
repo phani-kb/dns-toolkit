@@ -47,7 +47,8 @@ func TestValidateAndSetDirs(t *testing.T) {
 		},
 	}
 
-	os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
+	err := os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
+	assert.NoError(t, err)
 	validateAndSetDirs()
 	assert.True(t, filepath.IsAbs(constants.DownloadDir))
 	assert.True(
@@ -56,7 +57,8 @@ func TestValidateAndSetDirs(t *testing.T) {
 			filepath.Base(constants.DownloadDir) == "download",
 	)
 
-	os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	err = os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	assert.NoError(t, err)
 	validateAndSetDirs()
 
 	assert.True(t, filepath.IsAbs(constants.DownloadDir))
@@ -78,7 +80,8 @@ func TestInitForTesting(t *testing.T) {
 		},
 	}
 
-	os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	err := os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	assert.NoError(t, err)
 	InitForTesting()
 
 	assert.True(t, filepath.IsAbs(constants.SummaryDir))
@@ -144,7 +147,8 @@ func TestValidateAndSetDirsAllCases(t *testing.T) {
 	}
 
 	// Test in normal mode (not test mode)
-	os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
+	err := os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
+	assert.NoError(t, err)
 	validateAndSetDirs()
 
 	// Verify all constants are set as absolute paths with correct suffixes

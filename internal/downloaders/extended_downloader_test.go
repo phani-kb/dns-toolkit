@@ -21,9 +21,13 @@ func TestCanSkipDownload_WithModifiedHeader(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}(testDir)
 
-	// Create test file
 	testFile := createTestFile(t, testDir, "existing.txt", "test content")
 	fileInfo, err := os.Stat(testFile)
 	require.NoError(t, err)
@@ -81,9 +85,13 @@ func TestCanSkipDownload_NoLastModifiedHeader(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}(testDir)
 
-	// Create test file
 	testFile := createTestFile(t, testDir, "existing.txt", "test content")
 	fileInfo, err := os.Stat(testFile)
 	require.NoError(t, err)
@@ -133,9 +141,13 @@ func TestCanSkipDownload_DifferentFileSize(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}(testDir)
 
-	// Create test file
 	testFile := createTestFile(t, testDir, "existing.txt", "test content")
 	fileInfo, err := os.Stat(testFile)
 	require.NoError(t, err)
@@ -185,7 +197,12 @@ func TestDownloadFile_ForceFlagSet(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}(testDir)
 
 	contentBefore := "old content"
 	contentAfter := "new content"
@@ -193,7 +210,10 @@ func TestDownloadFile_ForceFlagSet(t *testing.T) {
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		io.WriteString(w, contentAfter)
+		_, err := io.WriteString(w, contentAfter)
+		if err != nil {
+			t.Logf("Failed to write response: %v", err)
+		}
 	}))
 	defer server.Close()
 
@@ -205,7 +225,9 @@ func TestDownloadFile_ForceFlagSet(t *testing.T) {
 	}
 
 	// Remove the file before force download to ensure overwrite
-	os.Remove(testFile)
+	if err := os.Remove(testFile); err != nil && !os.IsNotExist(err) {
+		t.Logf("Failed to remove test file: %v", err)
+	}
 
 	filePath, exists, err := d.Download(logger, file, true, nil, config.ApplicationConfig{})
 	assert.NoError(t, err)
@@ -222,13 +244,18 @@ func TestDownloadFile_ConnectionErrors(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}(testDir)
 
 	destDir := filepath.Join(testDir, "dest")
 	err := os.MkdirAll(destDir, 0755)
 	assert.NoError(t, err)
 
-	// Test with a connection refused scenario (invalid port)
+	// Test with a connection-refused scenario (invalid port)
 	d := NewDefaultDownloaderForTesting(1, 10*time.Millisecond)
 	file := c.DownloadFile{
 		URL:      "http://localhost:1", // Using port 1 which should be unavailable
@@ -246,7 +273,12 @@ func TestDownloadFile_EdgeCases(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}(testDir)
 
 	destDir := filepath.Join(testDir, "dest")
 	err := os.MkdirAll(destDir, 0755)
@@ -284,7 +316,10 @@ func TestDownloadFile_EdgeCases(t *testing.T) {
 
 		contentStr := "test content"
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			w.Write([]byte(contentStr))
+			_, err := w.Write([]byte(contentStr))
+			if err != nil {
+				t.Logf("Failed to write response: %v", err)
+			}
 		}))
 		defer server.Close()
 

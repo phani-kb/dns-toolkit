@@ -23,7 +23,11 @@ func TestGetLastSummary(t *testing.T) {
 
 	tempFile, err := os.CreateTemp("", "test_summary")
 	require.NoError(t, err)
-	defer os.Remove(tempFile.Name())
+	defer func() {
+		if err := os.Remove(tempFile.Name()); err != nil {
+			t.Logf("Failed to remove temp file: %v", err)
+		}
+	}()
 
 	err = os.WriteFile(tempFile.Name(), []byte("[]"), 0644)
 	require.NoError(t, err)
@@ -104,7 +108,11 @@ func TestGetSummaryFiles(t *testing.T) {
 	// Create a temporary file with test data
 	tempFile, err := os.CreateTemp("", "test_summary_files")
 	require.NoError(t, err)
-	defer os.Remove(tempFile.Name())
+	defer func() {
+		if err := os.Remove(tempFile.Name()); err != nil {
+			t.Logf("Failed to remove temp file: %v", err)
+		}
+	}()
 
 	summaries := []c.DownloadSummary{
 		{

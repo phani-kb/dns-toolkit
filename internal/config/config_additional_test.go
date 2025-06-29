@@ -113,7 +113,11 @@ func TestGetProcessedSummaries(t *testing.T) {
 
 	tempDir, err := os.MkdirTemp("", "test_summaries_*")
 	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func() {
+		if err := os.RemoveAll(tempDir); err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}()
 
 	originalSummaryDir := constants.SummaryDir
 	constants.SummaryDir = tempDir
@@ -346,8 +350,16 @@ func TestDNSToolkitConfigValidateEdgeCases(t *testing.T) {
 				if tt.name == "Config with existing source file" {
 					tempFile, err := os.CreateTemp("", "test_source_*.json")
 					require.NoError(t, err)
-					defer os.Remove(tempFile.Name())
-					defer tempFile.Close()
+					defer func() {
+						if err := os.Remove(tempFile.Name()); err != nil {
+							t.Logf("Failed to remove temp file: %v", err)
+						}
+					}()
+					defer func() {
+						if err := tempFile.Close(); err != nil {
+							t.Logf("Failed to close temp file: %v", err)
+						}
+					}()
 
 					tt.config.SourceFiles = []string{tempFile.Name()}
 				}
@@ -378,12 +390,21 @@ func TestLoadAppConfigEdgeCases(t *testing.T) {
 
 	tempFile, err := os.CreateTemp("", "invalid_config_*.yml")
 	require.NoError(t, err)
-	defer os.Remove(tempFile.Name())
-	defer tempFile.Close()
+	defer func() {
+		if err := os.Remove(tempFile.Name()); err != nil {
+			t.Logf("Failed to remove temp file: %v", err)
+		}
+	}()
+	defer func() {
+		if err := tempFile.Close(); err != nil {
+			t.Logf("Failed to close temp file: %v", err)
+		}
+	}()
 
 	_, err = tempFile.WriteString("invalid: yaml: content: [")
 	require.NoError(t, err)
-	tempFile.Close()
+	err = tempFile.Close()
+	require.NoError(t, err)
 
 	_, _, err = LoadAppConfig(logger, tempFile.Name())
 	assert.Error(t, err)
@@ -403,12 +424,21 @@ multilog:
 
 	tempFile2, err := os.CreateTemp("", "valid_config_*.yml")
 	require.NoError(t, err)
-	defer os.Remove(tempFile2.Name())
-	defer tempFile2.Close()
+	defer func() {
+		if err := os.Remove(tempFile2.Name()); err != nil {
+			t.Logf("Failed to remove temp file: %v", err)
+		}
+	}()
+	defer func() {
+		if err := tempFile2.Close(); err != nil {
+			t.Logf("Failed to close temp file: %v", err)
+		}
+	}()
 
 	_, err = tempFile2.WriteString(validYAML)
 	require.NoError(t, err)
-	tempFile2.Close()
+	err = tempFile2.Close()
+	require.NoError(t, err)
 
 	_, _, err = LoadAppConfig(logger, tempFile2.Name())
 	assert.Error(t, err)

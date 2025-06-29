@@ -56,7 +56,11 @@ func TestDefaultDownloader_CopyLocalFile(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	sourceContent := "test content"
 	sourceFilename := "source.txt"
@@ -88,7 +92,11 @@ func TestDefaultDownloader_Download_LocalFile(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	sourceContent := "test content"
 	sourceFilename := "source.txt"
@@ -120,7 +128,11 @@ func TestDefaultDownloader_Download_RemoteFile(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	content := "test file content"
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -169,7 +181,11 @@ func TestDefaultDownloader_RetryLogic(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	attemptCount := 0
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -213,7 +229,11 @@ func TestCanSkipDownload(t *testing.T) {
 
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	summaryDir := filepath.Join(testDir, "summary")
 	err := os.MkdirAll(summaryDir, 0755)
@@ -277,7 +297,11 @@ func TestCanSkipDownloadWithBadRequest(t *testing.T) {
 
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	// Setup server that always returns an error
 	badServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -307,7 +331,11 @@ func TestHandleArchiveFile(t *testing.T) {
 
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	regularFile := c.DownloadFile{
 		Folder:    testDir,
@@ -337,7 +365,11 @@ func TestHandleArchiveFileComprehensive(t *testing.T) {
 
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	// Test with empty targets - but should still error on invalid archive format
 	archiveFileWithNoTargets := c.DownloadFile{
@@ -352,7 +384,7 @@ func TestHandleArchiveFileComprehensive(t *testing.T) {
 	err := d.handleArchiveFile(logger, archiveFileWithNoTargets, archivePath)
 	assert.Error(t, err, "Should error with invalid archive format")
 
-	// Test with archive flag false but targets existing
+	// Test with archive flag false but focuses on existing
 	nonArchiveWithTargets := c.DownloadFile{
 		Folder:    testDir,
 		Filename:  "not_archive.txt",
@@ -391,7 +423,11 @@ func TestDefaultDownloader_Download_HTTPError(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
@@ -420,7 +456,11 @@ func TestDownloadEdgeCases_Merged(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	downloadDir := filepath.Join(testDir, "download")
 	err := os.MkdirAll(downloadDir, 0755)
@@ -470,7 +510,11 @@ func TestDownloadEdgeCases_Merged(t *testing.T) {
 		// Create a local test dir for this test
 		localTestDir, err := os.MkdirTemp("", "nonexistent_folder_test")
 		assert.NoError(t, err)
-		defer os.RemoveAll(localTestDir)
+		defer func() {
+			if err := os.RemoveAll(localTestDir); err != nil {
+				t.Logf("Failed to remove local test directory: %v", err)
+			}
+		}()
 
 		sourceContent := "test content"
 		sourceFilename := "source.txt"
@@ -578,7 +622,11 @@ func TestDownloaderConcurrency_Merged(t *testing.T) {
 	t.Parallel()
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	downloadDir := filepath.Join(testDir, "download")
 	err := os.MkdirAll(downloadDir, 0755)
