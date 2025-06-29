@@ -8,27 +8,35 @@ import (
 )
 
 func TestGetConfigPath(t *testing.T) {
-	os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
-	os.Unsetenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
+	err := os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
+	assert.NoError(t, err)
+	err = os.Unsetenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
+	assert.NoError(t, err)
 
 	configPath, err := GetConfigPath()
 	assert.NoError(t, err)
 	assert.Equal(t, "configs/config.yml", configPath)
 
-	os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
-	os.Setenv("DNS_TOOLKIT_TEST_CONFIG_PATH", "/test/config.yml")
+	err = os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	assert.NoError(t, err)
+	err = os.Setenv("DNS_TOOLKIT_TEST_CONFIG_PATH", "/test/config.yml")
+	assert.NoError(t, err)
 
 	configPath, err = GetConfigPath()
 	assert.NoError(t, err)
 	assert.Equal(t, "/test/config.yml", configPath)
 
-	os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
-	os.Unsetenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
+	err = os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	assert.NoError(t, err)
+	err = os.Unsetenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
+	assert.NoError(t, err)
 
 	_, err = GetConfigPath()
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "DNS_TOOLKIT_TEST_CONFIG_PATH is not set")
 
-	os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
-	os.Unsetenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
+	err = os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
+	assert.NoError(t, err)
+	err = os.Unsetenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
+	assert.NoError(t, err)
 }

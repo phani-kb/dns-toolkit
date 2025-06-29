@@ -175,10 +175,11 @@ func TestProcessSummaryFiles(t *testing.T) {
 	assert.Contains(t, fileNames, "processed_summary.json")
 
 	for _, sf := range archiveSummary.SummaryFiles {
-		if sf.Name == "download_summary.json" {
+		switch sf.Name {
+		case "download_summary.json":
 			assert.Equal(t, 2, sf.Count, "Download summary should have count 2")
 			assert.Equal(t, constants.SummaryTypeDownload, sf.SummaryType)
-		} else if sf.Name == "processed_summary.json" {
+		case "processed_summary.json":
 			assert.Equal(t, 1, sf.Count, "Processed summary should have count 1")
 			assert.Equal(t, constants.SummaryTypeProcessed, sf.SummaryType)
 		}
@@ -237,10 +238,18 @@ func TestAddFileToTar(t *testing.T) {
 	archivePath := filepath.Join(tmpDir, "test.tar")
 	archiveFile, err := os.Create(archivePath)
 	require.NoError(t, err)
-	defer archiveFile.Close()
+	defer func() {
+		if err := archiveFile.Close(); err != nil {
+			t.Logf("Failed to close archive file: %v", err)
+		}
+	}()
 
 	tarWriter := tar.NewWriter(archiveFile)
-	defer tarWriter.Close()
+	defer func() {
+		if err := tarWriter.Close(); err != nil {
+			t.Logf("Failed to close tar writer: %v", err)
+		}
+	}()
 
 	err = addFileToTar(logger, tarWriter, testFilePath, "target.txt", fileInfo)
 	assert.NoError(t, err, "Should successfully add file to tar")
@@ -270,10 +279,18 @@ func TestAddFileToTarDirectory(t *testing.T) {
 	archivePath := filepath.Join(tmpDir, "test.tar")
 	archiveFile, err := os.Create(archivePath)
 	require.NoError(t, err)
-	defer archiveFile.Close()
+	defer func() {
+		if err := archiveFile.Close(); err != nil {
+			t.Logf("Failed to close archive file: %v", err)
+		}
+	}()
 
 	tarWriter := tar.NewWriter(archiveFile)
-	defer tarWriter.Close()
+	defer func() {
+		if err := tarWriter.Close(); err != nil {
+			t.Logf("Failed to close tar writer: %v", err)
+		}
+	}()
 
 	err = addFileToTar(logger, tarWriter, subDir, "subdir/", dirInfo)
 	assert.NoError(t, err, "Should successfully add directory to tar")

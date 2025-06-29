@@ -10,7 +10,8 @@ import (
 func TestValidateConfig(t *testing.T) {
 	t.Parallel()
 
-	os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	err := os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	assert.NoError(t, err)
 	configPath := os.Getenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
 	if configPath == "" {
 		t.Skip("DNS_TOOLKIT_TEST_CONFIG_PATH is not set, skipping test")
@@ -18,7 +19,10 @@ func TestValidateConfig(t *testing.T) {
 	}
 
 	defer func() {
-		os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
+		err := os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
+		if err != nil {
+			t.Logf("Failed to unset DNS_TOOLKIT_TEST_MODE: %v", err)
+		}
 	}()
 
 	tests := []struct {
@@ -92,9 +96,10 @@ func TestValidateConfig(t *testing.T) {
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), "config validation error")
 			} else {
-				if !validationPerformed && tt.name != "already validated - should skip" {
-					// Should have attempted validation
-				}
+				assert.Equal(t, tt.name != "already validated - should skip", validationPerformed,
+					"Validation should %s performed for test: %s",
+					map[bool]string{true: "be", false: "not be"}[tt.name != "already validated - should skip"],
+					tt.name)
 			}
 		})
 	}
