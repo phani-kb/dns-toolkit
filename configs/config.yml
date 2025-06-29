@@ -33,12 +33,15 @@ dns_toolkit:
     - "raw.githubusercontent.com"
     - "tranco-list.eu"
     - "github.com"
+    - "rules.emergingthreats.net"
+    - "myip.ms"
   max_workers: 1
   max_retries: 3
   source_filters:
     name:
       contains:
         #- "Local"
+      #type: "domain_top" #"domain_with_comment_suffix" # "adguard"
 multilog:
   handlers:
     - type: console
