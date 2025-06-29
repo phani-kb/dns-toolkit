@@ -493,7 +493,15 @@ func GetSourceTypeFromStr(str string) string {
 // Returns:
 //   - true if the string is a valid domain name, false otherwise
 func IsDomain(domain string) bool {
-	return constants.SourceTypeRegexMap[constants.SourceTypeDomain].MatchString(domain)
+	if (constants.SourceTypeRegexMap[constants.SourceTypeDomain].MatchString(domain) && !IsIP(domain)) ||
+		isPunycodeEncoded(domain) {
+		return true
+	}
+	return false
+}
+
+func isPunycodeEncoded(domain string) bool {
+	return strings.HasPrefix(domain, constants.PunycodePrefix)
 }
 
 // PickRandomLines reads a file and returns a specified number of random lines from it.
