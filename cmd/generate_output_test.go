@@ -78,11 +78,20 @@ func TestPrepareDirectories(t *testing.T) {
 
 	tempDir, err := os.MkdirTemp("", "dns-toolkit-test")
 	assert.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func() {
+		if err := os.RemoveAll(tempDir); err != nil {
+			t.Logf("Failed to remove temporary directory: %v", err)
+		}
+	}()
 
 	oldWd, err := os.Getwd()
 	assert.NoError(t, err)
-	defer os.Chdir(oldWd)
+	defer func() {
+		err := os.Chdir(oldWd)
+		if err != nil {
+			t.Logf("Failed to change directory back to %s: %v", oldWd, err)
+		}
+	}()
 
 	err = os.Chdir(tempDir)
 	assert.NoError(t, err)
@@ -99,7 +108,11 @@ func TestCopySummaryFile(t *testing.T) {
 
 	tempDir, err := os.MkdirTemp("", "dns-toolkit-test")
 	assert.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func() {
+		if err := os.RemoveAll(tempDir); err != nil {
+			t.Logf("Failed to remove temporary directory: %v", err)
+		}
+	}()
 
 	srcPath := filepath.Join(tempDir, "source.txt")
 	dstPath := filepath.Join(tempDir, "dest.txt")
@@ -124,8 +137,14 @@ func TestCopySummaryFile(t *testing.T) {
 func TestLoadTemplates(t *testing.T) {
 	t.Parallel()
 
-	os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
-	defer os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
+	err := os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	assert.NoError(t, err)
+	defer func() {
+		err := os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
+		if err != nil {
+			t.Logf("Failed to unset DNS_TOOLKIT_TEST_MODE: %v", err)
+		}
+	}()
 
 	tmpl, staticTemplate, err := loadTemplates()
 
@@ -143,7 +162,11 @@ func TestCreateOutputFromFile(t *testing.T) {
 
 	tempDir, err := os.MkdirTemp("", "output-test")
 	assert.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func() {
+		if err := os.RemoveAll(tempDir); err != nil {
+			t.Logf("Failed to remove temporary directory: %v", err)
+		}
+	}()
 
 	inputFile := filepath.Join(tempDir, "input.txt")
 	inputContent := "data line 1\ndata line 2"
@@ -186,7 +209,12 @@ func TestProcessRegularFiles(t *testing.T) {
 
 	tempDir, err := os.MkdirTemp("", "regular-files-test")
 	assert.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}(tempDir)
 
 	origOutputDir := constants.SummaryTypesOutputDirMap["testtype"]
 	constants.SummaryTypesOutputDirMap["testtype"] = tempDir
@@ -231,7 +259,12 @@ func TestProcessIgnoredFiles(t *testing.T) {
 
 	tempDir, err := os.MkdirTemp("", "ignored-files-test")
 	assert.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}(tempDir)
 
 	origIgnoredDir := constants.OutputIgnoredDir
 	constants.OutputIgnoredDir = tempDir

@@ -98,7 +98,11 @@ func TestBasicApplicationConfigValidate(t *testing.T) {
 
 func TestBasicDNSToolkitConfigValidate(t *testing.T) {
 	testDir := createTestConfigFiles(t)
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	// Valid config
 	validSourcesPath := filepath.Join(testDir, "valid_sources.json")
@@ -130,7 +134,11 @@ func TestBasicDNSToolkitConfigValidate(t *testing.T) {
 
 func TestBasicAppConfigValidate(t *testing.T) {
 	testDir := createTestConfigFiles(t)
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	validSourcesPath := filepath.Join(testDir, "valid_sources.json")
 
@@ -210,7 +218,11 @@ func TestBasicAppConfigValidate(t *testing.T) {
 // Test LoadAppConfig
 func TestBasicLoadAppConfig(t *testing.T) {
 	testDir := createTestConfigFiles(t)
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	logger := createTestLogger(t)
 	validConfigPath := filepath.Join(testDir, "valid_config.yaml")

@@ -25,8 +25,14 @@ func TestOutputDirectoriesSetCorrectly(t *testing.T) {
 		},
 	}
 
-	os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
-	defer os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
+	err := os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	assert.NoError(t, err)
+	defer func() {
+		err := os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
+		if err != nil {
+			t.Logf("Failed to unset DNS_TOOLKIT_TEST_MODE: %v", err)
+		}
+	}()
 
 	InitForTesting()
 
