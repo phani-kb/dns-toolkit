@@ -124,17 +124,35 @@ const (
 )
 
 const (
-	SourceTypeIpv4         = "ipv4"
-	SourceTypeIpv6         = "ipv6"
-	SourceTypeCidrIpv4     = "cidr_ipv4"
-	SourceTypeDomain       = "domain"
-	SourceTypeDomainFinder = "domain_finder"
-	SourceTypeAdguard      = "adguard"
-	SourceTypeIpv4Hostname = "ipv4_hostname"
-	SourceTypeMixed        = "mixed"
-	SourceTypeHostname     = "hostname"
-	SourceTypeUnknown      = "unknown"
-	SourceTypeTopDomains   = "domain_top"
+	SourceTypeIpv4                       = "ipv4"
+	SourceTypeIpv4RangeExpand            = "ipv4_range_expand"
+	SourceTypeIpv6                       = "ipv6"
+	SourceTypeCidrIpv4                   = "cidr_ipv4"
+	SourceTypeIpv4CidrExpand             = "ipv4_cidr_expand"
+	SourceTypeDomain                     = "domain"
+	SourceTypeDomainComment              = "domain_comment"
+	SourceTypeDomainFinder               = "domain_finder"
+	SourceTypeAdguard                    = "adguard"
+	SourceTypeIpv4Hostname               = "ipv4_hostname"
+	SourceTypeMixed                      = "mixed"
+	SourceTypeHostname                   = "hostname"
+	SourceTypeUnknown                    = "unknown"
+	SourceTypeDomainAdguard              = "domain_adguard"
+	SourceTypeDomainCsvHttpUrlFind       = "domain_csv_http_url_find"
+	SourceTypeDomainCustomCsvBlackbook   = "domain_custom_csv_blackbook"
+	SourceTypeDomainCustomCsvMaltrail    = "domain_custom_csv_maltrail"
+	SourceTypeDomainCustomHtmlCcam       = "domain_custom_html_ccam"
+	SourceTypeDomainHttpUrl              = "domain_http_url"
+	SourceTypeDomainUrl                  = "domain_url"
+	SourceTypeDomainWithCommentSuffix    = "domain_with_comment_suffix"
+	SourceTypeIpv4CustomHtmlCcam         = "ipv4_custom_html_ccam"
+	SourceTypeIpv4Find                   = "ipv4_find"
+	SourceTypeIpv4HttpUrl                = "ipv4_http_url"
+	SourceTypeIpv4Url                    = "ipv4_url"
+	SourceTypeIpv6Find                   = "ipv6_find"
+	SourceTypeIpv6Htaccess               = "ipv6_htaccess"
+	SourceTypeTopDomains                 = "domain_top"
+	SourceTypeDomainCustomHtmlPuppyScams = "domain_custom_html_puppyscams"
 
 	ListTypeBlocklist = "blocklist"
 	ListTypeAllowlist = "allowlist"
@@ -142,15 +160,35 @@ const (
 
 var (
 	ValidTypes = map[string]bool{
-		SourceTypeIpv4:         true,
-		SourceTypeIpv6:         true,
-		SourceTypeDomain:       true,
-		SourceTypeDomainFinder: true,
-		SourceTypeAdguard:      true,
-		SourceTypeIpv4Hostname: true,
-		SourceTypeHostname:     true,
-		SourceTypeUnknown:      true,
-		SourceTypeTopDomains:   true,
+		SourceTypeIpv4:                       true,
+		SourceTypeIpv4RangeExpand:            true,
+		SourceTypeIpv6:                       true,
+		SourceTypeCidrIpv4:                   true,
+		SourceTypeIpv4CidrExpand:             true,
+		SourceTypeDomain:                     true,
+		SourceTypeDomainComment:              true,
+		SourceTypeDomainFinder:               true,
+		SourceTypeAdguard:                    true,
+		SourceTypeIpv4Hostname:               true,
+		SourceTypeMixed:                      true,
+		SourceTypeHostname:                   true,
+		SourceTypeUnknown:                    true,
+		SourceTypeDomainAdguard:              true,
+		SourceTypeDomainCsvHttpUrlFind:       true,
+		SourceTypeDomainCustomCsvBlackbook:   true,
+		SourceTypeDomainCustomCsvMaltrail:    true,
+		SourceTypeDomainCustomHtmlCcam:       true,
+		SourceTypeDomainHttpUrl:              true,
+		SourceTypeDomainUrl:                  true,
+		SourceTypeDomainWithCommentSuffix:    true,
+		SourceTypeIpv4CustomHtmlCcam:         true,
+		SourceTypeIpv4Find:                   true,
+		SourceTypeIpv4HttpUrl:                true,
+		SourceTypeIpv4Url:                    true,
+		SourceTypeIpv6Find:                   true,
+		SourceTypeIpv6Htaccess:               true,
+		SourceTypeTopDomains:                 true,
+		SourceTypeDomainCustomHtmlPuppyScams: true,
 	}
 	ValidListTypes = map[string]bool{
 		ListTypeBlocklist: true,

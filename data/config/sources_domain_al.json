@@ -2,7 +2,9 @@
   "sources": [
     {
       "name": "anudeepND_Allowlist",
+      "disabled": true,
       "license": "MIT",
+      "notes": "Last updated on 2021-12-01. This list is no longer maintained.",
       "types": [
         {
           "name": "domain",
@@ -16,6 +18,22 @@
       ],
       "url": "https://raw.githubusercontent.com/anudeepND/whitelist/refs/heads/master/domains/whitelist.txt",
       "website": "https://github.com/anudeepND/whitelist"
+    },
+    {
+      "name": "ShadowWhisperer_Allowlist",
+      "types": [
+        {
+          "name": "domain_with_comment_suffix",
+          "list_types": [
+            {
+              "name": "allowlist",
+              "groups": "normal"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/refs/heads/master/Whitelists/Whitelist",
+      "website": "https://github.com/ShadowWhisperer/BlockLists"
     }
   ]
 }

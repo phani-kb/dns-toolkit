@@ -19,6 +19,198 @@
       "website": "https://github.com/badmojr/1Hosts"
     },
     {
+      "name": "abpvn_hosts",
+      "countries": "VN",
+      "license": "GPL-3.0",
+      "types": [
+        {
+          "name": "adguard",
+          "list_types": [
+            {
+              "name": "blocklist"
+            },
+            {
+              "name": "allowlist"
+            }
+          ]
+        },
+        {
+          "name": "domain_adguard",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/abpvn/abpvn/refs/heads/master/filter/abpvn.txt",
+      "website": "https://abpvn.com"
+    },
+    {
+      "name": "Adaway",
+      "categories": "mobile",
+      "frequency": "weekly",
+      "license": "CC Attribution 3.0",
+      "types": [
+        {
+          "name": "hostname",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        }
+      ],
+      "url": "https://adaway.org/hosts.txt",
+      "website": "https://adaway.org"
+    },
+    {
+      "name": "AdGuard Base filter",
+      "categories": "ads",
+      "license": "GPL-3.0",
+      "types": [
+        {
+          "name": "adguard",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "lite"
+            },
+            {
+              "name": "allowlist",
+              "groups": "lite"
+            }
+          ]
+        },
+        {
+          "name": "domain_adguard",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://filters.adtidy.org/extension/firefox/filters/2.txt",
+      "website": "https://github.com/AdguardTeam/AdGuardFilters"
+    },
+    {
+      "name": "CybercrimeTracker_All",
+      "categories": "trackers",
+      "license": "CC0",
+      "types": [
+        {
+          "name": "domain_url"
+        },
+        {
+          "name": "ipv4_url"
+        }
+      ],
+      "url": "https://cybercrime-tracker.net/all.php",
+      "website": "https://cybercrime-tracker.net"
+    },
+    {
+      "name": "CybercrimeTracker_CCAM",
+      "categories": "trackers",
+      "license": "CC0",
+      "types": [
+        {
+          "name": "domain_custom_html_ccam",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "mini"
+            }
+          ]
+        },
+        {
+          "name": "ipv4_custom_html_ccam",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "mini"
+            }
+          ]
+        }
+      ],
+      "url": "https://cybercrime-tracker.net/ccam.php",
+      "website": "https://cybercrime-tracker.net"
+    },
+    {
+      "name": "CybercrimeTracker_CCPMGate",
+      "license": "CC0",
+      "types": [
+        {
+          "name": "domain_http_url",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "mini"
+            }
+          ]
+        },
+        {
+          "name": "ipv4_http_url",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "mini"
+            }
+          ]
+        }
+      ],
+      "url": "https://cybercrime-tracker.net/ccpmgate.php",
+      "website": "https://cybercrime-tracker.net"
+    },
+    {
+      "name": "Maltrail_StaticTrails",
+      "types": [
+        {
+          "name": "domain_custom_csv_maltrail"
+        },
+        {
+          "name": "ipv4_find"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/stamparm/aux/master/maltrail-static-trails.txt"
+    },
+    {
+      "name": "PuppyScams",
+      "categories": "scam",
+      "types": [
+        {
+          "name": "domain_custom_html_puppyscams",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "lite"
+            }
+          ]
+        }
+      ],
+      "url": "https://puppyscams.org/top-100-pet-scams",
+      "website": "https://puppyscams.org"
+    },
+    {
+      "name": "Stamparm_Blackbook",
+      "categories": "malware",
+      "frequency": "monthly",
+      "types": [
+        {
+          "name": "domain_custom_csv_blackbook",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/stamparm/blackbook/master/blackbook.csv",
+      "website": "https://github.com/stamparm/blackbook"
+    },
+    {
       "name": "StevenBlack_Adhoc_list",
       "categories": "ads, malware, trackers",
       "license": "MIT",
@@ -28,6 +220,7 @@
           "list_types": [
             {
               "name": "blocklist",
+              "must_consider": true,
               "groups": "lite"
             }
           ]
@@ -37,8 +230,60 @@
       "website": "https://github.com/StevenBlack/hosts"
     },
     {
+      "name": "StevenBlack_Fake_Gambling_Porn",
+      "categories": "ads, adult, fakenews, gambling",
+      "disabled": true,
+      "license": "MIT",
+      "types": [
+        {
+          "name": "hostname"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts",
+      "website": "https://github.com/StevenBlack/hosts"
+    },
+    {
+      "name": "Viriback_Dump",
+      "types": [
+        {
+          "name": "domain_csv_http_url_find"
+        },
+        {
+          "name": "ipv4_find"
+        }
+      ],
+      "url": "https://tracker.viriback.com/dump.php"
+    },
+    {
+      "name": "WindowsSpyBlocker_Hosts_spy",
+      "disabled": true,
+      "license": "MIT",
+      "notes": "No update since 2022-05-16",
+      "types": [
+        {
+          "name": "hostname"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/spy.txt",
+      "website": "https://github.com/crazy-max/WindowsSpyBlocker"
+    },
+    {
+      "name": "Winhelp2002",
+      "disabled": true,
+      "license": "CC BY-NC-SA 3.0",
+      "notes": "No update since 2021-03-06",
+      "types": [
+        {
+          "name": "hostname"
+        }
+      ],
+      "url": "https://winhelp2002.mvps.org/hosts.txt",
+      "website": "https://winhelp2002.mvps.org"
+    },
+    {
       "name": "youtube_GoodbyeAds",
       "categories": "ads",
+      "frequency": "monthly",
       "license": "MIT",
       "types": [
         {
