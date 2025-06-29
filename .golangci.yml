@@ -1,0 +1,77 @@
+version: "2"
+run:
+  timeout: 5m
+  issues-exit-code: 2
+  tests: false
+  concurrency: 4
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+    - golines
+  settings:
+    golines:
+      max-len: 120
+      shorten-comments: true
+
+linters:
+  enable:
+    - bodyclose
+    - dupl
+    - goconst
+    - gocyclo
+    - ineffassign
+    - misspell
+    - nakedret
+    - unconvert
+    - unparam
+  settings:
+    goconst:
+      min-occurrences: 5
+    revive:
+      rules:
+        - name: exported
+          arguments: [ { checkExported: true } ]
+        - name: package-comments
+        - name: var-naming
+          arguments: [ { allowCommonInitialisms: true } ]
+        - name: indent-error-flow
+        - name: error-strings
+        - name: error-return
+        - name: blank-imports
+        - name: context-as-argument
+        - name: if-return
+        - name: naked-return
+        - name: predeclared
+        - name: range-val-copy
+        - name: typecheck
+        - name: unnecessary-else
+        - name: unused-parameter
+          severity: warning
+          disabled: false
+        - name: unexported-return
+          severity: error
+          disabled: false
+    dupl:
+      threshold: 100
+    errcheck:
+      check-type-assertions: true
+      check-blank: true
+    gocyclo:
+      min-complexity: 50
+    govet:
+      enable-all: true
+    nakedret:
+      max-func-lines: 50
+    unparam:
+      check-exported: true
+    gocritic:
+      enabled-tags:
+        - diagnostic
+        - performance
+        - style
+        - opinionated
+      settings:
+        hugeParam:
+          sizeThreshold: 512

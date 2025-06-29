@@ -10,8 +10,8 @@ type ProcessFunc func(logger *multilog.Logger, content string) ([]string, []stri
 
 // GenericProcessor is a customizable processor that uses a function for processing
 type GenericProcessor struct {
-	BaseProcessor
 	processFunc ProcessFunc
+	BaseProcessor
 }
 
 // Process delegates to the custom process function

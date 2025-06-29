@@ -14,9 +14,9 @@ type Named interface {
 
 type SourceType struct {
 	Name      string     `json:"name"`
-	Disabled  bool       `json:"disabled,omitempty"`
-	ListTypes []ListType `json:"list_types,omitempty"`
 	Notes     string     `json:"notes,omitempty"`
+	ListTypes []ListType `json:"list_types,omitempty"`
+	Disabled  bool       `json:"disabled,omitempty"`
 }
 
 func (st *SourceType) Validate() error {
@@ -46,10 +46,10 @@ func (st *SourceType) GetListTypes() []ListType {
 
 type ListType struct {
 	Name         string   `json:"name"`
-	Disabled     bool     `json:"disabled,omitempty"`
-	Groups       []string `json:"groups,omitempty"`
-	MustConsider bool     `json:"must_consider,omitempty"`
 	Notes        string   `json:"notes,omitempty"`
+	Groups       []string `json:"groups,omitempty"`
+	Disabled     bool     `json:"disabled,omitempty"`
+	MustConsider bool     `json:"must_consider,omitempty"`
 }
 
 func (lt *ListType) Validate() error {
@@ -72,20 +72,23 @@ func (lt *ListType) Validate() error {
 type DownloadSummary struct {
 	Name                  string       `json:"name"`                        // Name of the source
 	URL                   string       `json:"url"`                         // URL where the list was downloaded from
-	TypeCount             int          `json:"type_count"`                  // Number of entry types in the source
-	Types                 []SourceType `json:"types"`                       // Array of entry types (ipv4, domain, etc.)
 	Filepath              string       `json:"filepath"`                    // Path to the downloaded file
-	CountToConsider       int          `json:"count_to_consider,omitempty"` // Number of entries to consider
 	Frequency             string       `json:"frequency"`                   // Frequency of updates
-	Categories            []string     `json:"categories,omitempty"`        // Categories this source belongs to
 	Checksum              string       `json:"checksum"`                    // Checksum of the file content
 	Error                 string       `json:"error"`                       // Error message if download failed
 	LastDownloadTimestamp string       `json:"last_download_timestamp"`     // Timestamp of the last successful download
 	LastCheckedTimestamp  string       `json:"last_checked_timestamp"`      // Timestamp when last checked for updates
+	Types                 []SourceType `json:"types"`                       // Array of entry types (ipv4, domain, etc.)
+	Categories            []string     `json:"categories,omitempty"`        // Categories this source belongs to
+	TypeCount             int          `json:"type_count"`                  // Number of entry types in the source
+	CountToConsider       int          `json:"count_to_consider,omitempty"` // Number of entries to consider
 }
 
 func (ds *DownloadSummary) ToJSON() string {
-	data, _ := json.Marshal(ds)
+	data, err := json.Marshal(ds)
+	if err != nil {
+		return "{}"
+	}
 	return string(data)
 }
 
@@ -198,10 +201,10 @@ type DownloadFile struct {
 	Name      string           `json:"name"`
 	Folder    string           `json:"folder"`
 	Filename  string           `json:"filename"`
-	IsArchive bool             `json:"is_archive"`
 	URL       string           `json:"url"`
 	Frequency string           `json:"frequency"`
 	Targets   []DownloadTarget `json:"targets"`
+	IsArchive bool             `json:"is_archive"`
 }
 
 type DownloadTarget struct {
@@ -219,12 +222,12 @@ type ProcessedFile struct {
 	ActualSourceType  string   `json:"actual_source_type"`      // Specific source type detected
 	ListType          string   `json:"list_type"`               // Type of list (blocklist or allowlist)
 	Filepath          string   `json:"filepath"`                // Path of the processed file
-	NumberOfEntries   int      `json:"number_of_entries"`       // Count of entries in the file
 	Checksum          string   `json:"checksum"`                // Checksum of the file content
-	MustConsider      bool     `json:"must_consider,omitempty"` // Whether the file must be considered
-	Valid             bool     `json:"valid"`                   // Whether the file contains valid entries
 	Groups            []string `json:"groups,omitempty"`        // Size groups this file belongs to (mini, lite, normal, big)
 	Categories        []string `json:"categories,omitempty"`    // Categories this file belongs to
+	NumberOfEntries   int      `json:"number_of_entries"`       // Count of entries in the file
+	MustConsider      bool     `json:"must_consider,omitempty"` // Whether the file must be considered
+	Valid             bool     `json:"valid"`                   // Whether the file contains valid entries
 }
 
 // UnmarshalJSON implements custom JSON unmarshalling for ProcessedFile to handle the group array
@@ -275,10 +278,10 @@ func (pf *ProcessedFile) UnmarshalJSON(data []byte) error {
 // It tracks both valid and invalid entries found during processing.
 type ProcessedSummary struct {
 	Name                   string          `json:"name"`                     // Source name
+	LastProcessedTimestamp string          `json:"last_processed_timestamp"` // When processing was completed
 	Types                  []SourceType    `json:"types"`                    // Content types in the source
 	ValidFiles             []ProcessedFile `json:"valid_files,omitempty"`    // Map of valid files by type
 	InvalidFiles           []ProcessedFile `json:"invalid_files,omitempty"`  // Map of invalid files by type
-	LastProcessedTimestamp string          `json:"last_processed_timestamp"` // When processing was completed
 }
 
 func (ps *ProcessedSummary) GetSourceTypes() []SourceType {
@@ -302,15 +305,15 @@ type ConsolidatedSummary struct {
 	Filepath                  string   `json:"filepath"`                        // Path to the consolidated file
 	ListType                  string   `json:"list_type"`                       // Type of list (blocklist or allowlist)
 	Checksum                  string   `json:"checksum"`                        // Checksum of the consolidated file
-	FilesCount                int      `json:"files_count"`                     // Number of source files consolidated
-	Files                     []string `json:"files"`                           // List of source files that were consolidated
-	Valid                     bool     `json:"valid"`                           // Whether this contains valid entries
-	Count                     int      `json:"count"`                           // Number of entries in the file
-	IgnoredEntriesCount       int      `json:"ignored_entries_count,omitempty"` // Number of entries ignored during consolidation
 	IgnoredFilepath           string   `json:"ignored_filepath,omitempty"`      // Path to the ignored entries file
 	LastConsolidatedTimestamp string   `json:"last_consolidated_timestamp"`     // When consolidation completed
 	Group                     string   `json:"group,omitempty"`                 // Size group (mini, lite, normal, big)
 	Category                  string   `json:"category,omitempty"`              // Category (advertising, malware, privacy, etc.)
+	Files                     []string `json:"files"`                           // List of source files that were consolidated
+	FilesCount                int      `json:"files_count"`                     // Number of source files consolidated
+	Count                     int      `json:"count"`                           // Number of entries in the file
+	IgnoredEntriesCount       int      `json:"ignored_entries_count,omitempty"` // Number of entries ignored during consolidation
+	Valid                     bool     `json:"valid"`                           // Whether this contains valid entries
 }
 
 // GetFilename generates the filename for a consolidated file based on its properties.
@@ -338,8 +341,8 @@ func (cs *ConsolidatedSummary) GetName() string {
 // ConsolidatedGroupsSummary represents a group of consolidated summaries organized by size.
 type ConsolidatedGroupsSummary struct {
 	Group                     string                `json:"group"`                       // Size group (mini, lite, normal, big)
-	ConsolidatedSummaries     []ConsolidatedSummary `json:"consolidated_summaries"`      // Consolidated summaries for this group
 	LastConsolidatedTimestamp string                `json:"last_consolidated_timestamp"` // When consolidation completed
+	ConsolidatedSummaries     []ConsolidatedSummary `json:"consolidated_summaries"`      // Consolidated summaries for this group
 }
 
 func (css *ConsolidatedGroupsSummary) GetName() string {
@@ -349,8 +352,8 @@ func (css *ConsolidatedGroupsSummary) GetName() string {
 // ConsolidatedCategoriesSummary represents consolidated summaries grouped by category.
 type ConsolidatedCategoriesSummary struct {
 	Category                  string                `json:"category"`                    // Category name (advertising, malware, privacy, etc)
-	ConsolidatedSummaries     []ConsolidatedSummary `json:"consolidated_summaries"`      // Consolidated summaries for this category
 	LastConsolidatedTimestamp string                `json:"last_consolidated_timestamp"` // When consolidation was completed
+	ConsolidatedSummaries     []ConsolidatedSummary `json:"consolidated_summaries"`      // Consolidated summaries for this category
 }
 
 // ConsolidatedCategoriesSummaryLessFunc provides sorting logic for ConsolidatedCategoriesSummary
@@ -369,16 +372,16 @@ type OverlapDetailedSummary struct {
 // OverlapSourceType represents overlap information for a specific source type.
 type OverlapSourceType struct {
 	Type       string        `json:"source_type"` // Source type (domain, ipv4, etc.)
-	PairsCount int           `json:"pairs_count"` // Number of file pairs analyzed
 	Pairs      []OverlapPair `json:"pairs"`       // List of file pairs with overlap data
+	PairsCount int           `json:"pairs_count"` // Number of file pairs analyzed
 }
 
 // OverlapPair represents the overlap between two specific files.
 type OverlapPair struct {
+	Filepath string          `json:"filepath"` // Path to the file containing the overlap entries
 	Source   OverlapFileInfo `json:"source"`   // Source file information
 	Target   OverlapFileInfo `json:"target"`   // Target file information
 	Overlap  int             `json:"overlap"`  // Number of overlapping entries
-	Filepath string          `json:"filepath"` // Path to the file containing the overlap entries
 }
 
 // OverlapFileInfo contains information about a file in an overlap analysis.
@@ -387,8 +390,8 @@ type OverlapFileInfo struct {
 	Name     string `json:"name"`      // Source name
 	Type     string `json:"type"`      // Type of entries (domain, ipv4, etc.)
 	ListType string `json:"list_type"` // Type of list (blocklist or allowlist)
-	Count    int    `json:"count"`     // Number of entries in the file
 	Percent  string `json:"percent"`   // Percentage of overlap
+	Count    int    `json:"count"`     // Number of entries in the file
 }
 
 // OverlapSummary represents a compact summary of overlap information for a source.
@@ -396,11 +399,11 @@ type OverlapSummary struct {
 	Source       string                  `json:"source"`        // Name of the source file
 	ListType     string                  `json:"list_type"`     // Type of list (blocklist or allowlist)
 	Type         string                  `json:"source_type"`   // Source type (domain, ipv4, etc.)
+	TargetsList  []string                `json:"targets"`       // List of targets as strings
+	Targets      []OverlapTargetFileInfo `json:"-"`             // Detailed target information (not serialized)
 	Count        int                     `json:"count"`         // Number of entries in the source
 	Unique       int                     `json:"unique"`        // Number of unique entries
 	TargetsCount int                     `json:"targets_count"` // Number of target files with overlap
-	TargetsList  []string                `json:"targets"`       // List of targets as strings
-	Targets      []OverlapTargetFileInfo `json:"-"`             // Detailed target information (not serialized)
 }
 
 func (os *OverlapSummary) GetName() string {
@@ -412,9 +415,9 @@ type OverlapTargetFileInfo struct {
 	Name     string `json:"name"`      // Name of the target
 	ListType string `json:"list_type"` // Type of list (blocklist or allowlist)
 	Type     string `json:"type"`      // Source type (domain, ipv4, etc.)
+	Percent  string `json:"percent"`   // Percentage of overlap
 	Count    int    `json:"count"`     // Number of entries in the target
 	Overlap  int    `json:"overlap"`   // Number of overlapping entries
-	Percent  string `json:"percent"`   // Percentage of overlap
 }
 
 // GetString returns a formatted string representation of the overlap target file info.
@@ -459,11 +462,11 @@ type TemplateData struct {
 // TopSummary contains information about the top entries found across multiple sources.
 type TopSummary struct {
 	GenericSourceType string           `json:"generic_source_type"` // Type of entries (domain, ipv4, etc.)
-	MinSources        int              `json:"min_sources"`         // Minimum number of sources to include entry
-	TopEntries        []EntryCountPair `json:"-"`                   // List of top entries (not serialized)
-	Count             int              `json:"count"`               // Number of entries
 	Filepath          string           `json:"filepath"`            // Path to the file containing top entries
 	ListType          string           `json:"list_type"`           // Type of list (blocklist or allowlist)
+	TopEntries        []EntryCountPair `json:"-"`                   // List of top entries (not serialized)
+	MinSources        int              `json:"min_sources"`         // Minimum number of sources to include entry
+	Count             int              `json:"count"`               // Number of entries
 }
 
 func (ts *TopSummary) GetName() string {
@@ -499,7 +502,9 @@ func (h *EntryHeap) Less(i, j int) bool { return (*h)[i].Count < (*h)[j].Count }
 func (h *EntryHeap) Swap(i, j int) { (*h)[i], (*h)[j] = (*h)[j], (*h)[i] }
 
 func (h *EntryHeap) Push(x interface{}) {
-	*h = append(*h, x.(EntryCountPair))
+	if ecp, ok := x.(EntryCountPair); ok {
+		*h = append(*h, ecp)
+	}
 }
 
 func (h *EntryHeap) Pop() interface{} {
@@ -594,29 +599,29 @@ func (as *ArchiveSummary) GetName() string {
 
 type ArchiveFolder struct {
 	Name      string        `json:"name"`      // Name of the folder
-	Count     int           `json:"count"`     // Number of sources containing this entry
-	Files     []ArchiveFile `json:"files"`     // List of files in the folder
 	Timestamp string        `json:"timestamp"` // Timestamp of the folder
+	Files     []ArchiveFile `json:"files"`     // List of files in the folder
+	Count     int           `json:"count"`     // Number of sources containing this entry
 }
 
 type ArchiveFile struct {
 	Name      string `json:"name"`      // Name of the file
 	Filepath  string `json:"filepath"`  // Path to the file
-	Count     int    `json:"count"`     // Number of lines in the file
 	Checksum  string `json:"checksum"`  // Checksum of the file content
-	Size      int64  `json:"size"`      // Size of the file in bytes
 	Timestamp string `json:"timestamp"` // Timestamp of the file
+	Size      int64  `json:"size"`      // Size of the file in bytes
+	Count     int    `json:"count"`     // Number of lines in the file
 }
 
 type ArchiveSummaryFile struct {
 	Name        string `json:"name"`         // Name of the file
 	Filepath    string `json:"filepath"`     // Path to the file
 	SummaryType string `json:"summary_type"` // Type of summary (download, processed, consolidated, etc.)
-	Count       int    `json:"count"`        // Number of entries in the file of the specific summary type
 	Checksum    string `json:"checksum"`     // Checksum of the file content
-	Size        int64  `json:"size"`         // Size of the file in bytes
-	Valid       bool   `json:"valid"`        // Whether the file contains valid entries
 	Timestamp   string `json:"timestamp"`    // Timestamp of the file
+	Size        int64  `json:"size"`         // Size of the file in bytes
+	Count       int    `json:"count"`        // Number of entries in the file of the specific summary type
+	Valid       bool   `json:"valid"`        // Whether the file contains valid entries
 }
 
 func (asf *ArchiveSummaryFile) GetName() string {

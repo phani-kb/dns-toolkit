@@ -25,16 +25,16 @@ const retryDelay = time.Second * constants.DefaultRetryDelayInSeconds
 
 // HTTPStatusError Custom error types for better handling
 type HTTPStatusError struct {
-	StatusCode int
 	Status     string
 	URL        string
+	StatusCode int
 }
 
 func (e *HTTPStatusError) Error() string {
 	return fmt.Sprintf("HTTP request returned non-success status: %d %s for %s", e.StatusCode, e.Status, e.URL)
 }
 
-type CertVerificationError struct {
+type CertVerificationError struct { // nolint: govet
 	Host string
 	Err  error
 }
@@ -163,23 +163,32 @@ func (d *DefaultDownloader) downloadFile(
 	userAgent := cfg.GetUserAgent(logger, applicationConfig)
 	logger.Debugf("User-Agent: %s", userAgent)
 	if fileExists && d.canSkipDownload(logger, client, userAgent, file, localFileSize, localModTime) {
-		err := d.handleArchiveFile(logger, file, filePath)
-		return filePath, true, err
+		archiveErr := d.handleArchiveFile(logger, file, filePath)
+		return filePath, true, archiveErr
 	}
 
 	var resp *http.Response
 	var lastErr error
 
 	for attempt := 1; attempt <= d.maxRetries; attempt++ {
-		req, err := http.NewRequest("GET", file.URL, nil)
-		if err != nil {
-			logger.Errorf("Creating request error: %v", err)
-			lastErr = err
+		req, reqErr := http.NewRequest("GET", file.URL, nil)
+		if reqErr != nil {
+			logger.Errorf("Creating request error: %v", reqErr)
+			lastErr = reqErr
 			continue
 		}
 
 		req.Header.Set("User-Agent", userAgent)
 		resp, err = client.Do(req)
+
+		// If we get a response but encounter an error later, we should still close the body
+		if err == nil && resp != nil && resp.Body != nil {
+			defer func() {
+				if closeErr := resp.Body.Close(); closeErr != nil {
+					logger.Warnf("Failed to close response body: %v", closeErr)
+				}
+			}()
+		}
 
 		if err != nil {
 			var urlErr *url.Error
@@ -329,13 +338,19 @@ func (d *DefaultDownloader) canSkipDownload(
 	}
 	headReq.Header.Set("User-Agent", userAgent)
 	resp, err := client.Do(headReq)
+
+	// Always ensure we close the response body if we got a response
+	if resp != nil && resp.Body != nil {
+		defer func() {
+			if closeErr := resp.Body.Close(); closeErr != nil {
+				logger.Warnf("Failed to close response body: %v", closeErr)
+			}
+		}()
+	}
+
 	if err != nil || resp.StatusCode != http.StatusOK {
-		if resp != nil {
-			u.CloseBody(logger, resp.Body)
-		}
 		return false
 	}
-	defer u.CloseBody(logger, resp.Body)
 
 	filePath := filepath.Join(file.Folder, file.Filename)
 	if contentLength := resp.ContentLength; contentLength != -1 && contentLength == localFileSize {

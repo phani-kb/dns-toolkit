@@ -45,17 +45,17 @@ func (sc *SourcesConfig) ValidateWithConfig(appConfig *AppConfig) error {
 type Source struct {
 	Name            string         `json:"name"`
 	URL             string         `json:"url"`
-	Files           []string       `json:"files,omitempty"`
-	TypeCount       int            `json:"type_count"`
-	Types           []c.SourceType `json:"types"`
 	Frequency       string         `json:"frequency,omitempty"`
-	Categories      []string       `json:"categories,omitempty"`
-	Countries       []string       `json:"countries,omitempty"`
 	License         string         `json:"license,omitempty"`
-	Disabled        bool           `json:"disabled,omitempty"`
 	Website         string         `json:"website,omitempty"`
 	Notes           string         `json:"notes,omitempty"`
+	Types           []c.SourceType `json:"types"`
+	Files           []string       `json:"files,omitempty"`
+	Categories      []string       `json:"categories,omitempty"`
+	Countries       []string       `json:"countries,omitempty"`
+	TypeCount       int            `json:"type_count"`
 	CountToConsider int            `json:"count_to_consider,omitempty"`
+	Disabled        bool           `json:"disabled,omitempty"`
 }
 
 func (s *Source) Validate() error {
@@ -132,16 +132,16 @@ var defaultValues = map[string]string{
 // UnmarshalJSON custom unmarshalling to handle nested list_types within types
 func (s *Source) UnmarshalJSON(data []byte) error {
 	type Alias Source
-	aux := &struct {
-		Types []struct {
-			Name      string `json:"name"`
+	aux := &struct { // nolint: govet
+		Types []struct { // nolint: govet
 			ListTypes []struct {
 				Name         string `json:"name"`
 				Groups       string `json:"groups"`
+				Notes        string `json:"notes"`
 				MustConsider bool   `json:"must_consider"`
 				Disabled     bool   `json:"disabled"`
-				Notes        string `json:"notes"`
 			} `json:"list_types,omitempty"`
+			Name string `json:"name"`
 		} `json:"types"`
 		Categories string `json:"categories"`
 		Countries  string `json:"countries"`
@@ -248,8 +248,8 @@ func LoadSourcesConfig(logger *multilog.Logger, filePath string) (SourcesConfig,
 		return SourcesConfig{}, fmt.Errorf("error opening sources file: %w", err)
 	}
 	defer func() {
-		if err := file.Close(); err != nil {
-			logger.Errorf("error closing file: %v", err)
+		if closeErr := file.Close(); closeErr != nil {
+			logger.Errorf("error closing file: %v", closeErr)
 		}
 	}()
 
