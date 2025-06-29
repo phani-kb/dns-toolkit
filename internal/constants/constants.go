@@ -226,7 +226,9 @@ var (
 	}
 
 	GenericSourceTypeAliases = map[string]string{
-		SourceTypeHostname: SourceTypeDomain,
+		SourceTypeHostname:        SourceTypeDomain,
+		SourceTypeIpv4RangeExpand: SourceTypeIpv4,
+		SourceTypeIpv4CidrExpand:  SourceTypeIpv4,
 	}
 )
 
@@ -341,6 +343,8 @@ var CommentPrefixes = []string{
 	"<",
 	">",
 }
+
+const PunycodePrefix = "xn--"
 
 const ContentSeparator = "###\n"
 
