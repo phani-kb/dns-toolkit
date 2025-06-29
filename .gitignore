@@ -19,7 +19,7 @@ go.work.sum
 .env
 
 # profiling files
-**/*.prof
+testdata/**/*.prof
 
 # IDEs and editors
 .idea/

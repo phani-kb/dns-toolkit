@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
+	con "github.com/phani-kb/dns-toolkit/internal/consolidators"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
@@ -135,6 +136,12 @@ func TestConsolidateByCategory(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// Create test registry to isolate from global state
+			testRegistry := con.NewConsolidatorRegistry()
+			origRegistry := con.Consolidators
+			con.Consolidators = testRegistry
+			defer func() { con.Consolidators = origRegistry }()
+
 			entries, summary := consolidateByCategory(
 				logger,
 				tt.genericSourceType,
