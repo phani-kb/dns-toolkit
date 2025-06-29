@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"testing"
 
@@ -65,12 +66,15 @@ func createTempFiles(t *testing.T, files []string) {
 	for _, file := range files {
 		f, err := os.Create(file)
 		assert.NoError(t, err)
-		f.Close()
+		err = f.Close()
+		assert.NoError(t, err)
 	}
 }
 
 func removeTempFiles(files []string) {
 	for _, file := range files {
-		os.Remove(file)
+		if err := os.Remove(file); err != nil && !os.IsNotExist(err) {
+			fmt.Printf("Failed to remove temp file %s: %v\n", file, err)
+		}
 	}
 }

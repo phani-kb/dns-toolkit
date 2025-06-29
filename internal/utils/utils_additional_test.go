@@ -17,7 +17,12 @@ func TestCopyFile(t *testing.T) {
 
 	tempDir, err := os.MkdirTemp("", "test_copy_*")
 	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}(tempDir)
 
 	srcFile := filepath.Join(tempDir, "source.txt")
 	dstFile := filepath.Join(tempDir, "destination.txt")
@@ -47,7 +52,12 @@ func TestFindOverlap(t *testing.T) {
 
 	tempDir, err := os.MkdirTemp("", "test_overlap_*")
 	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}(tempDir)
 
 	file1 := filepath.Join(tempDir, "file1.txt")
 	file2 := filepath.Join(tempDir, "file2.txt")
@@ -192,7 +202,12 @@ func TestWriteEntriesToFile(t *testing.T) {
 
 	tempDir, err := os.MkdirTemp("", "test_write_*")
 	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}(tempDir)
 
 	outputFile := filepath.Join(tempDir, "output.txt")
 
@@ -289,7 +304,12 @@ func TestExtractTarGzErrorCases(t *testing.T) {
 
 	tempDir, err := os.MkdirTemp("", "test_extract_*")
 	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}(tempDir)
 
 	err = extractTarGz(logger, "/non/existent/file.tar.gz", tempDir)
 	assert.Error(t, err)
@@ -316,7 +336,12 @@ func TestExtractZipErrorCases(t *testing.T) {
 
 	tempDir, err := os.MkdirTemp("", "test_extract_zip_*")
 	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}(tempDir)
 
 	err = extractZip(logger, "/non/existent/file.zip", tempDir)
 	assert.Error(t, err)

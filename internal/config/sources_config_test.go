@@ -503,7 +503,11 @@ func TestSourceJSONUnmarshaling(t *testing.T) {
 func TestLoadingSourcesWithDefaultValues(t *testing.T) {
 	testDir, err := os.MkdirTemp("", "dns-toolkit-test")
 	require.NoError(t, err)
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	// Create source file with minimal values that should get defaults applied
 	minimalSourceContent := `{
@@ -583,7 +587,11 @@ func TestLoadingSourcesWithDefaultValues(t *testing.T) {
 func TestGetDownloadFileWithExtensions(t *testing.T) {
 	testDir, err := os.MkdirTemp("", "dns-toolkit-test")
 	require.NoError(t, err)
-	defer os.RemoveAll(testDir)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
 
 	downloadDir := filepath.Join(testDir, "download")
 	err = os.MkdirAll(downloadDir, 0755)
@@ -646,7 +654,12 @@ func TestGetDownloadFileWithExtensions(t *testing.T) {
 func TestGetDownloadFileDetailedCases(t *testing.T) {
 	testDir, err := os.MkdirTemp("", "dns-toolkit-test")
 	require.NoError(t, err)
-	defer os.RemoveAll(testDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}(testDir)
 
 	downloadDir := filepath.Join(testDir, "download")
 	err = os.MkdirAll(downloadDir, 0755)
@@ -699,8 +712,16 @@ func TestCfgGetUserAgentFunction(t *testing.T) {
 
 	logFile, err := os.CreateTemp("", "test-logger-*.log")
 	assert.NoError(t, err)
-	defer os.Remove(logFile.Name())
-	defer logFile.Close()
+	defer func() {
+		if err := os.Remove(logFile.Name()); err != nil {
+			t.Logf("Failed to remove log file: %v", err)
+		}
+	}()
+	defer func() {
+		if err := logFile.Close(); err != nil {
+			t.Logf("Failed to close log file: %v", err)
+		}
+	}()
 
 	logger := createTestLogger(t)
 

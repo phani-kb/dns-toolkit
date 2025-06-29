@@ -19,7 +19,12 @@ func TestStartProfiling(t *testing.T) {
 
 	tempDir, err := os.MkdirTemp("", "test_profiling_*")
 	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func() {
+		err := os.RemoveAll(tempDir)
+		if err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}()
 
 	tests := []struct {
 		name string
@@ -106,7 +111,12 @@ func TestAnalyzeProfiles(t *testing.T) {
 
 	tempDir, err := os.MkdirTemp("", "test_analyze_*")
 	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func() {
+		err := os.RemoveAll(tempDir)
+		if err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}()
 
 	err = AnalyzeProfiles(logger, ProfileOptions{OutputDir: "/non/existent/directory"})
 	assert.NoError(t, err)
@@ -134,7 +144,12 @@ func TestSaveSummary(t *testing.T) {
 
 	tempDir, err := os.MkdirTemp("", "test_save_summary_*")
 	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func() {
+		err := os.RemoveAll(tempDir)
+		if err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}()
 
 	summaryFile := filepath.Join(tempDir, "test_summary.json")
 
@@ -176,7 +191,12 @@ func TestSaveSummaries(t *testing.T) {
 
 	tempDir, err := os.MkdirTemp("", "test_save_summaries_*")
 	require.NoError(t, err)
-	defer os.RemoveAll(tempDir)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}(tempDir)
 
 	summaryFile := filepath.Join(tempDir, "test_summaries.json")
 
@@ -235,7 +255,9 @@ func TestSaveSummaries(t *testing.T) {
 	backupPattern := "backup_test_*.json"
 	if matches, err := filepath.Glob(filepath.Join("data/backup", backupPattern)); err == nil {
 		for _, match := range matches {
-			os.Remove(match)
+			if err := os.Remove(match); err != nil {
+				t.Logf("Failed to remove backup file %s: %v", match, err)
+			}
 		}
 	}
 
