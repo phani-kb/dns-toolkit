@@ -379,8 +379,8 @@ func FindOverlap(logger *multilog.Logger, file1, file2 string) ([]string, int, i
 			count1++
 		}
 	}
-	if err := scanner1.Err(); err != nil {
-		logger.Errorf("Reading file error: %v (file: %s)", err, file1)
+	if scanErr := scanner1.Err(); scanErr != nil {
+		logger.Errorf("Reading file error: %v (file: %s)", scanErr, file1)
 		return nil, 0, 0
 	}
 
@@ -465,23 +465,6 @@ func isCommentFast(line string) bool {
 		}
 	}
 	return false
-}
-
-// GetSourceTypeFromStr determines the source type from a string by checking if it
-// begins with any of the known source type prefixes.
-//
-// Parameters:
-//   - str: The string to analyze
-//
-// Returns:
-//   - The identified source type or SourceTypeUnknown if no match is found
-func GetSourceTypeFromStr(str string) string {
-	for sourceType := range constants.SourceTypeRegexMap {
-		if strings.HasPrefix(str, sourceType) {
-			return sourceType
-		}
-	}
-	return constants.SourceTypeUnknown
 }
 
 // IsDomain checks if a string is a valid domain name.
@@ -943,13 +926,18 @@ func ShouldDownloadSource(logger *multilog.Logger, summaryFile string, sourceNam
 	}
 }
 
-// IsAlphanumericWithUnderscoresAndDashes checks if a string contains only alphanumeric characters, underscores, and dashes.
+// IsAlphanumericWithUnderscoresAndDashes checks if a string contains only alphanumeric characters,
+// underscores, and dashes.
 func IsAlphanumericWithUnderscoresAndDashes(s string) bool {
-	match, _ := regexp.MatchString("^[a-zA-Z0-9_-]+$", s)
+	match, err := regexp.MatchString("^[a-zA-Z0-9_-]+$", s)
+	if err != nil {
+		return false
+	}
 	return match
 }
 
-// GetFileLastModifiedTime retrieves the last modified time of a file and formats it according to the application's standard timestamp format.
+// GetFileLastModifiedTime retrieves the last modified time of a file and formats it according to the
+// application's standard timestamp format.
 func GetFileLastModifiedTime(logger *multilog.Logger, filePath string) (string, error) {
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {

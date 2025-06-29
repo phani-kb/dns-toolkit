@@ -278,8 +278,6 @@ var (
 		GroupBig:    true,
 	}
 
-	DefaultGroup = GroupBig
-
 	GroupIdMap = map[string]int{
 		GroupMini:   0,
 		GroupLite:   1,
@@ -295,8 +293,6 @@ var (
 	}
 )
 
-var UrlRegex = regexp.MustCompile(`^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]`)
-
 var ArchiveExtensions = []string{".zip", ".tar.gz"}
 
 const (
@@ -307,7 +303,6 @@ const (
 const (
 	MaxSampleLinesToCategorize    = 100
 	TimestampFormat               = "20060102_150405"
-	ArchiveFileTimestampFormat    = "20060102_150405"
 	BackupFileTimestampFormat     = "20060102_150405"
 	DownloadInterval              = 2000 * time.Millisecond
 	DefaultHashAlgorithm          = "md5"

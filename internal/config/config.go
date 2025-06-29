@@ -32,20 +32,20 @@ type SourceFilters struct {
 }
 
 type FilesChecksumConfig struct {
-	Enabled   bool   `yaml:"enabled"`
 	Algorithm string `yaml:"algorithm"`
+	Enabled   bool   `yaml:"enabled"`
 }
 
 type DNSToolkitConfig struct {
-	Folders                   FoldersConfig       `yaml:"folders"`
 	SourceFiles               []string            `yaml:"source_files"`
+	SkipCertVerificationHosts []string            `yaml:"skip_cert_verification_hosts,omitempty"`
+	Folders                   FoldersConfig       `yaml:"folders"`
 	SourceFilters             SourceFilters       `yaml:"source_filters"`
 	FilesChecksum             FilesChecksumConfig `yaml:"files_checksum"`
 	MaxWorkers                int                 `yaml:"max_workers"`
 	MaxRetries                int                 `yaml:"max_retries"`
 	SkipUnchangedDownloads    bool                `yaml:"skip_unchanged_downloads"`
 	SkipCertVerification      bool                `yaml:"skip_cert_verification,omitempty"`
-	SkipCertVerificationHosts []string            `yaml:"skip_cert_verification_hosts,omitempty"`
 	SkipNameSpecialCharsCheck bool                `yaml:"skip_name_special_chars_check,omitempty"`
 }
 
@@ -89,9 +89,9 @@ type FoldersConfig struct {
 	Profiles               string `yaml:"profiles"`
 }
 
-type AppConfig struct {
-	Application ApplicationConfig `yaml:"application"`
+type AppConfig struct { // nolint: govet
 	DNSToolkit  DNSToolkitConfig  `yaml:"dns_toolkit"`
+	Application ApplicationConfig `yaml:"application"`
 	Multilog    interface{}       `yaml:"multilog"`
 }
 
@@ -192,7 +192,8 @@ func IsEnabledSource(sourceName string, sourceConfigs []SourcesConfig, appConfig
 	return false
 }
 
-// GetProcessedSummaries reads the processed summaries from the default summary file and returns them along with the generic source types.
+// GetProcessedSummaries reads the processed summaries from the default summary file and returns them along with the
+// generic source types.
 func GetProcessedSummaries(
 	logger *multilog.Logger,
 	sourcesConfigs []SourcesConfig,

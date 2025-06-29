@@ -312,7 +312,9 @@ func (s *DefaultTopEntriesService) GetTopNEntries(
 
 	result := make([]common.EntryCountPair, h.Len())
 	for i := h.Len() - 1; i >= 0; i-- {
-		result[i] = heap.Pop(h).(common.EntryCountPair)
+		if ecp, ok := heap.Pop(h).(common.EntryCountPair); ok {
+			result[i] = ecp
+		}
 	}
 	return result
 }

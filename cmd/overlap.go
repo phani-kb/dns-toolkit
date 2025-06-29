@@ -107,13 +107,10 @@ var overlapCmd = &cobra.Command{
 
 		// Now analyze profiles after profiling has stopped
 		if profilingEnabled {
-			err := u.AnalyzeProfiles(Logger, u.ProfileOptions{
+			u.AnalyzeProfiles(Logger, u.ProfileOptions{
 				ProfileNameBase: "overlap",
 				OutputDir:       overlapProfileDir,
 			})
-			if err != nil {
-				Logger.Errorf("Failed to analyze profiles: %v", err)
-			}
 		}
 	},
 }

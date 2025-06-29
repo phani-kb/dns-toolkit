@@ -14,13 +14,38 @@ import (
 
 // ProfileOptions defines the configuration for profiling
 type ProfileOptions struct {
+	ProfileNameBase  string
+	OutputDir        string
+	BlockProfileRate int
 	CPUProfile       bool
 	MemProfile       bool
 	GoroutineProfile bool
 	BlockProfile     bool
-	ProfileNameBase  string
-	OutputDir        string
-	BlockProfileRate int
+}
+
+// createProfile creates a pprof profile of the specified type
+func createProfile(logger *multilog.Logger, profileType, outputDir, profileNameBase string) {
+	profilePath := filepath.Join(outputDir, fmt.Sprintf("%s_%s.prof", profileNameBase, profileType))
+	logger.Infof("Creating %s profile at %s", profileType, profilePath)
+
+	f, err := os.Create(profilePath)
+	if err != nil {
+		logger.Errorf("Could not create %s profile: %v", profileType, err)
+		return
+	}
+
+	err = pprof.Lookup(profileType).WriteTo(f, 0)
+	closeErr := f.Close()
+
+	if err != nil {
+		logger.Errorf("Could not write %s profile: %v", profileType, err)
+	} else {
+		logger.Infof("%s profile saved to %s", profileType, profilePath)
+	}
+
+	if closeErr != nil {
+		logger.Errorf("Could not close %s profile file: %v", profileType, closeErr)
+	}
 }
 
 // StartProfiling starts profiling based on provided options
@@ -139,53 +164,12 @@ func StartProfiling(logger *multilog.Logger, opts ProfileOptions) func() {
 
 		// Create a goroutine profile if enabled
 		if opts.GoroutineProfile {
-			goroutineProfilePath := filepath.Join(
-				opts.OutputDir,
-				fmt.Sprintf("%s_goroutine.prof", opts.ProfileNameBase),
-			)
-			logger.Infof("Creating goroutine profile at %s", goroutineProfilePath)
-
-			f, err := os.Create(goroutineProfilePath)
-			if err != nil {
-				logger.Errorf("Could not create goroutine profile: %v", err)
-			} else {
-				err = pprof.Lookup("goroutine").WriteTo(f, 0)
-				closeErr := f.Close()
-
-				if err != nil {
-					logger.Errorf("Could not write goroutine profile: %v", err)
-				} else {
-					logger.Infof("Goroutine profile saved to %s", goroutineProfilePath)
-				}
-
-				if closeErr != nil {
-					logger.Errorf("Could not close goroutine profile file: %v", closeErr)
-				}
-			}
+			createProfile(logger, "goroutine", opts.OutputDir, opts.ProfileNameBase)
 		}
 
 		// Create a block profile if enabled
 		if opts.BlockProfile {
-			blockProfilePath := filepath.Join(opts.OutputDir, fmt.Sprintf("%s_block.prof", opts.ProfileNameBase))
-			logger.Infof("Creating block profile at %s", blockProfilePath)
-
-			f, err := os.Create(blockProfilePath)
-			if err != nil {
-				logger.Errorf("Could not create block profile: %v", err)
-			} else {
-				err = pprof.Lookup("block").WriteTo(f, 0)
-				closeErr := f.Close()
-
-				if err != nil {
-					logger.Errorf("Could not write block profile: %v", err)
-				} else {
-					logger.Infof("Block profile saved to %s", blockProfilePath)
-				}
-
-				if closeErr != nil {
-					logger.Errorf("Could not close block profile file: %v", closeErr)
-				}
-			}
+			createProfile(logger, "block", opts.OutputDir, opts.ProfileNameBase)
 		}
 
 		LogMemStats(logger, "End")
@@ -198,7 +182,7 @@ func StartProfiling(logger *multilog.Logger, opts ProfileOptions) func() {
 
 // AnalyzeProfiles runs pprof analysis on generated profiles and saves the result to text files
 // This is useful for automated analysis of profiles without requiring manual pprof commands
-func AnalyzeProfiles(logger *multilog.Logger, opts ProfileOptions) error {
+func AnalyzeProfiles(logger *multilog.Logger, opts ProfileOptions) {
 	if opts.ProfileNameBase == "" {
 		opts.ProfileNameBase = "command"
 	}
@@ -245,8 +229,8 @@ func AnalyzeProfiles(logger *multilog.Logger, opts ProfileOptions) error {
 	if info, err := os.Stat(cpuProfilePath); err == nil {
 		if info.Size() == 0 {
 			logger.Warnf("CPU profile file %s is empty, skipping analysis", cpuProfilePath)
-		} else if err := runPprofAnalysis("cpu", cpuProfilePath); err != nil {
-			logger.Errorf("CPU profile analysis failed: %v", err)
+		} else if analysisErr := runPprofAnalysis("cpu", cpuProfilePath); analysisErr != nil {
+			logger.Errorf("CPU profile analysis failed: %v", analysisErr)
 		}
 	} else {
 		logger.Debugf("CPU profile not found at %s: %v", cpuProfilePath, err)
@@ -288,5 +272,4 @@ func AnalyzeProfiles(logger *multilog.Logger, opts ProfileOptions) error {
 		logger.Debugf("No block profile found at %s, skipping analysis", blockProfilePath)
 	}
 
-	return nil
 }

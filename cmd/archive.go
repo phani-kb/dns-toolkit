@@ -61,22 +61,22 @@ func runArchive(logger *multilog.Logger) {
 		os.Exit(1)
 	}
 	defer func() {
-		if err := archiveFile.Close(); err != nil {
-			logger.Warnf("Failed to close archive file: %v", err)
+		if closeErr := archiveFile.Close(); closeErr != nil {
+			logger.Warnf("Failed to close archive file: %v", closeErr)
 		}
 	}()
 
 	gzipWriter := gzip.NewWriter(archiveFile)
 	defer func() {
-		if err := gzipWriter.Close(); err != nil {
-			logger.Warnf("Failed to close gzip writer: %v", err)
+		if closeErr := gzipWriter.Close(); closeErr != nil {
+			logger.Warnf("Failed to close gzip writer: %v", closeErr)
 		}
 	}()
 
 	tarWriter := tar.NewWriter(gzipWriter)
 	defer func() {
-		if err := tarWriter.Close(); err != nil {
-			logger.Warnf("Failed to close tar writer: %v", err)
+		if closeErr := tarWriter.Close(); closeErr != nil {
+			logger.Warnf("Failed to close tar writer: %v", closeErr)
 		}
 	}()
 
@@ -92,9 +92,9 @@ func runArchive(logger *multilog.Logger) {
 			Files:     []common.ArchiveFile{},
 			Timestamp: timestamp,
 		}
-		err := filepath.WalkDir(folderPath, func(path string, d fs.DirEntry, err error) error {
-			if err != nil {
-				return err
+		walkErr := filepath.WalkDir(folderPath, func(path string, d fs.DirEntry, walkDirErr error) error {
+			if walkDirErr != nil {
+				return walkDirErr
 			}
 
 			if path == folderPath {
@@ -114,9 +114,9 @@ func runArchive(logger *multilog.Logger) {
 
 			// Only process files, not directories
 			if !d.IsDir() {
-				fileInfo, err := os.Stat(path)
-				if err != nil {
-					logger.Warnf("Failed to get file info for %s: %v", path, err)
+				fileInfo, statErr := os.Stat(path)
+				if statErr != nil {
+					logger.Warnf("Failed to get file info for %s: %v", path, statErr)
 					return nil
 				}
 
@@ -141,9 +141,9 @@ func runArchive(logger *multilog.Logger) {
 					targetPath = filepath.Base(path)
 				}
 
-				err = addFileToTar(logger, tarWriter, path, targetPath, fileInfo)
-				if err != nil {
-					logger.Warnf("Failed to add file %s to archive: %v", path, err)
+				addErr := addFileToTar(logger, tarWriter, path, targetPath, fileInfo)
+				if addErr != nil {
+					logger.Warnf("Failed to add file %s to archive: %v", path, addErr)
 				} else {
 					logger.Debugf("Added file %s to archive", path)
 				}
@@ -155,8 +155,8 @@ func runArchive(logger *multilog.Logger) {
 		// Set count to the number of files
 		archiveFolder.Count = len(archiveFolder.Files)
 
-		if err != nil {
-			logger.Errorf("Error walking directory %s: %v", folderPath, err)
+		if walkErr != nil {
+			logger.Errorf("Error walking directory %s: %v", folderPath, walkErr)
 			continue
 		}
 
@@ -315,8 +315,8 @@ func addFileToTar(
 			return err
 		}
 		defer func() {
-			if err := file.Close(); err != nil {
-				logger.Errorf("Failed to close file %s: %v\n", sourcePath, err)
+			if closeErr := file.Close(); closeErr != nil {
+				logger.Errorf("Failed to close file %s: %v\n", sourcePath, closeErr)
 			}
 		}()
 

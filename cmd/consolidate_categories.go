@@ -1,14 +1,12 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	cfg "github.com/phani-kb/dns-toolkit/internal/config"
-	con "github.com/phani-kb/dns-toolkit/internal/consolidators"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
@@ -52,78 +50,17 @@ var consolidateCategoriesCmd = &cobra.Command{
 
 		// Process each category and create consolidated lists
 		for _, category := range categories {
-			Logger.Infof("Processing category: %s", category)
-			// Filter processed files by category
-			var categoryFiles []c.ProcessedFile
-			for _, file := range processedFiles {
-				for _, fileCategory := range file.Categories {
-					if fileCategory == category && file.Valid {
-						categoryFiles = append(categoryFiles, file)
-						break
-					}
-				}
-			}
-			if len(categoryFiles) == 0 {
-				Logger.Infof("No files found for category: %s", category)
-				continue
-			}
-
-			// Create a map to allowlisted entries by source type
-			allowlistEntriesByType := make(map[string]u.StringSet)
-			// First process allowlists for each category and source type
-			for _, gst := range genericSourceTypes {
-				var allowlistFiles []c.ProcessedFile
-				for _, file := range categoryFiles {
-					if file.GenericSourceType == gst &&
-						file.ListType == constants.ListTypeAllowlist {
-						allowlistFiles = append(allowlistFiles, file)
-					}
-				}
-				if len(allowlistFiles) > 0 {
-					entries, allowlistSummary := consolidateByCategory(
-						Logger,
-						gst,
-						constants.ListTypeAllowlist,
-						category,
-						u.NewStringSet([]string{}),
-						allowlistFiles,
-					)
-					allowlistEntriesByType[gst] = entries
-					allowlistSummary.Category = category
-					consolidatedSummariesByCategory[category] = append(
-						consolidatedSummariesByCategory[category],
-						allowlistSummary,
-					)
-				} else {
-					allowlistEntriesByType[gst] = u.NewStringSet([]string{})
-				}
-			}
-
-			// Then process blocklists using the allowlists from above
-			for _, gst := range genericSourceTypes {
-				var blocklistFiles []c.ProcessedFile
-				for _, file := range categoryFiles {
-					if file.GenericSourceType == gst &&
-						file.ListType == constants.ListTypeBlocklist {
-						blocklistFiles = append(blocklistFiles, file)
-					}
-				}
-				if len(blocklistFiles) > 0 {
-					allowlistEntries := allowlistEntriesByType[gst]
-					_, blocklistSummary := consolidateByCategory(
-						Logger,
-						gst,
-						constants.ListTypeBlocklist,
-						category,
-						allowlistEntries,
-						blocklistFiles,
-					)
-					blocklistSummary.Category = category
-					consolidatedSummariesByCategory[category] = append(
-						consolidatedSummariesByCategory[category],
-						blocklistSummary,
-					)
-				}
+			categoryResults := processCategoryConsolidation(
+				Logger,
+				category,
+				processedFiles,
+				genericSourceTypes,
+			)
+			for identifier, summaries := range categoryResults {
+				consolidatedSummariesByCategory[identifier] = append(
+					consolidatedSummariesByCategory[identifier],
+					summaries...,
+				)
 			}
 		}
 
@@ -227,6 +164,39 @@ func getUniqueCategories(processedFiles []c.ProcessedFile) []string {
 	return categories
 }
 
+// getFilesForCategory filters processed files by category
+func getFilesForCategory(processedFiles []c.ProcessedFile, category string) []c.ProcessedFile {
+	var categoryFiles []c.ProcessedFile
+	for _, file := range processedFiles {
+		for _, fileCategory := range file.Categories {
+			if fileCategory == category && file.Valid {
+				categoryFiles = append(categoryFiles, file)
+				break
+			}
+		}
+	}
+	return categoryFiles
+}
+
+// processCategoryConsolidation processes consolidation for a specific category
+func processCategoryConsolidation(
+	logger *multilog.Logger,
+	category string,
+	processedFiles []c.ProcessedFile,
+	genericSourceTypes []string,
+) map[string][]c.ConsolidatedSummary {
+	config := ProcessingConfig{
+		Identifier:         category,
+		IdentifierField:    "Category",
+		ProcessedFiles:     processedFiles,
+		GenericSourceTypes: genericSourceTypes,
+		GetFilesFunc:       getFilesForCategory,
+		ConsolidateFunc:    consolidateByCategory,
+	}
+
+	return processIdentifierConsolidation(logger, config)
+}
+
 // consolidateByCategory consolidates files for a specific category
 func consolidateByCategory(
 	logger *multilog.Logger,
@@ -234,123 +204,15 @@ func consolidateByCategory(
 	entriesToIgnore u.StringSet,
 	processedFiles []c.ProcessedFile,
 ) (u.StringSet, c.ConsolidatedSummary) {
-	logger.Debugf(
-		"Starting consolidation for %s %s in category %s",
-		listType,
-		genericSourceType,
-		category,
-	)
-	if len(processedFiles) == 0 {
-		logger.Debugf(
-			"No processed files found for %s %s in category %s",
-			listType,
-			genericSourceType,
-			category,
-		)
-		return u.NewStringSet([]string{}), c.ConsolidatedSummary{}
+	params := ConsolidationParams{
+		GenericSourceType: genericSourceType,
+		ListType:          listType,
+		Identifier:        category,
+		OutputDir:         constants.ConsolidatedCategoriesDir,
+		IdentifierField:   "Category",
 	}
 
-	consolidator, exists := con.Consolidators.GetConsolidator(genericSourceType, listType)
-	if !exists {
-		logger.Warnf(
-			"No consolidator found for generic source type: %s, list type: %s",
-			genericSourceType,
-			listType,
-		)
-		return u.NewStringSet([]string{}), c.ConsolidatedSummary{}
-	}
-
-	consolidatedEntries, fileInfos := consolidator.Consolidate(logger, processedFiles)
-	consolidatedFileStrings := getFileStrings(fileInfos)
-
-	if len(consolidatedEntries) > 0 {
-		logger.Infof(
-			"Consolidated %s %s %d entry(s) for category %s",
-			listType,
-			genericSourceType,
-			len(consolidatedEntries),
-			category,
-		)
-	}
-
-	allEntries, ignoredEntries := consolidator.FilterEntries(
-		logger,
-		consolidatedEntries,
-		entriesToIgnore,
-	)
-
-	// Create a summary with category information
-	consolidatedSummary := c.ConsolidatedSummary{
-		Type:                      genericSourceType,
-		FilesCount:                len(fileInfos),
-		Files:                     consolidatedFileStrings,
-		Valid:                     true,
-		Count:                     len(allEntries),
-		IgnoredEntriesCount:       len(ignoredEntries),
-		ListType:                  listType,
-		Category:                  category,
-		LastConsolidatedTimestamp: u.GetTimestamp(),
-	}
-
-	if len(ignoredEntries) > 0 {
-		logger.Infof(
-			"Ignored %s %s %d entry(s) for category %s",
-			listType,
-			genericSourceType,
-			len(ignoredEntries),
-			category,
-		)
-		filenamePrefix := fmt.Sprintf("%s_%s_%s", category, genericSourceType, listType)
-		ignoredFilePath := filepath.Join(
-			constants.ConsolidatedCategoriesDir,
-			filenamePrefix+"_ignored.txt",
-		)
-		err := consolidator.SaveEntries(logger, ignoredEntries, ignoredFilePath)
-		if err != nil {
-			logger.Errorf("Error writing ignored entry(s) to file %s: %v", ignoredFilePath, err)
-		} else {
-			consolidatedSummary.IgnoredFilepath = ignoredFilePath
-		}
-	}
-
-	if len(allEntries) <= 0 {
-		logger.Infof(
-			"No entry(s) to consolidate for %s %s in category %s",
-			listType,
-			genericSourceType,
-			category,
-		)
-		return u.NewStringSet([]string{}), c.ConsolidatedSummary{}
-	}
-
-	// Use category-specific filename
-	filenamePrefix := fmt.Sprintf("%s_%s_%s", category, genericSourceType, listType)
-	consolidatedFilePath := filepath.Join(
-		constants.ConsolidatedCategoriesDir,
-		filenamePrefix+".txt",
-	)
-	consolidatedSummary.Filepath = consolidatedFilePath
-
-	err := consolidator.SaveEntries(logger, allEntries, consolidatedSummary.Filepath)
-	if err != nil {
-		logger.Errorf("Error writing entry(s) to file %s: %v", consolidatedSummary.Filepath, err)
-	} else {
-		if calculateChecksum || AppConfig.DNSToolkit.FilesChecksum.Enabled {
-			consolidatedSummary.Checksum = u.CalculateChecksum(
-				logger,
-				consolidatedSummary.Filepath,
-				AppConfig.DNSToolkit.FilesChecksum.Algorithm,
-			)
-		}
-	}
-
-	logger.Debugf(
-		"Finished consolidation for %s %s in category %s",
-		listType,
-		genericSourceType,
-		category,
-	)
-	return allEntries, consolidatedSummary
+	return consolidateGeneric(logger, params, entriesToIgnore, processedFiles)
 }
 
 func init() {

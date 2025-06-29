@@ -119,13 +119,10 @@ var topEntriesCmd = &cobra.Command{
 
 		if profilingEnabled {
 			Logger.Infof("Analyzing collected profiles...")
-			err := u.AnalyzeProfiles(Logger, u.ProfileOptions{
+			u.AnalyzeProfiles(Logger, u.ProfileOptions{
 				ProfileNameBase: "top",
 				OutputDir:       profileDir,
 			})
-			if err != nil {
-				Logger.Errorf("Failed to analyze profiles: %v", err)
-			}
 		}
 	},
 }
