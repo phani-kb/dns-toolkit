@@ -218,7 +218,7 @@ func createOutputFromFile(
 	}
 
 	// Combine templates and data
-	output := fmt.Sprintf("%s\n%s\n%s%s",
+	output := fmt.Sprintf("%s\n%s\n%s\n%s",
 		dynamicOutput.String(),
 		string(staticTemplate),
 		constants.ContentSeparator,

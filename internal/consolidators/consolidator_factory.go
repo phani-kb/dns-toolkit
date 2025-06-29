@@ -9,8 +9,8 @@ import (
 type ConsolidateFunc func(logger *multilog.Logger, processedFiles []c.ProcessedFile) (u.StringSet, []c.FileInfo)
 
 type GenericConsolidator struct {
-	BaseConsolidator
 	consolidateFunc ConsolidateFunc
+	BaseConsolidator
 }
 
 func (gc *GenericConsolidator) Consolidate(

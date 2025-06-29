@@ -74,8 +74,6 @@ func TestGenerateDescription(t *testing.T) {
 }
 
 func TestPrepareDirectories(t *testing.T) {
-	t.Parallel()
-
 	tempDir, err := os.MkdirTemp("", "dns-toolkit-test")
 	assert.NoError(t, err)
 	defer func() {
@@ -252,8 +250,6 @@ func TestProcessRegularFiles(t *testing.T) {
 }
 
 func TestProcessIgnoredFiles(t *testing.T) {
-	t.Parallel()
-
 	includeIgnored = true
 	defer func() { includeIgnored = false }()
 

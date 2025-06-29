@@ -7,8 +7,8 @@ import (
 
 // DTWorkerPool provides a fixed-size pool of workers for parallel task processing
 type DTWorkerPool struct {
-	wg        sync.WaitGroup
 	semaphore chan struct{} // Used to limit concurrency
+	wg        sync.WaitGroup
 }
 
 // NewDTWorkerPool creates a new worker pool with specified capacity

@@ -28,18 +28,17 @@ import (
 //
 // Returns:
 //   - The number of summaries written to the file
-//   - An error object if the operation failed, nil on success
 func SaveSummary[T any](
 	logger *multilog.Logger,
 	summary T,
 	summaryFile string,
 	lessFunc func(i, j T) bool,
-) (int, error) {
+) int {
 	summariesCount, err := SaveSummaries(logger, []T{summary}, summaryFile, lessFunc)
 	if err != nil {
 		logger.Errorf("Failed to save summary: %v", err)
 	}
-	return summariesCount, nil
+	return summariesCount
 }
 
 // SaveSummaries saves multiple summary objects to a JSON file.
