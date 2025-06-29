@@ -73,7 +73,45 @@ func StartProfiling(logger *multilog.Logger, opts ProfileOptions) func() {
 		err := os.MkdirAll(opts.OutputDir, 0755)
 		if err != nil {
 			logger.Errorf("Failed to create output directory for profiles: %v", err)
-			opts.OutputDir = ""
+			// Use testdata directory as fallback during tests
+			if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
+				// Get the project root directory
+				cwd, err := os.Getwd()
+				if err != nil {
+					logger.Errorf("Failed to get current working directory: %v", err)
+					return nil
+				}
+				if filepath.Base(cwd) != "dns-toolkit" {
+					for filepath.Base(cwd) != "dns-toolkit" && cwd != "/" {
+						cwd = filepath.Dir(cwd)
+					}
+				}
+				opts.OutputDir = filepath.Join(cwd, "testdata")
+				logger.Infof("Using testdata directory as fallback for profiles: %s", opts.OutputDir)
+				err = os.MkdirAll(opts.OutputDir, 0755)
+				if err != nil {
+					return nil
+				}
+			} else {
+				opts.OutputDir = ""
+			}
+		}
+	} else if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
+		// Default to testdata directory when running tests and no output dir is specified
+		cwd, err := os.Getwd()
+		if err != nil {
+			logger.Errorf("Failed to get current working directory: %v", err)
+			return nil
+		}
+		if filepath.Base(cwd) != "dns-toolkit" {
+			for filepath.Base(cwd) != "dns-toolkit" && cwd != "/" {
+				cwd = filepath.Dir(cwd)
+			}
+		}
+		opts.OutputDir = filepath.Join(cwd, "testdata")
+		err = os.MkdirAll(opts.OutputDir, 0755)
+		if err != nil {
+			return nil
 		}
 	}
 
