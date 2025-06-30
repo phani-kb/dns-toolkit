@@ -1,0 +1,39 @@
+# dns-toolkit 0.1.0
+# File name: top_domain_blocklist_min8.txt
+# Last Updated: 20250719_142706
+# Format: Top Domain blocklist (minimum 8 sources)
+# Count: 29
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+doubleclick.net
+tsyndicate.com
+ads.yahoo.com
+smartadserver.com
+googlesyndication.com
+adtech.com
+sumome.com
+adserver.pressboard.ca
+innovid.com
+onclickads.net
+ad-delivery.net
+engageya.com
+coin-hive.com
+samsungads.com
+adblade.com
+spotxchange.com
+pagead2.googlesyndication.com
+clevernt.com
+adform.com
+insightexpressai.com
+pixel.adsafeprotected.com
+adsrvr.org
+adnxs.com
+youradexchange.com
+adap.tv
+widespace.com
+carambo.la
+disqusads.com
+open.oneplus.net

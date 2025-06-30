@@ -1,0 +1,79 @@
+# dns-toolkit 0.1.0
+# File name: top_domain_allowlist_min3.txt
+# Last Updated: 20250719_142715
+# Format: Top Domain allowlist (minimum 3 sources)
+# Count: 69
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+gstatic.com
+github.com
+imasdk.googleapis.com
+connect.facebook.net
+cloudflare.com
+twitter.com
+apis.google.com
+amazonaws.com
+pagead2.googlesyndication.com
+cloudfront.net
+unpkg.com
+instagram.com
+awin1.com
+drive.google.com
+cvs.com
+storage.googleapis.com
+redirector.gvt1.com
+akamaihd.net
+facebook.com
+jsdelivr.net
+guce.advertising.com
+clients4.google.com
+msn.com
+icloud.com
+tra.scds.pmdstatic.net
+s0.2mdn.net
+securepubads.g.doubleclick.net
+cdn.jsdelivr.net
+static.doubleclick.net
+akamaiedge.net
+c.paypal.com
+youtu.be
+static.cloud.coveo.com
+googleapis.com
+netflix.com
+youtube.com
+cdninstagram.com
+plex.tv
+assets.msn.com
+microsoft.com
+linkedin.com
+accounts.google.com
+whatsapp.com
+teams.microsoft.com
+amazon.com
+cdnjs.cloudflare.com
+google-analytics.com
+apple.com
+ezodn.com
+doubleclick.net
+maxcdn.bootstrapcdn.com
+chrome.google.com
+pinterest.com
+cdn.optimizely.com
+tags.tiqcdn.com
+wordpress.org
+bit.ly
+p.jwpcdn.com
+windowsupdate.com
+wikipedia.org
+advertisement.js
+googletagmanager.com
+googleads.g.doubleclick.net
+googleadservices.com
+graph.microsoft.com
+imgur.com
+docs.google.com
+login.microsoftonline.com
+google.com

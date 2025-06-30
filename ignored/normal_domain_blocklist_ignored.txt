@@ -1,0 +1,96 @@
+# dns-toolkit 0.1.0
+# File name: normal_domain_blocklist_ignored.txt
+# Last Updated: 20250719_142639
+# Format: Consolidated Groups Domain Ignored
+# Count: 86
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+79423.analytics.edgekey.net
+a.klaviyo.com
+a1843.g.akamai.net
+ad.ourgame.com
+amplitude.com
+app.adjust.com
+app.appsflyer.com
+assets.minutemediacdn.com
+audid-api.taobao.com
+b.stats.paypal.com
+bestgore.fun
+c.bing.com
+capi.connatix.com
+cbsinteractive.hb.omtrdc.net
+cd.connatix.com
+cdn.boomtrain.com
+cdn.optimizely.com
+cdn.rlcdn.com
+cdn.tpdads.com
+cdn.vidible.tv
+cdn3.optimizely.com
+cdp.cloud.unity3d.com
+cds.connatix.com
+cf.iadsdk.apple.com
+config.uca.cloud.unity3d.com
+content.aimatch.com
+ct.pinterest.com
+cws-iad1.conviva.com
+cws-sjc2.conviva.com
+device-api.urbanairship.com
+devices.carnivalmobile.com
+disney.demdex.net
+doubleclick.net
+dpbolvw.net
+dpm.demdex.net
+engine.phn.doublepimp.com
+etrk.asus.com
+fls-na.amazon.com
+geolocation-db.com
+go.redirectingat.com
+go.skimresources.com
+google-analytics.com
+googleadservices.com
+googlesyndication.com
+iadsdk.apple.com
+images2.minutemediacdn.com
+img.connatix.com
+kqzyfj.com
+log.mmstat.com
+mparticle.map.fastly.net
+news.iadsdk.apple.com
+p.brid.tv
+pagead.l.doubleclick.net
+pi.pardot.com
+play.aniview.com
+polyfill.io
+prd.jwpltx.com
+production-cmp.isgprivacy.cbsi.com
+recommender.scarabresearch.com
+s0.2mdn.net
+sdk-02.moengage.com
+sdk.split.io
+secureir.ebaystatic.com
+services.brid.tv
+shalltry.com
+shareasale.com
+smart.link
+statcounter.com
+statics-marketingsites-eus-ms-com.akamaized.net
+statics-marketingsites-neu-ms-com.akamaized.net
+tag.dickssportinggoods.com
+tagger.opecloud.com
+tags.crwdcntrl.net
+tags.tiqcdn.com
+track.webgains.com
+tracking.truthfinder.com
+tradedoubler.com
+trk.klclick1.com
+vid.connatix.com
+vms.bluebillywig.com
+widget-cdn.rpxnow.com
+workers.dev
+ws-na.amazon-adsystem.com
+ws.sharethis.com
+www.googleadservices.com
+www.statcounter.com

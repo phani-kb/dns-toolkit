@@ -1,0 +1,11 @@
+# dns-toolkit 0.1.0
+# File name: privacy_adguard_allowlist.txt
+# Last Updated: 20250719_142648
+# Format: Consolidated Categories AdGuard allowlist
+# Count: 1
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+@@||gemius.pl/gplayer.js$domain=tsn.ua
