@@ -12,6 +12,11 @@ import (
 	"github.com/phani-kb/multilog"
 )
 
+const (
+	envTestMode      = "DNS_TOOLKIT_TEST_MODE"
+	envTestModeValue = "true"
+)
+
 // ProfileOptions defines the configuration for profiling
 type ProfileOptions struct {
 	ProfileNameBase  string
@@ -48,12 +53,126 @@ func createProfile(logger *multilog.Logger, profileType, outputDir, profileNameB
 	}
 }
 
+// getOutputDir resolves the output directory for profiles
+func getOutputDir(logger *multilog.Logger, outputDir string) string {
+	if outputDir != "" {
+		return outputDir
+	}
+
+	if os.Getenv(envTestMode) == envTestModeValue {
+		projectRoot, err := FindProjectRoot("")
+		if err != nil {
+			logger.Errorf("Could not find project root: %v", err)
+			return "."
+		}
+		return filepath.Join(projectRoot, "testdata")
+	}
+
+	return "."
+}
+
+// setupOutputDirectory ensures the output directory exists
+func setupOutputDirectory(logger *multilog.Logger, opts *ProfileOptions) bool {
+	if opts.OutputDir != "" {
+		err := os.MkdirAll(opts.OutputDir, 0755)
+		if err != nil {
+			logger.Errorf("Failed to create output directory for profiles: %v", err)
+			if os.Getenv(envTestMode) == envTestModeValue {
+				opts.OutputDir = getTestDataDir(logger)
+				if opts.OutputDir == "" {
+					return false
+				}
+				logger.Infof("Using testdata directory as fallback for profiles: %s", opts.OutputDir)
+				err = os.MkdirAll(opts.OutputDir, 0755)
+				if err != nil {
+					return false
+				}
+			} else {
+				opts.OutputDir = ""
+			}
+		}
+	} else if os.Getenv(envTestMode) == envTestModeValue {
+		opts.OutputDir = getTestDataDir(logger)
+		if opts.OutputDir == "" {
+			return false
+		}
+		err := os.MkdirAll(opts.OutputDir, 0755)
+		if err != nil {
+			return false
+		}
+	}
+	return true
+}
+
+// getTestDataDir gets the testdata directory path
+func getTestDataDir(logger *multilog.Logger) string {
+	cwd, err := os.Getwd()
+	if err != nil {
+		logger.Errorf("Failed to get current working directory: %v", err)
+		return ""
+	}
+
+	if filepath.Base(cwd) != "dns-toolkit" {
+		for filepath.Base(cwd) != "dns-toolkit" && cwd != "/" {
+			cwd = filepath.Dir(cwd)
+		}
+	}
+	return filepath.Join(cwd, "testdata")
+}
+
+// setupBlockProfiling enables block profiling if requested
+func setupBlockProfiling(logger *multilog.Logger, opts ProfileOptions) {
+	if !opts.BlockProfile {
+		return
+	}
+
+	rate := opts.BlockProfileRate
+	if rate <= 0 {
+		rate = 1 // Default value if isn't specified or invalid
+	}
+	runtime.SetBlockProfileRate(rate)
+	logger.Info("Block profiling enabled")
+}
+
+// cpuProfileData holds CPU profiling state
+type cpuProfileData struct {
+	file   *os.File
+	active bool
+}
+
+// startCPUProfiling starts CPU profiling and returns the profile data
+func startCPUProfiling(logger *multilog.Logger, opts ProfileOptions) *cpuProfileData {
+	if !opts.CPUProfile {
+		return &cpuProfileData{}
+	}
+
+	outputDir := getOutputDir(logger, opts.OutputDir)
+	cpuProfilePath := filepath.Join(outputDir, fmt.Sprintf("%s_cpu.prof", opts.ProfileNameBase))
+	logger.Infof("CPU profiling enabled, writing to %s", cpuProfilePath)
+
+	cpuFile, err := os.Create(cpuProfilePath)
+	if err != nil {
+		logger.Errorf("Could not create CPU profile: %v", err)
+		return &cpuProfileData{}
+	}
+
+	err = pprof.StartCPUProfile(cpuFile)
+	if err != nil {
+		logger.Errorf("Could not start CPU profile: %v", err)
+		if err := cpuFile.Close(); err != nil {
+			logger.Errorf("Could not close CPU profile file: %v", err)
+		}
+		return &cpuProfileData{}
+	}
+
+	logger.Info("CPU profiling started successfully")
+	return &cpuProfileData{file: cpuFile, active: true}
+}
+
 // StartProfiling starts profiling based on provided options
 // Returns a function that should be deferred to stop profiling and create profiles if enabled
 func StartProfiling(logger *multilog.Logger, opts ProfileOptions) func() {
 	startTime := time.Now()
-	var cpuFile *os.File
-	var cpuProfileActive bool
 
 	// If no profiles are enabled, return a simple function that just logs the execution time
 	if !opts.CPUProfile && !opts.MemProfile && !opts.GoroutineProfile && !opts.BlockProfile {
@@ -68,151 +187,114 @@ func StartProfiling(logger *multilog.Logger, opts ProfileOptions) func() {
 		opts.ProfileNameBase = "command"
 	}
 
-	// Ensure output directory exists
-	if opts.OutputDir != "" {
-		err := os.MkdirAll(opts.OutputDir, 0755)
-		if err != nil {
-			logger.Errorf("Failed to create output directory for profiles: %v", err)
-			// Use testdata directory as fallback during tests
-			if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
-				// Get the project root directory
-				cwd, err := os.Getwd()
-				if err != nil {
-					logger.Errorf("Failed to get current working directory: %v", err)
-					return nil
-				}
-				if filepath.Base(cwd) != "dns-toolkit" {
-					for filepath.Base(cwd) != "dns-toolkit" && cwd != "/" {
-						cwd = filepath.Dir(cwd)
-					}
-				}
-				opts.OutputDir = filepath.Join(cwd, "testdata")
-				logger.Infof("Using testdata directory as fallback for profiles: %s", opts.OutputDir)
-				err = os.MkdirAll(opts.OutputDir, 0755)
-				if err != nil {
-					return nil
-				}
-			} else {
-				opts.OutputDir = ""
-			}
-		}
-	} else if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
-		// Default to testdata directory when running tests and no output dir is specified
-		cwd, err := os.Getwd()
-		if err != nil {
-			logger.Errorf("Failed to get current working directory: %v", err)
-			return nil
-		}
-		if filepath.Base(cwd) != "dns-toolkit" {
-			for filepath.Base(cwd) != "dns-toolkit" && cwd != "/" {
-				cwd = filepath.Dir(cwd)
-			}
-		}
-		opts.OutputDir = filepath.Join(cwd, "testdata")
-		err = os.MkdirAll(opts.OutputDir, 0755)
-		if err != nil {
-			return nil
-		}
+	if !setupOutputDirectory(logger, &opts) {
+		return nil
 	}
 
-	// Enable block profiling if requested
-	if opts.BlockProfile {
-		rate := opts.BlockProfileRate
-		if rate <= 0 {
-			rate = 1 // Default value if isn't specified or invalid
-		}
-		runtime.SetBlockProfileRate(rate)
-		logger.Info("Block profiling enabled")
+	setupBlockProfiling(logger, opts)
+
+	cpuData := startCPUProfiling(logger, opts)
+
+	// Return cleanup function
+	return createCleanupFunction(logger, opts, startTime, cpuData)
+}
+
+// stopCPUProfiling stops CPU profiling and verifies the profile
+func stopCPUProfiling(logger *multilog.Logger, opts ProfileOptions, cpuData *cpuProfileData) {
+	if !opts.CPUProfile || cpuData.file == nil {
+		return
 	}
 
-	// Start CPU profiling if enabled
-	if opts.CPUProfile {
-		cpuProfilePath := filepath.Join(opts.OutputDir, fmt.Sprintf("%s_cpu.prof", opts.ProfileNameBase))
-		logger.Infof("CPU profiling enabled, writing to %s", cpuProfilePath)
+	logger.Info("Stopping CPU profiling...")
+	pprof.StopCPUProfile()
+	if err := cpuData.file.Close(); err != nil {
+		logger.Errorf("Could not close CPU profile file: %v", err)
+	}
 
-		var err error
-		cpuFile, err = os.Create(cpuProfilePath)
+	// Verify that the profile file has content
+	if cpuData.active {
+		outputDir := getOutputDir(logger, opts.OutputDir)
+		cpuProfilePath := filepath.Join(outputDir, fmt.Sprintf("%s_cpu.prof", opts.ProfileNameBase))
+		info, err := os.Stat(cpuProfilePath)
 		if err != nil {
-			logger.Errorf("Could not create CPU profile: %v", err)
+			logger.Errorf("Error checking CPU profile file: %v", err)
+		} else if info.Size() == 0 {
+			logger.Warnf("CPU profile file is empty. No profiling data was collected.")
 		} else {
-			err = pprof.StartCPUProfile(cpuFile)
-			if err != nil {
-				logger.Errorf("Could not start CPU profile: %v", err)
-				if err := cpuFile.Close(); err != nil {
-					logger.Errorf("Could not close CPU profile file: %v", err)
-				}
-				cpuFile = nil
-			} else {
-				cpuProfileActive = true
-				logger.Info("CPU profiling started successfully")
-			}
+			logger.Infof("CPU profiling completed successfully. Profile size: %d bytes", info.Size())
 		}
 	}
+}
 
-	// Return a function that stops profiling and records memory profile if enabled
+// createMemoryProfile creates a memory profile if enabled
+func createMemoryProfile(logger *multilog.Logger, opts ProfileOptions) {
+	if !opts.MemProfile {
+		return
+	}
+
+	outputDir := getOutputDir(logger, opts.OutputDir)
+	memProfilePath := filepath.Join(outputDir, fmt.Sprintf("%s_mem.prof", opts.ProfileNameBase))
+	logger.Infof("Creating memory profile at %s", memProfilePath)
+
+	// Force garbage collection to get a more accurate memory profile
+	runtime.GC()
+
+	f, err := os.Create(memProfilePath)
+	if err != nil {
+		logger.Errorf("Could not create memory profile: %v", err)
+		return
+	}
+
+	err = pprof.WriteHeapProfile(f)
+	closeErr := f.Close()
+
+	if err != nil {
+		logger.Errorf("Could not write memory profile: %v", err)
+	} else {
+		logger.Infof("Memory profile saved to %s", memProfilePath)
+	}
+
+	if closeErr != nil {
+		logger.Errorf("Could not close memory profile file: %v", closeErr)
+	}
+}
+
+// createGoroutineProfile creates a goroutine profile if enabled
+func createGoroutineProfile(logger *multilog.Logger, opts ProfileOptions) {
+	if !opts.GoroutineProfile {
+		return
+	}
+
+	outputDir := getOutputDir(logger, opts.OutputDir)
+	createProfile(logger, "goroutine", outputDir, opts.ProfileNameBase)
+}
+
+// createBlockProfile creates a block profile if enabled
+func createBlockProfile(logger *multilog.Logger, opts ProfileOptions) {
+	if !opts.BlockProfile {
+		return
+	}
+
+	outputDir := getOutputDir(logger, opts.OutputDir)
+	createProfile(logger, "block", outputDir, opts.ProfileNameBase)
+}
+
+// createCleanupFunction creates the cleanup function that stops profiling
+func createCleanupFunction(
+	logger *multilog.Logger,
+	opts ProfileOptions,
+	startTime time.Time,
+	cpuData *cpuProfileData,
+) func() {
 	return func() {
-		// Stop CPU profiling if it was started
-		if opts.CPUProfile && cpuFile != nil {
-			logger.Info("Stopping CPU profiling...")
-			pprof.StopCPUProfile()
-			if err := cpuFile.Close(); err != nil {
-				logger.Errorf("Could not close CPU profile file: %v", err)
-			}
+		stopCPUProfiling(logger, opts, cpuData)
 
-			// Verify that the profile file has content
-			if cpuProfileActive {
-				cpuProfilePath := filepath.Join(opts.OutputDir, fmt.Sprintf("%s_cpu.prof", opts.ProfileNameBase))
-				info, err := os.Stat(cpuProfilePath)
-				if err != nil {
-					logger.Errorf("Error checking CPU profile file: %v", err)
-				} else if info.Size() == 0 {
-					logger.Warnf("CPU profile file is empty. No profiling data was collected.")
-				} else {
-					logger.Infof("CPU profiling completed successfully. Profile size: %d bytes", info.Size())
-				}
-			}
-		}
-
-		// Create a memory profile if enabled
-		if opts.MemProfile {
-			memProfilePath := filepath.Join(opts.OutputDir, fmt.Sprintf("%s_mem.prof", opts.ProfileNameBase))
-			logger.Infof("Creating memory profile at %s", memProfilePath)
-
-			// Force garbage collection to get a more accurate memory profile
-			runtime.GC()
-
-			f, err := os.Create(memProfilePath)
-			if err != nil {
-				logger.Errorf("Could not create memory profile: %v", err)
-			} else {
-				err = pprof.WriteHeapProfile(f)
-				closeErr := f.Close()
-
-				if err != nil {
-					logger.Errorf("Could not write memory profile: %v", err)
-				} else {
-					logger.Infof("Memory profile saved to %s", memProfilePath)
-				}
-
-				if closeErr != nil {
-					logger.Errorf("Could not close memory profile file: %v", closeErr)
-				}
-			}
-		}
-
-		// Create a goroutine profile if enabled
-		if opts.GoroutineProfile {
-			createProfile(logger, "goroutine", opts.OutputDir, opts.ProfileNameBase)
-		}
-
-		// Create a block profile if enabled
-		if opts.BlockProfile {
-			createProfile(logger, "block", opts.OutputDir, opts.ProfileNameBase)
-		}
+		createMemoryProfile(logger, opts)
+		createGoroutineProfile(logger, opts)
+		createBlockProfile(logger, opts)
 
 		LogMemStats(logger, "End")
 
-		// Log execution time
 		elapsed := time.Since(startTime)
 		logger.Infof("Command completed in %s", elapsed)
 	}
@@ -309,5 +391,4 @@ func AnalyzeProfiles(logger *multilog.Logger, opts ProfileOptions) {
 	} else {
 		logger.Debugf("No block profile found at %s, skipping analysis", blockProfilePath)
 	}
-
 }

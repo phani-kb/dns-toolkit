@@ -639,7 +639,6 @@ func TestProcessingConfig(t *testing.T) {
 }
 
 func TestConsolidateGeneric_FileSaveError(t *testing.T) {
-	t.Parallel()
 
 	tempDir := t.TempDir()
 	logger := multilog.NewLogger()
@@ -717,7 +716,6 @@ func (m *mockConsolidatorWithCustomSave) SaveEntries(
 }
 
 func TestConsolidateGeneric_ChecksumCalculation(t *testing.T) {
-	t.Parallel()
 
 	tempDir := t.TempDir()
 	logger := multilog.NewLogger()
@@ -801,7 +799,6 @@ func TestConsolidateGeneric_ChecksumCalculation(t *testing.T) {
 // Additional edge case tests
 
 func TestConsolidateGeneric_EdgeCases(t *testing.T) {
-	t.Parallel()
 
 	tempDir := t.TempDir()
 	logger := multilog.NewLogger()
@@ -1069,7 +1066,6 @@ func TestConsolidateGeneric_LargeDataset(t *testing.T) {
 }
 
 func TestConsolidateGeneric_ConfigFlags(t *testing.T) {
-	t.Parallel()
 
 	tempDir := t.TempDir()
 	logger := multilog.NewLogger()
