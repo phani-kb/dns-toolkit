@@ -2,6 +2,7 @@
   "sources": [
     {
       "name": "VXVault_URLList",
+      "disabled": true,
       "types": [
         {
           "name": "domain"

@@ -2,6 +2,7 @@
   "sources": [
     {
       "name": "nrd-14day-mini",
+      "disabled": true,
       "frequency": "weekly",
       "license": "MIT",
       "types": [

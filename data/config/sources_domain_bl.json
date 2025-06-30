@@ -3,6 +3,7 @@
     {
       "name": "1Hosts (Lite)",
       "categories": "ads, trackers",
+      "disabled": true,
       "license": "MPLv2",
       "types": [
         {
@@ -49,6 +50,7 @@
     {
       "name": "Adaway",
       "categories": "mobile",
+      "disabled": true,
       "frequency": "weekly",
       "license": "CC Attribution 3.0",
       "types": [
@@ -98,6 +100,7 @@
     {
       "name": "CybercrimeTracker_All",
       "categories": "trackers",
+      "disabled": true,
       "license": "CC0",
       "types": [
         {
@@ -113,6 +116,7 @@
     {
       "name": "CybercrimeTracker_CCAM",
       "categories": "trackers",
+      "disabled": true,
       "license": "CC0",
       "types": [
         {
@@ -139,6 +143,7 @@
     },
     {
       "name": "CybercrimeTracker_CCPMGate",
+      "disabled": true,
       "license": "CC0",
       "types": [
         {
@@ -165,6 +170,7 @@
     },
     {
       "name": "Maltrail_StaticTrails",
+      "disabled": true,
       "types": [
         {
           "name": "domain_custom_csv_maltrail"
@@ -178,6 +184,7 @@
     {
       "name": "PuppyScams",
       "categories": "scam",
+      "disabled": true,
       "types": [
         {
           "name": "domain_custom_html_puppyscams",
@@ -295,6 +302,7 @@
     },
     {
       "name": "Yoyo Adservers",
+      "disabled": true,
       "license": "MIT",
       "types": [
         {
