@@ -1,0 +1,576 @@
+[
+  {
+    "type": "adguard",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/mini_adguard_allowlist.txt",
+    "list_type": "allowlist",
+    "checksum": "1e45453135326f5d37b0c64650bd0ff5",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "mini",
+    "files": [
+      "Local Allowlist (AdGuard) [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Allowlist (AdGuard)_adguard_AL_valid_ee499296263823bb0efaa57db9d1e045.txt] [39] [must consider]"
+    ],
+    "files_count": 1,
+    "count": 39,
+    "valid": true
+  },
+  {
+    "type": "adguard",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/mini_adguard_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "51c0fa5eb5080c13c3b3c7f5728124b4",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "mini",
+    "files": [
+      "GetAdmiral Domains Filter List [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/GetAdmiral Domains Filter List_adguard_BL_valid_977ddffb5c22dd34411c923a2b2ff0e2.txt] [1752] [must consider]",
+      "Local Blocklist (AdGuard) [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Blocklist (AdGuard)_adguard_BL_valid_ace9275b780165b90d51c18704c6e8b4.txt] [7] [must consider]"
+    ],
+    "files_count": 2,
+    "count": 1759,
+    "valid": true
+  },
+  {
+    "type": "adguard",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/lite_adguard_allowlist.txt",
+    "list_type": "allowlist",
+    "checksum": "8267aa6132c70bfc77ed860fcb1566d3",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "lite",
+    "files": [
+      "AdGuard DNS filter [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard DNS filter_adguard_AL_valid_2b7ef57511e73da07d4385eb9183eac5.txt] [181]",
+      "Local Allowlist (AdGuard) [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Allowlist (AdGuard)_adguard_AL_valid_ee499296263823bb0efaa57db9d1e045.txt] [39] [must consider]"
+    ],
+    "files_count": 2,
+    "count": 220,
+    "valid": true
+  },
+  {
+    "type": "adguard",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/lite_adguard_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "0485d9f7160a6c626f5935abb202717b",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "lite",
+    "files": [
+      "AdGuard Base filter [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard Base filter_adguard_BL_valid_7da2a463fc9052b569c0f428cacd41cd.txt] [94449]",
+      "AdGuard DNS filter [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard DNS filter_adguard_BL_valid_f5b8c0d85aaca9b52258d7b6e0473321.txt] [124007]",
+      "GetAdmiral Domains Filter List [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/GetAdmiral Domains Filter List_adguard_BL_valid_977ddffb5c22dd34411c923a2b2ff0e2.txt] [1752] [must consider]",
+      "Local Blocklist (AdGuard) [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Blocklist (AdGuard)_adguard_BL_valid_ace9275b780165b90d51c18704c6e8b4.txt] [7] [must consider]"
+    ],
+    "files_count": 4,
+    "count": 181332,
+    "valid": true
+  },
+  {
+    "type": "adguard",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/normal_adguard_allowlist.txt",
+    "list_type": "allowlist",
+    "checksum": "8267aa6132c70bfc77ed860fcb1566d3",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "normal",
+    "files": [
+      "AdGuard DNS filter [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard DNS filter_adguard_AL_valid_2b7ef57511e73da07d4385eb9183eac5.txt] [181]",
+      "Local Allowlist (AdGuard) [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Allowlist (AdGuard)_adguard_AL_valid_ee499296263823bb0efaa57db9d1e045.txt] [39] [must consider]"
+    ],
+    "files_count": 2,
+    "count": 220,
+    "valid": true
+  },
+  {
+    "type": "adguard",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/normal_adguard_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "f6665a9f5f1d420de4d8a71ab6d79d02",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "normal",
+    "files": [
+      "AdGuard Base filter [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard Base filter_adguard_BL_valid_7da2a463fc9052b569c0f428cacd41cd.txt] [94449]",
+      "AdGuard DNS filter [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard DNS filter_adguard_BL_valid_f5b8c0d85aaca9b52258d7b6e0473321.txt] [124007]",
+      "GetAdmiral Domains Filter List [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/GetAdmiral Domains Filter List_adguard_BL_valid_977ddffb5c22dd34411c923a2b2ff0e2.txt] [1752] [must consider]",
+      "Local Blocklist (AdGuard) [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Blocklist (AdGuard)_adguard_BL_valid_ace9275b780165b90d51c18704c6e8b4.txt] [7] [must consider]",
+      "OISD Blocklist NSFW Small [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/OISD Blocklist NSFW Small_adguard_BL_valid_fd9bb6c7be653d28226d508868de6aee.txt] [21480]",
+      "OISD Blocklist Small [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/OISD Blocklist Small_adguard_BL_valid_d8a065e7ec0fea08827f852b6b417a28.txt] [44484]"
+    ],
+    "files_count": 6,
+    "count": 208460,
+    "valid": true
+  },
+  {
+    "type": "adguard",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/big_adguard_allowlist.txt",
+    "list_type": "allowlist",
+    "checksum": "b4c74be553093a536a672c13d26fdb81",
+    "last_consolidated_timestamp": "20250816_170841",
+    "group": "big",
+    "files": [
+      "AdBlockID [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdBlockID_adguard_AL_valid_eea1b1b94a74acdfb290de352e2e3872.txt] [92]",
+      "AdGuard DNS filter [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard DNS filter_adguard_AL_valid_2b7ef57511e73da07d4385eb9183eac5.txt] [181]",
+      "AntiAdBlockFilters [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AntiAdBlockFilters_adguard_AL_valid_a5a541a9cb41c6ed985bd66b09714f60.txt] [68]",
+      "CJX Annoyance [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CJX Annoyance_adguard_AL_valid_f72e753a203ef90ea46681119d3540c1.txt] [6]",
+      "DandelionSprout-Anti-Malware-List [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/DandelionSprout-Anti-Malware-List_adguard_AL_valid_80ffb8c1d8065cc522270605ef8f7670.txt] [6]",
+      "DandelionSprout_AdGuardHome_Whitelist [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/DandelionSprout_AdGuardHome_Whitelist_adguard_AL_valid_9289be525fa43a87e88cdc7f45af7d53.txt] [285]",
+      "Easy Privacy [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Easy Privacy_adguard_AL_valid_525a8b3a1d49daf6ad621ca55274cfc5.txt] [753]",
+      "Local Allowlist (AdGuard) [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Allowlist (AdGuard)_adguard_AL_valid_ee499296263823bb0efaa57db9d1e045.txt] [39] [must consider]",
+      "RedDragonWebDesign_block-everything [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/RedDragonWebDesign_block-everything_adguard_AL_valid_63a00cc77d15bf551988954baf92dd2d.txt] [1]",
+      "Ukrainian Privacy Filter [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Ukrainian Privacy Filter_adguard_AL_valid_95e9c7f81ef516b2e58f778fc86346f1.txt] [1]",
+      "YousList-AdGuard [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/YousList-AdGuard_adguard_AL_valid_887c77b6a22947c12b06cac1fff86cf7.txt] [17]",
+      "abpvn_hosts [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/abpvn_hosts_adguard_AL_valid_b431a07d672c3bcfddf0c981ffba6cb8.txt] [51]"
+    ],
+    "files_count": 12,
+    "count": 1499,
+    "valid": true
+  },
+  {
+    "type": "adguard",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/big_adguard_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "542f5c07354c2326aa2c4cd8fbc72fe8",
+    "ignored_filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/big_adguard_blocklist_ignored.txt",
+    "last_consolidated_timestamp": "20250816_170841",
+    "group": "big",
+    "files": [
+      "AdBlockID [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdBlockID_adguard_BL_valid_59b4487f1255841cb4a1005aa04da106.txt] [3842]",
+      "AdGuard Base filter [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard Base filter_adguard_BL_valid_7da2a463fc9052b569c0f428cacd41cd.txt] [94449]",
+      "AdGuard DNS filter [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard DNS filter_adguard_BL_valid_f5b8c0d85aaca9b52258d7b6e0473321.txt] [124007]",
+      "AntiAdBlockFilters [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AntiAdBlockFilters_adguard_BL_valid_3f801cc684e8078033caeee3ee6d2fc5.txt] [1710]",
+      "CJX Annoyance [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CJX Annoyance_adguard_BL_valid_a8158927f42ddcf7a75ed32c7d9e9282.txt] [1800]",
+      "DandelionSprout-Anti-Malware-List [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/DandelionSprout-Anti-Malware-List_adguard_BL_valid_b7bc016f6eb4d96c71d53749e87ef449.txt] [32631]",
+      "Easy Privacy [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Easy Privacy_adguard_BL_valid_04d7402d1aa9eb5aa5c3ccfa794072ba.txt] [53239]",
+      "GetAdmiral Domains Filter List [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/GetAdmiral Domains Filter List_adguard_BL_valid_977ddffb5c22dd34411c923a2b2ff0e2.txt] [1752] [must consider]",
+      "HaGeZi Encrypted DNS Servers [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/HaGeZi Encrypted DNS Servers_adguard_BL_valid_d5be851a7fa90a66eb97af3ca279d504.txt] [1435]",
+      "HaGeZi Most Abused TLDs [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/HaGeZi Most Abused TLDs_adguard_BL_valid_9943b5a1571e8f9a08a061bcc4ae8754.txt] [425]",
+      "Local Blocklist (AdGuard) [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Blocklist (AdGuard)_adguard_BL_valid_ace9275b780165b90d51c18704c6e8b4.txt] [7] [must consider]",
+      "OISD Blocklist NSFW Small [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/OISD Blocklist NSFW Small_adguard_BL_valid_fd9bb6c7be653d28226d508868de6aee.txt] [21480]",
+      "OISD Blocklist Small [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/OISD Blocklist Small_adguard_BL_valid_d8a065e7ec0fea08827f852b6b417a28.txt] [44484]",
+      "RedDragonWebDesign_block-everything [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/RedDragonWebDesign_block-everything_adguard_BL_valid_869d29d0197c826187ffb6c9ffad9b3b.txt] [652]",
+      "ShadowWhisperer's Dating List [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer's Dating List_adguard_BL_valid_488dbe828289856d3b2f48a7e50b7418.txt] [1066]",
+      "Ukrainian Ad Filter [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Ukrainian Ad Filter_adguard_BL_valid_72172c0ad62c4e7019f5a3088657c916.txt] [1447]",
+      "Ukrainian Annoyance Filter [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Ukrainian Annoyance Filter_adguard_BL_valid_18da6a70e7fcc9e762ecd5ae1889a086.txt] [582]",
+      "Ukrainian Privacy Filter [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Ukrainian Privacy Filter_adguard_BL_valid_62d71b0f6e5ea1c0a3c4a7a6201cb269.txt] [345]",
+      "YousList-AdGuard [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/YousList-AdGuard_adguard_BL_valid_30aab25868b5a8908e01b54c713af77c.txt] [7347]",
+      "abpvn_hosts [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/abpvn_hosts_adguard_BL_valid_f3cfe59aca5ebb63ed5e4f870aafe2f0.txt] [1060]",
+      "iam-py-test_my-filters-001-antitypo [adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/iam-py-test_my-filters-001-antitypo_adguard_BL_valid_510ac884c1cefabb534ea08d5eb5aaf9.txt] [824]"
+    ],
+    "files_count": 21,
+    "count": 290051,
+    "ignored_entries_count": 14,
+    "valid": true
+  },
+  {
+    "type": "cidr_ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/big_cidr_ipv4_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "a080fa0c7490d4f570e82311fed04bd3",
+    "last_consolidated_timestamp": "20250816_170841",
+    "group": "big",
+    "files": [
+      "ET_fwip [cidr_ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ET_fwip_cidr_ipv4_BL_valid_6f02a7efa462ff8d93c27895d18b272f.txt] [1639] [must consider]",
+      "Firehol_level1 [cidr_ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_level1_cidr_ipv4_BL_valid_340e4d8461450bfb9d804c5384b0a906.txt] [4561]"
+    ],
+    "files_count": 2,
+    "count": 4699,
+    "valid": true
+  },
+  {
+    "type": "cidr_ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/normal_cidr_ipv4_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "c2ba10a8358ba708fd4144e6923eb66f",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "normal",
+    "files": [
+      "ET_fwip [cidr_ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ET_fwip_cidr_ipv4_BL_valid_6f02a7efa462ff8d93c27895d18b272f.txt] [1639] [must consider]"
+    ],
+    "files_count": 1,
+    "count": 1639,
+    "valid": true
+  },
+  {
+    "type": "cidr_ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/lite_cidr_ipv4_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "c2ba10a8358ba708fd4144e6923eb66f",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "lite",
+    "files": [
+      "ET_fwip [cidr_ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ET_fwip_cidr_ipv4_BL_valid_6f02a7efa462ff8d93c27895d18b272f.txt] [1639] [must consider]"
+    ],
+    "files_count": 1,
+    "count": 1639,
+    "valid": true
+  },
+  {
+    "type": "cidr_ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/mini_cidr_ipv4_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "c2ba10a8358ba708fd4144e6923eb66f",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "mini",
+    "files": [
+      "ET_fwip [cidr_ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ET_fwip_cidr_ipv4_BL_valid_6f02a7efa462ff8d93c27895d18b272f.txt] [1639] [must consider]"
+    ],
+    "files_count": 1,
+    "count": 1639,
+    "valid": true
+  },
+  {
+    "type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/big_domain_allowlist.txt",
+    "list_type": "allowlist",
+    "checksum": "6ef5147607ac7c5e6e42317439be2841",
+    "last_consolidated_timestamp": "20250816_170841",
+    "group": "big",
+    "files": [
+      "AdGuard DNS filter [domain_adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard DNS filter_domain_adguard_AL_valid_035ec24b1c6a33d1d0b18a0171092b33.txt] [180]",
+      "AdguardTeam_HttpsExclusions_android [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdguardTeam_HttpsExclusions_android_domain_AL_valid_6d8cfc335fa07f83a7b935c6b1fadae1.txt] [97]",
+      "AdguardTeam_HttpsExclusions_banks [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdguardTeam_HttpsExclusions_banks_domain_AL_valid_6f73a788a2d062a97206e44dc3722f16.txt] [3971]",
+      "AdguardTeam_HttpsExclusions_firefox [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdguardTeam_HttpsExclusions_firefox_domain_AL_valid_48bfcdaafc9f8e1d2d59aee5e835292d.txt] [18]",
+      "AdguardTeam_HttpsExclusions_issues [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdguardTeam_HttpsExclusions_issues_domain_AL_valid_abb214cd07ca11adee6e4aed22a85357.txt] [68]",
+      "AdguardTeam_HttpsExclusions_mac [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdguardTeam_HttpsExclusions_mac_domain_AL_valid_7e58267ef943300263fa0928416ee3b8.txt] [11]",
+      "AdguardTeam_HttpsExclusions_sensitive [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdguardTeam_HttpsExclusions_sensitive_domain_AL_valid_9e189ae3dfe973990bb0b69df434a698.txt] [164]",
+      "AdguardTeam_HttpsExclusions_windows [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdguardTeam_HttpsExclusions_windows_domain_AL_valid_a103dd5fbd70aa6a8df93d9f53dd2575.txt] [7]",
+      "BlahDNS_whitelist [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/BlahDNS_whitelist_domain_AL_valid_7a7853b9a4722b8a4dc23b62aa1ed17e.txt] [773]",
+      "CJX Annoyance [domain_adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CJX Annoyance_domain_adguard_AL_valid_50af80da71ad6bffc1852683fa9b07b6.txt] [6]",
+      "DandelionSprout-Anti-Malware-List [domain_adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/DandelionSprout-Anti-Malware-List_domain_adguard_AL_valid_0f662277e830b3f585b238657b8a9963.txt] [2]",
+      "Dogino_Discord_Official [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Dogino_Discord_Official_domain_AL_valid_4958f13f3e373be78ce424a4ef048670.txt] [43]",
+      "Easy Privacy [domain_adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Easy Privacy_domain_adguard_AL_valid_6f72b618b82df12f26856319aa2b237a.txt] [654]",
+      "Local Allowlist (Domain) [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Allowlist (Domain)_domain_AL_valid_5a503c099d4e0d133c6ac71c14004e30.txt] [40] [must consider]",
+      "ShadowWhisperer_Allowlist [domain_with_comment_suffix] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer_Allowlist_domain_with_comment_suffix_AL_valid_6a7f6a0aeed6801c08ae06afce009e0b.txt] [650]",
+      "YousList-AdGuard [domain_adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/YousList-AdGuard_domain_adguard_AL_valid_62ab60d3af3eb188a4d37f062071e0ef.txt] [12]",
+      "fabriziosalmi_allowlist [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/fabriziosalmi_allowlist_domain_AL_valid_a1d23ca34ce25af2ff62f145abb792df.txt] [2256]",
+      "tranco [domain_top] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/tranco_domain_top_AL_valid_b799ec5530feb45a919c6d9bd7026269.txt] [1000]"
+    ],
+    "files_count": 18,
+    "count": 9267,
+    "valid": true
+  },
+  {
+    "type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/lite_domain_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "338a7cf2a75de1b236b06350c74b68b0",
+    "ignored_filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/lite_domain_blocklist_ignored.txt",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "lite",
+    "files": [
+      "CybercrimeTracker_CCPMGate [domain_http_url] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_CCPMGate_domain_http_url_BL_valid_fc20514a093623b69a0842d05fc64aa9.txt] [982]",
+      "Local Blocklist (Domain) [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Blocklist (Domain)_domain_BL_valid_bba9b682fa9a0be7b02610145c61e732.txt] [1] [must consider]",
+      "PuppyScams [domain_custom_html_puppyscams] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/PuppyScams_domain_custom_html_puppyscams_BL_valid_a302389f019ba6e9d798ef8dca5531c6.txt] [102]",
+      "cyberhost_malware-blocklist [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/cyberhost_malware-blocklist_domain_BL_valid_30107037ccf85c2d69e637e27e6c9caa.txt] [17227]"
+    ],
+    "files_count": 4,
+    "count": 18309,
+    "ignored_entries_count": 3,
+    "valid": true
+  },
+  {
+    "type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/normal_domain_allowlist.txt",
+    "list_type": "allowlist",
+    "checksum": "ed393bbf414971b061e60439836a99c4",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "normal",
+    "files": [
+      "AdGuard DNS filter [domain_adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard DNS filter_domain_adguard_AL_valid_035ec24b1c6a33d1d0b18a0171092b33.txt] [180]",
+      "DandelionSprout-Anti-Malware-List [domain_adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/DandelionSprout-Anti-Malware-List_domain_adguard_AL_valid_0f662277e830b3f585b238657b8a9963.txt] [2]",
+      "Local Allowlist (Domain) [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Allowlist (Domain)_domain_AL_valid_5a503c099d4e0d133c6ac71c14004e30.txt] [40] [must consider]",
+      "ShadowWhisperer_Allowlist [domain_with_comment_suffix] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer_Allowlist_domain_with_comment_suffix_AL_valid_6a7f6a0aeed6801c08ae06afce009e0b.txt] [650]",
+      "fabriziosalmi_allowlist [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/fabriziosalmi_allowlist_domain_AL_valid_a1d23ca34ce25af2ff62f145abb792df.txt] [2256]",
+      "tranco [domain_top] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/tranco_domain_top_AL_valid_b799ec5530feb45a919c6d9bd7026269.txt] [1000]"
+    ],
+    "files_count": 6,
+    "count": 3762,
+    "valid": true
+  },
+  {
+    "type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/big_domain_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "566ce2322c3631524fcdc4c8b32b1c25",
+    "ignored_filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/big_domain_blocklist_ignored.txt",
+    "last_consolidated_timestamp": "20250816_170843",
+    "group": "big",
+    "files": [
+      "CybercrimeTracker_All [domain_url] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_All_domain_url_BL_valid_56e741d16b5e8fd13c65bba154067d57.txt] [13015]",
+      "CybercrimeTracker_CCPMGate [domain_http_url] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_CCPMGate_domain_http_url_BL_valid_fc20514a093623b69a0842d05fc64aa9.txt] [982]",
+      "FakeWebshopListHUN [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/FakeWebshopListHUN_domain_BL_valid_f5eb76e7c1e377104843e582945bef8c.txt] [8210]",
+      "Frogeye trackers [hostname] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Frogeye trackers_hostname_BL_valid_cf3fecac508c5e379c814426e3cce2de.txt] [33325]",
+      "HaGeZi Encrypted DNS Servers [domain_adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/HaGeZi Encrypted DNS Servers_domain_adguard_BL_valid_97ea5bc62f5e53fd9d5d5865441238f0.txt] [1435]",
+      "HaGeZi Pro [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/HaGeZi Pro_domain_BL_valid_7b828392f23c7e0fbc07ba9f3eb917ee.txt] [409816]",
+      "Local Blocklist (Domain) [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Blocklist (Domain)_domain_BL_valid_bba9b682fa9a0be7b02610145c61e732.txt] [1] [must consider]",
+      "Maltrail_StaticTrails [domain_custom_csv_maltrail] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Maltrail_StaticTrails_domain_custom_csv_maltrail_BL_valid_cedd6c7c1d3978881744daf714f8c946.txt] [690424]",
+      "OISD Blocklist NSFW Small [domain_adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/OISD Blocklist NSFW Small_domain_adguard_BL_valid_fcf69b5eb82773d3bc38d340e571c363.txt] [21476]",
+      "OpenPhish_Feed [domain_http_url] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/OpenPhish_Feed_domain_http_url_BL_valid_a35f2e85b8b39185e732b28613e87794.txt] [279]",
+      "PuppyScams [domain_custom_html_puppyscams] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/PuppyScams_domain_custom_html_puppyscams_BL_valid_a302389f019ba6e9d798ef8dca5531c6.txt] [102]",
+      "ShadowWhisperer's Dating List [domain_adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer's Dating List_domain_adguard_BL_valid_99e85151622324037c934c0500e31050.txt] [1066]",
+      "ShadowWhisperer_BlockLists Ads [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer_BlockLists Ads_domain_BL_valid_718515efb4b9cb6bf67d4cbbff25931d.txt] [23265]",
+      "ShadowWhisperer_BlockLists Malware [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer_BlockLists Malware_domain_BL_valid_5073cd028020291641dcde104ed9b056.txt] [51623]",
+      "ShadowWhisperer_BlockLists Scam [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer_BlockLists Scam_domain_BL_valid_764b51154d601982c3d31dd00e4c2b48.txt] [11036]",
+      "Spam404 [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Spam404_domain_BL_valid_80feaa7a341fd4ec201cee8657fec4a5.txt] [8141]",
+      "Stamparm_Blackbook [domain_custom_csv_blackbook] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Stamparm_Blackbook_domain_custom_csv_blackbook_BL_valid_be31b860c1516b61a5e097bfd3de72d8.txt] [18145]",
+      "StevenBlack_Fake_Gambling_Porn [hostname] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/StevenBlack_Fake_Gambling_Porn_hostname_BL_valid_3a36ac3b507f0937e64379ca0d11b49e.txt] [313584]",
+      "Torrent Trackers [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Torrent Trackers_domain_BL_valid_09ae697c4848ad36b2fc5ad54999dff7.txt] [479]",
+      "Ukrainian Security Filter [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Ukrainian Security Filter_domain_BL_valid_6e00be5e1b347d32e741f0054ea1e182.txt] [1736]",
+      "Viriback_Dump [domain_csv_http_url_find] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Viriback_Dump_domain_csv_http_url_find_BL_valid_da2cc4439c6884fa96f1e8cf10278c1b.txt] [4895]",
+      "WaLLy3K [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/WaLLy3K_domain_BL_valid_adb6f80956c2544040d72287f7465629.txt] [350]",
+      "YousList [hostname] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/YousList_hostname_BL_valid_09c99739baad67690ea510521dae59b8.txt] [624]",
+      "bigdargon_hostsVN [hostname] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/bigdargon_hostsVN_hostname_BL_valid_6756d89640aa1706e0efe5990abbc9df.txt] [18952]",
+      "cyberhost_malware-blocklist [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/cyberhost_malware-blocklist_domain_BL_valid_30107037ccf85c2d69e637e27e6c9caa.txt] [17227]",
+      "malware-filter_phishing-filter [hostname] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/malware-filter_phishing-filter_hostname_BL_valid_ba3bdbaae123b0c7f954a418f52d1910.txt] [25777]",
+      "quidsup_notrack-malware [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/quidsup_notrack-malware_domain_BL_valid_4d308c42e8ede37c5363fb646c146370.txt] [150]",
+      "quidsup_notrack-tracker [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/quidsup_notrack-tracker_domain_BL_valid_c4a07358b7369ad4691d3b7b0a41522d.txt] [15715]",
+      "youtube_GoodbyeAds [hostname] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/youtube_GoodbyeAds_hostname_BL_valid_ae580b49d39df246986b92654f12ad88.txt] [97645]"
+    ],
+    "files_count": 29,
+    "count": 1661581,
+    "ignored_entries_count": 811,
+    "valid": true
+  },
+  {
+    "type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/mini_domain_allowlist.txt",
+    "list_type": "allowlist",
+    "checksum": "9c428134780ffa454352013f4ab26e55",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "mini",
+    "files": [
+      "Local Allowlist (Domain) [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Allowlist (Domain)_domain_AL_valid_5a503c099d4e0d133c6ac71c14004e30.txt] [40] [must consider]"
+    ],
+    "files_count": 1,
+    "count": 40,
+    "valid": true
+  },
+  {
+    "type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/normal_domain_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "f11dbce86b477a2b5310863c9d987a2b",
+    "ignored_filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/normal_domain_blocklist_ignored.txt",
+    "last_consolidated_timestamp": "20250816_170841",
+    "group": "normal",
+    "files": [
+      "CybercrimeTracker_All [domain_url] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_All_domain_url_BL_valid_56e741d16b5e8fd13c65bba154067d57.txt] [13015]",
+      "CybercrimeTracker_CCPMGate [domain_http_url] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_CCPMGate_domain_http_url_BL_valid_fc20514a093623b69a0842d05fc64aa9.txt] [982]",
+      "Local Blocklist (Domain) [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Blocklist (Domain)_domain_BL_valid_bba9b682fa9a0be7b02610145c61e732.txt] [1] [must consider]",
+      "OISD Blocklist NSFW Small [domain_adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/OISD Blocklist NSFW Small_domain_adguard_BL_valid_fcf69b5eb82773d3bc38d340e571c363.txt] [21476]",
+      "PuppyScams [domain_custom_html_puppyscams] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/PuppyScams_domain_custom_html_puppyscams_BL_valid_a302389f019ba6e9d798ef8dca5531c6.txt] [102]",
+      "Stamparm_Blackbook [domain_custom_csv_blackbook] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Stamparm_Blackbook_domain_custom_csv_blackbook_BL_valid_be31b860c1516b61a5e097bfd3de72d8.txt] [18145]",
+      "StevenBlack_Fake_Gambling_Porn [hostname] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/StevenBlack_Fake_Gambling_Porn_hostname_BL_valid_3a36ac3b507f0937e64379ca0d11b49e.txt] [313584]",
+      "cyberhost_malware-blocklist [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/cyberhost_malware-blocklist_domain_BL_valid_30107037ccf85c2d69e637e27e6c9caa.txt] [17227]"
+    ],
+    "files_count": 8,
+    "count": 372642,
+    "ignored_entries_count": 256,
+    "valid": true
+  },
+  {
+    "type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/mini_domain_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "f4c47d8731e82526f9e3bd8c7da836ce",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "mini",
+    "files": [
+      "CybercrimeTracker_CCPMGate [domain_http_url] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_CCPMGate_domain_http_url_BL_valid_fc20514a093623b69a0842d05fc64aa9.txt] [982]",
+      "Local Blocklist (Domain) [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Blocklist (Domain)_domain_BL_valid_bba9b682fa9a0be7b02610145c61e732.txt] [1] [must consider]"
+    ],
+    "files_count": 2,
+    "count": 983,
+    "valid": true
+  },
+  {
+    "type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/lite_domain_allowlist.txt",
+    "list_type": "allowlist",
+    "checksum": "4476557ed37f053d1af8e4c53d6ae82b",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "lite",
+    "files": [
+      "AdGuard DNS filter [domain_adguard] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard DNS filter_domain_adguard_AL_valid_035ec24b1c6a33d1d0b18a0171092b33.txt] [180]",
+      "Local Allowlist (Domain) [domain] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Allowlist (Domain)_domain_AL_valid_5a503c099d4e0d133c6ac71c14004e30.txt] [40] [must consider]",
+      "tranco [domain_top] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/tranco_domain_top_AL_valid_b799ec5530feb45a919c6d9bd7026269.txt] [1000]"
+    ],
+    "files_count": 3,
+    "count": 1218,
+    "valid": true
+  },
+  {
+    "type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/mini_ipv4_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "45b68efcaab73c6f2c46adf27eabd403",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "mini",
+    "files": [
+      "BlockListDE_Brute [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/BlockListDE_Brute_ipv4_BL_valid_b0ef9085255410d611f704f99dddba82.txt] [613] [must consider]",
+      "BlockListDE_Strong [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/BlockListDE_Strong_ipv4_BL_valid_2bbc6252e900bd0373c46ebcf8c92d2f.txt] [276] [must consider]",
+      "CybercrimeTracker_CCPMGate [ipv4_http_url] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_CCPMGate_ipv4_http_url_BL_valid_26f94a1a3382dd05fde02727d28bb59a.txt] [103]",
+      "Firehol_CleanTalk_Top20 [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_CleanTalk_Top20_ipv4_BL_valid_08ceac5427faea46d7cd198edb012154.txt] [20] [must consider]",
+      "Greensnow [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Greensnow_ipv4_BL_valid_c083a905f21dc63ec3e4e0797ae1052c.txt] [5085] [must consider]"
+    ],
+    "files_count": 5,
+    "count": 5822,
+    "valid": true
+  },
+  {
+    "type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/normal_ipv4_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "20454253a5996675c302e9aee702edd7",
+    "last_consolidated_timestamp": "20250816_170841",
+    "group": "normal",
+    "files": [
+      "BinaryDefense_Banlist [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/BinaryDefense_Banlist_ipv4_BL_valid_34f1481db856857ae5332045ad0bbf1c.txt] [3023] [must consider]",
+      "BlockListDE_Brute [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/BlockListDE_Brute_ipv4_BL_valid_b0ef9085255410d611f704f99dddba82.txt] [613] [must consider]",
+      "BlockListDE_Strong [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/BlockListDE_Strong_ipv4_BL_valid_2bbc6252e900bd0373c46ebcf8c92d2f.txt] [276] [must consider]",
+      "Borestad_AbuseIPDB_S100_3d [ipv4_find] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Borestad_AbuseIPDB_S100_3d_ipv4_find_BL_valid_794057851420eae6709c5909b13da1bd.txt] [81697]",
+      "CINSScore_BadGuys_Army [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CINSScore_BadGuys_Army_ipv4_BL_valid_5ef43f46b0da45ed7503ad42d0877491.txt] [15000] [must consider]",
+      "CybercrimeTracker_All [ipv4_url] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_All_ipv4_url_BL_valid_a44eb5f152137a37456e30f46256655f.txt] [2864]",
+      "CybercrimeTracker_CCPMGate [ipv4_http_url] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_CCPMGate_ipv4_http_url_BL_valid_26f94a1a3382dd05fde02727d28bb59a.txt] [103]",
+      "EmergingThreats_CompromisedIPs [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/EmergingThreats_CompromisedIPs_ipv4_BL_valid_9903f49d5f0fd7dbffd1679844dd6cfc.txt] [450] [must consider]",
+      "Firehol_CleanTalk [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_CleanTalk_ipv4_BL_valid_609c1d56ced7eb524a7e7f617e4777b0.txt] [494]",
+      "Firehol_CleanTalk_Top20 [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_CleanTalk_Top20_ipv4_BL_valid_08ceac5427faea46d7cd198edb012154.txt] [20] [must consider]",
+      "Greensnow [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Greensnow_ipv4_BL_valid_c083a905f21dc63ec3e4e0797ae1052c.txt] [5085] [must consider]"
+    ],
+    "files_count": 11,
+    "count": 90720,
+    "valid": true
+  },
+  {
+    "type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/big_ipv4_allowlist.txt",
+    "list_type": "allowlist",
+    "checksum": "3595e3a41a554e4a106a45794cb9be29",
+    "last_consolidated_timestamp": "20250816_170841",
+    "group": "big",
+    "files": [
+      "Local Allowlist (ipv4) [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Allowlist (ipv4)_ipv4_AL_valid_806a7c9dc88697f1d0cb02d07b570249.txt] [62] [must consider]"
+    ],
+    "files_count": 1,
+    "count": 62,
+    "valid": true
+  },
+  {
+    "type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/big_ipv4_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "7e11b0caca9b0147f7b89430288f5550",
+    "ignored_filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/big_ipv4_blocklist_ignored.txt",
+    "last_consolidated_timestamp": "20250816_170845",
+    "group": "big",
+    "files": [
+      "BinaryDefense_Banlist [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/BinaryDefense_Banlist_ipv4_BL_valid_34f1481db856857ae5332045ad0bbf1c.txt] [3023] [must consider]",
+      "BlockListDE_Brute [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/BlockListDE_Brute_ipv4_BL_valid_b0ef9085255410d611f704f99dddba82.txt] [613] [must consider]",
+      "BlockListDE_Strong [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/BlockListDE_Strong_ipv4_BL_valid_2bbc6252e900bd0373c46ebcf8c92d2f.txt] [276] [must consider]",
+      "Borestad_AbuseIPDB_S100_3d [ipv4_find] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Borestad_AbuseIPDB_S100_3d_ipv4_find_BL_valid_794057851420eae6709c5909b13da1bd.txt] [81697]",
+      "CINSScore_BadGuys_Army [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CINSScore_BadGuys_Army_ipv4_BL_valid_5ef43f46b0da45ed7503ad42d0877491.txt] [15000] [must consider]",
+      "CybercrimeTracker_All [ipv4_url] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_All_ipv4_url_BL_valid_a44eb5f152137a37456e30f46256655f.txt] [2864]",
+      "CybercrimeTracker_CCPMGate [ipv4_http_url] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_CCPMGate_ipv4_http_url_BL_valid_26f94a1a3382dd05fde02727d28bb59a.txt] [103]",
+      "EmergingThreats_CompromisedIPs [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/EmergingThreats_CompromisedIPs_ipv4_BL_valid_9903f49d5f0fd7dbffd1679844dd6cfc.txt] [450] [must consider]",
+      "Firehol_BitcoinNodes_1d [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_BitcoinNodes_1d_ipv4_BL_valid_5b062fc10b7e8c50febde629845ae2a9.txt] [7140]",
+      "Firehol_BitcoinNodes_1d [ipv4_cidr_expand] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_BitcoinNodes_1d_ipv4_cidr_expand_BL_valid_656746ebcacb952e56da30b806917532.txt] [94]",
+      "Firehol_Botscout_1d [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_Botscout_1d_ipv4_BL_valid_9fa69b3f22a7bcd79c9a5ce2fd0d8c36.txt] [549]",
+      "Firehol_CleanTalk [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_CleanTalk_ipv4_BL_valid_609c1d56ced7eb524a7e7f617e4777b0.txt] [494]",
+      "Firehol_CleanTalk_Top20 [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_CleanTalk_Top20_ipv4_BL_valid_08ceac5427faea46d7cd198edb012154.txt] [20] [must consider]",
+      "Firehol_SSLProxies_1d [ipv4_cidr_expand] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_SSLProxies_1d_ipv4_cidr_expand_BL_valid_8d50b2006edd46fc4a9e4889df9e89a3.txt] [22]",
+      "Firehol_SSLProxies_1d [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_SSLProxies_1d_ipv4_BL_valid_a3643e6350e595281d7221c633bd31b8.txt] [369]",
+      "Firehol_SocksProxy_7d [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_SocksProxy_7d_ipv4_BL_valid_4da21c1ea903b007a03a49ff4c899c7c.txt] [2476]",
+      "Firehol_SocksProxy_7d [ipv4_cidr_expand] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_SocksProxy_7d_ipv4_cidr_expand_BL_valid_eb2c4acd3eddd5f9bf82d804619efa31.txt] [108]",
+      "Firehol_level2 [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_level2_ipv4_BL_valid_e76160870c9b5edd612cb59e4070761b.txt] [14216]",
+      "Firehol_level2 [ipv4_cidr_expand] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_level2_ipv4_cidr_expand_BL_valid_32454900bc0357b893d1e1024f775def.txt] [16226]",
+      "Firehol_level3 [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_level3_ipv4_BL_valid_411356ff256aa44f7ef3067d647086a5.txt] [12922]",
+      "Firehol_level3 [ipv4_cidr_expand] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_level3_ipv4_cidr_expand_BL_valid_57373971c7843f039b0cf12768dccfe4.txt] [20068]",
+      "Greensnow [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Greensnow_ipv4_BL_valid_c083a905f21dc63ec3e4e0797ae1052c.txt] [5085] [must consider]",
+      "Maltrail_StaticTrails [ipv4_find] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Maltrail_StaticTrails_ipv4_find_BL_valid_5b75d78aaaae1041df18ba91245b5c4b.txt] [203403]",
+      "Rutgers_DROP [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Rutgers_DROP_ipv4_BL_valid_79cd6202335b3c40b50c7b456041165e.txt] [1996]",
+      "Sblam_Blocklist [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Sblam_Blocklist_ipv4_BL_valid_9f66dc2480e6e892bc59c52dc43a9f33.txt] [1947]",
+      "ScriptzTeam_BadIPS [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ScriptzTeam_BadIPS_ipv4_BL_valid_97a1593eeb5c9b2dbbe92f614c883618.txt] [2567]",
+      "Sentinel_Greylist [ipv4_find] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Sentinel_Greylist_ipv4_find_BL_valid_01c87c754924c0af19bbdf11cf8a9ea2.txt] [9160]",
+      "URLHaus_Text [ipv4_http_url] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/URLHaus_Text_ipv4_http_url_BL_valid_155eb5e5ea4b19770763be5689c23809.txt] [16943]",
+      "USOM-Blocklists-ips [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/USOM-Blocklists-ips_ipv4_BL_valid_d3554c18007405fce19e360aee0f5912.txt] [12452]",
+      "Viriback_Dump [ipv4_csv_http_url_find] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Viriback_Dump_ipv4_csv_http_url_find_BL_valid_c22aef36f93e03e2ab256ba4dd75530d.txt] [4567]",
+      "Yoyo AdServers-IPList [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Yoyo AdServers-IPList_ipv4_BL_valid_881d7da4fb278eced9d128ad31061987.txt] [8950]"
+    ],
+    "files_count": 31,
+    "count": 362655,
+    "ignored_entries_count": 7,
+    "valid": true
+  },
+  {
+    "type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/normal_ipv4_allowlist.txt",
+    "list_type": "allowlist",
+    "checksum": "3595e3a41a554e4a106a45794cb9be29",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "normal",
+    "files": [
+      "Local Allowlist (ipv4) [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Allowlist (ipv4)_ipv4_AL_valid_806a7c9dc88697f1d0cb02d07b570249.txt] [62] [must consider]"
+    ],
+    "files_count": 1,
+    "count": 62,
+    "valid": true
+  },
+  {
+    "type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/lite_ipv4_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "c2357f6039fd311eb70be47c12ba76d9",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "lite",
+    "files": [
+      "BinaryDefense_Banlist [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/BinaryDefense_Banlist_ipv4_BL_valid_34f1481db856857ae5332045ad0bbf1c.txt] [3023] [must consider]",
+      "BlockListDE_Brute [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/BlockListDE_Brute_ipv4_BL_valid_b0ef9085255410d611f704f99dddba82.txt] [613] [must consider]",
+      "BlockListDE_Strong [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/BlockListDE_Strong_ipv4_BL_valid_2bbc6252e900bd0373c46ebcf8c92d2f.txt] [276] [must consider]",
+      "CINSScore_BadGuys_Army [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CINSScore_BadGuys_Army_ipv4_BL_valid_5ef43f46b0da45ed7503ad42d0877491.txt] [15000] [must consider]",
+      "CybercrimeTracker_CCPMGate [ipv4_http_url] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_CCPMGate_ipv4_http_url_BL_valid_26f94a1a3382dd05fde02727d28bb59a.txt] [103]",
+      "EmergingThreats_CompromisedIPs [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/EmergingThreats_CompromisedIPs_ipv4_BL_valid_9903f49d5f0fd7dbffd1679844dd6cfc.txt] [450] [must consider]",
+      "Firehol_CleanTalk_Top20 [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_CleanTalk_Top20_ipv4_BL_valid_08ceac5427faea46d7cd198edb012154.txt] [20] [must consider]",
+      "Greensnow [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Greensnow_ipv4_BL_valid_c083a905f21dc63ec3e4e0797ae1052c.txt] [5085] [must consider]"
+    ],
+    "files_count": 8,
+    "count": 23032,
+    "valid": true
+  },
+  {
+    "type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/lite_ipv4_allowlist.txt",
+    "list_type": "allowlist",
+    "checksum": "3595e3a41a554e4a106a45794cb9be29",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "lite",
+    "files": [
+      "Local Allowlist (ipv4) [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Allowlist (ipv4)_ipv4_AL_valid_806a7c9dc88697f1d0cb02d07b570249.txt] [62] [must consider]"
+    ],
+    "files_count": 1,
+    "count": 62,
+    "valid": true
+  },
+  {
+    "type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/mini_ipv4_allowlist.txt",
+    "list_type": "allowlist",
+    "checksum": "3595e3a41a554e4a106a45794cb9be29",
+    "last_consolidated_timestamp": "20250816_170840",
+    "group": "mini",
+    "files": [
+      "Local Allowlist (ipv4) [ipv4] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Allowlist (ipv4)_ipv4_AL_valid_806a7c9dc88697f1d0cb02d07b570249.txt] [62] [must consider]"
+    ],
+    "files_count": 1,
+    "count": 62,
+    "valid": true
+  },
+  {
+    "type": "ipv6",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/consolidated_groups/big_ipv6_blocklist.txt",
+    "list_type": "blocklist",
+    "checksum": "bc85156b6e84d0beb4193ea2ce4da2ce",
+    "last_consolidated_timestamp": "20250816_170845",
+    "group": "big",
+    "files": [
+      "MyIP_MS_Blocklist [ipv6_htaccess] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/MyIP_MS_Blocklist_ipv6_htaccess_BL_valid_dfe903077b481e903a0724fe97f79d65.txt] [27]",
+      "Sentinel_Greylist [ipv6_find] [/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Sentinel_Greylist_ipv6_find_BL_valid_41e6b0b9622ad80fd7103215ea0efdc8.txt] [41]"
+    ],
+    "files_count": 2,
+    "count": 68,
+    "valid": true
+  }
+]

@@ -1,0 +1,3644 @@
+[
+  {
+    "name": "abpvn_hosts",
+    "url": "https://raw.githubusercontent.com/abpvn/abpvn/refs/heads/master/filter/abpvn.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/abpvn_hosts.txt",
+    "frequency": "daily",
+    "checksum": "6009881450bc1bd11090f6f49f403933",
+    "error": "",
+    "last_download_timestamp": "20250816_170502",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "notes": "Conflicts with other sources",
+            "groups": [
+              "big"
+            ],
+            "disabled": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "AdBlockID",
+    "url": "https://cdn.jsdelivr.net/gh/realodix/AdBlockID@master/dist/adblockid.adfl.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/AdBlockID.txt",
+    "frequency": "daily",
+    "checksum": "918b8e68a59b1f21ebea76279492f036",
+    "error": "",
+    "last_download_timestamp": "20250816_170504",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "notes": "Conflicts with other sources",
+            "groups": [
+              "big"
+            ],
+            "disabled": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "AdGuard Base filter",
+    "url": "https://filters.adtidy.org/extension/firefox/filters/2.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/AdGuard Base filter.txt",
+    "frequency": "daily",
+    "checksum": "ea1a643b2a7409bd1506c306c42309b0",
+    "error": "",
+    "last_download_timestamp": "20250816_170506",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "notes": "Too many conflicts with other sources",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ],
+            "disabled": true
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "notes": "Too many conflicts with other sources",
+            "groups": [
+              "big"
+            ],
+            "disabled": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads",
+      "trackers"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "AdGuard DNS filter",
+    "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/AdGuard DNS filter.txt",
+    "frequency": "daily",
+    "checksum": "76cf6893627258b4cd88b4b85e19c325",
+    "error": "",
+    "last_download_timestamp": "20250816_170508",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads",
+      "trackers"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "AdGuardSDNSFilter_exclusions",
+    "url": "https://raw.githubusercontent.com/AdguardTeam/AdGuardSDNSFilter/master/Filters/exclusions.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/AdGuardSDNSFilter_exclusions.txt",
+    "frequency": "daily",
+    "checksum": "f52ae98afc2707f8b25bdce485f6ab1b",
+    "error": "",
+    "last_download_timestamp": "20250816_170652",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "others"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "AdguardTeam_HttpsExclusions_android",
+    "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/android.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/AdguardTeam_HttpsExclusions_android.txt",
+    "frequency": "daily",
+    "checksum": "edef10d685bf5b8e0cb8c19ac13b683b",
+    "error": "",
+    "last_download_timestamp": "20250816_170654",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "mobile"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "AdguardTeam_HttpsExclusions_banks",
+    "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/banks.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/AdguardTeam_HttpsExclusions_banks.txt",
+    "frequency": "daily",
+    "checksum": "53bf3487a795abac28c885fd5c6ebc4b",
+    "error": "",
+    "last_download_timestamp": "20250816_170656",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "finance"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "AdguardTeam_HttpsExclusions_firefox",
+    "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/firefox.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/AdguardTeam_HttpsExclusions_firefox.txt",
+    "frequency": "daily",
+    "checksum": "a72f58963f332e0bfaaa9ab50d7c7011",
+    "error": "",
+    "last_download_timestamp": "20250816_170657",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "browser"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "AdguardTeam_HttpsExclusions_issues",
+    "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/issues.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/AdguardTeam_HttpsExclusions_issues.txt",
+    "frequency": "daily",
+    "checksum": "2b63a0415caa1699166c87bff1f009c9",
+    "error": "",
+    "last_download_timestamp": "20250816_170659",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "issues"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "AdguardTeam_HttpsExclusions_mac",
+    "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/mac.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/AdguardTeam_HttpsExclusions_mac.txt",
+    "frequency": "daily",
+    "checksum": "23c32a250f1f4d3b5d98613beff83109",
+    "error": "",
+    "last_download_timestamp": "20250816_170701",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "mac"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "AdguardTeam_HttpsExclusions_sensitive",
+    "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/sensitive.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/AdguardTeam_HttpsExclusions_sensitive.txt",
+    "frequency": "daily",
+    "checksum": "7e3e3488d8e0ef83be7cdf4e6234df7e",
+    "error": "",
+    "last_download_timestamp": "20250816_170703",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "others"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "AdguardTeam_HttpsExclusions_windows",
+    "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/windows.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/AdguardTeam_HttpsExclusions_windows.txt",
+    "frequency": "daily",
+    "checksum": "4d3a4492647551ebd2d3756075b0a6f1",
+    "error": "",
+    "last_download_timestamp": "20250816_170705",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "windows"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "AntiAdBlockFilters",
+    "url": "https://easylist-downloads.adblockplus.org/antiadblockfilters.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/AntiAdBlockFilters.txt",
+    "frequency": "daily",
+    "checksum": "76e6f1b46dd5b77aa2e2fd85bba641a1",
+    "error": "",
+    "last_download_timestamp": "20250816_170510",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "notes": "Conflicts with other sources",
+            "groups": [
+              "big"
+            ],
+            "disabled": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "annoyance"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "bigdargon_hostsVN",
+    "url": "https://raw.githubusercontent.com/bigdargon/hostsVN/refs/heads/master/hosts",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/bigdargon_hostsVN.txt",
+    "frequency": "daily",
+    "checksum": "db78d43a185a27921492c20da96a762d",
+    "error": "",
+    "last_download_timestamp": "20250816_170511",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "hostname",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "BinaryDefense_Banlist",
+    "url": "https://www.binarydefense.com/banlist.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/BinaryDefense_Banlist.txt",
+    "frequency": "daily",
+    "checksum": "4551f9d7e69091702aaf5ba89d123bc9",
+    "error": "",
+    "last_download_timestamp": "20250816_170727",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "BlahDNS_whitelist",
+    "url": "https://raw.githubusercontent.com/ookangzheng/blahdns/master/hosts/whitelist.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/BlahDNS_whitelist.txt",
+    "frequency": "daily",
+    "checksum": "9e43afa0261d0fddf1ea44a7b12452a4",
+    "error": "",
+    "last_download_timestamp": "20250816_170706",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "others"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "BlockListDE_Brute",
+    "url": "https://lists.blocklist.de/lists/bruteforcelogin.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/BlockListDE_Brute.txt",
+    "frequency": "daily",
+    "checksum": "78bfb93c33adee048fb452354bc2838c",
+    "error": "",
+    "last_download_timestamp": "20250816_170728",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "BlockListDE_Strong",
+    "url": "https://lists.blocklist.de/lists/strongips.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/BlockListDE_Strong.txt",
+    "frequency": "daily",
+    "checksum": "f2b54b54f64ab2180ceaf2720c4cb0e9",
+    "error": "",
+    "last_download_timestamp": "20250816_170730",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Blocklists UT1 Cryptojacking",
+    "url": "https://github.com/olbat/ut1-blacklists/raw/refs/heads/master/blacklists/cryptojacking/domains",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Blocklists UT1 Cryptojacking.txt",
+    "frequency": "daily",
+    "checksum": "6613decdf3babd6d696a45d44625def6",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170513",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "cryptocurrency"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "Blocklists UT1 Malware",
+    "url": "https://github.com/olbat/ut1-blacklists/raw/refs/heads/master/blacklists/malware/domains",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Blocklists UT1 Malware.txt",
+    "frequency": "daily",
+    "checksum": "91ceaa7dd23320d1f168012ada234dfb",
+    "error": "",
+    "last_download_timestamp": "20250816_170516",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malware"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "Blocklists UT1 Shortener",
+    "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/refs/heads/master/blacklists/shortener/domains",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Blocklists UT1 Shortener.txt",
+    "frequency": "daily",
+    "checksum": "213c36895ff487706c21482d0bdde946",
+    "error": "",
+    "last_download_timestamp": "20250816_170517",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "url_shorteners"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "Borestad_AbuseIPDB_S100_3d",
+    "url": "https://raw.githubusercontent.com/borestad/blocklist-abuseipdb/refs/heads/main/abuseipdb-s100-3d.ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Borestad_AbuseIPDB_S100_3d.txt",
+    "frequency": "weekly",
+    "checksum": "06d40e7f68a5790ebf1778779a6753b7",
+    "error": "",
+    "last_download_timestamp": "20250816_170732",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4_find",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true
+  },
+  {
+    "name": "Boutetnico_URL_Shorteners",
+    "url": "https://raw.githubusercontent.com/boutetnico/url-shorteners/master/list.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Boutetnico_URL_Shorteners.txt",
+    "frequency": "daily",
+    "checksum": "555663e97f4192aeb824c28c99845179",
+    "error": "",
+    "last_download_timestamp": "20250816_170518",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "url_shorteners"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "CF Torrent Trackers",
+    "url": "https://cf.trackerslist.com/all.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/CF Torrent Trackers.txt",
+    "frequency": "daily",
+    "checksum": "4adf1ef15b7deb75c8588506dc1aa7af",
+    "error": "",
+    "last_download_timestamp": "20250816_170520",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain_url",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "torrent_trackers"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true
+  },
+  {
+    "name": "CINSScore_BadGuys_Army",
+    "url": "http://cinsscore.com/list/ci-badguys.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/CINSScore_BadGuys_Army.txt",
+    "frequency": "daily",
+    "checksum": "ddf64fe1a09f08d9df77d631f89c1c12",
+    "error": "",
+    "last_download_timestamp": "20250816_170734",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "CJX Annoyance",
+    "url": "https://raw.githubusercontent.com/cjx82630/cjxlist/refs/heads/master/cjx-annoyance.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/CJX Annoyance.txt",
+    "frequency": "daily",
+    "checksum": "cb6118b1847cb5be76d619c3985a0fe8",
+    "error": "",
+    "last_download_timestamp": "20250816_170522",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "annoyance"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "CybercrimeTracker_All",
+    "url": "https://cybercrime-tracker.net/all.php",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/CybercrimeTracker_All.txt",
+    "frequency": "daily",
+    "checksum": "0182ec5749bb957e75345cf2d30f0b6b",
+    "error": "",
+    "last_download_timestamp": "20250816_170525",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain_url",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4_url",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "botnet",
+      "malicious",
+      "malware"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "CybercrimeTracker_CCPMGate",
+    "url": "https://cybercrime-tracker.net/ccpmgate.php",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/CybercrimeTracker_CCPMGate.txt",
+    "frequency": "daily",
+    "checksum": "1028344b1f1a47b14dee050cf94a045b",
+    "error": "",
+    "last_download_timestamp": "20250816_170526",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain_http_url",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4_http_url",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "botnet",
+      "malicious",
+      "malware"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "cyberhost_malware-blocklist",
+    "url": "https://lists.cyberhost.uk/malware.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/cyberhost_malware-blocklist.txt",
+    "frequency": "daily",
+    "checksum": "1fd539811da921839bbe9fbcc7eba090",
+    "error": "",
+    "last_download_timestamp": "20250816_170528",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malware"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "DandelionSprout-Anti-Malware-List",
+    "url": "https://raw.githubusercontent.com/DandelionSprout/adfilt/refs/heads/master/Dandelion%20Sprout's%20Anti-Malware%20List.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/DandelionSprout-Anti-Malware-List.txt",
+    "frequency": "daily",
+    "checksum": "efb3e1516bcd265b867d76b8c0603917",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170529",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malware"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "DandelionSprout_AdGuardHome_Whitelist",
+    "url": "https://raw.githubusercontent.com/DandelionSprout/AdGuard-Home-Whitelist/master/whitelist.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/DandelionSprout_AdGuardHome_Whitelist.txt",
+    "frequency": "daily",
+    "checksum": "947eb27ec7ca5d49d8251d45901889c7",
+    "error": "",
+    "last_download_timestamp": "20250816_170708",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "others"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Dogino_Discord_Official",
+    "url": "https://raw.githubusercontent.com/Dogino/Discord-Phishing-URLs/main/official-domains.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Dogino_Discord_Official.txt",
+    "frequency": "daily",
+    "checksum": "e5d8bfabf65c1d0f8c3e709ff517703d",
+    "error": "",
+    "last_download_timestamp": "20250816_170710",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "discord"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "DoH_IP_blocklists",
+    "url": "https://raw.githubusercontent.com/dibdot/DoH-IP-blocklists/refs/heads/master/doh-ipv4.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/DoH_IP_blocklists.txt",
+    "frequency": "daily",
+    "checksum": "d70d35ecd9ee379f6130844002440170",
+    "error": "",
+    "last_download_timestamp": "20250816_170735",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain_comment",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "doh"
+    ],
+    "type_count": 2,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "DoH_IP_list",
+    "url": "https://raw.githubusercontent.com/oneoffdallas/dohservers/master/iplist.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/DoH_IP_list.txt",
+    "frequency": "monthly",
+    "checksum": "6ac10e7f88379491c85ffc2a9bed11ed",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170737",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "doh"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "Easy Privacy",
+    "url": "https://easylist.to/easylist/easyprivacy.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Easy Privacy.txt",
+    "frequency": "daily",
+    "checksum": "9ae16e3c2a34308d6974559a33e00ad9",
+    "error": "",
+    "last_download_timestamp": "20250816_170531",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "privacy",
+      "trackers"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "EmergingThreats_CompromisedIPs",
+    "url": "https://rules.emergingthreats.net/open/suricata/rules/compromised-ips.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/EmergingThreats_CompromisedIPs.txt",
+    "frequency": "daily",
+    "checksum": "60a94f188bab6cb0e0701fa4e89827d8",
+    "error": "",
+    "last_download_timestamp": "20250816_170739",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "ET_fwip",
+    "url": "https://rules.emergingthreats.net/fwrules/emerging-Block-IPs.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/ET_fwip.txt",
+    "frequency": "daily",
+    "checksum": "60066e4f62c5664534bcf32cebef7b8b",
+    "error": "",
+    "last_download_timestamp": "20250816_170741",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "cidr_ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "fabriziosalmi_allowlist",
+    "url": "https://raw.githubusercontent.com/fabriziosalmi/blacklists/refs/heads/main/whitelist.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/fabriziosalmi_allowlist.txt",
+    "frequency": "daily",
+    "checksum": "cdd134fb471e9bd67830e5d8f533e77c",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170712",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "others"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true
+  },
+  {
+    "name": "FabrizioSalmi_DNS",
+    "url": "https://raw.githubusercontent.com/fabriziosalmi/blacklists/refs/heads/main/dns_servers.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/FabrizioSalmi_DNS.txt",
+    "frequency": "monthly",
+    "checksum": "4f3736f1a0ffab1874053364c9cbc824",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170742",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "dns"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "FakeWebshopListHUN",
+    "url": "https://raw.githubusercontent.com/FakesiteListHUN/FakeWebshopListHUN/refs/heads/main/fakewebshoplist",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/FakeWebshopListHUN.txt",
+    "frequency": "daily",
+    "checksum": "6089fdc29fc333106795358a727f3209",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170533",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "fake",
+      "phishing",
+      "scam",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Firehol_BitcoinNodes_1d",
+    "url": "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/bitcoin_nodes_1d.ipset",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Firehol_BitcoinNodes_1d.txt",
+    "frequency": "daily",
+    "checksum": "a5dfda060ec34a6e5e4653b339f8b1d9",
+    "error": "",
+    "last_download_timestamp": "20250816_170744",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4_cidr_expand",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "cryptocurrency"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "Firehol_Botscout_1d",
+    "url": "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/botscout_1d.ipset",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Firehol_Botscout_1d.txt",
+    "frequency": "daily",
+    "checksum": "e27ffe070cd56ecd7098ceb05b03a796",
+    "error": "",
+    "last_download_timestamp": "20250816_170746",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Firehol_CleanTalk",
+    "url": "https://iplists.firehol.org/files/cleantalk.ipset",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Firehol_CleanTalk.txt",
+    "frequency": "daily",
+    "checksum": "a7085da265f6eb83a2ba941b958f2563",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170748",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Firehol_CleanTalk_Top20",
+    "url": "https://iplists.firehol.org/files/cleantalk_top20.ipset",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Firehol_CleanTalk_Top20.txt",
+    "frequency": "daily",
+    "checksum": "c472a38f77adc8d1a3fb0bb17506cf4d",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170750",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Firehol_GPF_Comics",
+    "url": "https://iplists.firehol.org/files/gpf_comics.ipset",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Firehol_GPF_Comics.txt",
+    "frequency": "daily",
+    "checksum": "e4a029ff0edbfc1b29b5fb7885c0a1f4",
+    "error": "",
+    "last_download_timestamp": "20250816_170751",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "Firehol_level1",
+    "url": "https://iplists.firehol.org/files/firehol_level1.netset",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Firehol_level1.txt",
+    "frequency": "daily",
+    "checksum": "3a089fa33cac9f8b138d59e015209e55",
+    "error": "",
+    "last_download_timestamp": "20250816_170753",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "cidr_ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Firehol_level2",
+    "url": "https://iplists.firehol.org/files/firehol_level2.netset",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Firehol_level2.txt",
+    "frequency": "daily",
+    "checksum": "2a3f3399cc704dc5a0e24d6f4df74e2b",
+    "error": "",
+    "last_download_timestamp": "20250816_170755",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4_cidr_expand",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "Firehol_level3",
+    "url": "https://iplists.firehol.org/files/firehol_level3.netset",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Firehol_level3.txt",
+    "frequency": "daily",
+    "checksum": "a0558f39199313fe346477a1a45423c9",
+    "error": "",
+    "last_download_timestamp": "20250816_170757",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4_cidr_expand",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "Firehol_SocksProxy_7d",
+    "url": "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/socks_proxy_7d.ipset",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Firehol_SocksProxy_7d.txt",
+    "frequency": "weekly",
+    "checksum": "215fef62e647e1dbe863cd92a869f7c5",
+    "error": "",
+    "last_download_timestamp": "20250816_170759",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4_cidr_expand",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "anonymizer",
+      "privacy",
+      "proxy"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "Firehol_SSLProxies_1d",
+    "url": "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/sslproxies_1d.ipset",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Firehol_SSLProxies_1d.txt",
+    "frequency": "weekly",
+    "checksum": "133857e7ea80ac60c57d16739960db4f",
+    "error": "",
+    "last_download_timestamp": "20250816_170800",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4_cidr_expand",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "anonymizer",
+      "privacy",
+      "proxy"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "Frogeye trackers",
+    "url": "https://hostfiles.frogeye.fr/firstparty-trackers-hosts.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Frogeye trackers.txt",
+    "frequency": "daily",
+    "checksum": "6211a55af6c24fdb6a2beb36b247c2e5",
+    "error": "",
+    "last_download_timestamp": "20250816_170536",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "hostname",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "trackers"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "GetAdmiral Domains Filter List",
+    "url": "https://raw.githubusercontent.com/LanikSJ/ubo-filters/refs/heads/main/filters/getadmiral-domains.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/GetAdmiral Domains Filter List.txt",
+    "frequency": "daily",
+    "checksum": "00888c4afbb49731f68b9e2835097d8c",
+    "error": "",
+    "last_download_timestamp": "20250816_170536",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads",
+      "annoyance"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "GlobalAntiScamOrg-blocklist-domains",
+    "url": "https://raw.githubusercontent.com/elliotwutingfeng/GlobalAntiScamOrg-blocklist/refs/heads/main/global-anti-scam-org-scam-urls-pihole.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/GlobalAntiScamOrg-blocklist-domains.txt",
+    "frequency": "daily",
+    "checksum": "8a09938065a30731f1fe8bc0c7cf6f46",
+    "error": "",
+    "last_download_timestamp": "20250816_170538",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "scam"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "GlobalAntiScamOrg-blocklist-ips",
+    "url": "https://raw.githubusercontent.com/elliotwutingfeng/GlobalAntiScamOrg-blocklist/refs/heads/main/global-anti-scam-org-scam-ips.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/GlobalAntiScamOrg-blocklist-ips.txt",
+    "frequency": "daily",
+    "checksum": "1b8401a875734394e9eadab58b1f1859",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170802",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "scam"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "Greensnow",
+    "url": "https://blocklist.greensnow.co/greensnow.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Greensnow.txt",
+    "frequency": "daily",
+    "checksum": "b2435f45297d9bfa79e19502f34da217",
+    "error": "",
+    "last_download_timestamp": "20250816_170805",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "malware",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "HaGeZi Encrypted DNS Servers",
+    "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/doh.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/HaGeZi Encrypted DNS Servers.txt",
+    "frequency": "daily",
+    "checksum": "c697aeb2fecb36df5016679d489342cd",
+    "error": "",
+    "last_download_timestamp": "20250816_170540",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "doh"
+    ],
+    "type_count": 2,
+    "skip_general_consolidation": true
+  },
+  {
+    "name": "HaGeZi Gambling Only Domains",
+    "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/gambling-onlydomains.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/HaGeZi Gambling Only Domains.txt",
+    "frequency": "daily",
+    "checksum": "6eb4b92450a2db9b9bcf5a44e78d1fbd",
+    "error": "",
+    "last_download_timestamp": "20250816_170542",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "gambling"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "HaGeZi Most Abused TLDs",
+    "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/spam-tlds-ublock.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/HaGeZi Most Abused TLDs.txt",
+    "frequency": "daily",
+    "checksum": "b9a6dc70292eb7ddf9b5d286eb49868e",
+    "error": "",
+    "last_download_timestamp": "20250816_170544",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "spam"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "HaGeZi Pro",
+    "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/domains/pro.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/HaGeZi Pro.txt",
+    "frequency": "daily",
+    "checksum": "e5a6280363b41ac92c6eaf81d2d7ef5f",
+    "error": "",
+    "last_download_timestamp": "20250816_170546",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads",
+      "malware",
+      "phishing",
+      "trackers"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "hufilter",
+    "url": "https://cdn.jsdelivr.net/gh/hufilter/hufilter@gh-pages/hufilter-hosts.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/hufilter.txt",
+    "frequency": "daily",
+    "checksum": "ad84d6bc08fd890464423352044214d3",
+    "error": "",
+    "last_download_timestamp": "20250816_170547",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "hostname",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "iam-py-test_my-filters-001-antitypo",
+    "url": "https://raw.githubusercontent.com/iam-py-test/my_filters_001/main/antitypo.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/iam-py-test_my-filters-001-antitypo.txt",
+    "frequency": "monthly",
+    "checksum": "6e15aab8f189b27c6443c343c21713ed",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170549",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "fake"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "jarelllama_Scam-Blocklist",
+    "url": "https://raw.githubusercontent.com/jarelllama/Scam-Blocklist/main/lists/wildcard_domains/scams.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/jarelllama_Scam-Blocklist.txt",
+    "frequency": "monthly",
+    "checksum": "f2ca5fba5e829681d54f5a4866bd3929",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170551",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "scam"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "Korlabs_UrlShortener",
+    "url": "https://raw.githubusercontent.com/korlabsio/urlshortener/refs/heads/main/names.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Korlabs_UrlShortener.txt",
+    "frequency": "daily",
+    "checksum": "758bc8bdadc8777e5bfdf41160df02b8",
+    "error": "",
+    "last_download_timestamp": "20250816_170553",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "url_shorteners"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "Local Allowlist (AdGuard)",
+    "url": "file://data/custom/allowlist_adg.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Local Allowlist (AdGuard).txt",
+    "frequency": "daily",
+    "checksum": "8d2bf9d14d2460ed19edfea1b6755c9f",
+    "error": "",
+    "last_download_timestamp": "20250816_170717",
+    "last_checked_timestamp": "20250816_170717",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "others"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Local Allowlist (Domain)",
+    "url": "file://data/custom/allowlist_domain.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Local Allowlist (Domain).txt",
+    "frequency": "daily",
+    "checksum": "735536c4c5d3194df01a1ace088eb14a",
+    "error": "",
+    "last_download_timestamp": "20250816_170719",
+    "last_checked_timestamp": "20250816_170719",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "others"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Local Allowlist (ipv4)",
+    "url": "file://data/custom/allowlist_ipv4.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Local Allowlist (ipv4).txt",
+    "frequency": "daily",
+    "checksum": "0586c6a2c4f0a3578e4aa35479900de4",
+    "error": "",
+    "last_download_timestamp": "20250816_170721",
+    "last_checked_timestamp": "20250816_170721",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "others"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Local Blocklist (AdGuard)",
+    "url": "file://data/custom/blocklist_adg.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Local Blocklist (AdGuard).txt",
+    "frequency": "daily",
+    "checksum": "882c0adc4c8b338d40debebf08293d7f",
+    "error": "",
+    "last_download_timestamp": "20250816_170723",
+    "last_checked_timestamp": "20250816_170723",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "others"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Local Blocklist (Domain)",
+    "url": "file://data/custom/blocklist_domain.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Local Blocklist (Domain).txt",
+    "frequency": "daily",
+    "checksum": "014d64ec8e2e48a9ea5aa54062bc62c9",
+    "error": "",
+    "last_download_timestamp": "20250816_170724",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "others"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Maltrail_StaticTrails",
+    "url": "https://raw.githubusercontent.com/stamparm/aux/master/maltrail-static-trails.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Maltrail_StaticTrails.txt",
+    "frequency": "daily",
+    "checksum": "6081e87cea44e1ca7e39cf9938e516cc",
+    "error": "",
+    "last_download_timestamp": "20250816_170555",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain_custom_csv_maltrail",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4_find",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malware",
+      "threat"
+    ],
+    "type_count": 2,
+    "skip_general_consolidation": true
+  },
+  {
+    "name": "malware-filter_phishing-filter",
+    "url": "https://malware-filter.gitlab.io/malware-filter/phishing-filter-hosts.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/malware-filter_phishing-filter.txt",
+    "frequency": "daily",
+    "checksum": "14191d2e8be373a558a3283be9ca3ce4",
+    "error": "",
+    "last_download_timestamp": "20250816_170556",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "hostname",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malware",
+      "phishing"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "MyIP_MS_Blocklist",
+    "url": "https://myip.ms/files/blacklist/htaccess/latest_blacklist.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/MyIP_MS_Blocklist.txt",
+    "frequency": "daily",
+    "checksum": "7585498b77da354f82304109e6b274a6",
+    "error": "",
+    "last_download_timestamp": "20250816_170807",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4_find",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "notes": "\u003e95% overlap with Firehol_level2/Firehol_level3",
+            "groups": [
+              "big"
+            ],
+            "disabled": true
+          }
+        ]
+      },
+      {
+        "name": "ipv6_htaccess",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "OISD Blocklist NSFW Small",
+    "url": "https://nsfw-small.oisd.nl",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/OISD Blocklist NSFW Small.txt",
+    "frequency": "daily",
+    "checksum": "c042f1af6a4b5d1aea114debe181bd03",
+    "error": "",
+    "last_download_timestamp": "20250816_170559",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "adult"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "OISD Blocklist Small",
+    "url": "https://small.oisd.nl/",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/OISD Blocklist Small.txt",
+    "frequency": "daily",
+    "checksum": "be45cc6d6b18fca23a58d41fca67914a",
+    "error": "",
+    "last_download_timestamp": "20250816_170600",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "notes": "\u003e95% overlap with HaGeZi Pro",
+            "groups": [
+              "normal",
+              "big"
+            ],
+            "disabled": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads",
+      "cryptocurrency",
+      "malware",
+      "phishing",
+      "ransomware",
+      "trackers"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "OpenPhish_Feed",
+    "url": "https://openphish.com/feed.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/OpenPhish_Feed.txt",
+    "frequency": "daily",
+    "checksum": "60bc9de3eaaf6d13a4b5c754e313f532",
+    "error": "",
+    "last_download_timestamp": "20250816_170602",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain_http_url",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "phishing"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "pexcn Torrent Trackers",
+    "url": "https://raw.githubusercontent.com/pexcn/daily/gh-pages/trackerlist/trackerlist-best.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/pexcn Torrent Trackers.txt",
+    "frequency": "daily",
+    "checksum": "af1af8b135c672de5a150ef31e9d9d27",
+    "error": "",
+    "last_download_timestamp": "20250816_170603",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain_url",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "torrent_trackers"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true
+  },
+  {
+    "name": "Public_DNS4",
+    "url": "https://public-dns.info/nameservers.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Public_DNS4.txt",
+    "frequency": "daily",
+    "checksum": "372d1d6f69a984fef4cc4ad49d7ecab2",
+    "error": "",
+    "last_download_timestamp": "20250816_170809",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv6",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "dns"
+    ],
+    "type_count": 2,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "PuppyScams",
+    "url": "https://web.archive.org/web/20250403122633/https://puppyscams.org/top-100-pet-scams/",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/PuppyScams.txt",
+    "frequency": "daily",
+    "checksum": "1db66af986c02db334e714db6e1fb717",
+    "error": "",
+    "last_download_timestamp": "20250816_170608",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain_custom_html_puppyscams",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "fake",
+      "scam"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "quidsup_notrack-malware",
+    "url": "https://quidsup.net/notrack/blocklist.php?download=malwaredomains",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/quidsup_notrack-malware.txt",
+    "frequency": "daily",
+    "checksum": "d7a6e7b0e1bc19ea791cf9d30f2315af",
+    "error": "",
+    "last_download_timestamp": "20250816_170608",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malware"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "quidsup_notrack-tracker",
+    "url": "https://quidsup.net/notrack/blocklist.php?download=trackersdomains",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/quidsup_notrack-tracker.txt",
+    "frequency": "daily",
+    "checksum": "cef3a52aa080b703439ae25e142c1323",
+    "error": "",
+    "last_download_timestamp": "20250816_170609",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "trackers"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "RedDragonWebDesign_block-everything",
+    "url": "https://raw.githubusercontent.com/RedDragonWebDesign/block-everything/refs/heads/master/block-everything.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/RedDragonWebDesign_block-everything.txt",
+    "frequency": "daily",
+    "checksum": "a3bacfcd7fa76d00a245c3a2aff75e61",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170611",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "notes": "100% overlap with other blocklists",
+            "groups": [
+              "big"
+            ],
+            "disabled": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads",
+      "malicious",
+      "trackers"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "RPiList_specials-phishing",
+    "url": "https://raw.githubusercontent.com/RPiList/specials/master/Blocklisten/Phishing-Angriffe",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/RPiList_specials-phishing.txt",
+    "frequency": "daily",
+    "checksum": "33790d318fa2aac9f8a047249b73fe26",
+    "error": "",
+    "last_download_timestamp": "20250816_170613",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "phishing"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "Rutgers_DROP",
+    "url": "https://report.cs.rutgers.edu/DROP/attackers",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Rutgers_DROP.txt",
+    "frequency": "daily",
+    "checksum": "c01355d24510e3d48be2ad34f6ba8e76",
+    "error": "",
+    "last_download_timestamp": "20250816_170817",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Sblam_Blocklist",
+    "url": "https://sblam.com/blacklist.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Sblam_Blocklist.txt",
+    "frequency": "daily",
+    "checksum": "27034dc1592b9fb827d4bff30e6be376",
+    "error": "",
+    "last_download_timestamp": "20250816_170817",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "spam"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "ScriptzTeam_BadIPS",
+    "url": "https://raw.githubusercontent.com/scriptzteam/badIPS/main/ips.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/ScriptzTeam_BadIPS.txt",
+    "frequency": "monthly",
+    "checksum": "aab936b34202c1c3b48b6496b2ddf114",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170818",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Sentinel_Greylist",
+    "url": "https://view.sentinel.turris.cz/greylist-data/greylist-latest.csv",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Sentinel_Greylist.txt",
+    "frequency": "daily",
+    "checksum": "3dd918c8ad6e95a8e0e7ae2f5b4a7821",
+    "error": "",
+    "last_download_timestamp": "20250816_170821",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4_find",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv6_find",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "ShadowWhisperer's Dating List",
+    "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_57.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/ShadowWhisperer's Dating List.txt",
+    "frequency": "daily",
+    "checksum": "07f61ef24f39738afdb1ecf7afc6da1c",
+    "error": "",
+    "last_download_timestamp": "20250816_170614",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "ShadowWhisperer_Allowlist",
+    "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/refs/heads/master/Whitelists/Whitelist",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/ShadowWhisperer_Allowlist.txt",
+    "frequency": "daily",
+    "checksum": "7ead2e57c8d0b0762e1d98d5e5f84b26",
+    "error": "",
+    "last_download_timestamp": "20250816_170714",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain_with_comment_suffix",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "others"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "ShadowWhisperer_BlockLists Ads",
+    "url": "https://github.com/ShadowWhisperer/BlockLists/raw/master/Lists/Ads",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/ShadowWhisperer_BlockLists Ads.txt",
+    "frequency": "daily",
+    "checksum": "2c75706b5e97b6e3d8f872341af9da9d",
+    "error": "",
+    "last_download_timestamp": "20250816_170616",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "ShadowWhisperer_BlockLists Adult",
+    "url": "https://github.com/ShadowWhisperer/BlockLists/raw/master/Lists/Adult",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/ShadowWhisperer_BlockLists Adult.txt",
+    "frequency": "daily",
+    "checksum": "fc3fe87e8103e2d330376b9d44dbaf61",
+    "error": "",
+    "last_download_timestamp": "20250816_170619",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "adult"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "ShadowWhisperer_BlockLists Malware",
+    "url": "https://github.com/ShadowWhisperer/BlockLists/raw/master/Lists/Malware",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/ShadowWhisperer_BlockLists Malware.txt",
+    "frequency": "daily",
+    "checksum": "92f49e69c36e6eb1d27ebc5c1b32d2b9",
+    "error": "",
+    "last_download_timestamp": "20250816_170620",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malware"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "ShadowWhisperer_BlockLists Scam",
+    "url": "https://github.com/ShadowWhisperer/BlockLists/raw/master/Lists/Scam",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/ShadowWhisperer_BlockLists Scam.txt",
+    "frequency": "daily",
+    "checksum": "a7605ff12b31d1b721a89203129754e4",
+    "error": "",
+    "last_download_timestamp": "20250816_170621",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "scam"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "ShadowWhisperer_UrlShortener",
+    "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/refs/heads/master/Lists/UrlShortener",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/ShadowWhisperer_UrlShortener.txt",
+    "frequency": "daily",
+    "checksum": "e8943d06658ad07bb53394c4195b4711",
+    "error": "",
+    "last_download_timestamp": "20250816_170623",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "url_shorteners"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "ShadowWhisperer_Whitelist",
+    "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Whitelists/Whitelist",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/ShadowWhisperer_Whitelist.txt",
+    "frequency": "daily",
+    "checksum": "7ead2e57c8d0b0762e1d98d5e5f84b26",
+    "error": "",
+    "last_download_timestamp": "20250816_170715",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "others"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Spam404",
+    "url": "https://raw.githubusercontent.com/Spam404/lists/master/main-blacklist.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Spam404.txt",
+    "frequency": "daily",
+    "checksum": "5cb12b42fe2ad92ad0ac308ef178bbd1",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170625",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "spam"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "spamhaus_drop",
+    "url": "http://www.spamhaus.org/drop/drop.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/spamhaus_drop.txt",
+    "frequency": "daily",
+    "checksum": "132ec65596497280cebff038083082f5",
+    "error": "",
+    "last_download_timestamp": "20250816_170823",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "cidr_ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "notes": "\u003e95% overlap with ET_fwip",
+            "groups": [
+              "big"
+            ],
+            "disabled": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "spam",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Stamparm_Blackbook",
+    "url": "https://raw.githubusercontent.com/stamparm/blackbook/master/blackbook.csv",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Stamparm_Blackbook.txt",
+    "frequency": "monthly",
+    "checksum": "230a6189bacbc6b403c521f3343d4659",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170627",
+    "types": [
+      {
+        "name": "domain_custom_csv_blackbook",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "StevenBlack_Fake_Gambling_Porn",
+    "url": "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/StevenBlack_Fake_Gambling_Porn.txt",
+    "frequency": "daily",
+    "checksum": "59a54ff28820ac6705dffb20c847129e",
+    "error": "",
+    "last_download_timestamp": "20250816_170629",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "hostname",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads",
+      "adult",
+      "fake",
+      "fakenews",
+      "gambling"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Torrent Trackers",
+    "url": "https://raw.githubusercontent.com/im-sm/Pi-hole-Torrent-Blocklist/main/all-torrent-trackers.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Torrent Trackers.txt",
+    "frequency": "daily",
+    "checksum": "1ea9a5cb7ae94b78a808d71da9a576eb",
+    "error": "",
+    "last_download_timestamp": "20250816_170630",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "torrent_trackers"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true
+  },
+  {
+    "name": "tranco",
+    "url": "https://tranco-list.eu/top-1m.csv.zip",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/tranco-top-1m.csv",
+    "frequency": "monthly",
+    "checksum": "81cd8be90279df788589c6c5832d2f64",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170829",
+    "types": [
+      {
+        "name": "domain_top",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "others"
+    ],
+    "type_count": 1,
+    "count_to_consider": 1000
+  },
+  {
+    "name": "Ukrainian Ad Filter",
+    "url": "https://raw.githubusercontent.com/ukrainianfilters/lists/refs/heads/main/ads/ads.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Ukrainian Ad Filter.txt",
+    "frequency": "daily",
+    "checksum": "1909864bc6cf4b3652466a8fabec46aa",
+    "error": "",
+    "last_download_timestamp": "20250816_170632",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Ukrainian Annoyance Filter",
+    "url": "https://raw.githubusercontent.com/ukrainianfilters/lists/refs/heads/main/annoyances/annoyances.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Ukrainian Annoyance Filter.txt",
+    "frequency": "daily",
+    "checksum": "db4420f12c0e391c862827dcce23c8fe",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170634",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "annoyance"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Ukrainian Privacy Filter",
+    "url": "https://raw.githubusercontent.com/ukrainianfilters/lists/refs/heads/main/privacy/privacy.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Ukrainian Privacy Filter.txt",
+    "frequency": "daily",
+    "checksum": "cb4ce11c0e431c90f23cf84a523736a8",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170636",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "notes": "100% overlap with other blocklists",
+            "groups": [
+              "big"
+            ],
+            "disabled": true
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "privacy",
+      "trackers"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "Ukrainian Security Filter",
+    "url": "https://raw.githubusercontent.com/braveinnovators/ukrainian-security-filter/main/lists/domains.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Ukrainian Security Filter.txt",
+    "frequency": "daily",
+    "checksum": "30b57f075ef483acd5638151d161c89a",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170638",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "URLHaus (Abuse.ch)",
+    "url": "https://urlhaus.abuse.ch/downloads/hostfile",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/URLHaus (Abuse.ch).txt",
+    "frequency": "daily",
+    "checksum": "4428255850bdf958f2217f1697f7534d",
+    "error": "",
+    "last_download_timestamp": "20250816_170640",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malware"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "URLHaus_Text",
+    "url": "https://urlhaus.abuse.ch/downloads/text/",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/URLHaus_Text.txt",
+    "frequency": "daily",
+    "checksum": "449ac9d691b685e493087cb44e85662a",
+    "error": "",
+    "last_download_timestamp": "20250816_170824",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4_http_url",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malware"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "USOM-Blocklists-domains",
+    "url": "https://raw.githubusercontent.com/elliotwutingfeng/USOM-Blocklists/refs/heads/main/urls_pihole.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/USOM-Blocklists-domains.txt",
+    "frequency": "daily",
+    "checksum": "fcb011a44b38ddb164d4d2204b17db5f",
+    "error": "",
+    "last_download_timestamp": "20250816_170642",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1,
+    "skip_general_consolidation": true,
+    "skip_groups_consolidation": true
+  },
+  {
+    "name": "USOM-Blocklists-ips",
+    "url": "https://raw.githubusercontent.com/elliotwutingfeng/USOM-Blocklists/refs/heads/main/ips.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/USOM-Blocklists-ips.txt",
+    "frequency": "daily",
+    "checksum": "8cee85d63d7ffe7a905e91cecda1f5ee",
+    "error": "",
+    "last_download_timestamp": "20250816_170826",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malicious",
+      "threat"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Viriback_Dump",
+    "url": "https://tracker.viriback.com/dump.php",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Viriback_Dump.txt",
+    "frequency": "daily",
+    "checksum": "25c532774e594f4a646fed6b467b4da8",
+    "error": "",
+    "last_download_timestamp": "20250816_170643",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain_csv_http_url_find",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4_csv_http_url_find",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "malware"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "WaLLy3K",
+    "url": "https://v.firebog.net/hosts/static/w3kbl.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/WaLLy3K.txt",
+    "frequency": "daily",
+    "checksum": "d7d3971525ce84052ea98abfc5ef4d6a",
+    "error": "",
+    "last_download_timestamp": "20250816_170645",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "YousList",
+    "url": "https://raw.githubusercontent.com/yous/YousList/master/hosts.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/YousList.txt",
+    "frequency": "daily",
+    "checksum": "631036a81bd93d099e32290c9f40cf60",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170647",
+    "types": [
+      {
+        "name": "hostname",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "YousList-AdGuard",
+    "url": "https://raw.githubusercontent.com/yous/YousList/refs/heads/master/youslist.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/YousList-AdGuard.txt",
+    "frequency": "monthly",
+    "checksum": "0cef1851ce13a60385aef2bb6f882418",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170648",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads"
+    ],
+    "type_count": 2
+  },
+  {
+    "name": "youtube_GoodbyeAds",
+    "url": "https://raw.githubusercontent.com/jerryn70/GoodbyeAds/master/Extension/GoodbyeAds-YouTube-AdBlock.txt",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/youtube_GoodbyeAds.txt",
+    "frequency": "monthly",
+    "checksum": "8b8307846dce3835263baf40b9520804",
+    "error": "",
+    "last_download_timestamp": "20250815_143016",
+    "last_checked_timestamp": "20250816_170650",
+    "types": [
+      {
+        "name": "hostname",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads"
+    ],
+    "type_count": 1
+  },
+  {
+    "name": "Yoyo AdServers-IPList",
+    "url": "https://pgl.yoyo.org/adservers/iplist.php?showintro=1\u0026mimetype=plaintext",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/download/Yoyo AdServers-IPList.txt",
+    "frequency": "daily",
+    "checksum": "efe0f6989a54828acf4e9230e7f7fe6a",
+    "error": "",
+    "last_download_timestamp": "20250816_170828",
+    "last_checked_timestamp": "",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "categories": [
+      "ads"
+    ],
+    "type_count": 1
+  }
+]
