@@ -1,0 +1,5512 @@
+[
+  {
+    "name": "abpvn_hosts",
+    "last_processed_timestamp": "20250809_142535",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "abpvn_hosts",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/abpvn_hosts_adguard_BL_valid_f3cfe59aca5ebb63ed5e4f870aafe2f0.txt",
+        "checksum": "6b57335f0e104b895d56d80eb94fff92",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 1051,
+        "valid": true
+      },
+      {
+        "name": "abpvn_hosts",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/abpvn_hosts_adguard_AL_valid_b431a07d672c3bcfddf0c981ffba6cb8.txt",
+        "checksum": "40453842320774c7745711f1b57065f8",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 51,
+        "valid": true
+      },
+      {
+        "name": "abpvn_hosts",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/abpvn_hosts_domain_adguard_AL_valid_1b5516a8cf77051fffa0cc5d17318dff.txt",
+        "checksum": "d2b4762428317bc288e1b98b48ce7e37",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 49,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "abpvn_hosts",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/abpvn_hosts_adguard_BL_invalid_c42cf69169d28b7ddd11e33a4503bbdb.txt",
+        "checksum": "40453842320774c7745711f1b57065f8",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 51,
+        "valid": false
+      },
+      {
+        "name": "abpvn_hosts",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/abpvn_hosts_adguard_AL_invalid_8c1558b4c79a437041fbdbc83b488fc4.txt",
+        "checksum": "6b57335f0e104b895d56d80eb94fff92",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 1051,
+        "valid": false
+      },
+      {
+        "name": "abpvn_hosts",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/abpvn_hosts_domain_adguard_AL_invalid_262de7a101735167a6c34990b0778037.txt",
+        "checksum": "6b57335f0e104b895d56d80eb94fff92",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 1051,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "AdBlockID",
+    "last_processed_timestamp": "20250809_142535",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "AdBlockID",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdBlockID_adguard_BL_valid_59b4487f1255841cb4a1005aa04da106.txt",
+        "checksum": "508651d33ccd8ba5d421f1f887bded03",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 3835,
+        "valid": true
+      },
+      {
+        "name": "AdBlockID",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdBlockID_adguard_AL_valid_eea1b1b94a74acdfb290de352e2e3872.txt",
+        "checksum": "c5f60924b03ba71190ed4534f90b9dfb",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 92,
+        "valid": true
+      },
+      {
+        "name": "AdBlockID",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdBlockID_domain_adguard_AL_valid_cd7370e012a347b7a5d9f07111004981.txt",
+        "checksum": "deb7eec2a17aea276c1c03d6bcbc95e9",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 59,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "AdBlockID",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdBlockID_adguard_BL_invalid_aa0367df25e669f54075b720ef7955b4.txt",
+        "checksum": "c5f60924b03ba71190ed4534f90b9dfb",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 92,
+        "valid": false
+      },
+      {
+        "name": "AdBlockID",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdBlockID_adguard_AL_invalid_91dc6c9a45a17106dd516a83aaa463c4.txt",
+        "checksum": "508651d33ccd8ba5d421f1f887bded03",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 3835,
+        "valid": false
+      },
+      {
+        "name": "AdBlockID",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdBlockID_domain_adguard_AL_invalid_8c3faf59ca13d8cf4c06a2c4adaec7ec.txt",
+        "checksum": "6ecb3111921e69459c3639000e0f9d0c",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 3852,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "AdGuard Base filter",
+    "last_processed_timestamp": "20250809_142535",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "AdGuard Base filter",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard Base filter_adguard_BL_valid_7da2a463fc9052b569c0f428cacd41cd.txt",
+        "checksum": "1b4d1729242dacae0bfad246f23083b4",
+        "groups": [
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "trackers"
+        ],
+        "number_of_entries": 98624,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "AdGuard Base filter",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard Base filter_adguard_BL_invalid_1873dc77223b9429a2769c4e533c1864.txt",
+        "checksum": "5cb29f90e99daa06278bc47ce2b74d5c",
+        "groups": [
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "trackers"
+        ],
+        "number_of_entries": 5819,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "AdGuard DNS filter",
+    "last_processed_timestamp": "20250809_142535",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "AdGuard DNS filter",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard DNS filter_adguard_BL_valid_f5b8c0d85aaca9b52258d7b6e0473321.txt",
+        "checksum": "4966a7e4a4d4e5abfa6fb2e9a5bc64a9",
+        "groups": [
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "trackers"
+        ],
+        "number_of_entries": 126350,
+        "valid": true
+      },
+      {
+        "name": "AdGuard DNS filter",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard DNS filter_adguard_AL_valid_2b7ef57511e73da07d4385eb9183eac5.txt",
+        "checksum": "126a4cc269be0525750a6459905baf31",
+        "groups": [
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "trackers"
+        ],
+        "number_of_entries": 181,
+        "valid": true
+      },
+      {
+        "name": "AdGuard DNS filter",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard DNS filter_domain_adguard_AL_valid_035ec24b1c6a33d1d0b18a0171092b33.txt",
+        "checksum": "1960f7f902480dcc06e0b494e77c17ea",
+        "groups": [
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "trackers"
+        ],
+        "number_of_entries": 180,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "AdGuard DNS filter",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard DNS filter_adguard_BL_invalid_49821fa5ed02b6d9ef8a80798bfc0c3b.txt",
+        "checksum": "126a4cc269be0525750a6459905baf31",
+        "groups": [
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "trackers"
+        ],
+        "number_of_entries": 181,
+        "valid": false
+      },
+      {
+        "name": "AdGuard DNS filter",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard DNS filter_adguard_AL_invalid_8ef272dbe1c7a7c0ce49a1e7ee4843e8.txt",
+        "checksum": "4966a7e4a4d4e5abfa6fb2e9a5bc64a9",
+        "groups": [
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "trackers"
+        ],
+        "number_of_entries": 126350,
+        "valid": false
+      },
+      {
+        "name": "AdGuard DNS filter",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AdGuard DNS filter_domain_adguard_AL_invalid_00be4db87c170aef100cd2505fba5f0f.txt",
+        "checksum": "4966a7e4a4d4e5abfa6fb2e9a5bc64a9",
+        "groups": [
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "trackers"
+        ],
+        "number_of_entries": 126350,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "AntiAdBlockFilters",
+    "last_processed_timestamp": "20250809_142535",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "AntiAdBlockFilters",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AntiAdBlockFilters_adguard_BL_valid_3f801cc684e8078033caeee3ee6d2fc5.txt",
+        "checksum": "4620eda8504a05051664d76bd7364b26",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "annoyance"
+        ],
+        "number_of_entries": 1712,
+        "valid": true
+      },
+      {
+        "name": "AntiAdBlockFilters",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AntiAdBlockFilters_adguard_AL_valid_a5a541a9cb41c6ed985bd66b09714f60.txt",
+        "checksum": "0ad0528bc19af98cfd4e2b3a87f8311d",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "annoyance"
+        ],
+        "number_of_entries": 68,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "AntiAdBlockFilters",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AntiAdBlockFilters_adguard_BL_invalid_f900ea3f11c7fbdf2909bba2536e79a1.txt",
+        "checksum": "0ad0528bc19af98cfd4e2b3a87f8311d",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "annoyance"
+        ],
+        "number_of_entries": 68,
+        "valid": false
+      },
+      {
+        "name": "AntiAdBlockFilters",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/AntiAdBlockFilters_adguard_AL_invalid_f78803861c2a6b83a75a2b407cea67aa.txt",
+        "checksum": "4620eda8504a05051664d76bd7364b26",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "annoyance"
+        ],
+        "number_of_entries": 1712,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "bigdargon_hostsVN",
+    "last_processed_timestamp": "20250809_142535",
+    "types": [
+      {
+        "name": "hostname",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "bigdargon_hostsVN",
+        "generic_source_type": "domain",
+        "actual_source_type": "hostname",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/bigdargon_hostsVN_hostname_BL_valid_6756d89640aa1706e0efe5990abbc9df.txt",
+        "checksum": "01b498f4a30b9a105967b6f889f637cf",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 18938,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "BinaryDefense_Banlist",
+    "last_processed_timestamp": "20250809_142535",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "BinaryDefense_Banlist",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/BinaryDefense_Banlist_ipv4_BL_valid_34f1481db856857ae5332045ad0bbf1c.txt",
+        "checksum": "0f8ac6fb74363ea0cec45fc209d1fa2c",
+        "groups": [
+          "mini",
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 3550,
+        "must_consider": true,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "BlockListDE_Strong",
+    "last_processed_timestamp": "20250809_142535",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "BlockListDE_Strong",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/BlockListDE_Strong_ipv4_BL_valid_2bbc6252e900bd0373c46ebcf8c92d2f.txt",
+        "checksum": "52f09b4d60b75d1e65926d20a83052dc",
+        "groups": [
+          "mini",
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 282,
+        "must_consider": true,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Blocklists UT1 Cryptojacking",
+    "last_processed_timestamp": "20250809_142535",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Blocklists UT1 Cryptojacking",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Blocklists UT1 Cryptojacking_domain_BL_valid_720e65af98222d087c2b64d03599b908.txt",
+        "checksum": "6613decdf3babd6d696a45d44625def6",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "cryptocurrency"
+        ],
+        "number_of_entries": 16291,
+        "valid": true,
+        "skip_general_consolidation": true,
+        "skip_groups_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "Blocklists UT1 Malware",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Blocklists UT1 Malware",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Blocklists UT1 Malware_domain_BL_valid_7a9dd78097bf201c56e79f85405fb1f8.txt",
+        "checksum": "cb9e241b506ed3cab4e4b8ab5e0d142a",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 222026,
+        "valid": true,
+        "skip_general_consolidation": true,
+        "skip_groups_consolidation": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "Blocklists UT1 Malware",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Blocklists UT1 Malware_domain_BL_invalid_683c78b0f798327bbd7dc0aafc9690ce.txt",
+        "checksum": "c657780839be8d3abeaf017e9255824f",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 1746,
+        "valid": false,
+        "skip_general_consolidation": true,
+        "skip_groups_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "Borestad_AbuseIPDB_S100_3d",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "ipv4_find",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Borestad_AbuseIPDB_S100_3d",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_find",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Borestad_AbuseIPDB_S100_3d_ipv4_find_BL_valid_794057851420eae6709c5909b13da1bd.txt",
+        "checksum": "ae1fa7eac5d80e958802e8d39cb85e19",
+        "groups": [
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 52665,
+        "valid": true,
+        "skip_general_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "CINSScore_BadGuys_Army",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "CINSScore_BadGuys_Army",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CINSScore_BadGuys_Army_ipv4_BL_valid_5ef43f46b0da45ed7503ad42d0877491.txt",
+        "checksum": "cc639d4e930a9d77a74fe169e4645a10",
+        "groups": [
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 15000,
+        "must_consider": true,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "CJX Annoyance",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "CJX Annoyance",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CJX Annoyance_adguard_BL_valid_a8158927f42ddcf7a75ed32c7d9e9282.txt",
+        "checksum": "9dedccb57754ca2f93b3df37a25c0601",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "annoyance"
+        ],
+        "number_of_entries": 1799,
+        "valid": true
+      },
+      {
+        "name": "CJX Annoyance",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CJX Annoyance_adguard_AL_valid_f72e753a203ef90ea46681119d3540c1.txt",
+        "checksum": "4a91df0ee5164759f586e34ba00a655f",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "annoyance"
+        ],
+        "number_of_entries": 6,
+        "valid": true
+      },
+      {
+        "name": "CJX Annoyance",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CJX Annoyance_domain_adguard_AL_valid_50af80da71ad6bffc1852683fa9b07b6.txt",
+        "checksum": "470a02d901e283337ca7a1fce03848e6",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "annoyance"
+        ],
+        "number_of_entries": 6,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "CJX Annoyance",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CJX Annoyance_domain_adguard_AL_invalid_3b64722d6823be3de0b771f0cbde87d8.txt",
+        "checksum": "9dedccb57754ca2f93b3df37a25c0601",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "annoyance"
+        ],
+        "number_of_entries": 1799,
+        "valid": false
+      },
+      {
+        "name": "CJX Annoyance",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CJX Annoyance_adguard_BL_invalid_1b939a0502dd93633af28297eba6911c.txt",
+        "checksum": "4a91df0ee5164759f586e34ba00a655f",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "annoyance"
+        ],
+        "number_of_entries": 6,
+        "valid": false
+      },
+      {
+        "name": "CJX Annoyance",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CJX Annoyance_adguard_AL_invalid_b39c718a5fd4de5bfda30da5ea1429e7.txt",
+        "checksum": "9dedccb57754ca2f93b3df37a25c0601",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "annoyance"
+        ],
+        "number_of_entries": 1799,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "CybercrimeTracker_All",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "domain_url",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4_url",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "CybercrimeTracker_All",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_url",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_All_domain_url_BL_valid_56e741d16b5e8fd13c65bba154067d57.txt",
+        "checksum": "0301fc1a07be39cefd2cabe8a9cad97c",
+        "groups": [
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "botnet",
+          "malicious",
+          "malware"
+        ],
+        "number_of_entries": 13015,
+        "valid": true
+      },
+      {
+        "name": "CybercrimeTracker_All",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_url",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_All_ipv4_url_BL_valid_a44eb5f152137a37456e30f46256655f.txt",
+        "checksum": "ad5b561ec7cc30800155f10c931b54ca",
+        "groups": [
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "botnet",
+          "malicious",
+          "malware"
+        ],
+        "number_of_entries": 2864,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "CybercrimeTracker_All",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_url",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_All_domain_url_BL_invalid_ee68db1a25f4b87aa4f7b16a4a203623.txt",
+        "checksum": "9699a97c6b64c3dbc18652b1a45f13ef",
+        "groups": [
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "botnet",
+          "malicious",
+          "malware"
+        ],
+        "number_of_entries": 3566,
+        "valid": false
+      },
+      {
+        "name": "CybercrimeTracker_All",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_url",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_All_ipv4_url_BL_invalid_e70dd07d395c8ec060b17ae620e185c6.txt",
+        "checksum": "d0a16a0cba5b4761949e827b88bf39b8",
+        "groups": [
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "botnet",
+          "malicious",
+          "malware"
+        ],
+        "number_of_entries": 19147,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "CybercrimeTracker_CCPMGate",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "domain_http_url",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4_http_url",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "CybercrimeTracker_CCPMGate",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_http_url",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_CCPMGate_domain_http_url_BL_valid_fc20514a093623b69a0842d05fc64aa9.txt",
+        "checksum": "82a965657f69f23c05d906715319f563",
+        "groups": [
+          "mini",
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "botnet",
+          "malicious",
+          "malware"
+        ],
+        "number_of_entries": 982,
+        "valid": true
+      },
+      {
+        "name": "CybercrimeTracker_CCPMGate",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_http_url",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_CCPMGate_ipv4_http_url_BL_valid_26f94a1a3382dd05fde02727d28bb59a.txt",
+        "checksum": "eeaa13f8b6feb6ac3d9f9ffa4ebd7f12",
+        "groups": [
+          "mini",
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "botnet",
+          "malicious",
+          "malware"
+        ],
+        "number_of_entries": 103,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "CybercrimeTracker_CCPMGate",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_http_url",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_CCPMGate_domain_http_url_BL_invalid_c71c777bbdf0960b00c31242e755a6b5.txt",
+        "checksum": "f3c3fa7584431ca9272c1ce2c9953e49",
+        "groups": [
+          "mini",
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "botnet",
+          "malicious",
+          "malware"
+        ],
+        "number_of_entries": 120,
+        "valid": false
+      },
+      {
+        "name": "CybercrimeTracker_CCPMGate",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_http_url",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/CybercrimeTracker_CCPMGate_ipv4_http_url_BL_invalid_c93d7b7f0cc32b2127df4a06b6bb6e93.txt",
+        "checksum": "53cc1a1ca67fba8f8eaecadc677fa780",
+        "groups": [
+          "mini",
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "botnet",
+          "malicious",
+          "malware"
+        ],
+        "number_of_entries": 1219,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "cyberhost_malware-blocklist",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "cyberhost_malware-blocklist",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/cyberhost_malware-blocklist_domain_BL_valid_30107037ccf85c2d69e637e27e6c9caa.txt",
+        "checksum": "d50aca64c2996f30894d353ca0c738f9",
+        "groups": [
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 16863,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "DandelionSprout-Anti-Malware-List",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "DandelionSprout-Anti-Malware-List",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/DandelionSprout-Anti-Malware-List_adguard_BL_valid_b7bc016f6eb4d96c71d53749e87ef449.txt",
+        "checksum": "9229b251011017bf4981b5ca58ecfb49",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 32631,
+        "valid": true
+      },
+      {
+        "name": "DandelionSprout-Anti-Malware-List",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/DandelionSprout-Anti-Malware-List_adguard_AL_valid_80ffb8c1d8065cc522270605ef8f7670.txt",
+        "checksum": "1fbe7968f1e9271fcf283728ed0f5f8e",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 6,
+        "valid": true
+      },
+      {
+        "name": "DandelionSprout-Anti-Malware-List",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/DandelionSprout-Anti-Malware-List_domain_adguard_AL_valid_0f662277e830b3f585b238657b8a9963.txt",
+        "checksum": "bd92f4a104e571a8486c9782912a9335",
+        "groups": [
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 2,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "DandelionSprout-Anti-Malware-List",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/DandelionSprout-Anti-Malware-List_adguard_BL_invalid_6126b9e4d56cd31d86e8b018dc048399.txt",
+        "checksum": "1fbe7968f1e9271fcf283728ed0f5f8e",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 6,
+        "valid": false
+      },
+      {
+        "name": "DandelionSprout-Anti-Malware-List",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/DandelionSprout-Anti-Malware-List_adguard_AL_invalid_39a64ea9e0ada40ad217cb456c0977df.txt",
+        "checksum": "9229b251011017bf4981b5ca58ecfb49",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 32631,
+        "valid": false
+      },
+      {
+        "name": "DandelionSprout-Anti-Malware-List",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/DandelionSprout-Anti-Malware-List_domain_adguard_AL_invalid_764c23afebc8d35ee44d5ab0abec3fb3.txt",
+        "checksum": "c52cbcb91baa0391522112e5d72fec0b",
+        "groups": [
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 32635,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "DoH_IP_blocklists",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "domain_comment",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "DoH_IP_blocklists",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_comment",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/DoH_IP_blocklists_domain_comment_BL_valid_27177ecf8f8c17be129c9617b162b9bc.txt",
+        "checksum": "63d069d2b85a61a82192f2f6e819dc85",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "doh"
+        ],
+        "number_of_entries": 1270,
+        "valid": true,
+        "skip_general_consolidation": true
+      },
+      {
+        "name": "DoH_IP_blocklists",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/DoH_IP_blocklists_ipv4_BL_valid_aee2c066463bff844741c5273a93d441.txt",
+        "checksum": "53d476b716aa5280a8839379b03ae81f",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "doh"
+        ],
+        "number_of_entries": 2537,
+        "valid": true,
+        "skip_general_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "DoH_IP_list",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "DoH_IP_list",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/DoH_IP_list_ipv4_BL_valid_b25435a86d8b7474f3009c826025baa1.txt",
+        "checksum": "e3864390701496cddf270b16e89df216",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "doh"
+        ],
+        "number_of_entries": 731,
+        "valid": true,
+        "skip_general_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "Easy Privacy",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Easy Privacy",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Easy Privacy_adguard_BL_valid_04d7402d1aa9eb5aa5c3ccfa794072ba.txt",
+        "checksum": "c51bd695aa79858bd5b73b0878fd99e1",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "privacy",
+          "trackers"
+        ],
+        "number_of_entries": 53280,
+        "valid": true
+      },
+      {
+        "name": "Easy Privacy",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Easy Privacy_adguard_AL_valid_525a8b3a1d49daf6ad621ca55274cfc5.txt",
+        "checksum": "bfd1b1a12407c750713b6fec6944f077",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "privacy",
+          "trackers"
+        ],
+        "number_of_entries": 752,
+        "valid": true
+      },
+      {
+        "name": "Easy Privacy",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Easy Privacy_domain_adguard_AL_valid_6f72b618b82df12f26856319aa2b237a.txt",
+        "checksum": "8f4e1e51db2111370178601c62e2d431",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "privacy",
+          "trackers"
+        ],
+        "number_of_entries": 653,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "Easy Privacy",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Easy Privacy_adguard_BL_invalid_84af38bc55ee8218eb07678c718482a6.txt",
+        "checksum": "bfd1b1a12407c750713b6fec6944f077",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "privacy",
+          "trackers"
+        ],
+        "number_of_entries": 752,
+        "valid": false
+      },
+      {
+        "name": "Easy Privacy",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Easy Privacy_adguard_AL_invalid_9ae9c42f0b24498d557a6fb67483f0d8.txt",
+        "checksum": "c51bd695aa79858bd5b73b0878fd99e1",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "privacy",
+          "trackers"
+        ],
+        "number_of_entries": 53280,
+        "valid": false
+      },
+      {
+        "name": "Easy Privacy",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Easy Privacy_domain_adguard_AL_invalid_f0158d605a1fbce9be57f622effb9194.txt",
+        "checksum": "b634ae1d9343c37c62692148ec0bfd3b",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "privacy",
+          "trackers"
+        ],
+        "number_of_entries": 53281,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "EmergingThreats_CompromisedIPs",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "EmergingThreats_CompromisedIPs",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/EmergingThreats_CompromisedIPs_ipv4_BL_valid_9903f49d5f0fd7dbffd1679844dd6cfc.txt",
+        "checksum": "6a2a73db177df8f7322bfb25ed124c11",
+        "groups": [
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 440,
+        "must_consider": true,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "ET_fwip",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "cidr_ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "ET_fwip",
+        "generic_source_type": "cidr_ipv4",
+        "actual_source_type": "cidr_ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ET_fwip_cidr_ipv4_BL_valid_6f02a7efa462ff8d93c27895d18b272f.txt",
+        "checksum": "aad90eea0c2e6d9ea59129c55ef8cc6d",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 1613,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "ET_fwip",
+        "generic_source_type": "cidr_ipv4",
+        "actual_source_type": "cidr_ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ET_fwip_cidr_ipv4_BL_invalid_248924706122eb8b5b58f5bb5a2ed36b.txt",
+        "checksum": "e438885284640330e71c63b5f5a43909",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 1,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "fabriziosalmi_allowlist",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "fabriziosalmi_allowlist",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/fabriziosalmi_allowlist_domain_AL_valid_a1d23ca34ce25af2ff62f145abb792df.txt",
+        "checksum": "cdd134fb471e9bd67830e5d8f533e77c",
+        "groups": [
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "others"
+        ],
+        "number_of_entries": 2256,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "FabrizioSalmi_DNS",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "FabrizioSalmi_DNS",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/FabrizioSalmi_DNS_ipv4_BL_valid_34cb7b855a2b80626bf547eb1946ec91.txt",
+        "checksum": "56b8cbaee74ec6951c77afb505c76cca",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "dns"
+        ],
+        "number_of_entries": 66,
+        "valid": true,
+        "skip_general_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "FakeWebshopListHUN",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "FakeWebshopListHUN",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/FakeWebshopListHUN_domain_BL_valid_f5eb76e7c1e377104843e582945bef8c.txt",
+        "checksum": "27ffef285351489621fcc56ccdb9ea91",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "fake",
+          "phishing",
+          "scam",
+          "threat"
+        ],
+        "number_of_entries": 8210,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "FakeWebshopListHUN",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/FakeWebshopListHUN_domain_BL_invalid_6eaab5b116fa5cfd1e35fbea7de1aa66.txt",
+        "checksum": "76fcaf6da117f706cc2b5194e0ab9369",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "fake",
+          "phishing",
+          "scam",
+          "threat"
+        ],
+        "number_of_entries": 237,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "Firehol_BitcoinNodes_1d",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4_cidr_expand",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Firehol_BitcoinNodes_1d",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_BitcoinNodes_1d_ipv4_BL_valid_5b062fc10b7e8c50febde629845ae2a9.txt",
+        "checksum": "750e831d5d9153d0b2098a45ab55940e",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "cryptocurrency"
+        ],
+        "number_of_entries": 7140,
+        "valid": true
+      },
+      {
+        "name": "Firehol_BitcoinNodes_1d",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_cidr_expand",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_BitcoinNodes_1d_ipv4_cidr_expand_BL_valid_656746ebcacb952e56da30b806917532.txt",
+        "checksum": "ca14fc84ffb21c48c3fa9ba478892c2e",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "cryptocurrency"
+        ],
+        "number_of_entries": 108,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "Firehol_BitcoinNodes_1d",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_cidr_expand",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_BitcoinNodes_1d_ipv4_cidr_expand_BL_invalid_84dd4558b24007660d2f2bf685173e69.txt",
+        "checksum": "b5caf020185388127a63187616dc3c14",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "cryptocurrency"
+        ],
+        "number_of_entries": 7092,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "Firehol_Botscout_1d",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Firehol_Botscout_1d",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_Botscout_1d_ipv4_BL_valid_9fa69b3f22a7bcd79c9a5ce2fd0d8c36.txt",
+        "checksum": "89f0a033e00d90d2b40041107f5ef102",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 620,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Firehol_CleanTalk",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Firehol_CleanTalk",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_CleanTalk_ipv4_BL_valid_609c1d56ced7eb524a7e7f617e4777b0.txt",
+        "checksum": "93c4630401cc71f6c5c80abd3d2df271",
+        "groups": [
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 494,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Firehol_CleanTalk_Top20",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Firehol_CleanTalk_Top20",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_CleanTalk_Top20_ipv4_BL_valid_08ceac5427faea46d7cd198edb012154.txt",
+        "checksum": "2e11ef5626c12b068a9ad5af4a69f7d4",
+        "groups": [
+          "mini",
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 20,
+        "must_consider": true,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Firehol_GPF_Comics",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Firehol_GPF_Comics",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_GPF_Comics_ipv4_BL_valid_6b408f857cc9d30d65a104aa7249d141.txt",
+        "checksum": "1674c7ef1210a29cb520986ba9ea4770",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 2193,
+        "valid": true,
+        "skip_general_consolidation": true,
+        "skip_groups_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "Firehol_level1",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "cidr_ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Firehol_level1",
+        "generic_source_type": "cidr_ipv4",
+        "actual_source_type": "cidr_ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_level1_cidr_ipv4_BL_valid_340e4d8461450bfb9d804c5384b0a906.txt",
+        "checksum": "72f78295be6399c049ff5884b90f01ca",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 4540,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Firehol_level2",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "ipv4_cidr_expand",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Firehol_level2",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_level2_ipv4_BL_valid_e76160870c9b5edd612cb59e4070761b.txt",
+        "checksum": "1828a51093d4b26092f98fe6ad3c8d29",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 14771,
+        "valid": true
+      },
+      {
+        "name": "Firehol_level2",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_cidr_expand",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_level2_ipv4_cidr_expand_BL_valid_32454900bc0357b893d1e1024f775def.txt",
+        "checksum": "75b641be6e638abb2221a41cb1857d0f",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 16614,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "Firehol_level2",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_cidr_expand",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_level2_ipv4_cidr_expand_BL_invalid_fe07397bcd5b397cf4b1beaefdddba74.txt",
+        "checksum": "b48e231b9e322b7e36b60340398d411b",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 14517,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "Firehol_level3",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4_cidr_expand",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Firehol_level3",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_level3_ipv4_BL_valid_411356ff256aa44f7ef3067d647086a5.txt",
+        "checksum": "96a06ca35086af96a8e74633c6d0c7c0",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 14466,
+        "valid": true
+      },
+      {
+        "name": "Firehol_level3",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_cidr_expand",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_level3_ipv4_cidr_expand_BL_valid_57373971c7843f039b0cf12768dccfe4.txt",
+        "checksum": "7dc1f99cc424c75a8408c0f923c492df",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 23142,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "Firehol_level3",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_cidr_expand",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_level3_ipv4_cidr_expand_BL_invalid_620eff6264a26ba6d7a4b6f74597283b.txt",
+        "checksum": "c8be47fea77bdff5013e47c134bb0d11",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 13952,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "Firehol_SocksProxy_7d",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "ipv4_cidr_expand",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Firehol_SocksProxy_7d",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_SocksProxy_7d_ipv4_BL_valid_4da21c1ea903b007a03a49ff4c899c7c.txt",
+        "checksum": "f8fbda453384263d0dd0508b8e4633f8",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "anonymizer",
+          "privacy",
+          "proxy"
+        ],
+        "number_of_entries": 2508,
+        "valid": true
+      },
+      {
+        "name": "Firehol_SocksProxy_7d",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_cidr_expand",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_SocksProxy_7d_ipv4_cidr_expand_BL_valid_eb2c4acd3eddd5f9bf82d804619efa31.txt",
+        "checksum": "890b013caa85b60f0e9dd417f66b0cc1",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "anonymizer",
+          "privacy",
+          "proxy"
+        ],
+        "number_of_entries": 88,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "Firehol_SocksProxy_7d",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_cidr_expand",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_SocksProxy_7d_ipv4_cidr_expand_BL_invalid_a6e1d8a9a09f7e1f9ff217bb68fbc2ce.txt",
+        "checksum": "7d32ae9f79dc425317b23793c94e6796",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "anonymizer",
+          "privacy",
+          "proxy"
+        ],
+        "number_of_entries": 2468,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "Firehol_SSLProxies_1d",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4_cidr_expand",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Firehol_SSLProxies_1d",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_SSLProxies_1d_ipv4_BL_valid_a3643e6350e595281d7221c633bd31b8.txt",
+        "checksum": "99f45e93af8ebf547ce2d168041e3b55",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "anonymizer",
+          "privacy",
+          "proxy"
+        ],
+        "number_of_entries": 228,
+        "valid": true
+      },
+      {
+        "name": "Firehol_SSLProxies_1d",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_cidr_expand",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_SSLProxies_1d_ipv4_cidr_expand_BL_valid_8d50b2006edd46fc4a9e4889df9e89a3.txt",
+        "checksum": "8ccc81cef98bf7b7d40ba43a5c121284",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "anonymizer",
+          "privacy",
+          "proxy"
+        ],
+        "number_of_entries": 18,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "Firehol_SSLProxies_1d",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_cidr_expand",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Firehol_SSLProxies_1d_ipv4_cidr_expand_BL_invalid_47dcbc2ac673eb3828b984508f9fc169.txt",
+        "checksum": "752096a1c98d6b1fe5db48aca9d6bdee",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "anonymizer",
+          "privacy",
+          "proxy"
+        ],
+        "number_of_entries": 219,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "Frogeye trackers",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "hostname",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Frogeye trackers",
+        "generic_source_type": "domain",
+        "actual_source_type": "hostname",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Frogeye trackers_hostname_BL_valid_cf3fecac508c5e379c814426e3cce2de.txt",
+        "checksum": "73c1b352ef263df8cd2929ddce71c98c",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "trackers"
+        ],
+        "number_of_entries": 33334,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "Frogeye trackers",
+        "generic_source_type": "domain",
+        "actual_source_type": "hostname",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Frogeye trackers_hostname_BL_invalid_d07441a5c184b3c598a5e3153f561bb6.txt",
+        "checksum": "1de1b6df7012e616a7d2a065cdda55f4",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "trackers"
+        ],
+        "number_of_entries": 26,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "GetAdmiral Domains Filter List",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "GetAdmiral Domains Filter List",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/GetAdmiral Domains Filter List_adguard_BL_valid_977ddffb5c22dd34411c923a2b2ff0e2.txt",
+        "checksum": "990ead0178e3839fcafe851b604e63e9",
+        "groups": [
+          "mini",
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "annoyance"
+        ],
+        "number_of_entries": 1767,
+        "must_consider": true,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "GetAdmiral Domains Filter List",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/GetAdmiral Domains Filter List_adguard_AL_invalid_39287b6c6d32b273b713a7b649b7a09e.txt",
+        "checksum": "990ead0178e3839fcafe851b604e63e9",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "annoyance"
+        ],
+        "number_of_entries": 1767,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "GlobalAntiScamOrg-blocklist-domains",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "GlobalAntiScamOrg-blocklist-domains",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/GlobalAntiScamOrg-blocklist-domains_domain_BL_valid_26d4a749d4ffb4b014889100d571da90.txt",
+        "checksum": "0a7f41b00fe1dd53d3b8eec26d3fbab1",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "scam"
+        ],
+        "number_of_entries": 11045,
+        "valid": true,
+        "skip_general_consolidation": true,
+        "skip_groups_consolidation": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "GlobalAntiScamOrg-blocklist-domains",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/GlobalAntiScamOrg-blocklist-domains_domain_BL_invalid_cff1b629094a8dd810929a3f2cfcf6af.txt",
+        "checksum": "fc2b8f04c72c95ce6152ee589a44a893",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "scam"
+        ],
+        "number_of_entries": 19,
+        "valid": false,
+        "skip_general_consolidation": true,
+        "skip_groups_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "GlobalAntiScamOrg-blocklist-ips",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "GlobalAntiScamOrg-blocklist-ips",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/GlobalAntiScamOrg-blocklist-ips_ipv4_BL_valid_9824c905af5f51809bfdf5e27b0e64fb.txt",
+        "checksum": "8761b8792bf41395635e100560389e4d",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "scam"
+        ],
+        "number_of_entries": 7,
+        "valid": true,
+        "skip_general_consolidation": true,
+        "skip_groups_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "Greensnow",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Greensnow",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Greensnow_ipv4_BL_valid_c083a905f21dc63ec3e4e0797ae1052c.txt",
+        "checksum": "d0f6d082f6dd6a60fb8c21c66df64de0",
+        "groups": [
+          "mini",
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "malware",
+          "threat"
+        ],
+        "number_of_entries": 4977,
+        "must_consider": true,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "HaGeZi Encrypted DNS Servers",
+    "last_processed_timestamp": "20250809_142536",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "HaGeZi Encrypted DNS Servers",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/HaGeZi Encrypted DNS Servers_adguard_BL_valid_d5be851a7fa90a66eb97af3ca279d504.txt",
+        "checksum": "d447a3e417e052148127e48685cc95fe",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "doh"
+        ],
+        "number_of_entries": 1448,
+        "valid": true,
+        "skip_general_consolidation": true
+      },
+      {
+        "name": "HaGeZi Encrypted DNS Servers",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/HaGeZi Encrypted DNS Servers_domain_adguard_BL_valid_97ea5bc62f5e53fd9d5d5865441238f0.txt",
+        "checksum": "8d15ec4b0496a9345c7c3f1e4873608d",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "doh"
+        ],
+        "number_of_entries": 1448,
+        "valid": true,
+        "skip_general_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "HaGeZi Gambling Only Domains",
+    "last_processed_timestamp": "20250809_142537",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "HaGeZi Gambling Only Domains",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/HaGeZi Gambling Only Domains_domain_BL_valid_7c48aabf8ccdb75c86eadec14bb94d84.txt",
+        "checksum": "b18ff901a8480b44539d1f87b3cb96d5",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "gambling"
+        ],
+        "number_of_entries": 183318,
+        "valid": true,
+        "skip_general_consolidation": true,
+        "skip_groups_consolidation": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "HaGeZi Gambling Only Domains",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/HaGeZi Gambling Only Domains_domain_BL_invalid_b2320677bc8fda23d5ba40425164b2ca.txt",
+        "checksum": "88e9d892c3f69ce48d27b8ac0af498ce",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "gambling"
+        ],
+        "number_of_entries": 9,
+        "valid": false,
+        "skip_general_consolidation": true,
+        "skip_groups_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "HaGeZi Most Abused TLDs",
+    "last_processed_timestamp": "20250809_142537",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "HaGeZi Most Abused TLDs",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/HaGeZi Most Abused TLDs_adguard_BL_valid_9943b5a1571e8f9a08a061bcc4ae8754.txt",
+        "checksum": "2b7e69acfc25dbc9c7d5973d250ee088",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "spam"
+        ],
+        "number_of_entries": 426,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "HaGeZi Pro",
+    "last_processed_timestamp": "20250809_142537",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "HaGeZi Pro",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/HaGeZi Pro_domain_BL_valid_7b828392f23c7e0fbc07ba9f3eb917ee.txt",
+        "checksum": "dd6fcb80387af0001bc5491c550e701e",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "malware",
+          "phishing",
+          "trackers"
+        ],
+        "number_of_entries": 405726,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "HaGeZi Pro",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/HaGeZi Pro_domain_BL_invalid_df03fb78135f45ee2e324bc3c25aad6f.txt",
+        "checksum": "35a33e34413e6a64438e57347aea4e30",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "malware",
+          "phishing",
+          "trackers"
+        ],
+        "number_of_entries": 28,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "hufilter",
+    "last_processed_timestamp": "20250809_142537",
+    "types": [
+      {
+        "name": "hostname",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "hufilter",
+        "generic_source_type": "domain",
+        "actual_source_type": "hostname",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/hufilter_hostname_BL_valid_439d1951fd3ad1271c9aabadf4209c7e.txt",
+        "checksum": "19940caaac039e08dd51b0833152141b",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 99,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "iam-py-test_my-filters-001-antitypo",
+    "last_processed_timestamp": "20250809_142537",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "iam-py-test_my-filters-001-antitypo",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/iam-py-test_my-filters-001-antitypo_adguard_BL_valid_510ac884c1cefabb534ea08d5eb5aaf9.txt",
+        "checksum": "7405f978f165ecab673da8de5195c848",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "fake"
+        ],
+        "number_of_entries": 824,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "jarelllama_Scam-Blocklist",
+    "last_processed_timestamp": "20250809_142538",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "jarelllama_Scam-Blocklist",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/jarelllama_Scam-Blocklist_domain_BL_valid_7bad29b777a184267144fd15ff5089f7.txt",
+        "checksum": "6dc6d1729ae695ebead72fb9743cadd3",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "scam"
+        ],
+        "number_of_entries": 457737,
+        "valid": true,
+        "skip_general_consolidation": true,
+        "skip_groups_consolidation": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "jarelllama_Scam-Blocklist",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/jarelllama_Scam-Blocklist_domain_BL_invalid_8d8fa68587c94be1c7c131f80845c140.txt",
+        "checksum": "18811d21776698f661b24094a5342d64",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "scam"
+        ],
+        "number_of_entries": 10992,
+        "valid": false,
+        "skip_general_consolidation": true,
+        "skip_groups_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "Local Allowlist (AdGuard)",
+    "last_processed_timestamp": "20250809_142538",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Local Allowlist (AdGuard)",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Allowlist (AdGuard)_adguard_AL_valid_ee499296263823bb0efaa57db9d1e045.txt",
+        "checksum": "1e45453135326f5d37b0c64650bd0ff5",
+        "groups": [
+          "mini",
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "others"
+        ],
+        "number_of_entries": 39,
+        "must_consider": true,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Local Allowlist (Domain)",
+    "last_processed_timestamp": "20250809_142538",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Local Allowlist (Domain)",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Allowlist (Domain)_domain_AL_valid_5a503c099d4e0d133c6ac71c14004e30.txt",
+        "checksum": "9c428134780ffa454352013f4ab26e55",
+        "groups": [
+          "mini",
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "others"
+        ],
+        "number_of_entries": 40,
+        "must_consider": true,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Local Allowlist (ipv4)",
+    "last_processed_timestamp": "20250809_142538",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Local Allowlist (ipv4)",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Allowlist (ipv4)_ipv4_AL_valid_806a7c9dc88697f1d0cb02d07b570249.txt",
+        "checksum": "3595e3a41a554e4a106a45794cb9be29",
+        "groups": [
+          "mini",
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "others"
+        ],
+        "number_of_entries": 62,
+        "must_consider": true,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Local Blocklist (AdGuard)",
+    "last_processed_timestamp": "20250809_142538",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "mini",
+              "lite",
+              "normal",
+              "big"
+            ],
+            "must_consider": true
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Local Blocklist (AdGuard)",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Local Blocklist (AdGuard)_adguard_BL_valid_ace9275b780165b90d51c18704c6e8b4.txt",
+        "checksum": "3a86fa465e0a91df97b780c6f6048756",
+        "groups": [
+          "mini",
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "others"
+        ],
+        "number_of_entries": 7,
+        "must_consider": true,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Maltrail_StaticTrails",
+    "last_processed_timestamp": "20250809_142541",
+    "types": [
+      {
+        "name": "domain_custom_csv_maltrail",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4_find",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Maltrail_StaticTrails",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_custom_csv_maltrail",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Maltrail_StaticTrails_domain_custom_csv_maltrail_BL_valid_cedd6c7c1d3978881744daf714f8c946.txt",
+        "checksum": "44412295e62db8aec6226727b280f81f",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware",
+          "threat"
+        ],
+        "number_of_entries": 687313,
+        "valid": true,
+        "skip_general_consolidation": true
+      },
+      {
+        "name": "Maltrail_StaticTrails",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_find",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Maltrail_StaticTrails_ipv4_find_BL_valid_5b75d78aaaae1041df18ba91245b5c4b.txt",
+        "checksum": "3d45bcfb0e09bfa5be5672950d05fd03",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware",
+          "threat"
+        ],
+        "number_of_entries": 203165,
+        "valid": true,
+        "skip_general_consolidation": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "Maltrail_StaticTrails",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_custom_csv_maltrail",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Maltrail_StaticTrails_domain_custom_csv_maltrail_BL_invalid_724c78391e5b580c5d591ffc7ced6299.txt",
+        "checksum": "99f1188347c26420e38bc7c9d1b55bd0",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware",
+          "threat"
+        ],
+        "number_of_entries": 329151,
+        "valid": false,
+        "skip_general_consolidation": true
+      },
+      {
+        "name": "Maltrail_StaticTrails",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_find",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Maltrail_StaticTrails_ipv4_find_BL_invalid_456e0562b859b841f30d9728925285ae.txt",
+        "checksum": "03bc1ea9273c40e11aba52f95619bc94",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware",
+          "threat"
+        ],
+        "number_of_entries": 793414,
+        "valid": false,
+        "skip_general_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "malware-filter_phishing-filter",
+    "last_processed_timestamp": "20250809_142541",
+    "types": [
+      {
+        "name": "hostname",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "malware-filter_phishing-filter",
+        "generic_source_type": "domain",
+        "actual_source_type": "hostname",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/malware-filter_phishing-filter_hostname_BL_valid_ba3bdbaae123b0c7f954a418f52d1910.txt",
+        "checksum": "b542c1f77ba74e83240219f8b433f283",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware",
+          "phishing"
+        ],
+        "number_of_entries": 25479,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "malware-filter_phishing-filter",
+        "generic_source_type": "domain",
+        "actual_source_type": "hostname",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/malware-filter_phishing-filter_hostname_BL_invalid_5cb489ef442f201e755a4c2f44927f26.txt",
+        "checksum": "7bcf13a39d620ec05c1629497f7d4785",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware",
+          "phishing"
+        ],
+        "number_of_entries": 32,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "MyIP_MS_Blocklist",
+    "last_processed_timestamp": "20250809_142541",
+    "types": [
+      {
+        "name": "ipv6_htaccess",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "MyIP_MS_Blocklist",
+        "generic_source_type": "ipv6",
+        "actual_source_type": "ipv6_htaccess",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/MyIP_MS_Blocklist_ipv6_htaccess_BL_valid_dfe903077b481e903a0724fe97f79d65.txt",
+        "checksum": "28a30b195a259ca973420efebf57073c",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 12,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "MyIP_MS_Blocklist",
+        "generic_source_type": "ipv6",
+        "actual_source_type": "ipv6_htaccess",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/MyIP_MS_Blocklist_ipv6_htaccess_BL_invalid_6198934f3b85832f2df4003256dabbae.txt",
+        "checksum": "800e8b174c8ba7cdd291ee624e6b27bf",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 892,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "OISD Blocklist NSFW Small",
+    "last_processed_timestamp": "20250809_142541",
+    "types": [
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "OISD Blocklist NSFW Small",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/OISD Blocklist NSFW Small_domain_adguard_BL_valid_fcf69b5eb82773d3bc38d340e571c363.txt",
+        "checksum": "5155cd5b4449933a88ae4fa108b8ee95",
+        "groups": [
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "adult"
+        ],
+        "number_of_entries": 21027,
+        "valid": true
+      },
+      {
+        "name": "OISD Blocklist NSFW Small",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/OISD Blocklist NSFW Small_adguard_BL_valid_fd9bb6c7be653d28226d508868de6aee.txt",
+        "checksum": "d796da8862af34ec45092dfedfbfe052",
+        "groups": [
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "adult"
+        ],
+        "number_of_entries": 21031,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "OISD Blocklist NSFW Small",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/OISD Blocklist NSFW Small_domain_adguard_BL_invalid_dc3688deb8e6312ce690563c14fcb998.txt",
+        "checksum": "76c858d051ba6d6da46a503c553d53a2",
+        "groups": [
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "adult"
+        ],
+        "number_of_entries": 4,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "OISD Blocklist Small",
+    "last_processed_timestamp": "20250809_142541",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "OISD Blocklist Small",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/OISD Blocklist Small_adguard_BL_valid_d8a065e7ec0fea08827f852b6b417a28.txt",
+        "checksum": "7f4906371ad1c34fe50f9a6d4b9b2696",
+        "groups": [
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "cryptocurrency",
+          "malware",
+          "phishing",
+          "ransomware",
+          "trackers"
+        ],
+        "number_of_entries": 44435,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "OpenPhish_Feed",
+    "last_processed_timestamp": "20250809_142541",
+    "types": [
+      {
+        "name": "domain_http_url",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "OpenPhish_Feed",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_http_url",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/OpenPhish_Feed_domain_http_url_BL_valid_a35f2e85b8b39185e732b28613e87794.txt",
+        "checksum": "b1d1661ae3d056e52b1188143e9d509d",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "phishing"
+        ],
+        "number_of_entries": 283,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "OpenPhish_Feed",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_http_url",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/OpenPhish_Feed_domain_http_url_BL_invalid_d1c3b09bc478eb80b91e0e49454d1ba6.txt",
+        "checksum": "7159003f23fcadddb1d33bdecd75353f",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "phishing"
+        ],
+        "number_of_entries": 3,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "Public_DNS4",
+    "last_processed_timestamp": "20250809_142541",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv6",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Public_DNS4",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Public_DNS4_ipv4_BL_valid_456b2c6d7697cbdc3706299eafc125fa.txt",
+        "checksum": "34ed2a470ed85b5e8db83e5d2cdaa696",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "dns"
+        ],
+        "number_of_entries": 62607,
+        "valid": true,
+        "skip_general_consolidation": true
+      },
+      {
+        "name": "Public_DNS4",
+        "generic_source_type": "ipv6",
+        "actual_source_type": "ipv6",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Public_DNS4_ipv6_BL_valid_072fcbc321a396e80151388e595adf04.txt",
+        "checksum": "41a5bf819668b591794916606216568a",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "dns"
+        ],
+        "number_of_entries": 11,
+        "valid": true,
+        "skip_general_consolidation": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "Public_DNS4",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Public_DNS4_ipv4_BL_invalid_1fbb57772cd3a28cf2a322b2a918d241.txt",
+        "checksum": "7b77485bac4f055e4a53c7a2830bc3ae",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "dns"
+        ],
+        "number_of_entries": 183,
+        "valid": false,
+        "skip_general_consolidation": true
+      },
+      {
+        "name": "Public_DNS4",
+        "generic_source_type": "ipv6",
+        "actual_source_type": "ipv6",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Public_DNS4_ipv6_BL_invalid_4c680c8825029bcafbe2abeb99e48872.txt",
+        "checksum": "928425eaaf697acd212dd13bb7fec96a",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "dns"
+        ],
+        "number_of_entries": 62779,
+        "valid": false,
+        "skip_general_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "PuppyScams",
+    "last_processed_timestamp": "20250809_142541",
+    "types": [
+      {
+        "name": "domain_custom_html_puppyscams",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "PuppyScams",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_custom_html_puppyscams",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/PuppyScams_domain_custom_html_puppyscams_BL_valid_a302389f019ba6e9d798ef8dca5531c6.txt",
+        "checksum": "3048e4f15f588864a1adfdbd754e7c59",
+        "groups": [
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "fake",
+          "scam"
+        ],
+        "number_of_entries": 102,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "PuppyScams",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_custom_html_puppyscams",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/PuppyScams_domain_custom_html_puppyscams_BL_invalid_7811584bbd5b4e2973c9caca3cc8d33b.txt",
+        "checksum": "68a9b9bf8fd5e5f28a34384f110029b2",
+        "groups": [
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "fake",
+          "scam"
+        ],
+        "number_of_entries": 33,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "quidsup_notrack-malware",
+    "last_processed_timestamp": "20250809_142541",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "quidsup_notrack-malware",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/quidsup_notrack-malware_domain_BL_valid_4d308c42e8ede37c5363fb646c146370.txt",
+        "checksum": "2207c88fe8daa384963ee534aa56c3ab",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 151,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "quidsup_notrack-tracker",
+    "last_processed_timestamp": "20250809_142541",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "quidsup_notrack-tracker",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/quidsup_notrack-tracker_domain_BL_valid_c4a07358b7369ad4691d3b7b0a41522d.txt",
+        "checksum": "5a35e191c770e9cb33f796e6b1484933",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "trackers"
+        ],
+        "number_of_entries": 15726,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "RedDragonWebDesign_block-everything",
+    "last_processed_timestamp": "20250809_142541",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "RedDragonWebDesign_block-everything",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/RedDragonWebDesign_block-everything_adguard_AL_valid_63a00cc77d15bf551988954baf92dd2d.txt",
+        "checksum": "0df5262865ef440cf07c36cd815c2b36",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "malicious",
+          "trackers"
+        ],
+        "number_of_entries": 1,
+        "valid": true
+      },
+      {
+        "name": "RedDragonWebDesign_block-everything",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/RedDragonWebDesign_block-everything_adguard_BL_valid_869d29d0197c826187ffb6c9ffad9b3b.txt",
+        "checksum": "eaa1ced9a18ff925a85467731af73702",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "malicious",
+          "trackers"
+        ],
+        "number_of_entries": 652,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "RedDragonWebDesign_block-everything",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/RedDragonWebDesign_block-everything_adguard_BL_invalid_3274f2b7b52635d16c510b2f903a5297.txt",
+        "checksum": "0df5262865ef440cf07c36cd815c2b36",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "malicious",
+          "trackers"
+        ],
+        "number_of_entries": 1,
+        "valid": false
+      },
+      {
+        "name": "RedDragonWebDesign_block-everything",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/RedDragonWebDesign_block-everything_adguard_AL_invalid_8dc043bdbd950a55e98488859c4e270e.txt",
+        "checksum": "eaa1ced9a18ff925a85467731af73702",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "malicious",
+          "trackers"
+        ],
+        "number_of_entries": 652,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "RPiList_specials-phishing",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "RPiList_specials-phishing",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/RPiList_specials-phishing_adguard_BL_valid_1d1619818b5622b4f229a5912aa9cc4e.txt",
+        "checksum": "078baa70a5244ec21005cd8d2407ad53",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "phishing"
+        ],
+        "number_of_entries": 777731,
+        "valid": true,
+        "skip_general_consolidation": true,
+        "skip_groups_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "Rutgers_DROP",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Rutgers_DROP",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Rutgers_DROP_ipv4_BL_valid_79cd6202335b3c40b50c7b456041165e.txt",
+        "checksum": "fde4e0c64e9e3667c300c3014a5d0469",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 2197,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Sblam_Blocklist",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Sblam_Blocklist",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Sblam_Blocklist_ipv4_BL_valid_9f66dc2480e6e892bc59c52dc43a9f33.txt",
+        "checksum": "7b4ac22115016f05dd5b68793e08cfab",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "spam"
+        ],
+        "number_of_entries": 1950,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "ScriptzTeam_BadIPS",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "ScriptzTeam_BadIPS",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ScriptzTeam_BadIPS_ipv4_BL_valid_97a1593eeb5c9b2dbbe92f614c883618.txt",
+        "checksum": "ff8a05182c62a6e9b87b7097b52263fa",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 2567,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Sentinel_Greylist",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "ipv4_find",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv6_find",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Sentinel_Greylist",
+        "generic_source_type": "ipv6",
+        "actual_source_type": "ipv6_find",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Sentinel_Greylist_ipv6_find_BL_valid_41e6b0b9622ad80fd7103215ea0efdc8.txt",
+        "checksum": "fd2dd723536c2467aaadff229b4bd057",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 56,
+        "valid": true
+      },
+      {
+        "name": "Sentinel_Greylist",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_find",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Sentinel_Greylist_ipv4_find_BL_valid_01c87c754924c0af19bbdf11cf8a9ea2.txt",
+        "checksum": "696618fa44f708b5e5d278525426694c",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 8223,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "Sentinel_Greylist",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_find",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Sentinel_Greylist_ipv4_find_BL_invalid_e628e28fea394723e255e40a98b29a3e.txt",
+        "checksum": "913fff704497ed97e69ad212efac6ca3",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 57,
+        "valid": false
+      },
+      {
+        "name": "Sentinel_Greylist",
+        "generic_source_type": "ipv6",
+        "actual_source_type": "ipv6_find",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Sentinel_Greylist_ipv6_find_BL_invalid_54cffc906b9c4950d6370ee1ca5842b5.txt",
+        "checksum": "c47ba6333597ed628f2755b9493c6b8e",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 8224,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "ShadowWhisperer's Dating List",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "ShadowWhisperer's Dating List",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer's Dating List_adguard_BL_valid_488dbe828289856d3b2f48a7e50b7418.txt",
+        "checksum": "2458ccbc7d3ef64b4f4dd002b3a7070f",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 1062,
+        "valid": true
+      },
+      {
+        "name": "ShadowWhisperer's Dating List",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer's Dating List_domain_adguard_BL_valid_99e85151622324037c934c0500e31050.txt",
+        "checksum": "919619a8ca91252b756797ce1ead8310",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 1062,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "ShadowWhisperer_Allowlist",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "domain_with_comment_suffix",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "ShadowWhisperer_Allowlist",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_with_comment_suffix",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer_Allowlist_domain_with_comment_suffix_AL_valid_6a7f6a0aeed6801c08ae06afce009e0b.txt",
+        "checksum": "7f38e25950b97ef67d0dedd3094b464e",
+        "groups": [
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "others"
+        ],
+        "number_of_entries": 648,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "ShadowWhisperer_Allowlist",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_with_comment_suffix",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer_Allowlist_domain_with_comment_suffix_AL_invalid_84dffb09df28f80f5fcf3c91894a30be.txt",
+        "checksum": "f6ea093c3f534797451090fa7af58160",
+        "groups": [
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "others"
+        ],
+        "number_of_entries": 2,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "ShadowWhisperer_BlockLists Ads",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "ShadowWhisperer_BlockLists Ads",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer_BlockLists Ads_domain_BL_valid_718515efb4b9cb6bf67d4cbbff25931d.txt",
+        "checksum": "2591808c53e1fc58e38e631114883bf1",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 22962,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "ShadowWhisperer_BlockLists Adult",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "ShadowWhisperer_BlockLists Adult",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer_BlockLists Adult_domain_BL_valid_62a8e7703de5170f08c3ae506b6155e0.txt",
+        "checksum": "f65404b4c9782d9ca52c525289b1a7db",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "adult"
+        ],
+        "number_of_entries": 264320,
+        "valid": true,
+        "skip_general_consolidation": true,
+        "skip_groups_consolidation": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "ShadowWhisperer_BlockLists Adult",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer_BlockLists Adult_domain_BL_invalid_94f1542014c25f34c2e54abfe9fb93d0.txt",
+        "checksum": "9c9aea687bb18878f23babfad2ea562b",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "adult"
+        ],
+        "number_of_entries": 10,
+        "valid": false,
+        "skip_general_consolidation": true,
+        "skip_groups_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "ShadowWhisperer_BlockLists Malware",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "ShadowWhisperer_BlockLists Malware",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer_BlockLists Malware_domain_BL_valid_5073cd028020291641dcde104ed9b056.txt",
+        "checksum": "3c23ad47c5dadb29d405359fb08bbd3d",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 50144,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "ShadowWhisperer_BlockLists Malware",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer_BlockLists Malware_domain_BL_invalid_96117ee13636950fe0839e9639878bc3.txt",
+        "checksum": "76118de0b92a136b9cb45251434c191c",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 1,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "ShadowWhisperer_BlockLists Scam",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "ShadowWhisperer_BlockLists Scam",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/ShadowWhisperer_BlockLists Scam_domain_BL_valid_764b51154d601982c3d31dd00e4c2b48.txt",
+        "checksum": "832adf52023681c6011af9f85672ddc3",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "scam"
+        ],
+        "number_of_entries": 10876,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Spam404",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Spam404",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Spam404_domain_BL_valid_80feaa7a341fd4ec201cee8657fec4a5.txt",
+        "checksum": "74097f426d7038cbc8697bf04699a13e",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "spam"
+        ],
+        "number_of_entries": 8141,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "spamhaus_drop",
+    "last_processed_timestamp": "20250809_142542",
+    "types": []
+  },
+  {
+    "name": "Stamparm_Blackbook",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "domain_custom_csv_blackbook",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Stamparm_Blackbook",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_custom_csv_blackbook",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Stamparm_Blackbook_domain_custom_csv_blackbook_BL_valid_be31b860c1516b61a5e097bfd3de72d8.txt",
+        "checksum": "f7504e81a3bdbdfdfac8d41b6aecd107",
+        "groups": [
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 18145,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "Stamparm_Blackbook",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_custom_csv_blackbook",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Stamparm_Blackbook_domain_custom_csv_blackbook_BL_invalid_d6d111c9269f9176ccf899249e9a8558.txt",
+        "checksum": "cc86a3917d68c3408e10dd4d7e8efec9",
+        "groups": [
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 1,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "StevenBlack_Fake_Gambling_Porn",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "hostname",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "StevenBlack_Fake_Gambling_Porn",
+        "generic_source_type": "domain",
+        "actual_source_type": "hostname",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/StevenBlack_Fake_Gambling_Porn_hostname_BL_valid_3a36ac3b507f0937e64379ca0d11b49e.txt",
+        "checksum": "f081aed3149e9484928e02048f3133b9",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "adult",
+          "fake",
+          "fakenews",
+          "gambling"
+        ],
+        "number_of_entries": 312613,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "StevenBlack_Fake_Gambling_Porn",
+        "generic_source_type": "domain",
+        "actual_source_type": "hostname",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/StevenBlack_Fake_Gambling_Porn_hostname_BL_invalid_9dee3734df9edd20c31730197b1d4d2a.txt",
+        "checksum": "5395c0329d397e7196b28d3a0c1ec6a6",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads",
+          "adult",
+          "fake",
+          "fakenews",
+          "gambling"
+        ],
+        "number_of_entries": 22,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "tranco",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "domain_top",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "lite",
+              "normal",
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "tranco",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_top",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/tranco_domain_top_AL_valid_b799ec5530feb45a919c6d9bd7026269.txt",
+        "checksum": "875988915579ab236eee35d4321af3cc",
+        "groups": [
+          "lite",
+          "normal",
+          "big"
+        ],
+        "categories": [
+          "others"
+        ],
+        "number_of_entries": 1000,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Ukrainian Ad Filter",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Ukrainian Ad Filter",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Ukrainian Ad Filter_adguard_BL_valid_72172c0ad62c4e7019f5a3088657c916.txt",
+        "checksum": "1d3747440862ae9ab74be8cedca86f8a",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 1440,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Ukrainian Annoyance Filter",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Ukrainian Annoyance Filter",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Ukrainian Annoyance Filter_adguard_BL_valid_18da6a70e7fcc9e762ecd5ae1889a086.txt",
+        "checksum": "cffbc82ab8e72e05c9597f28d91ff9de",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "annoyance"
+        ],
+        "number_of_entries": 582,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Ukrainian Privacy Filter",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Ukrainian Privacy Filter",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Ukrainian Privacy Filter_adguard_BL_valid_62d71b0f6e5ea1c0a3c4a7a6201cb269.txt",
+        "checksum": "567a69c1252ffd9a09e9f1f07471c987",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "privacy",
+          "trackers"
+        ],
+        "number_of_entries": 345,
+        "valid": true
+      },
+      {
+        "name": "Ukrainian Privacy Filter",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Ukrainian Privacy Filter_adguard_AL_valid_95e9c7f81ef516b2e58f778fc86346f1.txt",
+        "checksum": "01a590d97bf8aee9bd768bd0d7d5f645",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "privacy",
+          "trackers"
+        ],
+        "number_of_entries": 1,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "Ukrainian Privacy Filter",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Ukrainian Privacy Filter_adguard_BL_invalid_a5ea92a21f49f9bd8007b8aae1e7e085.txt",
+        "checksum": "01a590d97bf8aee9bd768bd0d7d5f645",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "privacy",
+          "trackers"
+        ],
+        "number_of_entries": 1,
+        "valid": false
+      },
+      {
+        "name": "Ukrainian Privacy Filter",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Ukrainian Privacy Filter_adguard_AL_invalid_33dc424e3b26169d6ab32e56f95607be.txt",
+        "checksum": "567a69c1252ffd9a09e9f1f07471c987",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "privacy",
+          "trackers"
+        ],
+        "number_of_entries": 345,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "Ukrainian Security Filter",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Ukrainian Security Filter",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Ukrainian Security Filter_domain_BL_valid_6e00be5e1b347d32e741f0054ea1e182.txt",
+        "checksum": "8e2a41b12f008468d7e91bf996ff411d",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 1736,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "URLHaus (Abuse.ch)",
+    "last_processed_timestamp": "20250809_142542",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "URLHaus (Abuse.ch)",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/URLHaus (Abuse.ch)_domain_BL_invalid_af14e02ebd405119e2c7e60681b5a54e.txt",
+        "checksum": "9df1b520ea30172fe33dea2b01e7b494",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 392,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "URLHaus_Text",
+    "last_processed_timestamp": "20250809_142543",
+    "types": [
+      {
+        "name": "ipv4_http_url",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "URLHaus_Text",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_http_url",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/URLHaus_Text_ipv4_http_url_BL_valid_155eb5e5ea4b19770763be5689c23809.txt",
+        "checksum": "2794aa13cc62b87b607274d402134cb6",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 17649,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "URLHaus_Text",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_http_url",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/URLHaus_Text_ipv4_http_url_BL_invalid_aa2a9def96d9a75968d9bafd3640944a.txt",
+        "checksum": "ccea622b17cba3315d1f991103135684",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 14840,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "USOM-Blocklists-domains",
+    "last_processed_timestamp": "20250809_142543",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "USOM-Blocklists-domains",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/USOM-Blocklists-domains_domain_BL_valid_b444c54434ffb06b78de1b7c90065c0d.txt",
+        "checksum": "8c615b1bc77a741566499d611aa46738",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 401082,
+        "valid": true,
+        "skip_general_consolidation": true,
+        "skip_groups_consolidation": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "USOM-Blocklists-domains",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/USOM-Blocklists-domains_domain_BL_invalid_6c8060011a509b6043c07725f9ad7f3d.txt",
+        "checksum": "5ae9c38126b8a2bc155969dc32def9a8",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 37,
+        "valid": false,
+        "skip_general_consolidation": true,
+        "skip_groups_consolidation": true
+      }
+    ]
+  },
+  {
+    "name": "USOM-Blocklists-ips",
+    "last_processed_timestamp": "20250809_142543",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "USOM-Blocklists-ips",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/USOM-Blocklists-ips_ipv4_BL_valid_d3554c18007405fce19e360aee0f5912.txt",
+        "checksum": "3b733d54dfa56ae7a8ee57eb066287ce",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malicious",
+          "threat"
+        ],
+        "number_of_entries": 12376,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Viriback_Dump",
+    "last_processed_timestamp": "20250809_142543",
+    "types": [
+      {
+        "name": "domain_csv_http_url_find",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "ipv4_csv_http_url_find",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Viriback_Dump",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_csv_http_url_find",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Viriback_Dump_domain_csv_http_url_find_BL_valid_da2cc4439c6884fa96f1e8cf10278c1b.txt",
+        "checksum": "9b39114900069e2ac69f048039b3f9f1",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 4894,
+        "valid": true
+      },
+      {
+        "name": "Viriback_Dump",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_csv_http_url_find",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Viriback_Dump_ipv4_csv_http_url_find_BL_valid_c22aef36f93e03e2ab256ba4dd75530d.txt",
+        "checksum": "72297c526e282242251bbe1d01a144fc",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 4555,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "Viriback_Dump",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_csv_http_url_find",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Viriback_Dump_domain_csv_http_url_find_BL_invalid_5182ad036ecc05730c4d2522a930a444.txt",
+        "checksum": "ec11a1dc26285515a915f27169c010cb",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 5279,
+        "valid": false
+      },
+      {
+        "name": "Viriback_Dump",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4_csv_http_url_find",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Viriback_Dump_ipv4_csv_http_url_find_BL_invalid_fa4377de3ae56703050bac96cc91fd4a.txt",
+        "checksum": "3c61e5ab6ea56e74012053a84e738e9c",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "malware"
+        ],
+        "number_of_entries": 7215,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "WaLLy3K",
+    "last_processed_timestamp": "20250809_142543",
+    "types": [
+      {
+        "name": "domain",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "WaLLy3K",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/WaLLy3K_domain_BL_valid_adb6f80956c2544040d72287f7465629.txt",
+        "checksum": "81980fa962c696be8d57d0bbee27e1c3",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 350,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "YousList",
+    "last_processed_timestamp": "20250809_142543",
+    "types": [
+      {
+        "name": "hostname",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "YousList",
+        "generic_source_type": "domain",
+        "actual_source_type": "hostname",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/YousList_hostname_BL_valid_09c99739baad67690ea510521dae59b8.txt",
+        "checksum": "e5c3bacf6fcaec0982004d5f396b4069",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 624,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "YousList",
+        "generic_source_type": "domain",
+        "actual_source_type": "hostname",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/YousList_hostname_BL_invalid_b2a018ea6df922febf8445e43d432482.txt",
+        "checksum": "2d05346fdd41a4f9300960e817911cc8",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 2,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "YousList-AdGuard",
+    "last_processed_timestamp": "20250809_142543",
+    "types": [
+      {
+        "name": "adguard",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          },
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "domain_adguard",
+        "list_types": [
+          {
+            "name": "allowlist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "YousList-AdGuard",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/YousList-AdGuard_adguard_BL_valid_30aab25868b5a8908e01b54c713af77c.txt",
+        "checksum": "bdfd0695b452464076ebb96c8652b66f",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 7347,
+        "valid": true
+      },
+      {
+        "name": "YousList-AdGuard",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/YousList-AdGuard_adguard_AL_valid_887c77b6a22947c12b06cac1fff86cf7.txt",
+        "checksum": "500b6b6782e3ee7e24851460529a4427",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 17,
+        "valid": true
+      },
+      {
+        "name": "YousList-AdGuard",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/YousList-AdGuard_domain_adguard_AL_valid_62ab60d3af3eb188a4d37f062071e0ef.txt",
+        "checksum": "e93cc1cdea948248f410ce57757421c8",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 12,
+        "valid": true
+      }
+    ],
+    "invalid_files": [
+      {
+        "name": "YousList-AdGuard",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/YousList-AdGuard_adguard_BL_invalid_47c5676c2291c5a506b62c9032c6c9e8.txt",
+        "checksum": "500b6b6782e3ee7e24851460529a4427",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 17,
+        "valid": false
+      },
+      {
+        "name": "YousList-AdGuard",
+        "generic_source_type": "adguard",
+        "actual_source_type": "adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/YousList-AdGuard_adguard_AL_invalid_a696a9ca1d9a15a18a6af69d628b8f86.txt",
+        "checksum": "bdfd0695b452464076ebb96c8652b66f",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 7347,
+        "valid": false
+      },
+      {
+        "name": "YousList-AdGuard",
+        "generic_source_type": "domain",
+        "actual_source_type": "domain_adguard",
+        "list_type": "allowlist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/YousList-AdGuard_domain_adguard_AL_invalid_ada307333b1c6b544c7521917f0aefa9.txt",
+        "checksum": "bdfd0695b452464076ebb96c8652b66f",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 7347,
+        "valid": false
+      }
+    ]
+  },
+  {
+    "name": "youtube_GoodbyeAds",
+    "last_processed_timestamp": "20250809_142543",
+    "types": [
+      {
+        "name": "hostname",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "youtube_GoodbyeAds",
+        "generic_source_type": "domain",
+        "actual_source_type": "hostname",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/youtube_GoodbyeAds_hostname_BL_valid_ae580b49d39df246986b92654f12ad88.txt",
+        "checksum": "804740b7f95eecc0d038d10d24575f68",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 97645,
+        "valid": true
+      }
+    ]
+  },
+  {
+    "name": "Yoyo AdServers-IPList",
+    "last_processed_timestamp": "20250809_142543",
+    "types": [
+      {
+        "name": "ipv4",
+        "list_types": [
+          {
+            "name": "blocklist",
+            "groups": [
+              "big"
+            ]
+          }
+        ]
+      }
+    ],
+    "valid_files": [
+      {
+        "name": "Yoyo AdServers-IPList",
+        "generic_source_type": "ipv4",
+        "actual_source_type": "ipv4",
+        "list_type": "blocklist",
+        "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/processed/Yoyo AdServers-IPList_ipv4_BL_valid_881d7da4fb278eced9d128ad31061987.txt",
+        "checksum": "6213ca597b042d63ce2a965bb16a9efb",
+        "groups": [
+          "big"
+        ],
+        "categories": [
+          "ads"
+        ],
+        "number_of_entries": 8966,
+        "valid": true
+      }
+    ]
+  }
+]
