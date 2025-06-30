@@ -1,0 +1,14 @@
+# dns-toolkit 1.0.5
+# File name: top_ipv4_blocklist_min10.txt
+# Last Updated: 20261128_034604
+# Format: Top IPv4 blocklist (minimum 10 sources)
+# Count: 5
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+102.220.45.186
+119.204.122.94
+125.130.102.172
+27.102.116.43
+80.82.77.139
