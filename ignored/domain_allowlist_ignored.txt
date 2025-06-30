@@ -1,0 +1,11 @@
+# dns-toolkit 0.4.0
+# File name: domain_allowlist_ignored.txt
+# Last Updated: 20250826_052606
+# Format: Consolidated Domain Ignored
+# Count: 1
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+pagead2.googlesyndication.com

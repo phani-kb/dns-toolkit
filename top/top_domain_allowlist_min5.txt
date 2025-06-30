@@ -1,0 +1,20 @@
+# dns-toolkit 0.4.0
+# File name: top_domain_allowlist_min5.txt
+# Last Updated: 20250826_052750
+# Format: Top Domain allowlist (minimum 5 sources)
+# Count: 10
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+unpkg.com
+bit.ly
+cdn.jsdelivr.net
+github.com
+gravatar.com
+gstatic.com
+msftncsi.com
+paypal.com
+tinyurl.com
+windowsupdate.com

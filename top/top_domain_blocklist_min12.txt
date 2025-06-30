@@ -1,0 +1,96 @@
+# dns-toolkit 0.4.0
+# File name: top_domain_blocklist_min12.txt
+# Last Updated: 20250826_052748
+# Format: Top Domain blocklist (minimum 12 sources)
+# Count: 86
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+tsyndicate.com
+ads.yahoo.com
+smartadserver.com
+ad-delivery.net
+adap.tv
+adblade.com
+adform.com
+ads.linkedin.com
+ads.msn.com
+ads1.msn.com
+adsrvr.org
+alphonso.tv
+buzzonclick.com
+carambo.la
+clevernt.com
+clksite.com
+coinhive.com
+disqusads.com
+ero-advertising.com
+graizoah.com
+innovid.com
+mgid.com
+onclickads.net
+open.oneplus.net
+popcash.net
+sumome.com
+a-ads.com
+ad4game.com
+adcash.com
+adhese.com
+adition.com
+admedia.com
+admeld.com
+adnet.de
+adnetworkperformance.com
+adriver.ru
+ads-twitter.com
+ads.ign.com
+ads.supplyframe.com
+ads.youtube.com
+adserver.pressboard.ca
+adsfac.eu
+adskeeper.co.uk
+adtech.de
+adviva.net
+analytics.tiktok.com
+app-analytics.snapchat.com
+bluelithium.com
+bttrack.com
+casalemedia.com
+contextweb.com
+cpalead.com
+cpmstar.com
+criteo.com
+deloplen.com
+dianomi.com
+doubleclick.de
+doubleclick.net
+ebayadvertising.com
+etahub.com
+exoclick.com
+exponential.com
+extreme-dm.com
+flashtalking.com
+googlesyndication.com
+juicyads.com
+maxonclick.com
+medleyads.com
+ml314.com
+moatads.com
+mydas.mobi
+oclasrv.com
+popmyads.com
+projectwonderful.com
+pushno.com
+samsungads.com
+simpli.fi
+smetrics.foxnews.com
+smetrics.walgreens.com
+steelhousemedia.com
+stickyadstv.com
+tidaltv.com
+turn.com
+vungle.com
+webads.nl
+youradexchange.com

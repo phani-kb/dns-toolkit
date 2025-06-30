@@ -1,0 +1,15 @@
+# dns-toolkit 0.4.0
+# File name: ipv4_blocklist_ignored.txt
+# Last Updated: 20250826_052607
+# Format: Consolidated IPv4 Ignored
+# Count: 5
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+185.199.109.133
+185.199.110.133
+185.199.111.133
+52.123.128.14
+52.123.129.14

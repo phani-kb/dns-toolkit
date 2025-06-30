@@ -1,0 +1,70 @@
+# dns-toolkit 0.4.0
+# File name: top_domain_allowlist_min4.txt
+# Last Updated: 20250826_052749
+# Format: Top Domain allowlist (minimum 4 sources)
+# Count: 60
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+unpkg.com
+bit.ly
+cdn.jsdelivr.net
+github.com
+gravatar.com
+gstatic.com
+msftncsi.com
+paypal.com
+tinyurl.com
+windowsupdate.com
+accounts.google.com
+amazonaws.com
+appboot.netflix.com
+apple.com
+blogspot.com
+c.paypal.com
+cdc.gov
+clients1.google.com
+clients2.google.com
+clients3.google.com
+clients4.google.com
+cloudflare.com
+cloudfront.net
+connect.facebook.net
+device.auth.xboxlive.com
+discord.gg
+displaycatalog.mp.microsoft.com
+dl.dropboxusercontent.com
+dns.msftncsi.com
+ea.com
+goo.gl
+graph.facebook.com
+guce.advertising.com
+imasdk.googleapis.com
+imgur.com
+indeed.com
+login.live.com
+mailchimp.com
+msftconnecttest.com
+netflix.com
+nypost.com
+nytimes.com
+ow.ly
+spiegel.de
+statcounter.com
+steamcommunity.com
+steampowered.com
+steamstatic.com
+stripe.com
+tag.aticdn.net
+tags.tiqcdn.com
+title.auth.xboxlive.com
+title.mgt.xboxlive.com
+twitch.tv
+twitter.com
+userapi.com
+vk.com
+xsts.auth.xboxlive.com
+youtu.be
+youtube-nocookie.com
