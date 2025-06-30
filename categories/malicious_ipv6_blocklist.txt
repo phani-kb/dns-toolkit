@@ -1,0 +1,50 @@
+# dns-toolkit 1.0.5
+# File name: malicious_ipv6_blocklist.txt
+# Last Updated: 20261107_013327
+# Format: Consolidated Categories IPv6 blocklist
+# Count: 37 (original: 37)
+# Files:
+# This blocklist list was consolidated from 2 source file(s):
+#   - MyIP_MS_Blocklist ipv6_htaccess: 8 
+#   - Sentinel_Greylist ipv6_find    : 29
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+2001:19f0:ac01:1ad7:5400:6ff:fe72:b8f2
+2001:470:1:332::166
+2001:470:1:332::6
+2001:470:1:332::8
+2001:470:1:c84::18
+2001:470:1:c84::19
+2001:470:1:c84::25
+2001:470:1:fb5::1c0
+2001:470:1:fb5::240
+2001:470:1:fb5::2a0
+2001:470:1:fb5::2c0
+2001:861:8cc0:9f20:b90a:30e1:952e:5ab9
+240d:c000:f07f:9500:1a60:dff8:9814:2
+2600:1f28:365:80b0:5746:99e2:41c6:73d7
+2602:f71d:200::10
+2602:f71d:400::20
+2602:f71d::30
+2604:a880:4:1d0::294:3000
+2604:a880:4:1d0::2b5:8000
+2604:a880:4:1d0::2b8:0
+2605:a140:2357:8340::1
+2607:ff10:c8:594::7
+2607:ff10:c8:594::e
+2620:24:c040:4::248
+2620:24:c040:4::288
+2620:24:c040:4::2c8
+2620:24:c040:4::328
+2620:24:c040:4::368
+2a02:85f:e875:8800:5582:c743:2f5a:4bb5
+2a02:85f:e875:8800:61f2:4c21:3259:b0cb
+2a02:85f:e875:8800:a965:1496:8065:e20
+2a02:85f:e875:8800:f054:578d:68f:d571
+2a0a:20c0:f001:307::4
+2a0a:20c0:f001:308::4
+2a0a:20c0:f001:3609:ae1f:6bff:fec9:6030
+2c0e:6040:27f:2662:f82c:872c:3ff4:4c56
+2c0e:6040:27f:d991:2916:c5a9:2f81:91c8
