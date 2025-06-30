@@ -1,0 +1,3602 @@
+[
+  {
+    "entry": "flashtalking.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 10,
+    "allow_count": 1
+  },
+  {
+    "entry": "intentiq.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "adgrx.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "onetag-sys.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "YousList",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "appsflyer.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 6,
+    "allow_count": 1
+  },
+  {
+    "entry": "click.linksynergy.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "criteo.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "smaato.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "presage.io",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "amplitude.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "exelator.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN",
+      "quidsup_notrack-malware"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "asadcdn.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "WaLLy3K",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "a-mo.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 4,
+    "allow_count": 1
+  },
+  {
+    "entry": "secureir.ebaystatic.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Dan Pollock's List",
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "t.co",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Peter Lowe's Blocklist",
+      "Yoyo Adservers-Hosts"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "eu-1-id5-sync.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 4,
+    "allow_count": 1
+  },
+  {
+    "entry": "ioam.de",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "adtrafficquality.google",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "ShadowWhisperer_BlockLists Ads",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 4,
+    "allow_count": 1
+  },
+  {
+    "entry": "footprintdns.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "go.skimresources.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Adaway",
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "branch.io",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 6,
+    "allow_count": 1
+  },
+  {
+    "entry": "contentsquare.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "omnitagjs.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "360yield.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "go-mpulse.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "app-analytics-services.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 4,
+    "allow_count": 1
+  },
+  {
+    "entry": "singular.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Adaway",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "vungle.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 10,
+    "allow_count": 1
+  },
+  {
+    "entry": "s0.2mdn.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Adaway",
+      "HaGeZi Pro",
+      "StevenBlack_Fake_Gambling",
+      "youtube_GoodbyeAds"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 4,
+    "allow_count": 1
+  },
+  {
+    "entry": "33across.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "outbrain.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "doubleclick.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "WaLLy3K",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN",
+      "youtube_GoodbyeAds"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 10,
+    "allow_count": 1
+  },
+  {
+    "entry": "zemanta.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "adsrvr.org",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 11,
+    "allow_count": 1
+  },
+  {
+    "entry": "networkadvertising.org",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "ShadowWhisperer_BlockLists Ads"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "moe.video",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "ShadowWhisperer_BlockLists Ads"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "browser-intake-datadoghq.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "smartadserver.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "YousList",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 11,
+    "allow_count": 1
+  },
+  {
+    "entry": "inner-active.mobi",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "tracking.truthfinder.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "conviva.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "bidr.io",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "cdn.rlcdn.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "stickyadstv.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 10,
+    "allow_count": 1
+  },
+  {
+    "entry": "pangle.io",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "adriver.ru",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 10,
+    "allow_count": 1
+  },
+  {
+    "entry": "stripchat.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "HaGeZi Pro",
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "samsungacr.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "nr-data.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "innovid.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN",
+      "youtube_GoodbyeAds"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 11,
+    "allow_count": 1
+  },
+  {
+    "entry": "2mdn.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "youtube_GoodbyeAds"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 6,
+    "allow_count": 1
+  },
+  {
+    "entry": "creativecdn.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 6,
+    "allow_count": 1
+  },
+  {
+    "entry": "scorecardresearch.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "trk.klclick1.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Adaway",
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "lnks.gd",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "segment.io",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "rlcdn.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "ws-na.amazon-adsystem.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Dan Pollock's List",
+      "HaGeZi Amazon Tracker",
+      "HaGeZi Pro",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "contextweb.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 10,
+    "allow_count": 1
+  },
+  {
+    "entry": "omtrdc.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "criteo.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 10,
+    "allow_count": 1
+  },
+  {
+    "entry": "dotomi.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "alphonso.tv",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 10,
+    "allow_count": 1
+  },
+  {
+    "entry": "ad.gt",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "tags.tiqcdn.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Adaway",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "WaLLy3K",
+      "Yoyo Adservers-Hosts"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "clarity.ms",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "optimizely.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 4,
+    "allow_count": 1
+  },
+  {
+    "entry": "app-measurement.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Dan Pollock's List",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "4dex.io",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "ShadowWhisperer_BlockLists Ads",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 4,
+    "allow_count": 1
+  },
+  {
+    "entry": "anrdoezrs.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "everesttech.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "unrulymedia.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "crashlytics.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "gvt2.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "HaGeZi Pro",
+      "OISD Blocklist Small"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "unagi.amazon.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Amazon Tracker",
+      "HaGeZi Pro"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "fresnel-events.vimeocdn.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "OISD Blocklist Small"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "3lift.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "hotjar.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 6,
+    "allow_count": 1
+  },
+  {
+    "entry": "google-analytics.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "7eer.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "liadm.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "vtwenty.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "adsafeprotected.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "adnxs.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "ShadowWhisperer_BlockLists Ads"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "deepintent.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "bidswitch.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "uid.mavencoalition.io",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "quantserve.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "shareasale.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "prf.hn",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "googlesyndication.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "WaLLy3K",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 10,
+    "allow_count": 1
+  },
+  {
+    "entry": "btloader.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "rfihub.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "forter.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "company-target.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "doubleverify.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "go.redirectingat.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "crwdcntrl.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "imrworldwide.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "statics-marketingsites-eus-ms-com.akamaized.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Adaway",
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "kqzyfj.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "shalltry.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Adaway",
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "applovin.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "adform.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "googletagmanager.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN",
+      "youtube_GoodbyeAds"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "analytics.plex.tv",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "WaLLy3K",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "umeng.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "inmobi.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "avantlink.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "mixpanel.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "awstrack.me",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 4,
+    "allow_count": 1
+  },
+  {
+    "entry": "pubmatic.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "ShadowWhisperer_BlockLists Ads",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 6,
+    "allow_count": 1
+  },
+  {
+    "entry": "jdoqocy.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 4,
+    "allow_count": 1
+  },
+  {
+    "entry": "api.bam-x.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "pjtra.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "1rx.io",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 6,
+    "allow_count": 1
+  },
+  {
+    "entry": "lijit.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN",
+      "cyberhost_malware-blocklist"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "tapad.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "stackadapt.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "emjcd.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "mtgglobals.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "ShadowWhisperer_BlockLists Ads",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 4,
+    "allow_count": 1
+  },
+  {
+    "entry": "tremorhub.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "turn.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 10,
+    "allow_count": 1
+  },
+  {
+    "entry": "liftoff.io",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "bidmachine.io",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "ShadowWhisperer_BlockLists Ads"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "online-metrix.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "adjust.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "yellowblue.io",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "ShadowWhisperer_BlockLists Ads",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 4,
+    "allow_count": 1
+  },
+  {
+    "entry": "geolocation-db.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Dan Pollock's List",
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "awin1.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "ojrq.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 4,
+    "allow_count": 1
+  },
+  {
+    "entry": "appsflyersdk.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "aniview.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 6,
+    "allow_count": 1
+  },
+  {
+    "entry": "teads.tv",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "prodregistryv2.org",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "indexww.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "dpbolvw.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "id5-sync.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "googletagservices.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Dan Pollock's List",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "WaLLy3K",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "cloudflareinsights.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 6,
+    "allow_count": 1
+  },
+  {
+    "entry": "gumgum.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "seedtag.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "ShadowWhisperer_BlockLists Ads",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 4,
+    "allow_count": 1
+  },
+  {
+    "entry": "cdn.tpdads.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 3,
+    "allow_count": 1
+  },
+  {
+    "entry": "cdn.boomtrain.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 4,
+    "allow_count": 1
+  },
+  {
+    "entry": "demdex.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "media.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "etrk.asus.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Dan Pollock's List",
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 2,
+    "allow_count": 1
+  },
+  {
+    "entry": "rubiconproject.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 7,
+    "allow_count": 1
+  },
+  {
+    "entry": "kueezrtb.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "ShadowWhisperer_BlockLists Ads",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "casalemedia.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 10,
+    "allow_count": 1
+  },
+  {
+    "entry": "braze.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "yieldmo.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "sharethrough.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "googleadservices.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN",
+      "youtube_GoodbyeAds"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "rayjump.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "taboola.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "agkn.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "amazon-adsystem.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Adaway",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "YousList",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 10,
+    "allow_count": 1
+  },
+  {
+    "entry": "kargo.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 8,
+    "allow_count": 1
+  },
+  {
+    "entry": "adnxs.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "HaGeZi Pro",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "WaLLy3K",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 10,
+    "allow_count": 1
+  },
+  {
+    "entry": "mgid.com",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "Dan Pollock's List",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 10,
+    "allow_count": 1
+  },
+  {
+    "entry": "openx.net",
+    "decision": "block",
+    "reason": "counts",
+    "block_sources": [
+      "1Hosts (Lite)",
+      "Blocklists UT1 Publicite",
+      "HaGeZi Pro",
+      "OISD Blocklist Small",
+      "Peter Lowe's Blocklist",
+      "ShadowWhisperer_BlockLists Ads",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts",
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 9,
+    "allow_count": 1
+  },
+  {
+    "entry": "app.e.sigsauer.com",
+    "decision": "block",
+    "reason": "manual_forced_block",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "assoc-redirect.amazon.com",
+    "decision": "block",
+    "reason": "manual_forced_block",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "bugsnag.com",
+    "decision": "block",
+    "reason": "manual_forced_block",
+    "block_sources": [
+      "HaGeZi Pro"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "analytics.barnebys.sh",
+    "decision": "block",
+    "reason": "manual_forced_block",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "api.narrativ.com",
+    "decision": "block",
+    "reason": "manual_forced_block",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "attn.tv",
+    "decision": "block",
+    "reason": "manual_forced_block",
+    "block_sources": [
+      "OISD Blocklist Small"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "aboutads.info",
+    "decision": "block",
+    "reason": "manual_forced_block",
+    "block_sources": [
+      "HaGeZi Pro"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "at.adtech.redventures.io",
+    "decision": "block",
+    "reason": "manual_forced_block",
+    "block_sources": [
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "lddy.no",
+    "decision": "block",
+    "reason": "manual_forced_block",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "onelink.me",
+    "decision": "block",
+    "reason": "manual_forced_block",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "github.com",
+    "decision": "allow",
+    "reason": "manual_forced_allow",
+    "block_sources": [
+      "VXVault_URLList"
+    ],
+    "allow_sources": [
+      "Local Allowlist (Domain)",
+      "tranco"
+    ],
+    "block_count": 1,
+    "allow_count": 2
+  },
+  {
+    "entry": "raw.githubusercontent.com",
+    "decision": "allow",
+    "reason": "manual_forced_allow",
+    "block_sources": [
+      "VXVault_URLList"
+    ],
+    "allow_sources": [
+      "Local Allowlist (Domain)"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "185.199.109.133",
+    "decision": "allow",
+    "reason": "manual_forced_allow",
+    "block_sources": [
+      "Firehol_level3"
+    ],
+    "allow_sources": [
+      "Local Allowlist (ipv4)"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "185.199.111.133",
+    "decision": "allow",
+    "reason": "manual_forced_allow",
+    "block_sources": [
+      "Firehol_level3"
+    ],
+    "allow_sources": [
+      "Local Allowlist (ipv4)"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "185.199.110.133",
+    "decision": "allow",
+    "reason": "manual_forced_allow",
+    "block_sources": [
+      "Firehol_level3"
+    ],
+    "allow_sources": [
+      "Local Allowlist (ipv4)"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "click.redditmail.com",
+    "decision": "allow",
+    "reason": "manual_forced_allow",
+    "block_sources": [
+      "Blocklists UT1 Publicite",
+      "Frogeye-firstparty-trackers",
+      "Peter Lowe's Blocklist",
+      "StevenBlack_Fake_Gambling",
+      "Yoyo Adservers-Hosts"
+    ],
+    "allow_sources": [
+      "Local Allowlist (Domain)"
+    ],
+    "block_count": 5,
+    "allow_count": 1
+  },
+  {
+    "entry": "clients1.google.com",
+    "decision": "allow",
+    "reason": "manual_forced_allow",
+    "block_sources": [
+      "youtube_GoodbyeAds"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "newrelic.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "HaGeZi Pro"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "click.instantink.hpsmart.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "target.georiot.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "cookielaw.org",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "quidsup_notrack-annoyance"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "t.lt02.net",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "inbake.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "HaGeZi Pro"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "click.email.newegg.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "cdn.webclicks24.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "webto.salesforce.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "otf.msn.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "AdGuardTeam_HttpsExclusions_android"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "onetrust.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "ShadowWhisperer_BlockLists Ads"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "sentry.io",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "HaGeZi Pro"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "list-manage.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "geoip-db.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "links.iterable.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "workers.dev",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "cyberhost_malware-blocklist"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "click.dji.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "onesignal.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "ShadowWhisperer_BlockLists Ads"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "click.pstmrk.it",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "wallet.advcash.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "1Hosts (Lite)"
+    ],
+    "allow_sources": [
+      "AdGuardTeam_HttpsExclusions_banks"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "oempprd.samsungcloudsolution.net",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "shareasale-analytics.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "redirect.viglink.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "dynatrace.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "oempprd.samsungcloudsolution.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "events.release.narrativ.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "cdn.cookielaw.org",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "StevenBlack_Fake_Gambling"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "mandrillapp.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "urbanairship.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "AdGuardTeam_HttpsExclusions_android"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "aax-us-iad.amazon.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "geo1.presslabs.net",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "c2.piano.io",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "nelreports.net",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "HaGeZi Pro"
+    ],
+    "allow_sources": [
+      "tranco"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "click.mc.crimsontrace.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "Blocklists UT1 Publicite"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  },
+  {
+    "entry": "cj.dotomi.com",
+    "decision": "conflict",
+    "reason": "equal_counts",
+    "block_sources": [
+      "bigdargon_hostsVN"
+    ],
+    "allow_sources": [
+      "ShadowWhisperer_Allowlist"
+    ],
+    "block_count": 1,
+    "allow_count": 1
+  }
+]
