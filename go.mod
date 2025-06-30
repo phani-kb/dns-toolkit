@@ -3,7 +3,7 @@ module github.com/phani-kb/dns-toolkit
 go 1.23.6
 
 require (
-	github.com/phani-kb/multilog v0.0.0-20250604142712-523b6994e973
+	github.com/phani-kb/multilog v0.2.0
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/text v0.26.0
