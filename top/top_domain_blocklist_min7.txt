@@ -1,0 +1,51 @@
+# dns-toolkit 0.1.0
+# File name: top_domain_blocklist_min7.txt
+# Last Updated: 20250809_142635
+# Format: Top Domain blocklist (minimum 7 sources)
+# Count: 41
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+tsyndicate.com
+ctp1.xyz
+amos-malware.ru
+coinhive.com
+crypto-loot.com
+manvim.co
+theonlygoodman.com
+mxrz.xyz
+intelserviceupdate.com
+f0538386.xsph.ru
+nemty.top
+greenbazaar.xyz
+silentlegion.duckdns.org
+airmanselectiontest.com
+f0537341.xsph.ru
+x-vpn.ug
+friendshipmale.com
+checkvim.com
+smartadserver.com
+googie-anaiytics.com
+thammyvienanthea.com
+oclasrv.com
+forexdispatch.info
+f0524225.xsph.ru
+vietphatjsc.xyz
+f0527262.xsph.ru
+clksite.com
+fueda.info
+avsvmcloud.com
+lascolinasresortdalas.com
+reimageplus.com
+coin-hive.com
+doubleclick.net
+secure01-redirect.net
+f0531750.xsph.ru
+inpagepush.com
+addresseepaper.com
+deloplen.com
+cpf-th.com
+cobalten.com
+sempersim.su

@@ -1,0 +1,29 @@
+# dns-toolkit 0.1.0
+# File name: normal_domain_blocklist_ignored.txt
+# Last Updated: 20250809_142546
+# Format: Consolidated Groups Domain Ignored
+# Count: 19
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+bestgore.fun
+chaturbate.com
+collegehumor.com
+eporner.com
+erome.com
+lijit.com
+nutaku.com
+nutaku.net
+onlyfans.com
+polyfill.io
+pornhub.com
+puppyscams.org
+stripchat.com
+thechive.com
+workers.dev
+xhamster.com
+xhamster.desi
+xnxx.com
+xvideos.com

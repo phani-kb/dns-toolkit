@@ -1,0 +1,19 @@
+# dns-toolkit 0.1.0
+# File name: annoyance_domain_allowlist.txt
+# Last Updated: 20250809_142551
+# Format: Consolidated Categories Domain allowlist
+# Count: 6
+# Files:
+# This allowlist list was consolidated from 1 source file(s):
+#   - CJX Annoyance domain_adguard: 6
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+doutula.com
+fm.ipinyou
+fm.p0y.cn
+lancdn.com
+qbox.me
+th7.cn

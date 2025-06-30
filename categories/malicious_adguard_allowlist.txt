@@ -1,0 +1,14 @@
+# dns-toolkit 0.1.0
+# File name: malicious_adguard_allowlist.txt
+# Last Updated: 20250809_142553
+# Format: Consolidated Categories AdGuard allowlist
+# Count: 1
+# Files:
+# This allowlist list was consolidated from 1 source file(s):
+#   - RedDragonWebDesign_block-everything adguard: 1
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+@@||tinypass.com^$frame,script,xhr,domain=thedailybeast.com

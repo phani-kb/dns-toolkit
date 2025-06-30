@@ -1,0 +1,14 @@
+# dns-toolkit 0.1.0
+# File name: lite_domain_blocklist_ignored.txt
+# Last Updated: 20250809_142545
+# Format: Consolidated Groups Domain Ignored
+# Count: 4
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+lijit.com
+polyfill.io
+puppyscams.org
+workers.dev

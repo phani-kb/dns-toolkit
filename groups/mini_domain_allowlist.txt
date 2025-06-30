@@ -1,0 +1,53 @@
+# dns-toolkit 0.1.0
+# File name: mini_domain_allowlist.txt
+# Last Updated: 20250809_142545
+# Format: Consolidated Groups Domain allowlist
+# Count: 40
+# Files:
+# This allowlist list was consolidated from 1 source file(s):
+#   - Local Allowlist (Domain) domain: 40 [must consider]
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+adaway.org
+adguardteam.github.io
+big.oisd.nl
+blocklist.greensnow.co
+cdn.jsdelivr.net
+cinsscore.com
+click.redditmail.com
+cybercrime-tracker.net
+drive.google.com
+dsi.ut-capitole.fr
+easylist-downloads.adblockplus.org
+easylist.to
+filters.adtidy.org
+github.com
+hostfiles.frogeye.fr
+iplists.firehol.org
+lists.blocklist.de
+lists.cyberhost.uk
+malware-filter.gitlab.io
+myip.ms
+opendbl.net
+openphish.com
+pgl.yoyo.org
+public-dns.info
+puppyscams.org
+quidsup.net
+raw.githubusercontent.com
+report.cs.rutgers.edu
+rules.emergingthreats.net
+sblam.com
+someonewhocares.org
+tracker.viriback.com
+tranco-list.eu
+urlhaus.abuse.ch
+v.firebog.net
+view.sentinel.turris.cz
+web.archive.org
+web.whatsapp.com
+www.binarydefense.com
+www.spamhaus.org

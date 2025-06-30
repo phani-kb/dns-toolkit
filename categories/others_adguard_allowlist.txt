@@ -1,0 +1,52 @@
+# dns-toolkit 0.1.0
+# File name: others_adguard_allowlist.txt
+# Last Updated: 20250809_142556
+# Format: Consolidated Categories AdGuard allowlist
+# Count: 39
+# Files:
+# This allowlist list was consolidated from 1 source file(s):
+#   - Local Allowlist (AdGuard) adguard: 39 [must consider]
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+@@||adaway.org^
+@@||adguardteam.github.io^
+@@||big.oisd.nl^
+@@||blocklist.greensnow.co^
+@@||cdn.jsdelivr.net^
+@@||cinsscore.com^
+@@||click.discord.com^$important
+@@||cybercrime-tracker.net^
+@@||dsi.ut-capitole.fr^
+@@||easylist-downloads.adblockplus.org^
+@@||easylist.to^
+@@||filters.adtidy.org^
+@@||fpt.live.com^$important
+@@||github.com^
+@@||hostfiles.frogeye.fr^
+@@||iplists.firehol.org^
+@@||lists.blocklist.de^
+@@||lists.cyberhost.uk^
+@@||malware-filter.gitlab.io^
+@@||myip.ms^
+@@||opendbl.net^
+@@||openphish.com^
+@@||pgl.yoyo.org^
+@@||public-dns.info^
+@@||puppyscams.org^
+@@||quidsup.net^
+@@||raw.githubusercontent.com^
+@@||report.cs.rutgers.edu^
+@@||rs6.net^$image,script,third-party
+@@||rules.emergingthreats.net^
+@@||sblam.com^
+@@||someonewhocares.org^
+@@||tracker.viriback.com^
+@@||tranco-list.eu^
+@@||urlhaus.abuse.ch^
+@@||v.firebog.net^
+@@||view.sentinel.turris.cz^
+@@||www.binarydefense.com^
+@@||www.spamhaus.org^

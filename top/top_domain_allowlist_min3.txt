@@ -1,0 +1,48 @@
+# dns-toolkit 0.1.0
+# File name: top_domain_allowlist_min3.txt
+# Last Updated: 20250809_142654
+# Format: Top Domain allowlist (minimum 3 sources)
+# Count: 38
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+gstatic.com
+github.com
+unpkg.com
+indeed.com
+kohls.com
+ikea.com
+repubblica.it
+twitter.com
+guce.advertising.com
+bit.ly
+cloudflare.com
+cdc.gov
+spiegel.de
+gravatar.com
+msftncsi.com
+paypal.com
+connect.facebook.net
+cdn.jsdelivr.net
+nypost.com
+imgur.com
+windowsupdate.com
+apis.google.com
+nike.com
+c.paypal.com
+amplitude.com
+tags.tiqcdn.com
+cloudfront.net
+akamaihd.net
+static.cloud.coveo.com
+tinyurl.com
+youtube-nocookie.com
+amazonaws.com
+statcounter.com
+steamstatic.com
+jsdelivr.net
+imasdk.googleapis.com
+youtu.be
+nytimes.com

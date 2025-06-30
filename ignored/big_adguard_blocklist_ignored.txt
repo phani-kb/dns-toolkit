@@ -1,0 +1,12 @@
+# dns-toolkit 0.1.0
+# File name: big_adguard_blocklist_ignored.txt
+# Last Updated: 20250809_142546
+# Format: Consolidated Groups AdGuard Ignored
+# Count: 2
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+||content.ingbank.pl^
+||rs6.net^$image,script,third-party

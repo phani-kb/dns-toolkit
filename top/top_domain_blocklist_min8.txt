@@ -1,0 +1,16 @@
+# dns-toolkit 0.1.0
+# File name: top_domain_blocklist_min8.txt
+# Last Updated: 20250809_142639
+# Format: Top Domain blocklist (minimum 8 sources)
+# Count: 6
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+tsyndicate.com
+coinhive.com
+crypto-loot.com
+amos-malware.ru
+manvim.co
+ctp1.xyz
