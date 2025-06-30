@@ -35,6 +35,7 @@ dns_toolkit:
     - "github.com"
     - "rules.emergingthreats.net"
     - "myip.ms"
+    - "vxvault.net"
   max_workers: 1
   max_retries: 3
   source_filters:
