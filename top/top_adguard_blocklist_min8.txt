@@ -1,0 +1,10 @@
+# dns-toolkit 1.0.5
+# File name: top_adguard_blocklist_min8.txt
+# Last Updated: 20261011_004024
+# Format: Top AdGuard blocklist (minimum 8 sources)
+# Count: 1
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+||fingerprint-veri.info^
