@@ -3,6 +3,7 @@
     {
       "name": "AlienVault_Reputation",
       "categories": "anonymizer, botnet, exploit, malicious, malware, phishing, proxy, ransomware, spam, trojan",
+      "disabled": true,
       "types": [
         {
           "name": "ipv4_find",
@@ -20,6 +21,7 @@
     },
     {
       "name": "BinaryDefense_Banlist",
+      "disabled": true,
       "notes": "This is for public use only.",
       "types": [
         {
@@ -80,6 +82,7 @@
     {
       "name": "DoH_IP_blocklists",
       "categories": "dns",
+      "disabled": true,
       "exclude": true,
       "license": "GPL-3.0",
       "types": [
@@ -121,6 +124,7 @@
     },
     {
       "name": "MyIP_MS_Blocklist",
+      "disabled": true,
       "types": [
         {
           "name": "ipv4_find"
@@ -134,6 +138,7 @@
     },
     {
       "name": "Sentinel_Greylist",
+      "disabled": true,
       "license": "CC BY-NC-SA 4.0",
       "types": [
         {
@@ -161,6 +166,7 @@
     },
     {
       "name": "Yoyo AdServers",
+      "disabled": true,
       "license": "MIT",
       "types": [
         {

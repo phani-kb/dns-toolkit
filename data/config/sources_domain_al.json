@@ -21,6 +21,7 @@
     },
     {
       "name": "ShadowWhisperer_Allowlist",
+      "disabled": true,
       "types": [
         {
           "name": "domain_with_comment_suffix",
