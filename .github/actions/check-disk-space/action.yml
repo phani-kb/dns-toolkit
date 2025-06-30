@@ -1,0 +1,30 @@
+name: 'Check Disk Space'
+description: 'Checks and reports disk space usage'
+inputs:
+  context:
+    description: 'Context for the disk space check'
+    required: true
+  directories:
+    description: 'Optional comma-separated list of directories to check'
+    required: false
+    default: '.'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Check Disk Space
+      shell: bash
+      run: |
+        echo "Disk space ${{ inputs.context }}:"
+        df -h
+        
+        # Split directories and check each one
+        IFS=',' read -ra DIRS <<< "${{ inputs.directories }}"
+        for dir in "${DIRS[@]}"; do
+          if [ -d "$dir" ]; then
+            echo "Size of $dir directory:"
+            du -sh "$dir"
+          else
+            echo "Directory $dir does not exist"
+          fi
+        done
