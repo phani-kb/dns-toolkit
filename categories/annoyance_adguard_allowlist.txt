@@ -1,0 +1,88 @@
+# dns-toolkit 1.0.0
+# File name: annoyance_adguard_allowlist.txt
+# Last Updated: 20250830_101159
+# Format: Consolidated Categories AdGuard allowlist
+# Count: 74
+# Files:
+# This allowlist list was consolidated from 2 source file(s):
+#   - AntiAdBlockFilters adguard: 68
+#   - CJX Annoyance      adguard: 6 
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+@@/ads.js$script,~third-party,domain=abcbourse.com|action-sociale.org|anime-vf.fr|impactmangas.fr|presse-algerie.net|primfx.com|undernews.fr
+@@/adsbygoogle.js$script,domain=arabiaweather.com
+@@/advertisement.js$script,~third-party,domain=fun-animes.fr|macupload.net|majorgeeks.com|upload.ac
+@@/adview_pic_$domain=doutula.com|fastadmin.net|toolfk.com|xclient.info
+@@/noadblock-nice-message/assets/js/ads.js?$script,~third-party
+@@||ak.sv^$generichide
+@@||al-aqsanews.com
+@@||alwingulla.com/88/tag.min.js$domain=darkino.online
+@@||ams.cdn.arkadiumhosted.com/assets/arena-4/arena/heap/advertisements.js$script,domain=jeux.lemonde.fr
+@@||anidub.com/ads.js|$script,domain=anidub.com
+@@||animedigitalnetwork.fr/templates/*/js/advertising.min.js?$script,~third-party
+@@||ankrzkz.sbs/js/boxad.js?$script,~third-party
+@@||ausujet.com/skins/common/ads.js
+@@||cdn4.tennistemple.com/js/advert.js|$script,~third-party
+@@||cdncontent.wakanim.tv/scripts/dist/ads.js$script,xmlhttprequest,~third-party
+@@||cheatography.com^$generichide
+@@||cyberdean.fr/js/advertisement.js
+@@||darkino.online^$generichide
+@@||dbz-fantasy.com/ads.css
+@@||docs.w3cub.com^$generichide
+@@||download.megaup.net/openads.js$script,~third-party
+@@||ency-educ.com^$generichide
+@@||fm.ipinyou.$domain=ipinyou.com.cn
+@@||fm.p0y.cn^$domain=ipinyou.com.cn
+@@||forums.macg.co/js/audentio/funbox/advertisement.js
+@@||frandroid.com/ads.js
+@@||free-reseau.fr/css/publicite.css|$stylesheet
+@@||fundingchoicesmessages.google.com^$script,domain=hurriyet.com.tr|milliyet.com.tr
+@@||fusacq.com/javascript/advertising.js|$script
+@@||gamaniak.com/js/check_adsense.js$script
+@@||goha.ru/app/video/adblock.teaser.js|$script,domain=goha.ru
+@@||grattable.com/blogads.css
+@@||haxnode.net^$generichide
+@@||hdnumerique.com/tpl/jscript/advert.js
+@@||imasdk.googleapis.com/js/sdkloader/ima3.js$domain=shahid.mbc.net
+@@||item-voyage.fr/ads.css
+@@||jeux-geographiques.com/js/adblock_detector.js
+@@||jeux.meteocity.com^$generichide
+@@||jeuxvideo-live.com/js/ads.js
+@@||ktu.sv2.biz/sv3/advertisement.js
+@@||lancdn.com/landian/public/js/ads.js
+@@||larvf.com/js/ads.js
+@@||lecrabeinfo.net^$generichide
+@@||manga-news.com/js/advert.js$script
+@@||mon-maire.fr^$generichide
+@@||nouvelle-fiat500.fr/ad-pub.js$script
+@@||numerama.com/ads.js
+@@||pagead2.googlesyndication.com/pagead/js/adsbygoogle.js$domain=empire-anime.com|empire-streaming.app|empire-streamz.fr
+@@||pagead2.googlesyndication.com/pagead/js/adsbygoogle.js$domain=exe-urls.com|fileink.com|phoneky.com|rockmods.net
+@@||pagead2.googlesyndication.com/pagead/js/adsbygoogle.js$domain=shed4u1.com|elktob.online
+@@||pagerank.fr/js*/advert.js?$script
+@@||peimg.fr/js/ads.js$script,domain=pubeco.fr
+@@||penducado.com/styles/ads.css
+@@||play.bokracdn.run/v2/adsjs/ads.js$script,~third-party
+@@||proxy.ads.canalplus-bo.net/web/undefined/v1/adserver/info/?asset=*&channel=$xmlhttprequest,domain=www.mycanal.fr
+@@||ps3-infos.fr/adsense/openads/ads/ads.js
+@@||pstream.net/js/prebid35.js$~third-party
+@@||ptitchef.com/js/ads.js
+@@||qbox.me/static/js/ads.js$domain=linux.cn
+@@||qpython.club^$generichide
+@@||securepubads.g.doubleclick.net/tag/js/gpt.js$domain=shahid.mbc.net
+@@||shahid.mbc.net^$generichide
+@@||sports.ru^*/adfox.$xmlhttprequest
+@@||static.admysports.com/hb/site/als/hb_allosurf.js$domain=allosurf.net
+@@||static.adsafeprotected.com/favicon.ico$domain=tf1info.fr
+@@||static.koreus.com/js/advert.js
+@@||th7.cn/sanda2015/css/ads.js
+@@||toplien.fr^$generichide
+@@||universfreebox.com/js/advertisement.js
+@@||v.fwmrm.net/ad/g/1?$xmlhttprequest,domain=www.mycanal.fr
+@@||wamiz.com/css/ads.css
+@@||www.ifon.ca^$generichide
+@@||yacine-app.com^$generichide
+@@||zagaz.com/img/blogads.css

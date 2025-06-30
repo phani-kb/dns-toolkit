@@ -1,0 +1,110 @@
+# dns-toolkit 1.0.0
+# File name: mobile_domain_allowlist.txt
+# Last Updated: 20250830_101206
+# Format: Consolidated Categories Domain allowlist
+# Count: 97
+# Files:
+# This allowlist list was consolidated from 1 source file(s):
+#   - AdGuardTeam_HttpsExclusions_android domain: 97
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+ac-talk.kakao.com
+accountsettingsmobile-pa.googleapis.com
+acompli.net
+android.clients.google.com
+androidwearcloudsync-pa.googleapis.com
+api-between.vcnc.co.kr
+api-kino.vl.ru
+api-notify.dropbox.com
+api.accuweather.com
+api.box.com
+api.cognitive.microsoft.com
+api.crunchyroll.com
+api.freeletics.com
+api.gm.com
+api.here.com
+api.kakao.com
+api.meetme.com
+api.simperium.com
+api.tumblr.com
+apis.live.net
+atlas.samsung.com
+auth.simperium.com
+bccard.com
+brightcove.com
+budgetbankers.com
+cdc.daikin.eu
+channel.kakao.com
+clientproxyservice.atomtickets.com
+clog-aggregator.kakao.com
+content.yikyakapi.net
+data.here.com
+disk.yandex.net
+dropboxapi.com
+dropboxusercontent.com
+feoquizserver.com
+generalmotorscorporation.sc.omtrdc.net
+gift.kakao.com
+global.ssl.fastly.net
+global.uci.blackberry.com
+gmmobileservices.gm.com
+goods.bbm.blackberry.com
+grabtaxi.com
+hk.enel.it
+instapaper.com
+isu-odc.samsungapps.com
+item.kakao.com
+katalk.kakao.com
+lastpass.com
+lcms.services.tomtom.com
+local.gosi.go.kr
+login.live.com
+m.taxi.yandex.ru
+mapi.flypgs.com
+media.tumblr.com
+mob.maps.yandex.net
+mob2api.mdc53.com
+mobile.yandex.net
+msa.enel.it
+musical.ly
+navcloud.tomtom.com
+newstube.ru
+notify.yikyakapi.net
+otf.msn.com
+pf-api.kakao.com
+productserver.sygic.com
+profile.bbm.blackberry.com
+quizup.com
+review.lineageos.org
+samsungosp.com
+spdy3.maps.rostaxi.org
+static.tumblr.com
+talk.kakao.com
+tamtam.chat
+tamtam.ok.ru
+tech1-cdn.com
+tech2-cdn.com
+termux.net
+thisissand.com
+trips-pa.googleapis.com
+tutotoons.com
+urbanairship.com
+us-central-api.yikyakapi.net
+userapi.com
+vas.samsungapps.com
+voiseservices.yandex.net
+vt.tumblr.com
+wallpaperapi.sofa.opera-api2.com
+webdav.yandex.com.ua
+webdav.yandex.ru
+websockets.platform.bing.com
+whatsapp.net
+whisper.sh
+wire.com
+wodtogether.com
+wunderlist.com
+zenstudios.com
+zoom.us

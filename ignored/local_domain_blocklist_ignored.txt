@@ -1,0 +1,34 @@
+# dns-toolkit 1.0.0
+# File name: local_domain_blocklist_ignored.txt
+# Last Updated: 20250830_101201
+# Format: Consolidated Categories Domain Ignored
+# Count: 24
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+10web.io
+aixploria.com
+chat.openai.com
+chatgpt.com
+claude.ai
+copilot.microsoft.com
+copy.ai
+cursor.com
+cursor.sh
+deepseek.com
+descript.com
+fathom.video
+gemini.google.com
+hailuo.ai
+lalal.ai
+midjourney.com
+n8n.io
+openai.com
+perplexity.ai
+play.ai
+synthesia.io
+tickeron.com
+toolify.ai
+zapier.com

@@ -1,0 +1,56 @@
+# dns-toolkit 1.0.0
+# File name: discord_domain_allowlist.txt
+# Last Updated: 20250830_101200
+# Format: Consolidated Categories Domain allowlist
+# Count: 43
+# Files:
+# This allowlist list was consolidated from 1 source file(s):
+#   - Dogino_Discord_Official domain: 43
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+dis.gd
+discord-activities.com
+discord.co
+discord.com
+discord.design
+discord.dev
+discord.gg
+discord.gift
+discord.gifts
+discord.media
+discord.new
+discord.store
+discord.tools
+discordactivities.com
+discordapp.com
+discordapp.io
+discordapp.net
+discordcdn.com
+discordmerch.com
+discordpartygames.com
+discordsays.com
+discordstatus.com
+ext-twitch.tv
+jtvnw.net
+live-video.net
+s.team
+steam-chat.com
+steamchina.com
+steamcommunity.com
+steamcontent.com
+steamgames.com
+steampowered.com
+steampowered.com.8686c.com
+steamstatic.com
+steamstatic.com.8686c.com
+steamusercontent.com
+ttvnw.net
+twitch.okta.com
+twitch.tv
+twitchcdn.net
+twitchsvc.net
+valve.net
+valvesoftware.com

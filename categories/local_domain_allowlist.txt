@@ -1,0 +1,86 @@
+# dns-toolkit 1.0.0
+# File name: local_domain_allowlist.txt
+# Last Updated: 20250830_101201
+# Format: Consolidated Categories Domain allowlist
+# Count: 72
+# Files:
+# This allowlist list was consolidated from 2 source file(s):
+#   - Local AI Allowlist (Domain) domain: 24
+#   - Local Allowlist (Domain)    domain: 48 [must consider]
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+10web.io
+adaway.org
+adguardteam.github.io
+aixploria.com
+big.oisd.nl
+blocklist.greensnow.co
+cdn.jsdelivr.net
+cf.trackerslist.com
+chat.openai.com
+chatgpt.com
+cinsscore.com
+claude.ai
+click.redditmail.com
+copilot.microsoft.com
+copy.ai
+cursor.com
+cursor.sh
+cybercrime-tracker.net
+danger.rulez.sk
+deepseek.com
+descript.com
+drive.google.com
+dsi.ut-capitole.fr
+easylist-downloads.adblockplus.org
+easylist.to
+fathom.video
+filters.adtidy.org
+gemini.google.com
+github.com
+hailuo.ai
+hostfiles.frogeye.fr
+iplists.firehol.org
+lalal.ai
+lists.blocklist.de
+lists.cyberhost.uk
+malware-filter.gitlab.io
+midjourney.com
+myip.ms
+n8n.io
+nsfw-small.oisd.nl
+o0.pages.dev
+openai.com
+opendbl.net
+openphish.com
+perplexity.ai
+pgl.yoyo.org
+phishing.army
+play.ai
+public-dns.info
+quidsup.net
+raw.githubusercontent.com
+report.cs.rutgers.edu
+rules.emergingthreats.net
+sblam.com
+small.oisd.nl
+someonewhocares.org
+synthesia.io
+teams.microsoft.com
+tickeron.com
+toolify.ai
+tracker.viriback.com
+tranco-list.eu
+urlhaus.abuse.ch
+v.firebog.net
+view.sentinel.turris.cz
+vxvault.net
+warui.intaa.net
+web.archive.org
+web.whatsapp.com
+www.binarydefense.com
+www.spamhaus.org
+zapier.com

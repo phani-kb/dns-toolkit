@@ -1,0 +1,64 @@
+# dns-toolkit 1.0.0
+# File name: top_adguard_blocklist_min7.txt
+# Last Updated: 20250830_101227
+# Format: Top AdGuard blocklist (minimum 7 sources)
+# Count: 54
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+||googie-anaiytics.com^
+||kra18.com^
+||wpadmngr.com^
+||0af2a962b0102942d9a7df351b20be55.com^
+||0i0i0i0.com^
+||0x01n2ptpuz3.com^
+||abzaligtwd.com^
+||adblock-zen.com^
+||azurestealth.com^
+||beauty1.xyz^
+||cjvdfw.com^
+||cpmrevenuegate.com^
+||d24ak3f2b.top^
+||daily-info.live^
+||deckedsi.com^
+||departurealtar.com^
+||dismantlepenantiterrorist.com^
+||duo-zlhbjsld.buzz^
+||dyipkcuro.rocks^
+||fastincognitomode.com^
+||fzmflvwn.tech^
+||hhbypdoecp.com^
+||hi-xgnnkqs.buzz^
+||highcpmgate.com^
+||highperformancegate.com^
+||hmkwhhnflgg.space^
+||illuminateinconveniencenutrient.com^
+||itweepinbelltor.com^
+||iyfbodn.com^
+||iyfnz.com^
+||linkredirect.biz^
+||lookebonyhill.com^
+||mb102.com^
+||modoodeul.com^
+||novidash.com^
+||passfixx.com^
+||plirkep.com^
+||regulationprivilegescan.top^
+||secthatlead.com^
+||security-u.com^
+||septfd2em64eber.com^
+||sr7pv7n5x.com^
+||startperfectsolutions.com^
+||truanet.com^
+||tsyndicate.com^
+||twinrdsyn.com^
+||ungothoritator.com^
+||unjustsubmerge.com^
+||vaikijie.net^
+||variouscreativeformats.com^
+||viewyentreat.guru^
+||wvhba6470p.com^
+||zaamgqlgdhac.love^
+||zoawufoy.net^

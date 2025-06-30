@@ -1,0 +1,20 @@
+# dns-toolkit 1.0.0
+# File name: local_adguard_blocklist.txt
+# Last Updated: 20250830_101201
+# Format: Consolidated Categories AdGuard blocklist
+# Count: 7
+# Files:
+# This blocklist list was consolidated from 1 source file(s):
+#   - Local Blocklist (AdGuard) adguard: 7 [must consider]
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+||ads.pinterest.com^
+||ads.tiktok.com^
+||ads.youtube.com^
+||crashlytics.com^
+||logs.roku.com^
+||ls.cti.roku.com^
+||prod.mobile.roku.com^

@@ -1,0 +1,20 @@
+# dns-toolkit 1.0.0
+# File name: scam_ipv4_blocklist.txt
+# Last Updated: 20250830_101210
+# Format: Consolidated Categories IPv4 blocklist
+# Count: 7
+# Files:
+# This blocklist list was consolidated from 1 source file(s):
+#   - GlobalAntiScamOrg-blocklist-ips ipv4: 7
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+118.107.18.122
+134.122.182.139
+192.109.228.226
+20.2.48.198
+20.255.121.173
+66.232.10.33
+99.83.211.96

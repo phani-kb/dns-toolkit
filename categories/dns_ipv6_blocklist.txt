@@ -1,0 +1,24 @@
+# dns-toolkit 1.0.0
+# File name: dns_ipv6_blocklist.txt
+# Last Updated: 20250830_101200
+# Format: Consolidated Categories IPv6 blocklist
+# Count: 11
+# Files:
+# This blocklist list was consolidated from 1 source file(s):
+#   - Public_DNS4 ipv6: 11
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+2001:41d0:700:13cb:141:95:6:51
+2001:428:101:100:205:171:3:65
+2001:468:c80:2101:0:100:0:22
+2001:468:c80:4101:0:100:0:42
+2001:678:f68:70:5054:ff:fe57:4a07
+2001:878:0:e000:82:e1:f4:a6
+2402:2c00:1688:162:1643:4989:f51c:7392
+2607:5300:203:7f27:5054:ff:fe45:85b5
+2607:5300:203:7f27:5054:ff:fe57:4a07
+2a03:4000:17:9ca:8860:f2ff:feb0:cbfe
+2a03:4000:4d:c92:88c0:96ff:fec6:b9d

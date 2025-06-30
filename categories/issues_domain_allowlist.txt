@@ -1,0 +1,81 @@
+# dns-toolkit 1.0.0
+# File name: issues_domain_allowlist.txt
+# Last Updated: 20250830_101201
+# Format: Consolidated Categories Domain allowlist
+# Count: 68
+# Files:
+# This allowlist list was consolidated from 1 source file(s):
+#   - AdGuardTeam_HttpsExclusions_issues domain: 68
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+api.adguard.org
+api.apple-cloudkit.com
+api.samsungcloud.com
+api.surfeasy.com
+api.viber.com
+asm.skype.com
+boxcryptor.com
+charts.profinance.ru
+console.cloud.google.com
+control.phone.com
+discovery-announce-v4.syncthing.net
+discovery-announce-v6.syncthing.net
+discovery-lookup.syncthing.net
+dms.metlife.ru
+download.skype.com
+e-tjanster.1177.se
+e-xacbank.com
+easy.box
+files.msal.ru
+firestore.clients6.google.com
+firestore.googleapis.com
+formy.upriver.ru
+fritz.box
+get.skype.com
+gw.buaa.edu.cn
+hpcloud.hp.com
+hpcloud.hp.net
+idmsa.apple.com
+ihelper.mts.by
+instantmessaging-pa.googleapis.com
+keenetic.link
+keenetic.pro
+line.naver.jp
+link.adtidy.org
+mail.hostmonster.com
+media-share-1.s3.amazonaws.com
+media-share-4.s3-eu-west-1.amazonaws.com
+media-share-5.s3.eu-central-1.amazonaws.com
+meet.google.com
+mid.ru
+nest.com
+nuernberg.de
+opera-proxy.net
+playfamily.ru
+postacertificata.lextel.it
+profile.franklintempleton.com
+relays.syncthing.net
+sec-tunnel.com
+sitecheck1.opera.com
+sitecheck2.opera.com
+sitecheck3.opera.com
+sitecheck4.opera.com
+sitecheck5.opera.com
+sitecheck6.opera.com
+sitecheck7.opera.com
+speedport.ip
+ssh.cloud.google.com
+startmail.com
+static.adtidy.org
+swisslife.ch
+theluckygene.com
+tknauth.spmode.ne.jp
+triolan.name
+ufa.wifi.domru.ru
+updates.cdn-apple.com
+vnn-res.vgcloud.vn
+voipnx-saturn.line-apps.com
+vseinstrumenti.ru

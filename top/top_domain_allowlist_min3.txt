@@ -1,0 +1,42 @@
+# dns-toolkit 1.0.0
+# File name: top_domain_allowlist_min3.txt
+# Last Updated: 20250830_101336
+# Format: Top Domain allowlist (minimum 3 sources)
+# Count: 32
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+accounts.google.com
+apple.com
+bit.ly
+discord.com
+discord.gg
+discord.media
+discordapp.com
+dl.dropboxusercontent.com
+github.com
+gravatar.com
+gstatic.com
+icloud.com
+live-video.net
+login.live.com
+msftncsi.com
+mzstatic.com
+openai.com
+paypal.com
+steamcommunity.com
+steampowered.com
+steamstatic.com
+stripe.com
+tinyurl.com
+ttvnw.net
+twitch.tv
+unpkg.com
+web.whatsapp.com
+whatsapp.net
+windowsupdate.com
+youtu.be
+youtube-nocookie.com
+zoom.us

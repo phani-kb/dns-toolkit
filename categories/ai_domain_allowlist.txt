@@ -1,0 +1,37 @@
+# dns-toolkit 1.0.0
+# File name: ai_domain_allowlist.txt
+# Last Updated: 20250830_101159
+# Format: Consolidated Categories Domain allowlist
+# Count: 24
+# Files:
+# This allowlist list was consolidated from 1 source file(s):
+#   - Local AI Allowlist (Domain) domain: 24
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+10web.io
+aixploria.com
+chat.openai.com
+chatgpt.com
+claude.ai
+copilot.microsoft.com
+copy.ai
+cursor.com
+cursor.sh
+deepseek.com
+descript.com
+fathom.video
+gemini.google.com
+hailuo.ai
+lalal.ai
+midjourney.com
+n8n.io
+openai.com
+perplexity.ai
+play.ai
+synthesia.io
+tickeron.com
+toolify.ai
+zapier.com

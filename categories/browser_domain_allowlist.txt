@@ -1,0 +1,31 @@
+# dns-toolkit 1.0.0
+# File name: browser_domain_allowlist.txt
+# Last Updated: 20250830_101159
+# Format: Consolidated Categories Domain allowlist
+# Count: 18
+# Files:
+# This allowlist list was consolidated from 1 source file(s):
+#   - AdGuardTeam_HttpsExclusions_firefox domain: 18
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+8pecxstudios.com
+accounts.firefox.com
+addons-api.adguard.com
+addons.mozilla.org
+adtidy.org
+agrd.io
+api.adguard.com
+aus5.mozilla.org
+cdn.agilebits.com
+chrome.adtidy.org
+d13itkw33a7sus.cloudfront.net
+dl.dropboxusercontent.com
+eff.org
+fpn.firefox.com
+mozilla.com
+mozilla.net
+static.adguard.com
+stickypassword.com

@@ -1,0 +1,20 @@
+# dns-toolkit 1.0.0
+# File name: windows_domain_allowlist.txt
+# Last Updated: 20250830_101214
+# Format: Consolidated Categories Domain allowlist
+# Count: 7
+# Files:
+# This allowlist list was consolidated from 1 source file(s):
+#   - AdGuardTeam_HttpsExclusions_windows domain: 7
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+api.myteamspeak.com
+api.truckersmp.com
+aus.waterfox.net
+badges-content.teamspeak.com
+clientapi.myteamspeak.com
+licensing.mp.microsoft.com
+named.myteamspeak.com

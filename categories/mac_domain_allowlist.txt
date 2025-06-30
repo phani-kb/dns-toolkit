@@ -1,0 +1,24 @@
+# dns-toolkit 1.0.0
+# File name: mac_domain_allowlist.txt
+# Last Updated: 20250830_101201
+# Format: Consolidated Categories Domain allowlist
+# Count: 11
+# Files:
+# This allowlist list was consolidated from 1 source file(s):
+#   - AdGuardTeam_HttpsExclusions_mac domain: 11
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+apple.com
+check.svyaznoy.ru
+emploiquebec.gouv.qc.ca
+icloud.com
+icloud.com.cn
+mzstatic.com
+raindrop.io
+vchecks.me
+www.antonioli.eu
+www.re-store.ru
+www.svyaznoy.ru
