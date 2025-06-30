@@ -1,0 +1,13 @@
+# dns-toolkit 1.0.3
+# File name: social_domain_allowlist.txt
+# Last Updated: 20260506_114617
+# Format: Consolidated Categories Domain allowlist
+# Count: 1 (original: 1)
+# Files:
+# This allowlist list was consolidated from 1 source file(s):
+#   - local_social_allowlist domain: 1
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+web.whatsapp.com

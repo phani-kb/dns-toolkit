@@ -1,0 +1,11 @@
+# dns-toolkit 1.0.3
+# File name: top_adguard_blocklist_min7.txt
+# Last Updated: 20260506_114638
+# Format: Top AdGuard blocklist (minimum 7 sources)
+# Count: 2
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+||analytics.tiktok.com^
+||websdk.appsflyer.com^

@@ -1,0 +1,55 @@
+# dns-toolkit 1.0.3
+# File name: mini_domain_allowlist.txt
+# Last Updated: 20260506_114545
+# Format: Consolidated Groups Domain allowlist
+# Count: 43 (original: 43)
+# Files:
+# This allowlist list was consolidated from 1 source file(s):
+#   - local_source_domain_allowlist domain: 43 [must consider]
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+adaway.org
+adguardteam.github.io
+big.oisd.nl
+blocklist.greensnow.co
+cdn.jsdelivr.net
+cf.trackerslist.com
+cinsscore.com
+danger.rulez.sk
+dsi.ut-capitole.fr
+easylist-downloads.adblockplus.org
+easylist.to
+github.com
+gitlab.com
+hostfiles.frogeye.fr
+iplists.firehol.org
+lists.blocklist.de
+lists.cyberhost.uk
+malware-filter.gitlab.io
+myip.ms
+nsfw-small.oisd.nl
+opendbl.net
+pgl.yoyo.org
+phishing.army
+public-dns.info
+raw.githubusercontent.com
+report.cs.rutgers.edu
+rules.emergingthreats.net
+sblam.com
+small.oisd.nl
+someonewhocares.org
+threatfox.abuse.ch
+threatview.io
+tracker.viriback.com
+tranco-list.eu
+urlhaus.abuse.ch
+v.firebog.net
+view.sentinel.turris.cz
+vxvault.net
+warui.intaa.net
+web.archive.org
+www.binarydefense.com
+www.dan.me.uk
+www.spamhaus.org

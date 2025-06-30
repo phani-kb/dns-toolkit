@@ -1,0 +1,67 @@
+# dns-toolkit 1.0.3
+# File name: local_adguard_allowlist.txt
+# Last Updated: 20260506_114601
+# Format: Consolidated Categories AdGuard allowlist
+# Count: 52 (original: 52)
+# Files:
+# This allowlist list was consolidated from 4 source file(s):
+#   - local_adg_allowlist           adguard       : 43 [must consider]
+#   - local_miscellaneous_allowlist adguard_domain: 7 
+#   - local_mobile_allowlist        adguard_domain: 1 
+#   - local_social_allowlist        adguard_domain: 1 
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+@@||adaway.org^
+@@||adguardteam.github.io^
+@@||big.oisd.nl^
+@@||blocklist.greensnow.co^
+@@||cdn.jsdelivr.net^
+@@||cf.trackerslist.com^
+@@||cinsscore.com^
+@@||click.redditmail.com^
+@@||danger.rulez.sk^
+@@||drive.google.com^
+@@||dsi.ut-capitole.fr^
+@@||easylist-downloads.adblockplus.org^
+@@||easylist.to^
+@@||github.com^
+@@||gitlab.com^
+@@||hostfiles.frogeye.fr^
+@@||internet.nl^
+@@||iplists.firehol.org^
+@@||lists.blocklist.de^
+@@||lists.cyberhost.uk^
+@@||login.newrelic.com^
+@@||malware-filter.gitlab.io^
+@@||myip.ms^
+@@||newrelic.com^
+@@||nsfw-small.oisd.nl^
+@@||onenr.io^
+@@||opendbl.net^
+@@||pgl.yoyo.org^
+@@||phishing.army^
+@@||play.googleapis.com^
+@@||public-dns.info^
+@@||raw.githubusercontent.com^
+@@||report.cs.rutgers.edu^
+@@||rules.emergingthreats.net^
+@@||sblam.com^
+@@||small.oisd.nl^
+@@||someonewhocares.org^
+@@||teams.microsoft.com^
+@@||threatfox.abuse.ch^
+@@||threatview.io^
+@@||tracker.viriback.com^
+@@||tranco-list.eu^
+@@||urlhaus.abuse.ch^
+@@||v.firebog.net^
+@@||view.sentinel.turris.cz^
+@@||vxvault.net^
+@@||warui.intaa.net^
+@@||web.archive.org^
+@@||web.whatsapp.com^
+@@||www.binarydefense.com^
+@@||www.dan.me.uk^
+@@||www.spamhaus.org^

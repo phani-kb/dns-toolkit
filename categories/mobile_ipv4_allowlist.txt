@@ -1,0 +1,16 @@
+# dns-toolkit 1.0.3
+# File name: mobile_ipv4_allowlist.txt
+# Last Updated: 20260506_114612
+# Format: Consolidated Categories IPv4 allowlist
+# Count: 4 (original: 4)
+# Files:
+# This allowlist list was consolidated from 1 source file(s):
+#   - local_mobile_allowlist ipv4_from_domain: 4
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+216.239.32.223
+216.239.34.223
+216.239.36.223
+216.239.38.223

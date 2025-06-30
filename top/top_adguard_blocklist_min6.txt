@@ -1,0 +1,62 @@
+# dns-toolkit 1.0.3
+# File name: top_adguard_blocklist_min6.txt
+# Last Updated: 20260506_114638
+# Format: Top AdGuard blocklist (minimum 6 sources)
+# Count: 53
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+||analytics.tiktok.com^
+||websdk.appsflyer.com^
+||0i0i0i0.com^
+||ad.about.co.kr^
+||ad.mox.tv^
+||ads-twitter.com^
+||adtelligent.com^
+||advertipros.com^
+||analytics-api.samsunghealthcn.com^
+||analytics.mobile.yandex.net^
+||azurestealth.com^
+||beacon.qq.com^
+||beacon.shazam.com^
+||btloader.com^
+||c.bigmir.net^
+||camschat.net^
+||cjvdfw.com^
+||click.oneplus.cn^
+||creativecdn.com^
+||damdoor.com^
+||direct-collect.dy-api.com^
+||direct-collect.dy-api.eu^
+||dismantlepenantiterrorist.com^
+||eskimi.com^
+||ia.51.la^
+||itweepinbelltor.com^
+||kettledroopingcontinuation.com^
+||kra18.com^
+||log.cookieyes.com^
+||log.pinterest.com^
+||logbak.hicloud.com^
+||logservice.hicloud.com^
+||logservice1.hicloud.com^
+||metrics.brightcove.com^
+||mtrace.qq.com^
+||optad360.io^
+||player-telemetry.vimeo.com^
+||protagcdn.com^
+||reauthenticator.com^
+||stats.wp.com^
+||statsjs.klevu.com^
+||syndicatedsearch.goog^
+||telemetry.canva.com^
+||tns.simba.taobao.com^
+||to.getnitropack.com^
+||track.mailerlite.com^
+||track.uc.cn^
+||tracking.miui.com^
+||tsyndicate.com^
+||wellhello.com^
+||wpadmngr.com^
+||xlivrdr.com^
+||yfdnzfa.com^

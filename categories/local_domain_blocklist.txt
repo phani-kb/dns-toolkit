@@ -1,0 +1,19 @@
+# dns-toolkit 1.0.3
+# File name: local_domain_blocklist.txt
+# Last Updated: 20260506_114601
+# Format: Consolidated Categories Domain blocklist
+# Count: 7 (original: 7)
+# Files:
+# This blocklist list was consolidated from 1 source file(s):
+#   - local_domain_blocklist domain: 7 [must consider]
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+ads.pinterest.com
+ads.tiktok.com
+ads.youtube.com
+crashlytics.com
+logs.roku.com
+ls.cti.roku.com
+pagead2.googlesyndication.com
