@@ -18,7 +18,7 @@ import (
 )
 
 func TestCanSkipDownload_WithModifiedHeader(t *testing.T) {
-	t.Parallel()
+
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
 	defer func(path string) {
@@ -82,7 +82,7 @@ func TestCanSkipDownload_WithModifiedHeader(t *testing.T) {
 }
 
 func TestCanSkipDownload_NoLastModifiedHeader(t *testing.T) {
-	t.Parallel()
+
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
 	defer func(path string) {
@@ -194,7 +194,7 @@ func TestCanSkipDownload_DifferentFileSize(t *testing.T) {
 }
 
 func TestDownloadFile_ForceFlagSet(t *testing.T) {
-	t.Parallel()
+
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
 	defer func(path string) {
@@ -241,7 +241,7 @@ func TestDownloadFile_ForceFlagSet(t *testing.T) {
 
 // Test downloading with various connection issues
 func TestDownloadFile_ConnectionErrors(t *testing.T) {
-	t.Parallel()
+
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
 	defer func(path string) {

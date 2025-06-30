@@ -13,7 +13,6 @@ import (
 )
 
 func TestGetUniqueCategories(t *testing.T) {
-	t.Parallel()
 
 	tests := []struct {
 		name           string
@@ -75,7 +74,6 @@ func TestGetUniqueCategories(t *testing.T) {
 }
 
 func TestConsolidateByCategory(t *testing.T) {
-	t.Parallel()
 
 	logger := multilog.NewLogger()
 
@@ -159,7 +157,6 @@ func TestConsolidateByCategory(t *testing.T) {
 }
 
 func TestConsolidateCategoriesCommand(t *testing.T) {
-	t.Parallel()
 
 	assert.NotNil(t, consolidateCategoriesCmd)
 	assert.Equal(t, "categories", consolidateCategoriesCmd.Use)
