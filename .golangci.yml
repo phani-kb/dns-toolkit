@@ -32,21 +32,14 @@ linters:
     revive:
       rules:
         - name: exported
-          arguments: [ { checkExported: true } ]
         - name: package-comments
         - name: var-naming
-          arguments: [ { allowCommonInitialisms: true } ]
         - name: indent-error-flow
         - name: error-strings
         - name: error-return
         - name: blank-imports
         - name: context-as-argument
         - name: if-return
-        - name: naked-return
-        - name: predeclared
-        - name: range-val-copy
-        - name: typecheck
-        - name: unnecessary-else
         - name: unused-parameter
           severity: warning
           disabled: false
