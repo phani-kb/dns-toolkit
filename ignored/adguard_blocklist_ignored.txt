@@ -1,0 +1,24 @@
+# dns-toolkit 0.1.0
+# File name: adguard_blocklist_ignored.txt
+# Last Updated: 20250816_170839
+# Format: Consolidated AdGuard Ignored
+# Count: 14
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+||cdp.cloud.unity3d.com^
+||config.uca.cloud.unity3d.com^
+||content.ingbank.pl^
+||cws.conviva.com^
+||d2c8v52ll5s99u.cloudfront.net^
+||driftt.com^
+||ichnaea.netflix.com^
+||image.ard.de^
+||msmetrics.ws.sonos.com^
+||om.cbsi.com^
+||rs6.net^$image,script,third-party
+||s2.youtube.com^
+||sanalytics.disneyplus.com^
+||v.shopify.com^

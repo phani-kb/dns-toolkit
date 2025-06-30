@@ -1,0 +1,69 @@
+# dns-toolkit 0.1.0
+# File name: ads_domain_blocklist_ignored.txt
+# Last Updated: 20250816_170846
+# Format: Consolidated Categories Domain Ignored
+# Count: 59
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+5471782.fls.doubleclick.net
+79423.analytics.edgekey.net
+action.metaffiliation.com
+ad.10010.com
+ad.cgv.co.kr
+ad.ourgame.com
+ad.smartmediarep.com
+admin.dable.io
+ads.adsterra.com
+ads.sportsseoul.com
+adsterra.com
+afi-b.com
+analytics.amplitude.com
+ap01.records.in.treasuredata.com
+api.ads.tvb.com
+app.adjust.com
+app.appsflyer.com
+app.crazyegg.com
+awin1.com
+beta.partners.adsterra.com
+beta.publishers.adsterra.com
+brsrvr.com
+cj.dotomi.com
+cm-beacon.nakanohito.jp
+cm-widget.nakanohito.jp
+cmp.inmobi.com
+core.crazyegg.com
+e.customeriomail.com
+evergage.com
+ezodn.com
+googleads.g.doubleclick.net
+hb.afl.rakuten.co.jp
+help-advertisers.adsterra.com
+img.ads.tvb.com
+infra-api.newrelic.com
+log.mmstat.com
+my.tealiumiq.com
+nineto5mac-d.openx.net
+pagead.l.doubleclick.net
+proto2ad.durasite.net
+publishers.adsterra.com
+px.a8.net
+recommender.scarabresearch.com
+redirect.appmetrica.yandex.com
+res.ads.nicovideo.jp
+sax.sina.com.cn
+statcounter.com
+str.hit.gemius.pl
+support-widget.nakanohito.jp
+tags.crwdcntrl.net
+track.webgains.com
+tradedoubler.com
+trbo.com
+vads-api.ad.daum.net
+videoads.kakao.com
+www.googleadservices.com
+www.jdoqocy.com
+www.statcounter.com
+www3.doubleclick.net

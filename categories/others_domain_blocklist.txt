@@ -1,0 +1,14 @@
+# dns-toolkit 0.1.0
+# File name: others_domain_blocklist.txt
+# Last Updated: 20250816_170852
+# Format: Consolidated Categories Domain blocklist
+# Count: 1
+# Files:
+# This blocklist list was consolidated from 1 source file(s):
+#   - Local Blocklist (Domain) domain: 1 [must consider]
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+pagead2.googlesyndication.com
