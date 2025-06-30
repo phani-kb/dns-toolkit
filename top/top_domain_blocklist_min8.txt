@@ -1,0 +1,95 @@
+# dns-toolkit 0.1.0
+# File name: top_domain_blocklist_min8.txt
+# Last Updated: 20250712_142856
+# Format: Top Domain blocklist (minimum 8 sources)
+# Count: 85
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+tsyndicate.com
+ads.yahoo.com
+friendshipmale.com
+tracking.intl.miui.com
+doubleclick.net
+innovid.com
+googlesyndication.com
+stickyadstv.com
+alphonso.tv
+flashtalking.com
+carambo.la
+addresseepaper.com
+smaato.com
+brealtime.com
+id5-sync.com
+youradexchange.com
+sdkconfig.ad.intl.xiaomi.com
+tappx.com
+bluelithium.com
+sumome.com
+ads.linkedin.com
+adingo.jp
+smetrics.foxnews.com
+rayjump.com
+vungle.com
+banquetunarmedgrater.com
+btrll.com
+aerserv.com
+clksite.com
+samsungads.com
+ads-twitter.com
+onetag-sys.com
+mobilefuse.com
+adserver.pressboard.ca
+tremorhub.com
+securepubads.g.doubleclick.net
+cpmstar.com
+admixer.net
+smetrics.bestbuy.com
+adform.com
+adtech.com
+spotxchange.com
+open.oneplus.net
+disqusads.com
+adformdsp.net
+netmng.com
+onclickads.net
+steelhousemedia.com
+adblade.com
+mobclix.com
+smetrics.walgreens.com
+ad.daum.net
+api.ad.intl.xiaomi.com
+mydas.mobi
+tidaltv.com
+tracking.miui.com
+adnxs.com
+clevernt.com
+widespace.com
+ad-delivery.net
+acdn.adnxs.com
+applog.uc.cn
+snapads.com
+adsrvr.org
+deloplen.com
+pubnative.net
+pagead2.googlesyndication.com
+ads.supplyframe.com
+coin-hive.com
+criteo.com
+adcolony.com
+adap.tv
+ads.msn.com
+powerad.ai
+ncaudienceexchange.com
+engageya.com
+bttrack.com
+oclasrv.com
+sdkconfig.ad.xiaomi.com
+adtng.com
+supersonicads.com
+dianomi.com
+smartadserver.com
+moatads.com
+celtra.com

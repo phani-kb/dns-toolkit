@@ -1,0 +1,79 @@
+# dns-toolkit 0.1.0
+# File name: top_domain_allowlist_min3.txt
+# Last Updated: 20250712_142905
+# Format: Top Domain allowlist (minimum 3 sources)
+# Count: 69
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+github.com
+imasdk.googleapis.com
+gstatic.com
+twitter.com
+pagead2.googlesyndication.com
+cloudflare.com
+connect.facebook.net
+cloudfront.net
+unpkg.com
+amazonaws.com
+apis.google.com
+google.com
+ezodn.com
+static.doubleclick.net
+googleadservices.com
+docs.google.com
+netflix.com
+chrome.google.com
+redirector.gvt1.com
+googletagmanager.com
+doubleclick.net
+instagram.com
+cdn.optimizely.com
+graph.microsoft.com
+plex.tv
+p.jwpcdn.com
+tags.tiqcdn.com
+youtube.com
+facebook.com
+storage.googleapis.com
+wordpress.org
+cvs.com
+jsdelivr.net
+bit.ly
+teams.microsoft.com
+icloud.com
+googleapis.com
+pinterest.com
+wikipedia.org
+youtu.be
+google-analytics.com
+akamaihd.net
+assets.msn.com
+whatsapp.com
+msn.com
+tra.scds.pmdstatic.net
+drive.google.com
+s0.2mdn.net
+guce.advertising.com
+cdnjs.cloudflare.com
+accounts.google.com
+amazon.com
+imgur.com
+microsoft.com
+awin1.com
+securepubads.g.doubleclick.net
+maxcdn.bootstrapcdn.com
+googleads.g.doubleclick.net
+cdn.jsdelivr.net
+advertisement.js
+apple.com
+static.cloud.coveo.com
+login.microsoftonline.com
+windowsupdate.com
+clients4.google.com
+linkedin.com
+akamaiedge.net
+c.paypal.com
+cdninstagram.com

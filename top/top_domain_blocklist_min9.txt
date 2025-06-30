@@ -1,0 +1,17 @@
+# dns-toolkit 0.1.0
+# File name: top_domain_blocklist_min9.txt
+# Last Updated: 20250712_142858
+# Format: Top Domain blocklist (minimum 9 sources)
+# Count: 7
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+tsyndicate.com
+ads.yahoo.com
+doubleclick.net
+innovid.com
+googlesyndication.com
+friendshipmale.com
+tracking.intl.miui.com

@@ -1,0 +1,13 @@
+# dns-toolkit 0.1.0
+# File name: mini_adguard_allowlist.txt
+# Last Updated: 20250712_142826
+# Format: Consolidated Groups AdGuard allowlist
+# Count: 3
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+@@||click.discord.com^$important
+@@||fpt.live.com^$important
+@@||rs6.net^$image,script,third-party

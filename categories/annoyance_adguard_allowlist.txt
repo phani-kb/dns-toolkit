@@ -1,0 +1,16 @@
+# dns-toolkit 0.1.0
+# File name: annoyance_adguard_allowlist.txt
+# Last Updated: 20250712_142833
+# Format: Consolidated Categories AdGuard allowlist
+# Count: 6
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+@@/adview_pic_$domain=doutula.com|fastadmin.net|toolfk.com|xclient.info
+@@||fm.ipinyou.$domain=ipinyou.com.cn
+@@||fm.p0y.cn^$domain=ipinyou.com.cn
+@@||lancdn.com/landian/public/js/ads.js
+@@||qbox.me/static/js/ads.js$domain=linux.cn
+@@||th7.cn/sanda2015/css/ads.js

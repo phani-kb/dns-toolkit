@@ -1,0 +1,77 @@
+# dns-toolkit 0.1.0
+# File name: normal_domain_blocklist_ignored.txt
+# Last Updated: 20250712_142827
+# Format: Consolidated Groups Domain Ignored
+# Count: 67
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+79423.analytics.edgekey.net
+a.klaviyo.com
+a1843.g.akamai.net
+amplitude.com
+app.appsflyer.com
+assets.minutemediacdn.com
+audid-api.taobao.com
+b.stats.paypal.com
+c.bing.com
+capi.connatix.com
+cbsinteractive.hb.omtrdc.net
+cd.connatix.com
+cdn.boomtrain.com
+cdn.optimizely.com
+cdn.rlcdn.com
+cdn.tpdads.com
+cdn.vidible.tv
+cdn3.optimizely.com
+cdp.cloud.unity3d.com
+cds.connatix.com
+cf.iadsdk.apple.com
+ct.pinterest.com
+cws-iad1.conviva.com
+cws-sjc2.conviva.com
+devices.carnivalmobile.com
+disney.demdex.net
+doubleclick.net
+dpm.demdex.net
+fls-na.amazon.com
+go.redirectingat.com
+go.skimresources.com
+google-analytics.com
+googleadservices.com
+googlesyndication.com
+iadsdk.apple.com
+images2.minutemediacdn.com
+img.connatix.com
+log.mmstat.com
+mparticle.map.fastly.net
+news.iadsdk.apple.com
+p.brid.tv
+pi.pardot.com
+play.aniview.com
+polyfill.io
+prd.jwpltx.com
+production-cmp.isgprivacy.cbsi.com
+recommender.scarabresearch.com
+s0.2mdn.net
+sdk-02.moengage.com
+sdk.split.io
+services.brid.tv
+shalltry.com
+smart.link
+statics-marketingsites-eus-ms-com.akamaized.net
+statics-marketingsites-neu-ms-com.akamaized.net
+tag.dickssportinggoods.com
+tagger.opecloud.com
+tags.crwdcntrl.net
+tags.tiqcdn.com
+trk.klclick1.com
+vid.connatix.com
+vms.bluebillywig.com
+widget-cdn.rpxnow.com
+workers.dev
+ws-na.amazon-adsystem.com
+ws.sharethis.com
+www.googleadservices.com

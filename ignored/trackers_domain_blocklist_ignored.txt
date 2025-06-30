@@ -1,0 +1,19 @@
+# dns-toolkit 0.1.0
+# File name: trackers_domain_blocklist_ignored.txt
+# Last Updated: 20250712_142837
+# Format: Consolidated Categories Domain Ignored
+# Count: 9
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+
+ad.10010.com
+adsterra.com
+awin1.com
+evergage.com
+exacttarget.com
+ezodn.com
+goto.target.com
+statcounter.com
+tradedoubler.com
