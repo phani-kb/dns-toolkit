@@ -13,7 +13,6 @@ import (
 )
 
 func TestConsolidateGroupsCommand(t *testing.T) {
-	t.Parallel()
 
 	assert.NotNil(t, consolidateGroupsCmd)
 	assert.Equal(t, "groups", consolidateGroupsCmd.Use)
@@ -22,7 +21,6 @@ func TestConsolidateGroupsCommand(t *testing.T) {
 }
 
 func TestConsolidateByGroup(t *testing.T) {
-	t.Parallel()
 
 	logger := multilog.NewLogger()
 
