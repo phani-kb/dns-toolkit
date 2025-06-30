@@ -1,0 +1,30 @@
+# dns-toolkit 1.0.5
+# File name: top_adguard_blocklist_min7.txt
+# Last Updated: 20261024_134443
+# Format: Top AdGuard blocklist (minimum 7 sources)
+# Count: 21
+# Project: https://github.com/phani-kb/dns-toolkit
+# License: GPL-3.0
+# Issues:  https://github.com/phani-kb/dns-toolkit/issues
+###
+||fingerprint-veri.info^
+||actuallysheep.com^
+||aifpleasurebeh.org^
+||azurestealth.com^
+||cjvdfw.com^
+||content-website-analytics.com^
+||copyrightaccesscontrols.com^
+||cuddlethehyena.com^
+||damdoor.com^
+||decidedrum.com^
+||difficultfog.com^
+||dismantlepenantiterrorist.com^
+||distributiontomatoes.com^
+||eatablesquare.com^
+||evanescentedge.com^
+||illustriousoatmeal.com^
+||iyfbodn.com^
+||relationrest.com^
+||report1.biz^
+||weatherplllatform.com^
+||wpadmngr.com^
