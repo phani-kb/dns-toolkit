@@ -1,0 +1,184 @@
+[
+  {
+    "generic_source_type": "adguard",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_adguard_blocklist_min8.txt",
+    "list_type": "blocklist",
+    "min_sources": 8,
+    "count": 10
+  },
+  {
+    "generic_source_type": "adguard",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_adguard_blocklist_min7.txt",
+    "list_type": "blocklist",
+    "min_sources": 7,
+    "count": 72
+  },
+  {
+    "generic_source_type": "adguard",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_adguard_blocklist_min6.txt",
+    "list_type": "blocklist",
+    "min_sources": 6,
+    "count": 3989
+  },
+  {
+    "generic_source_type": "adguard",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_adguard_blocklist_min5.txt",
+    "list_type": "blocklist",
+    "min_sources": 5,
+    "count": 27867
+  },
+  {
+    "generic_source_type": "adguard",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_adguard_blocklist_min4.txt",
+    "list_type": "blocklist",
+    "min_sources": 4,
+    "count": 41511
+  },
+  {
+    "generic_source_type": "adguard",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_adguard_blocklist_min3.txt",
+    "list_type": "blocklist",
+    "min_sources": 3,
+    "count": 106970
+  },
+  {
+    "generic_source_type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_domain_blocklist_min12.txt",
+    "list_type": "blocklist",
+    "min_sources": 12,
+    "count": 188
+  },
+  {
+    "generic_source_type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_domain_blocklist_min11.txt",
+    "list_type": "blocklist",
+    "min_sources": 11,
+    "count": 457
+  },
+  {
+    "generic_source_type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_domain_blocklist_min10.txt",
+    "list_type": "blocklist",
+    "min_sources": 10,
+    "count": 1017
+  },
+  {
+    "generic_source_type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_domain_blocklist_min9.txt",
+    "list_type": "blocklist",
+    "min_sources": 9,
+    "count": 2029
+  },
+  {
+    "generic_source_type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_domain_blocklist_min8.txt",
+    "list_type": "blocklist",
+    "min_sources": 8,
+    "count": 3530
+  },
+  {
+    "generic_source_type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_domain_blocklist_min7.txt",
+    "list_type": "blocklist",
+    "min_sources": 7,
+    "count": 10534
+  },
+  {
+    "generic_source_type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_domain_blocklist_min6.txt",
+    "list_type": "blocklist",
+    "min_sources": 6,
+    "count": 17929
+  },
+  {
+    "generic_source_type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_domain_blocklist_min5.txt",
+    "list_type": "blocklist",
+    "min_sources": 5,
+    "count": 50421
+  },
+  {
+    "generic_source_type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_domain_blocklist_min4.txt",
+    "list_type": "blocklist",
+    "min_sources": 4,
+    "count": 111178
+  },
+  {
+    "generic_source_type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_domain_allowlist_min3.txt",
+    "list_type": "allowlist",
+    "min_sources": 3,
+    "count": 33
+  },
+  {
+    "generic_source_type": "domain",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_domain_blocklist_min3.txt",
+    "list_type": "blocklist",
+    "min_sources": 3,
+    "count": 247316
+  },
+  {
+    "generic_source_type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_ipv4_blocklist_min11.txt",
+    "list_type": "blocklist",
+    "min_sources": 11,
+    "count": 2
+  },
+  {
+    "generic_source_type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_ipv4_blocklist_min10.txt",
+    "list_type": "blocklist",
+    "min_sources": 10,
+    "count": 11
+  },
+  {
+    "generic_source_type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_ipv4_blocklist_min9.txt",
+    "list_type": "blocklist",
+    "min_sources": 9,
+    "count": 52
+  },
+  {
+    "generic_source_type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_ipv4_blocklist_min8.txt",
+    "list_type": "blocklist",
+    "min_sources": 8,
+    "count": 289
+  },
+  {
+    "generic_source_type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_ipv4_blocklist_min7.txt",
+    "list_type": "blocklist",
+    "min_sources": 7,
+    "count": 833
+  },
+  {
+    "generic_source_type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_ipv4_blocklist_min6.txt",
+    "list_type": "blocklist",
+    "min_sources": 6,
+    "count": 2317
+  },
+  {
+    "generic_source_type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_ipv4_blocklist_min5.txt",
+    "list_type": "blocklist",
+    "min_sources": 5,
+    "count": 7129
+  },
+  {
+    "generic_source_type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_ipv4_blocklist_min4.txt",
+    "list_type": "blocklist",
+    "min_sources": 4,
+    "count": 15592
+  },
+  {
+    "generic_source_type": "ipv4",
+    "filepath": "/home/runner/work/dns-toolkit/dns-toolkit/data/top/top_ipv4_blocklist_min3.txt",
+    "list_type": "blocklist",
+    "min_sources": 3,
+    "count": 31915
+  }
+]
