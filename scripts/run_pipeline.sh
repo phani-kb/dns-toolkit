@@ -51,7 +51,7 @@ for step in "${steps[@]}"; do
             ;;
         t)
             echo "Step 6: Generating top entries..."
-            ./bin/dns-toolkit top #--cpu-profile --mem-profile
+            ./bin/dns-toolkit top --min-sources 2 # until all the processors are implemented
             ;;
         o)
             echo "Step 7: Finding overlaps..."
