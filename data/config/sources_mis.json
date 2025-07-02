@@ -3,6 +3,7 @@
     {
       "name": "VXVault_URLList",
       "disabled": true,
+      "notes": ">97% overlap with Firehol_level3",
       "types": [
         {
           "name": "domain"

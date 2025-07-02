@@ -3,7 +3,6 @@
     {
       "name": "1Hosts (Lite)",
       "categories": "ads, trackers",
-      "disabled": true,
       "license": "MPLv2",
       "types": [
         {
@@ -251,6 +250,7 @@
     },
     {
       "name": "Viriback_Dump",
+      "disabled": true,
       "types": [
         {
           "name": "domain_csv_http_url_find"
