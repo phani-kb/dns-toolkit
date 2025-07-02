@@ -22,7 +22,7 @@ export DNS_TOOLKIT_TEST_MODE=true
 export DNS_TOOLKIT_TEST_CONFIG_PATH=$(pwd)/testdata/config.yml
 
 PACKAGES=$(go list ./... | grep -v "/mocks" | grep -v "constants")
-if ! go test -coverprofile=coverage/coverage.out $PACKAGES; then
+if ! go test -coverprofile=coverage/coverage.out -covermode=atomic $PACKAGES; then
     echo -e "${RED}Tests failed! See output above for details.${NC}"
     exit 1
 fi
