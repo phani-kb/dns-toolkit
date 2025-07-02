@@ -21,7 +21,6 @@
     },
     {
       "name": "BinaryDefense_Banlist",
-      "disabled": true,
       "notes": "This is for public use only.",
       "types": [
         {
