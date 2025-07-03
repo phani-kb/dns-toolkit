@@ -19,6 +19,7 @@ fi
 # t  - top
 # o  - overlap
 # op - output
+# r  - output README
 # cp - copy summaries
 
 if [ "$#" -gt 0 ]; then
@@ -61,8 +62,12 @@ for step in "${steps[@]}"; do
             echo "Step 8: Generating output files..."
             ./bin/dns-toolkit generate output -i
             ;;
+        r)
+            echo "Step 9: Generating output README..."
+            ./bin/dns-toolkit generate output-readme
+            ;;
         cp)
-            echo "Step 9: Copy summary files to archive..."
+            echo "Step 10: Copy summary files to archive..."
             cp data/output/summaries/* data/archive/
             ;;
         *)

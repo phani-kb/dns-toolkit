@@ -52,7 +52,6 @@
     },
     {
       "name": "BlockListDE_Brute",
-      "disabled": true,
       "notes": "100% overlap with Firehol_level2",
       "types": [
         {
@@ -64,7 +63,6 @@
     },
     {
       "name": "BlockListDE_Strong",
-      "disabled": true,
       "types": [
         {
           "name": "ipv4",
@@ -154,7 +152,6 @@
     },
     {
       "name": "URLHaus_Text",
-      "disabled": true,
       "types": [
         {
           "name": "domain_http_url"
@@ -168,7 +165,6 @@
     },
     {
       "name": "Yoyo AdServers",
-      "disabled": true,
       "license": "MIT",
       "types": [
         {
