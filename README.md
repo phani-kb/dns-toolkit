@@ -1,5 +1,12 @@
 # DNS Toolkit
 
+[![Go CI Workflow](https://github.com/phani-kb/dns-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/phani-kb/dns-toolkit/actions/workflows/ci.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/phani-kb/dns-toolkit)](https://goreportcard.com/report/github.com/phani-kb/dns-toolkit)
+[![codecov](https://codecov.io/gh/phani-kb/dns-toolkit/branch/main/graph/badge.svg)](https://codecov.io/gh/phani-kb/dns-toolkit)
+[![GoDoc](https://godoc.org/github.com/phani-kb/dns-toolkit?status.svg)](https://godoc.org/github.com/phani-kb/dns-toolkit)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Go Version](https://img.shields.io/badge/Go-1.23-blue.svg)](https://golang.org/doc/go1.23)
+
 `dns-toolkit` is a Go-based command-line utility designed to download, process, consolidate, and analyze DNS blocklists and allowlists from multiple sources. It resolves domain names to IP addresses, performs reverse lookups, detects overlaps, and generates output lists tailored for use with DNS sinkholes or firewalls.
 
 ## Published Outputs
@@ -8,7 +15,7 @@ The DNS Toolkit automatically processes and publishes ready-to-use blocklist/all
 
 ### Generated Output Files
 
-Processed and formatted blocklist/allowlist files are published to the [`output`](https://github.com/phani-kb/dns-toolkit/tree/output) branch. These files are ready for direct use with DNS sinkholes and network security tools:
+<span style="color: red; font-weight: bold;">Processed and formatted blocklist/allowlist files are published to the <a href="https://github.com/phani-kb/dns-toolkit/tree/output">output</a> branch.</span> These files are ready for direct use with DNS sinkholes and network security tools:
 
 - **Template-formatted domain and IP blocklists/allowlists** - Compatible with Pi-hole, pfBlockerNG, AdGuard Home, Unbound, and other DNS filtering solutions
 - **Consolidated lists organized by size groups** (mini, lite, normal, big) - Choose the appropriate size for your needs
@@ -23,7 +30,7 @@ Processed and formatted blocklist/allowlist files are published to the [`output`
 
 ### Summary Archives
 
-Processing summaries and metadata are archived in the [`summaries`](https://github.com/phani-kb/dns-toolkit/tree/summaries) branch, organized by month (01-12) with 1-year retention. These include:
+<span style="color: red; font-weight: bold;">Processing summaries and metadata are archived in the <a href="https://github.com/phani-kb/dns-toolkit/tree/summaries"><strong>summaries</strong></a> branch, organized by month (01-12) with 1-year retention.</span> These include:
 
 - Download summaries with source status and timestamps
 - Processing summaries with validation results
