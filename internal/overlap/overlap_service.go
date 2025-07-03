@@ -278,6 +278,7 @@ func (s *DefaultOverlapService) WriteCompactOverlapSummaries(
 
 			// Use a map to deduplicate targets by their name
 			targetMap := make(map[string]c.OverlapTargetFileInfo)
+			totalOverlapCount := 0
 
 			// Find all unique targets that overlap with this source
 			for _, targetPair := range pairs {
@@ -290,6 +291,9 @@ func (s *DefaultOverlapService) WriteCompactOverlapSummaries(
 				targetFile := targetPair.Target
 
 				if targetPair.Overlap > 0 {
+					// Track total overlap count for unique calculation
+					totalOverlapCount += targetPair.Overlap
+
 					overlapTargetFile := c.OverlapTargetFileInfo{
 						Name:     targetFile.Name,
 						ListType: targetFile.ListType,
@@ -331,6 +335,13 @@ func (s *DefaultOverlapService) WriteCompactOverlapSummaries(
 			}
 
 			compactSummary.TargetsCount = len(compactSummary.Targets)
+
+			uniqueEntries := compactSummary.Count - totalOverlapCount
+			if uniqueEntries < 0 {
+				uniqueEntries = 0
+			}
+			compactSummary.Unique = uniqueEntries
+
 			logger.Infof(
 				"Source: %s targets count: %d for %s",
 				compactSummary.Source,
