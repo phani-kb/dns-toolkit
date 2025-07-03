@@ -3,6 +3,7 @@
     {
       "name": "1Hosts (Lite)",
       "categories": "ads, trackers",
+      "disabled": true,
       "license": "MPLv2",
       "types": [
         {
@@ -21,6 +22,7 @@
     {
       "name": "abpvn_hosts",
       "countries": "VN",
+      "disabled": true,
       "license": "GPL-3.0",
       "types": [
         {
