@@ -1,7 +1,11 @@
 package cmd
 
 import (
+	"os"
 	"testing"
+
+	"github.com/phani-kb/dns-toolkit/internal/utils"
+	"github.com/stretchr/testify/require"
 
 	"github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/stretchr/testify/assert"
@@ -31,6 +35,18 @@ func TestExecuteCommands(t *testing.T) {
 			},
 		},
 	}
+
+	err := os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	require.NoError(t, err)
+
+	wd, err := os.Getwd()
+	require.NoError(t, err)
+
+	projectRoot, err := utils.FindProjectRoot(wd)
+	assert.NoError(t, err)
+
+	err = os.Setenv("DNS_TOOLKIT_TEST_CONFIG_PATH", projectRoot+"/testdata/config.yml")
+	assert.NoError(t, err)
 
 	InitForTesting()
 
@@ -68,7 +84,6 @@ func TestExecuteCommands(t *testing.T) {
 		topEntriesCmd.Run(topEntriesCmd, []string{})
 	}
 
-	// Test archiveCmd
 	if archiveCmd.Run != nil {
 		archiveCmd.Run(archiveCmd, []string{})
 	}

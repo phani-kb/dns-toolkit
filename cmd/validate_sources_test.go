@@ -90,16 +90,23 @@ func TestValidateConfig(t *testing.T) {
 				}
 			}()
 
+			// Capture initial state
+			initialValidationState := validationPerformed
+
 			err := validateConfig(tt.configPath)
 
 			if tt.expectError {
 				assert.Error(t, err)
 				assert.Contains(t, err.Error(), "config validation error")
 			} else {
-				assert.Equal(t, tt.name != "already validated - should skip", validationPerformed,
-					"Validation should %s performed for test: %s",
-					map[bool]string{true: "be", false: "not be"}[tt.name != "already validated - should skip"],
-					tt.name)
+				assert.NoError(t, err)
+				if tt.name == "already validated - should skip" {
+					assert.True(t, initialValidationState, "Initial state should be true for skip case")
+					assert.True(t, validationPerformed, "Validation should remain true")
+				} else {
+					assert.False(t, initialValidationState, "Initial state should be false")
+					assert.True(t, validationPerformed, "Validation should be performed and become true")
+				}
 			}
 		})
 	}

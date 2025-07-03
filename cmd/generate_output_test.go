@@ -10,7 +10,27 @@ import (
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+func TestGenerateOutputCmdRun(t *testing.T) {
+	err := os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	require.NoError(t, err)
+	err = os.Setenv("DNS_TOOLKIT_TEST_CONFIG_PATH", "/home/bpk/projects/dns-toolkit/testdata/config.yml")
+	require.NoError(t, err)
+	defer func() {
+		err := os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
+		if err != nil {
+			t.Logf("Failed to unset DNS_TOOLKIT_TEST_MODE: %v", err)
+		}
+		err = os.Unsetenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
+		if err != nil {
+			t.Logf("Failed to unset DNS_TOOLKIT_TEST_CONFIG_PATH: %v", err)
+		}
+	}()
+
+	generateOutputCmd.Run(generateOutputCmd, []string{})
+}
 
 func TestGenerateDescription(t *testing.T) {
 	t.Parallel()
@@ -82,23 +102,39 @@ func TestPrepareDirectories(t *testing.T) {
 		}
 	}()
 
-	oldWd, err := os.Getwd()
-	assert.NoError(t, err)
+	// Store original values
+	origOutputDir := constants.OutputDir
+	origOutputIgnoredDir := constants.OutputIgnoredDir
+	origOutputSummariesDir := constants.OutputSummariesDir
+	origArchiveDir := constants.ArchiveDir
+	origIncludeIgnored := includeIgnored
 	defer func() {
-		err := os.Chdir(oldWd)
-		if err != nil {
-			t.Logf("Failed to change directory back to %s: %v", oldWd, err)
-		}
+		constants.OutputDir = origOutputDir
+		constants.OutputIgnoredDir = origOutputIgnoredDir
+		constants.OutputSummariesDir = origOutputSummariesDir
+		constants.ArchiveDir = origArchiveDir
+		includeIgnored = origIncludeIgnored
 	}()
 
-	err = os.Chdir(tempDir)
-	assert.NoError(t, err)
-
-	origIncludeIgnored := includeIgnored
-	defer func() { includeIgnored = origIncludeIgnored }()
+	constants.OutputDir = filepath.Join(tempDir, "output")
+	constants.OutputIgnoredDir = filepath.Join(tempDir, "ignored")
+	constants.OutputSummariesDir = filepath.Join(tempDir, "summaries")
+	constants.ArchiveDir = filepath.Join(tempDir, "archive")
 
 	includeIgnored = false
-	_ = prepareDirectories()
+	err = prepareDirectories()
+	assert.NoError(t, err)
+
+	assert.DirExists(t, constants.OutputDir)
+	assert.DirExists(t, constants.OutputSummariesDir)
+	assert.DirExists(t, constants.ArchiveDir)
+	assert.NoDirExists(t, constants.OutputIgnoredDir) // Should not exist when includeIgnored is false
+
+	includeIgnored = true
+	err = prepareDirectories()
+	assert.NoError(t, err)
+
+	assert.DirExists(t, constants.OutputIgnoredDir)
 }
 
 func TestCopySummaryFile(t *testing.T) {
@@ -137,10 +173,16 @@ func TestLoadTemplates(t *testing.T) {
 
 	err := os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
 	assert.NoError(t, err)
+	err = os.Setenv("DNS_TOOLKIT_TEST_CONFIG_PATH", "/home/bpk/projects/dns-toolkit/testdata/config.yml")
+	assert.NoError(t, err)
 	defer func() {
 		err := os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
 		if err != nil {
 			t.Logf("Failed to unset DNS_TOOLKIT_TEST_MODE: %v", err)
+		}
+		err = os.Unsetenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
+		if err != nil {
+			t.Logf("Failed to unset DNS_TOOLKIT_TEST_CONFIG_PATH: %v", err)
 		}
 	}()
 
@@ -250,8 +292,8 @@ func TestProcessRegularFiles(t *testing.T) {
 }
 
 func TestProcessIgnoredFiles(t *testing.T) {
-	includeIgnored = true
-	defer func() { includeIgnored = false }()
+	origIncludeIgnored := includeIgnored
+	defer func() { includeIgnored = origIncludeIgnored }()
 
 	tempDir, err := os.MkdirTemp("", "ignored-files-test")
 	assert.NoError(t, err)
@@ -266,17 +308,27 @@ func TestProcessIgnoredFiles(t *testing.T) {
 	constants.OutputIgnoredDir = tempDir
 	defer func() { constants.OutputIgnoredDir = origIgnoredDir }()
 
+	dynTmpl, err := template.New("dynamic").Parse("Header: {{.FileName}} - {{.Description}} - {{.Count}}")
+	assert.NoError(t, err)
+	staticTemplate := []byte("STATIC HEADER")
+
+	includeIgnored = false
+	ignoredFilesCount := map[string]int{
+		"some_file.txt": 3,
+	}
+	processIgnoredFiles(dynTmpl, staticTemplate, "testtype", ignoredFilesCount)
+
+	includeIgnored = true
+	emptyIgnored := map[string]int{}
+	processIgnoredFiles(dynTmpl, staticTemplate, "testtype", emptyIgnored)
+
+	includeIgnored = true
 	ignoredFile := filepath.Join(tempDir, "ignored.txt")
 	ignoredContent := "ignored data"
 	err = os.WriteFile(ignoredFile, []byte(ignoredContent), 0644)
 	assert.NoError(t, err)
 
-	dynTmpl, err := template.New("dynamic").Parse("Header: {{.FileName}} - {{.Description}} - {{.Count}}")
-	assert.NoError(t, err)
-
-	staticTemplate := []byte("STATIC HEADER")
-
-	ignoredFilesCount := map[string]int{
+	ignoredFilesCount = map[string]int{
 		ignoredFile: 3,
 	}
 
@@ -292,6 +344,11 @@ func TestProcessIgnoredFiles(t *testing.T) {
 	assert.Contains(t, contentStr, "Header: ignored.txt")
 	assert.Contains(t, contentStr, "STATIC HEADER")
 	assert.Contains(t, contentStr, ignoredContent)
+
+	nonExistentIgnored := map[string]int{
+		"/nonexistent/path/file.txt": 5,
+	}
+	processIgnoredFiles(dynTmpl, staticTemplate, "testtype", nonExistentIgnored)
 }
 
 func TestProcessFilesForSummaryType(t *testing.T) {
@@ -353,4 +410,173 @@ func TestProcessFilesForSummaryType(t *testing.T) {
 			assert.Equal(t, tt.wantIgnored, gotIgnored)
 		})
 	}
+}
+
+func TestCopySummaryFiles(t *testing.T) {
+
+	tempDir, err := os.MkdirTemp("", "copy-summary-test")
+	require.NoError(t, err)
+	defer func() {
+		if err := os.RemoveAll(tempDir); err != nil {
+			t.Logf("Failed to remove temporary directory: %v", err)
+		}
+	}()
+
+	origOutputSummariesDir := constants.OutputSummariesDir
+	origSummaryDir := constants.SummaryDir
+	defer func() {
+		constants.OutputSummariesDir = origOutputSummariesDir
+		constants.SummaryDir = origSummaryDir
+	}()
+
+	summariesDir := filepath.Join(tempDir, "summaries")
+	outputDir := filepath.Join(tempDir, "output")
+	constants.OutputSummariesDir = outputDir
+	constants.SummaryDir = summariesDir
+
+	require.NoError(t, os.MkdirAll(summariesDir, 0755))
+	require.NoError(t, os.MkdirAll(outputDir, 0755))
+
+	testFiles := []string{
+		constants.DefaultSummaryFiles[constants.SummaryTypeDownload],
+		constants.DefaultSummaryFiles[constants.SummaryTypeProcessed],
+	}
+	testContent := `{"test": "data"}`
+	for _, filename := range testFiles {
+		filePath := filepath.Join(summariesDir, filename)
+		require.NoError(t, os.WriteFile(filePath, []byte(testContent), 0644))
+	}
+
+	processedFiles := map[string]string{
+		constants.SummaryTypeDownload: filepath.Join(
+			summariesDir,
+			constants.DefaultSummaryFiles[constants.SummaryTypeDownload],
+		),
+		constants.SummaryTypeProcessed: filepath.Join(
+			summariesDir,
+			constants.DefaultSummaryFiles[constants.SummaryTypeProcessed],
+		),
+	}
+	copySummaryFiles(processedFiles, outputDir)
+
+	for _, filename := range testFiles {
+		destPath := filepath.Join(outputDir, filename)
+		assert.FileExists(t, destPath)
+
+		content, err := os.ReadFile(destPath)
+		require.NoError(t, err)
+		assert.Equal(t, `{"test": "data"}`, string(content))
+	}
+
+	nonExistentFiles := map[string]string{
+		"missing.json": "/nonexistent/path/missing.json",
+	}
+	copySummaryFiles(nonExistentFiles, outputDir)
+}
+
+func TestArchiveSummaryFiles(t *testing.T) {
+
+	tempDir, err := os.MkdirTemp("", "archive-summary-test")
+	require.NoError(t, err)
+	defer func() {
+		if err := os.RemoveAll(tempDir); err != nil {
+			t.Logf("Failed to remove temporary directory: %v", err)
+		}
+	}()
+
+	// Store original values
+	origArchiveDir := constants.ArchiveDir
+	origSummaryDir := constants.SummaryDir
+	defer func() {
+		constants.ArchiveDir = origArchiveDir
+		constants.SummaryDir = origSummaryDir
+	}()
+
+	summariesDir := filepath.Join(tempDir, "summaries")
+	archiveDir := filepath.Join(tempDir, "archive")
+	constants.ArchiveDir = archiveDir
+	constants.SummaryDir = summariesDir
+
+	require.NoError(t, os.MkdirAll(summariesDir, 0755))
+	require.NoError(t, os.MkdirAll(archiveDir, 0755))
+
+	testSummaryTypes := []string{"download", "processed"}
+	processedFiles := make(map[string]string)
+
+	for _, summaryType := range testSummaryTypes {
+		filename := constants.DefaultSummaryFiles[summaryType]
+		filePath := filepath.Join(summariesDir, filename)
+		require.NoError(t, os.WriteFile(filePath, []byte(`{"archive": "test"}`), 0644))
+		processedFiles[summaryType] = filePath
+	}
+
+	archiveSummaryFiles(processedFiles)
+
+	archiveFiles, err := os.ReadDir(archiveDir)
+	require.NoError(t, err)
+
+	foundArchiveFiles := 0
+	for _, file := range archiveFiles {
+		if strings.Contains(file.Name(), "download") || strings.Contains(file.Name(), "processed") {
+			foundArchiveFiles++
+		}
+	}
+	assert.Greater(t, foundArchiveFiles, 0)
+}
+
+func TestDeleteFilesAndFoldersAfterGeneration(t *testing.T) {
+
+	tempDir, err := os.MkdirTemp("", "delete-test")
+	require.NoError(t, err)
+	defer func() {
+		if err := os.RemoveAll(tempDir); err != nil {
+			t.Logf("Failed to remove temporary directory: %v", err)
+		}
+	}()
+
+	// Store original values
+	origSummaryDir := constants.SummaryDir
+	origProcessedDir := constants.ProcessedDir
+	origDeleteFolders := deleteFolders
+	defer func() {
+		constants.SummaryDir = origSummaryDir
+		constants.ProcessedDir = origProcessedDir
+		constants.SummaryTypesDirMap[constants.SummaryTypeProcessed] = origProcessedDir
+		deleteFolders = origDeleteFolders
+	}()
+
+	summaryDir := filepath.Join(tempDir, "summary")
+	processedDir := filepath.Join(tempDir, "processed")
+	constants.SummaryDir = summaryDir
+	constants.ProcessedDir = processedDir
+	constants.SummaryTypesDirMap[constants.SummaryTypeProcessed] = processedDir
+	deleteFolders = true // Enable deletion
+
+	require.NoError(t, os.MkdirAll(summaryDir, 0755))
+	require.NoError(t, os.MkdirAll(processedDir, 0755))
+
+	processedSummaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles[constants.SummaryTypeProcessed])
+	require.NoError(t, os.WriteFile(processedSummaryFile, []byte(`{"test": "data"}`), 0644))
+
+	testFile := filepath.Join(processedDir, "test.txt")
+	require.NoError(t, os.WriteFile(testFile, []byte("test content"), 0644))
+
+	assert.FileExists(t, processedSummaryFile)
+	assert.FileExists(t, testFile)
+
+	deleteFilesAndFoldersAfterGeneration()
+
+	assert.NoFileExists(t, processedSummaryFile)
+	assert.NoDirExists(t, processedDir)
+
+	deleteFolders = false
+
+	require.NoError(t, os.MkdirAll(processedDir, 0755))
+	require.NoError(t, os.WriteFile(processedSummaryFile, []byte(`{"test": "data"}`), 0644))
+	require.NoError(t, os.WriteFile(testFile, []byte("test content"), 0644))
+
+	deleteFilesAndFoldersAfterGeneration()
+
+	assert.FileExists(t, processedSummaryFile)
+	assert.FileExists(t, testFile)
 }

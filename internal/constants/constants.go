@@ -9,6 +9,7 @@ const (
 	AppName        = "dns-toolkit"
 	AppVersion     = "1.0.0"
 	AppDescription = "A toolkit for DNS data processing and analysis."
+	GitHubRawURL   = "https://raw.githubusercontent.com/phani-kb/dns-toolkit/output"
 )
 
 // SummaryTypes - Enum-like constants for summary types

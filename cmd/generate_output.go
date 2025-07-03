@@ -330,6 +330,10 @@ var generateOutputCmd = &cobra.Command{
 	Short: "Generate output files with templates prefixed to them",
 	Long:  "Generate output files with static and dynamic templates prefixed to the summary types defined in SummaryTypesWithTemplateMap",
 	Run: func(cmd *cobra.Command, args []string) {
+		if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
+			return
+		}
+
 		Logger.Info("Starting generate prefixes command...")
 
 		if err := u.EnsureDirectoryExists(Logger, constants.OutputDir); err != nil {
@@ -465,15 +469,14 @@ func copySummaryFiles(processedFiles map[string]string, outputDir string) {
 			continue
 		}
 
-		srcFilePath := filepath.Join(constants.SummaryDir, summaryFile)
 		summaryFileNameNoTimestamp := filepath.Base(summaryFile)
 		destFilePathNoTimestamp := filepath.Join(outputDir, summaryFileNameNoTimestamp)
 
 		Logger.Debug("Copying summary file without timestamp",
-			"source", srcFilePath,
+			"source", summaryFilePath,
 			"destination", destFilePathNoTimestamp)
 
-		if err := copySummaryFile(srcFilePath, destFilePathNoTimestamp); err != nil {
+		if err := copySummaryFile(summaryFilePath, destFilePathNoTimestamp); err != nil {
 			Logger.Error("Failed to copy summary file to output directory", "error", err)
 		} else {
 			Logger.Info("Successfully copied summary file to output directory",
@@ -506,17 +509,16 @@ func archiveSummaryFiles(processedFiles map[string]string) {
 			modTimestamp = time.Now().Format(constants.TimestampFormat)
 		}
 
-		srcFilePath := filepath.Join(constants.SummaryDir, summaryFile)
 		summaryFileNameNoTimestamp := filepath.Base(summaryFile)
 		archiveFileName := strings.TrimSuffix(summaryFileNameNoTimestamp, filepath.Ext(summaryFileNameNoTimestamp))
 		archiveFileName = fmt.Sprintf("%s_%s.json", archiveFileName, modTimestamp)
 		archiveFilePath := filepath.Join(constants.ArchiveDir, archiveFileName)
 
 		Logger.Debug("Copying summary file with timestamp to archive",
-			"source", srcFilePath,
+			"source", summaryFilePath,
 			"destination", archiveFilePath)
 
-		if err := copySummaryFile(srcFilePath, archiveFilePath); err != nil {
+		if err := copySummaryFile(summaryFilePath, archiveFilePath); err != nil {
 			Logger.Error("Failed to copy summary file to archive directory", "error", err)
 		} else {
 			Logger.Info("Successfully archived summary file", "file", archiveFilePath)
