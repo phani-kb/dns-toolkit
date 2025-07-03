@@ -89,7 +89,7 @@ var consolidateGroupsCmd = &cobra.Command{
 			if len(allConsolidatedSummaries) > 0 {
 				summaryFile := filepath.Join(
 					constants.SummaryDir,
-					constants.DefaultSummaryFiles["consolidated"],
+					constants.DefaultSummaryFiles["consolidated_groups"],
 				)
 				summariesCount, err := u.SaveSummaries(
 					Logger,
