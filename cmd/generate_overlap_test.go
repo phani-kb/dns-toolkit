@@ -292,8 +292,8 @@ func TestFormatNumberInOverlap(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		expected string
 		input    int
+		expected string
 	}{
 		{0, "0"},
 		{500, "500"},
