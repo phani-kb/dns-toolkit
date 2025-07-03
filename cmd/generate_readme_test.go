@@ -189,7 +189,7 @@ func TestCollectProcessingStats(t *testing.T) {
 	}()
 
 	// Test with missing file
-	var stats *ProcessingStats = &ProcessingStats{}
+	var stats = &ProcessingStats{}
 	err = collectProcessingStats(stats)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "processed summary file not found")
@@ -250,38 +250,32 @@ func TestCollectGroupsStats(t *testing.T) {
 	assert.Contains(t, err.Error(), "groups summary file not found")
 
 	// Create test groups summary
-	groupsSummaries := []c.ConsolidatedGroupsSummary{
+	consolidatedSummaries := []c.ConsolidatedSummary{
 		{
+			Type:                      "domain",
+			ListType:                  "blocklist",
+			Count:                     100,
 			Group:                     "mini",
 			LastConsolidatedTimestamp: "2023-01-01T13:00:00Z",
-			ConsolidatedSummaries: []c.ConsolidatedSummary{
-				{
-					Type:     "domain",
-					ListType: "blocklist",
-					Count:    100,
-				},
-				{
-					Type:     "domain",
-					ListType: "allowlist",
-					Count:    50,
-				},
-			},
 		},
 		{
+			Type:                      "domain",
+			ListType:                  "allowlist",
+			Count:                     50,
+			Group:                     "mini",
+			LastConsolidatedTimestamp: "2023-01-01T13:00:00Z",
+		},
+		{
+			Type:                      "domain",
+			ListType:                  "blocklist",
+			Count:                     200,
 			Group:                     "lite",
 			LastConsolidatedTimestamp: "2023-01-01T13:00:00Z",
-			ConsolidatedSummaries: []c.ConsolidatedSummary{
-				{
-					Type:     "domain",
-					ListType: "blocklist",
-					Count:    200,
-				},
-			},
 		},
 	}
 
 	summaryFile := filepath.Join(outputSummariesDir, constants.DefaultSummaryFiles["consolidated_groups"])
-	content, err := json.Marshal(groupsSummaries)
+	content, err := json.Marshal(consolidatedSummaries)
 	require.NoError(t, err)
 	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
 
@@ -322,38 +316,32 @@ func TestCollectCategoriesStats(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "categories summary file not found")
 
-	categoriesSummaries := []c.ConsolidatedCategoriesSummary{
+	consolidatedSummaries := []c.ConsolidatedSummary{
 		{
+			Type:                      "domain",
+			ListType:                  "blocklist",
+			Count:                     300,
 			Category:                  "malware",
 			LastConsolidatedTimestamp: "2023-01-01T14:00:00Z",
-			ConsolidatedSummaries: []c.ConsolidatedSummary{
-				{
-					Type:     "domain",
-					ListType: "blocklist",
-					Count:    300,
-				},
-				{
-					Type:     "ipv4",
-					ListType: "blocklist",
-					Count:    150,
-				},
-			},
 		},
 		{
+			Type:                      "ipv4",
+			ListType:                  "blocklist",
+			Count:                     150,
+			Category:                  "malware",
+			LastConsolidatedTimestamp: "2023-01-01T14:00:00Z",
+		},
+		{
+			Type:                      "domain",
+			ListType:                  "allowlist",
+			Count:                     75,
 			Category:                  "ads",
 			LastConsolidatedTimestamp: "2023-01-01T14:00:00Z",
-			ConsolidatedSummaries: []c.ConsolidatedSummary{
-				{
-					Type:     "domain",
-					ListType: "allowlist",
-					Count:    75,
-				},
-			},
 		},
 	}
 
 	summaryFile := filepath.Join(outputSummariesDir, constants.DefaultSummaryFiles["consolidated_categories"])
-	content, err := json.Marshal(categoriesSummaries)
+	content, err := json.Marshal(consolidatedSummaries)
 	require.NoError(t, err)
 	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
 
@@ -572,7 +560,7 @@ func TestFormatNumber(t *testing.T) {
 		{999, "999"},
 		{1000, "1.0K"},
 		{1500, "1.5K"},
-		{999999, "1000.0K"}, // Fixed expected value
+		{999999, "1000.0K"},
 		{1000000, "1.0M"},
 		{2500000, "2.5M"},
 		{1234567, "1.2M"},
@@ -757,7 +745,10 @@ func TestCollectTopStats(t *testing.T) {
 			// Clean up before each test
 			defer func() {
 				topFile := filepath.Join(tempDir, constants.DefaultSummaryFiles["top"])
-				os.Remove(topFile)
+				err := os.Remove(topFile)
+				if err != nil {
+					return
+				}
 			}()
 
 			var stats TopStats
