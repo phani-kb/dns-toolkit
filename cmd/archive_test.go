@@ -20,8 +20,8 @@ func TestGetSummaryCount(t *testing.T) {
 
 	tests := []struct {
 		name        string
-		content     []byte
 		summaryType string
+		content     []byte
 		expected    int
 	}{
 		{

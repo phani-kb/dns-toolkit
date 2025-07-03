@@ -32,11 +32,7 @@ var generateReadmeCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		readme, err := generateOutputBranchReadme()
-		if err != nil {
-			Logger.Errorf("Failed to generate README: %v", err)
-			os.Exit(1)
-		}
+		readme := generateOutputBranchReadme()
 
 		readmePath := filepath.Join(constants.OutputDir, "README.md")
 		if err := os.WriteFile(readmePath, []byte(readme), 0644); err != nil {
@@ -51,35 +47,35 @@ var generateReadmeCmd = &cobra.Command{
 // WorkflowSummary holds summary data for the entire workflow
 type WorkflowSummary struct {
 	LastRun     string
-	Download    DownloadStats
 	Processing  ProcessingStats
-	Consolidate ConsolidateStats
 	Groups      GroupsStats
 	Categories  CategoriesStats
-	Overlap     OverlapStats
 	Top         TopStats
+	Consolidate ConsolidateStats
+	Overlap     OverlapStats
+	Download    DownloadStats
 }
 
 type DownloadStats struct {
+	SourcesByType  map[string]int
+	LastUpdateTime string
+	ErrorSources   []string
 	TotalSources   int
 	SuccessCount   int
 	FailedCount    int
-	LastUpdateTime string
-	SourcesByType  map[string]int
-	ErrorSources   []string
 }
 
 type ProcessingStats struct {
-	TotalSources       int
 	ValidFilesByType   map[string]int
 	InvalidFilesByType map[string]int
 	LastUpdateTime     string
+	TotalSources       int
 }
 
 type ConsolidateStats struct {
-	TotalFiles     int
 	FilesByType    map[string]ConsolidateTypeStats
 	LastUpdateTime string
+	TotalFiles     int
 }
 
 type ConsolidateTypeStats struct {
@@ -94,42 +90,39 @@ type ConsolidateListStats struct {
 }
 
 type GroupsStats struct {
-	TotalGroups    int
 	GroupSummary   map[string]int
 	GroupListTypes map[string][]string
 	LastUpdateTime string
+	TotalGroups    int
 }
 
 type CategoriesStats struct {
-	TotalCategories   int
 	CategorySummary   map[string]int
 	CategoryListTypes map[string][]string
 	LastUpdateTime    string
+	TotalCategories   int
 }
 
 type OverlapStats struct {
-	TotalAnalyzed  int
 	LastUpdateTime string
+	TotalAnalyzed  int
 }
 
 type TopStats struct {
-	TotalFiles     int
 	FilesByType    map[string]int
 	FileDetails    map[string][]TopFileDetail
 	LastUpdateTime string
+	TotalFiles     int
 }
 
 type TopFileDetail struct {
+	ListType   string
 	MinSources int
 	Count      int
-	ListType   string
 }
 
-func generateOutputBranchReadme() (string, error) {
-	summary, err := collectWorkflowSummary()
-	if err != nil {
-		return "", fmt.Errorf("failed to collect workflow summary: %w", err)
-	}
+func generateOutputBranchReadme() string {
+	summary := collectWorkflowSummary()
 
 	var sb strings.Builder
 
@@ -378,10 +371,10 @@ func generateOutputBranchReadme() (string, error) {
 	)
 	sb.WriteString("from multiple reputable sources.\n\n")
 
-	return sb.String(), nil
+	return sb.String()
 }
 
-func collectWorkflowSummary() (*WorkflowSummary, error) {
+func collectWorkflowSummary() *WorkflowSummary {
 	summary := &WorkflowSummary{
 		LastRun: time.Now().Format("2006-01-02 15:04:05 UTC"),
 	}
@@ -414,7 +407,7 @@ func collectWorkflowSummary() (*WorkflowSummary, error) {
 		Logger.Warnf("Failed to collect top stats: %v", err)
 	}
 
-	return summary, nil
+	return summary
 }
 
 func collectDownloadStats(stats *DownloadStats) error {
@@ -520,11 +513,12 @@ func collectConsolidateStats(stats *ConsolidateStats) error {
 
 		typeStats := stats.FilesByType[summary.Type]
 
-		if summary.ListType == "blocklist" {
+		switch summary.ListType {
+		case "blocklist":
 			typeStats.Blocklist.Count = summary.Count
 			typeStats.Blocklist.FilesCount = summary.FilesCount
 			typeStats.Blocklist.IgnoredCount = summary.IgnoredEntriesCount
-		} else if summary.ListType == "allowlist" {
+		case "allowlist":
 			typeStats.Allowlist.Count = summary.Count
 			typeStats.Allowlist.FilesCount = summary.FilesCount
 			typeStats.Allowlist.IgnoredCount = summary.IgnoredEntriesCount
@@ -536,10 +530,11 @@ func collectConsolidateStats(stats *ConsolidateStats) error {
 	return nil
 }
 
-func collectGroupsStats(stats *GroupsStats) error {
-	summaryFile := filepath.Join(constants.OutputSummariesDir, constants.DefaultSummaryFiles["consolidated_groups"])
+// collectConsolidatedStats is a generic function to collect stats from consolidated summaries
+func collectConsolidatedStats(summaryFileKey string, processFunc func([]byte) error) error {
+	summaryFile := filepath.Join(constants.OutputSummariesDir, constants.DefaultSummaryFiles[summaryFileKey])
 	if _, err := os.Stat(summaryFile); os.IsNotExist(err) {
-		return fmt.Errorf("groups summary file not found")
+		return fmt.Errorf("%s summary file not found", summaryFileKey)
 	}
 
 	content, err := os.ReadFile(summaryFile)
@@ -547,83 +542,81 @@ func collectGroupsStats(stats *GroupsStats) error {
 		return err
 	}
 
-	var groupsSummaries []c.ConsolidatedGroupsSummary
-	if err := json.Unmarshal(content, &groupsSummaries); err != nil {
-		return err
-	}
+	return processFunc(content)
+}
 
-	stats.TotalGroups = len(groupsSummaries)
-	stats.GroupSummary = make(map[string]int)
-	stats.GroupListTypes = make(map[string][]string)
-
-	for _, groupSummary := range groupsSummaries {
-		if groupSummary.LastConsolidatedTimestamp != "" {
-			stats.LastUpdateTime = groupSummary.LastConsolidatedTimestamp
+func collectGroupsStats(stats *GroupsStats) error {
+	return collectConsolidatedStats("consolidated_groups", func(content []byte) error {
+		var groupsSummaries []c.ConsolidatedGroupsSummary
+		if err := json.Unmarshal(content, &groupsSummaries); err != nil {
+			return err
 		}
 
-		groupTotal := 0
-		listTypesSet := make(map[string]bool)
-		for _, consolidatedSummary := range groupSummary.ConsolidatedSummaries {
-			groupTotal += consolidatedSummary.Count
-			listTypesSet[consolidatedSummary.ListType] = true
-		}
-		stats.GroupSummary[groupSummary.Group] = groupTotal
+		stats.TotalGroups = len(groupsSummaries)
+		stats.GroupSummary = make(map[string]int)
+		stats.GroupListTypes = make(map[string][]string)
 
-		// Convert set to slice
-		var listTypes []string
-		for listType := range listTypesSet {
-			listTypes = append(listTypes, listType)
-		}
-		sort.Strings(listTypes)
-		stats.GroupListTypes[groupSummary.Group] = listTypes
-	}
+		for _, groupSummary := range groupsSummaries {
+			if groupSummary.LastConsolidatedTimestamp != "" {
+				stats.LastUpdateTime = groupSummary.LastConsolidatedTimestamp
+			}
 
-	return nil
+			groupTotal := 0
+			listTypesSet := make(map[string]bool)
+			for _, consolidatedSummary := range groupSummary.ConsolidatedSummaries {
+				groupTotal += consolidatedSummary.Count
+				listTypesSet[consolidatedSummary.ListType] = true
+			}
+			stats.GroupSummary[groupSummary.Group] = groupTotal
+
+			// Convert set to slice
+			var listTypes []string
+			for listType := range listTypesSet {
+				listTypes = append(listTypes, listType)
+			}
+			sort.Strings(listTypes)
+			stats.GroupListTypes[groupSummary.Group] = listTypes
+		}
+
+		return nil
+	})
 }
 
 func collectCategoriesStats(stats *CategoriesStats) error {
-	summaryFile := filepath.Join(constants.OutputSummariesDir, constants.DefaultSummaryFiles["consolidated_categories"])
-	if _, err := os.Stat(summaryFile); os.IsNotExist(err) {
-		return fmt.Errorf("categories summary file not found")
-	}
-
-	content, err := os.ReadFile(summaryFile)
-	if err != nil {
-		return err
-	}
-
-	var categoriesSummaries []c.ConsolidatedCategoriesSummary
-	if err := json.Unmarshal(content, &categoriesSummaries); err != nil {
-		return err
-	}
-
-	stats.TotalCategories = len(categoriesSummaries)
-	stats.CategorySummary = make(map[string]int)
-	stats.CategoryListTypes = make(map[string][]string)
-
-	for _, categorySummary := range categoriesSummaries {
-		if categorySummary.LastConsolidatedTimestamp != "" {
-			stats.LastUpdateTime = categorySummary.LastConsolidatedTimestamp
+	return collectConsolidatedStats("consolidated_categories", func(content []byte) error {
+		var categoriesSummaries []c.ConsolidatedCategoriesSummary
+		if err := json.Unmarshal(content, &categoriesSummaries); err != nil {
+			return err
 		}
 
-		categoryTotal := 0
-		listTypesSet := make(map[string]bool)
-		for _, consolidatedSummary := range categorySummary.ConsolidatedSummaries {
-			categoryTotal += consolidatedSummary.Count
-			listTypesSet[consolidatedSummary.ListType] = true
-		}
-		stats.CategorySummary[categorySummary.Category] = categoryTotal
+		stats.TotalCategories = len(categoriesSummaries)
+		stats.CategorySummary = make(map[string]int)
+		stats.CategoryListTypes = make(map[string][]string)
 
-		// Convert set to slice
-		var listTypes []string
-		for listType := range listTypesSet {
-			listTypes = append(listTypes, listType)
-		}
-		sort.Strings(listTypes)
-		stats.CategoryListTypes[categorySummary.Category] = listTypes
-	}
+		for _, categorySummary := range categoriesSummaries {
+			if categorySummary.LastConsolidatedTimestamp != "" {
+				stats.LastUpdateTime = categorySummary.LastConsolidatedTimestamp
+			}
 
-	return nil
+			categoryTotal := 0
+			listTypesSet := make(map[string]bool)
+			for _, consolidatedSummary := range categorySummary.ConsolidatedSummaries {
+				categoryTotal += consolidatedSummary.Count
+				listTypesSet[consolidatedSummary.ListType] = true
+			}
+			stats.CategorySummary[categorySummary.Category] = categoryTotal
+
+			// Convert set to slice
+			var listTypes []string
+			for listType := range listTypesSet {
+				listTypes = append(listTypes, listType)
+			}
+			sort.Strings(listTypes)
+			stats.CategoryListTypes[categorySummary.Category] = listTypes
+		}
+
+		return nil
+	})
 }
 
 func collectOverlapStats(stats *OverlapStats) error {
