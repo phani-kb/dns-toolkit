@@ -21,6 +21,7 @@
     },
     {
       "name": "BinaryDefense_Banlist",
+      "disabled": true,
       "notes": "This is for public use only.",
       "types": [
         {
@@ -63,6 +64,7 @@
     },
     {
       "name": "BlockListDE_Strong",
+      "disabled": true,
       "types": [
         {
           "name": "ipv4",
@@ -152,6 +154,7 @@
     },
     {
       "name": "URLHaus_Text",
+      "disabled": true,
       "types": [
         {
           "name": "domain_http_url"
