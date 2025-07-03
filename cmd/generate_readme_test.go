@@ -565,8 +565,8 @@ func TestFormatConsolidateCount(t *testing.T) {
 func TestFormatNumber(t *testing.T) {
 
 	tests := []struct {
-		expected string
 		input    int
+		expected string
 	}{
 		{0, "0"},
 		{999, "999"},
