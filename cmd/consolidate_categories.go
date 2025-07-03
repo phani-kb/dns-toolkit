@@ -91,7 +91,7 @@ var consolidateCategoriesCmd = &cobra.Command{
 			if len(allConsolidatedSummaries) > 0 {
 				summaryFile := filepath.Join(
 					constants.SummaryDir,
-					constants.DefaultSummaryFiles["consolidated"],
+					constants.DefaultSummaryFiles["consolidated_categories"],
 				)
 				summariesCount, err := u.SaveSummaries(
 					Logger,
@@ -213,8 +213,4 @@ func consolidateByCategory(
 	}
 
 	return consolidateGeneric(logger, params, entriesToIgnore, processedFiles)
-}
-
-func init() {
-	consolidateCmd.AddCommand(consolidateCategoriesCmd)
 }

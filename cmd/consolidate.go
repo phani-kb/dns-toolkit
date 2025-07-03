@@ -287,8 +287,11 @@ func init() {
 		BoolVar(&includeInvalid, "include-invalid", false, "Include invalid entry(s) during consolidation")
 	consolidateCmd.PersistentFlags().
 		BoolVar(&calculateChecksum, "calculate-checksum", false, "Calculate checksum on the consolidated files")
+	consolidateCategoriesCmd.Flags().
+		BoolVar(&skipConsolidatedSummary, "skip-consolidated-summary", false, "Skip creating the consolidated summary file")
 	consolidateGroupsCmd.Flags().
-		BoolVar(&skipConsolidatedSummary, "skip-consolidated-summary", true, "Skip creating the regular consolidated summary file")
+		BoolVar(&skipConsolidatedSummary, "skip-consolidated-summary", false, "Skip creating the regular consolidated summary file")
 	consolidateCmd.AddCommand(consolidateAllCmd)
 	consolidateCmd.AddCommand(consolidateGroupsCmd)
+	consolidateCmd.AddCommand(consolidateCategoriesCmd)
 }
