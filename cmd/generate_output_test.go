@@ -371,7 +371,7 @@ func TestProcessFilesForSummaryType(t *testing.T) {
 		{
 			name:        "consolidated_groups summary",
 			summaryType: "consolidated_groups",
-			summaryData: `[{"consolidated_summaries":[{"filepath":"file2.txt","list_type":"allowlist","count":5,"ignored_entries_count":0,"ignored_filepath":""}]}]`,
+			summaryData: `[{"filepath":"file2.txt","list_type":"allowlist","count":5,"ignored_entries_count":0,"ignored_filepath":""}]`,
 			wantType:    map[string]string{"file2.txt": "allowlist"},
 			wantCount:   map[string]int{"file2.txt": 5},
 			wantIgnored: map[string]int{},
@@ -379,7 +379,7 @@ func TestProcessFilesForSummaryType(t *testing.T) {
 		{
 			name:        "consolidated_categories summary",
 			summaryType: "consolidated_categories",
-			summaryData: `[{"consolidated_summaries":[{"filepath":"file3.txt","list_type":"blocklist","count":7,"ignored_entries_count":1,"ignored_filepath":"file3_ignored.txt"}]}]`,
+			summaryData: `[{"filepath":"file3.txt","list_type":"blocklist","count":7,"ignored_entries_count":1,"ignored_filepath":"file3_ignored.txt"}]`,
 			wantType:    map[string]string{"file3.txt": "blocklist"},
 			wantCount:   map[string]int{"file3.txt": 7},
 			wantIgnored: map[string]int{"file3_ignored.txt": 1},
