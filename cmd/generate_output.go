@@ -119,42 +119,32 @@ func processFilesForSummaryType(
 		}
 
 	case constants.SummaryTypeConsolidatedGroups:
-		var sizedSummaries []common.ConsolidatedGroupsSummary
-		if err := json.Unmarshal(summaryData, &sizedSummaries); err != nil {
+		var summaries []common.ConsolidatedSummary
+		if err := json.Unmarshal(summaryData, &summaries); err != nil {
 			Logger.Error("Failed to unmarshal consolidated groups summary", "error", err)
 			return typeFiles, fileCount, ignoredFilesCount
 		}
-		for _, summary := range sizedSummaries {
-			files := u.GetFilesFromSummaries(
-				summary.ConsolidatedSummaries,
-				constants.SummaryTypeConsolidatedGroups,
-			)
-			for key, value := range files {
-				typeFiles[key] = value.ListType
-				fileCount[key] = value.Count
-				if value.IgnoredEntriesCount > 0 && value.IgnoredFilepath != "" {
-					ignoredFilesCount[value.IgnoredFilepath] = value.IgnoredEntriesCount
-				}
+		files := u.GetFilesFromSummaries(summaries, constants.SummaryTypeConsolidatedGroups)
+		for key, value := range files {
+			typeFiles[key] = value.ListType
+			fileCount[key] = value.Count
+			if value.IgnoredEntriesCount > 0 && value.IgnoredFilepath != "" {
+				ignoredFilesCount[value.IgnoredFilepath] = value.IgnoredEntriesCount
 			}
 		}
 
 	case constants.SummaryTypeConsolidatedCategories:
-		var categorySummaries []common.ConsolidatedCategoriesSummary
-		if err := json.Unmarshal(summaryData, &categorySummaries); err != nil {
+		var summaries []common.ConsolidatedSummary
+		if err := json.Unmarshal(summaryData, &summaries); err != nil {
 			Logger.Error("Failed to unmarshal consolidated categories summary", "error", err)
 			return typeFiles, fileCount, ignoredFilesCount
 		}
-		for _, summary := range categorySummaries {
-			files := u.GetFilesFromSummaries(
-				summary.ConsolidatedSummaries,
-				constants.SummaryTypeConsolidatedCategories,
-			)
-			for key, value := range files {
-				typeFiles[key] = value.ListType
-				fileCount[key] = value.Count
-				if value.IgnoredEntriesCount > 0 && value.IgnoredFilepath != "" {
-					ignoredFilesCount[value.IgnoredFilepath] = value.IgnoredEntriesCount
-				}
+		files := u.GetFilesFromSummaries(summaries, constants.SummaryTypeConsolidatedCategories)
+		for key, value := range files {
+			typeFiles[key] = value.ListType
+			fileCount[key] = value.Count
+			if value.IgnoredEntriesCount > 0 && value.IgnoredFilepath != "" {
+				ignoredFilesCount[value.IgnoredFilepath] = value.IgnoredEntriesCount
 			}
 		}
 
@@ -591,5 +581,5 @@ func init() {
 
 	// Add the deleteFolders flag
 	generateOutputCmd.Flags().BoolVarP(&deleteFolders, "delete-folders", "d", false,
-		"Delete folders specified in FoldersToDeleteAfterOutputGeneration after output generation")
+		"Delete source folders after output generation")
 }
