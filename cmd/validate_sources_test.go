@@ -26,11 +26,11 @@ func TestValidateConfig(t *testing.T) {
 	}()
 
 	tests := []struct {
+		setupFunc   func()
+		cleanupFunc func()
 		name        string
 		configPath  string
 		expectError bool
-		setupFunc   func()
-		cleanupFunc func()
 	}{
 		{
 			name:        "valid config path",

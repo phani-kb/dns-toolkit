@@ -37,15 +37,15 @@ func TestConsolidateByGroup(t *testing.T) {
 	logger := multilog.NewLogger()
 
 	tests := []struct {
+		entriesToIgnore   u.StringSet
 		name              string
 		genericSourceType string
 		listType          string
 		group             string
-		entriesToIgnore   u.StringSet
+		expectedGroup     string
 		processedFiles    []c.ProcessedFile
 		expectedCount     int
 		expectedValid     bool
-		expectedGroup     string
 	}{
 		{
 			name:              "empty processed files",
@@ -118,8 +118,8 @@ func TestConsolidateByGroup(t *testing.T) {
 func TestGetFilesForGroup(t *testing.T) {
 	tests := []struct {
 		name           string
-		processedFiles []c.ProcessedFile
 		group          string
+		processedFiles []c.ProcessedFile
 		expected       int
 	}{
 		{

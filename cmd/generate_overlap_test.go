@@ -85,9 +85,9 @@ func TestParseTargetString(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
+		expected *TargetDetail
 		name     string
 		input    string
-		expected *TargetDetail
 	}{
 		{
 			name:  "valid target string",
@@ -292,8 +292,8 @@ func TestFormatNumberInOverlap(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		input    int
 		expected string
+		input    int
 	}{
 		{0, "0"},
 		{500, "500"},
