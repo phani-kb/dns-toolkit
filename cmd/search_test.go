@@ -156,8 +156,8 @@ func TestCategorizeFileContent(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		lines    []string
 		expected string
+		lines    []string
 	}{
 		{
 			name:     "mostly domains",

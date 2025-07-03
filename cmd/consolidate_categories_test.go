@@ -90,15 +90,15 @@ func TestConsolidateByCategory(t *testing.T) {
 	logger := multilog.NewLogger()
 
 	tests := []struct {
+		entriesToIgnore   u.StringSet
 		name              string
 		genericSourceType string
 		listType          string
 		category          string
-		entriesToIgnore   u.StringSet
+		expectedCategory  string
 		processedFiles    []c.ProcessedFile
 		expectedCount     int
 		expectedValid     bool
-		expectedCategory  string
 	}{
 		{
 			name:              "empty processed files",
@@ -179,8 +179,8 @@ func TestConsolidateCategoriesCommand(t *testing.T) {
 func TestGetFilesForCategory(t *testing.T) {
 	tests := []struct {
 		name           string
-		processedFiles []c.ProcessedFile
 		category       string
+		processedFiles []c.ProcessedFile
 		expected       int
 	}{
 		{

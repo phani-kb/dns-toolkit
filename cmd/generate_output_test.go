@@ -353,12 +353,12 @@ func TestProcessIgnoredFiles(t *testing.T) {
 
 func TestProcessFilesForSummaryType(t *testing.T) {
 	tests := []struct {
-		name        string
-		summaryType string
-		summaryData string
 		wantType    map[string]string
 		wantCount   map[string]int
 		wantIgnored map[string]int
+		name        string
+		summaryType string
+		summaryData string
 	}{
 		{
 			name:        "consolidated summary",

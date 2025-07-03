@@ -17,13 +17,13 @@ import (
 
 // mockConsolidatorCommon implements the Consolidator interface for testing
 type mockConsolidatorCommon struct {
+	saveError         error
 	mockEntries       u.StringSet
-	mockFiles         []c.FileInfo
 	filteredEntries   u.StringSet
 	ignoredEntries    u.StringSet
-	saveError         error
 	sourceType        string
 	listType          string
+	mockFiles         []c.FileInfo
 	shouldReturnValid bool
 }
 
@@ -68,13 +68,13 @@ func TestConsolidateGeneric(t *testing.T) {
 	logger := multilog.NewLogger()
 
 	tests := []struct {
-		name                string
-		params              ConsolidationParams
 		entriesToIgnore     u.StringSet
-		processedFiles      []c.ProcessedFile
 		setupMock           func() *mockConsolidatorCommon
-		expectedEntryCount  int
+		params              ConsolidationParams
+		name                string
 		expectedSummaryType string
+		processedFiles      []c.ProcessedFile
+		expectedEntryCount  int
 		shouldHaveFilepath  bool
 		shouldHaveGroup     bool
 		shouldHaveCategory  bool

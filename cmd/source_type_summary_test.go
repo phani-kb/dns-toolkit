@@ -47,10 +47,10 @@ func TestProcessSource(t *testing.T) {
 	logger := multilog.NewLogger()
 
 	tests := []struct {
-		name           string
-		source         config.Source
 		setupFunc      func() error
 		expectedCounts map[string]int
+		name           string
+		source         config.Source
 		expectedTotal  int
 	}{
 		{
