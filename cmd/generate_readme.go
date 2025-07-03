@@ -341,7 +341,7 @@ func generateOutputBranchReadme() string {
 		sb.WriteString(fmt.Sprintf("| Total Sources Analyzed | %d |\n", summary.Overlap.TotalAnalyzed))
 		sb.WriteString(fmt.Sprintf("| **Last Update** | %s |\n", summary.Overlap.LastUpdateTime))
 		sb.WriteString("\n")
-		sb.WriteString("📊 **[View Detailed Overlap Analysis →](overlap.md)**\n\n")
+		sb.WriteString("**[View Detailed Overlap Analysis →](overlap.md)**\n\n")
 	}
 
 	// Top Entries Summary
@@ -545,78 +545,91 @@ func collectConsolidatedStats(summaryFileKey string, processFunc func([]byte) er
 	return processFunc(content)
 }
 
-func collectGroupsStats(stats *GroupsStats) error {
-	return collectConsolidatedStats("consolidated_groups", func(content []byte) error {
-		var groupsSummaries []c.ConsolidatedGroupsSummary
-		if err := json.Unmarshal(content, &groupsSummaries); err != nil {
+// collectConsolidatedStatsGeneric is a generic function to collect stats from consolidated summaries
+// It processes summaries and extracts identifier-based statistics (groups or categories)
+func collectConsolidatedStatsGeneric(
+	summaryFileKey string,
+	getIdentifier func(c.ConsolidatedSummary) string,
+	setStats func(map[string]int, map[string][]string, int, string),
+) error {
+	return collectConsolidatedStats(summaryFileKey, func(content []byte) error {
+		var consolidatedSummaries []c.ConsolidatedSummary
+		if err := json.Unmarshal(content, &consolidatedSummaries); err != nil {
 			return err
 		}
 
-		stats.TotalGroups = len(groupsSummaries)
-		stats.GroupSummary = make(map[string]int)
-		stats.GroupListTypes = make(map[string][]string)
+		summary := make(map[string]int)
+		listTypes := make(map[string][]string)
+		identifiersSet := make(map[string]bool)
+		var lastUpdateTime string
 
-		for _, groupSummary := range groupsSummaries {
-			if groupSummary.LastConsolidatedTimestamp != "" {
-				stats.LastUpdateTime = groupSummary.LastConsolidatedTimestamp
+		for _, consolidatedSummary := range consolidatedSummaries {
+			if consolidatedSummary.LastConsolidatedTimestamp != "" {
+				lastUpdateTime = consolidatedSummary.LastConsolidatedTimestamp
 			}
 
-			groupTotal := 0
-			listTypesSet := make(map[string]bool)
-			for _, consolidatedSummary := range groupSummary.ConsolidatedSummaries {
-				groupTotal += consolidatedSummary.Count
-				listTypesSet[consolidatedSummary.ListType] = true
-			}
-			stats.GroupSummary[groupSummary.Group] = groupTotal
+			identifier := getIdentifier(consolidatedSummary)
+			if identifier != "" {
+				identifiersSet[identifier] = true
+				summary[identifier] += consolidatedSummary.Count
 
-			// Convert set to slice
-			var listTypes []string
-			for listType := range listTypesSet {
-				listTypes = append(listTypes, listType)
+				// Track list types for each identifier
+				if _, exists := listTypes[identifier]; !exists {
+					listTypes[identifier] = []string{}
+				}
+
+				// Add list type if not already present
+				listTypeExists := false
+				for _, existingType := range listTypes[identifier] {
+					if existingType == consolidatedSummary.ListType {
+						listTypeExists = true
+						break
+					}
+				}
+				if !listTypeExists {
+					listTypes[identifier] = append(listTypes[identifier], consolidatedSummary.ListType)
+				}
 			}
-			sort.Strings(listTypes)
-			stats.GroupListTypes[groupSummary.Group] = listTypes
 		}
 
+		// Sort list types for each identifier
+		for identifier := range listTypes {
+			sort.Strings(listTypes[identifier])
+		}
+
+		setStats(summary, listTypes, len(identifiersSet), lastUpdateTime)
 		return nil
 	})
 }
 
+func collectGroupsStats(stats *GroupsStats) error {
+	return collectConsolidatedStatsGeneric(
+		"consolidated_groups",
+		func(summary c.ConsolidatedSummary) string {
+			return summary.Group
+		},
+		func(summary map[string]int, listTypes map[string][]string, total int, lastUpdate string) {
+			stats.GroupSummary = summary
+			stats.GroupListTypes = listTypes
+			stats.TotalGroups = total
+			stats.LastUpdateTime = lastUpdate
+		},
+	)
+}
+
 func collectCategoriesStats(stats *CategoriesStats) error {
-	return collectConsolidatedStats("consolidated_categories", func(content []byte) error {
-		var categoriesSummaries []c.ConsolidatedCategoriesSummary
-		if err := json.Unmarshal(content, &categoriesSummaries); err != nil {
-			return err
-		}
-
-		stats.TotalCategories = len(categoriesSummaries)
-		stats.CategorySummary = make(map[string]int)
-		stats.CategoryListTypes = make(map[string][]string)
-
-		for _, categorySummary := range categoriesSummaries {
-			if categorySummary.LastConsolidatedTimestamp != "" {
-				stats.LastUpdateTime = categorySummary.LastConsolidatedTimestamp
-			}
-
-			categoryTotal := 0
-			listTypesSet := make(map[string]bool)
-			for _, consolidatedSummary := range categorySummary.ConsolidatedSummaries {
-				categoryTotal += consolidatedSummary.Count
-				listTypesSet[consolidatedSummary.ListType] = true
-			}
-			stats.CategorySummary[categorySummary.Category] = categoryTotal
-
-			// Convert set to slice
-			var listTypes []string
-			for listType := range listTypesSet {
-				listTypes = append(listTypes, listType)
-			}
-			sort.Strings(listTypes)
-			stats.CategoryListTypes[categorySummary.Category] = listTypes
-		}
-
-		return nil
-	})
+	return collectConsolidatedStatsGeneric(
+		"consolidated_categories",
+		func(summary c.ConsolidatedSummary) string {
+			return summary.Category
+		},
+		func(summary map[string]int, listTypes map[string][]string, total int, lastUpdate string) {
+			stats.CategorySummary = summary
+			stats.CategoryListTypes = listTypes
+			stats.TotalCategories = total
+			stats.LastUpdateTime = lastUpdate
+		},
+	)
 }
 
 func collectOverlapStats(stats *OverlapStats) error {
