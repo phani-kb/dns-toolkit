@@ -164,12 +164,12 @@ func TestMergeProcessedFiles(t *testing.T) {
 
 func TestCreateSummary(t *testing.T) {
 	tests := []struct {
+		expectedFields map[string]interface{}
 		name           string
 		sourceName     string
 		sourceTypes    []c.SourceType
 		validFiles     []c.ProcessedFile
 		invalidFiles   []c.ProcessedFile
-		expectedFields map[string]interface{}
 	}{
 		{
 			name:       "Basic summary creation",
@@ -297,12 +297,12 @@ func TestSaveEntries(t *testing.T) {
 
 	tests := []struct {
 		name              string
-		validEntries      []string
-		invalidEntries    []string
 		processedDir      string
 		sourceName        string
 		sourceType        string
 		listType          string
+		validEntries      []string
+		invalidEntries    []string
 		expectValidFile   bool
 		expectInvalidFile bool
 	}{
@@ -437,12 +437,12 @@ func TestSaveToFile(t *testing.T) {
 	}(tempDir)
 
 	tests := []struct {
+		setupFunc       func()
 		name            string
-		entries         []string
 		filePath        string
-		expectError     bool
+		entries         []string
 		expectedContent []string
-		setupFunc       func() // Optional setup function
+		expectError     bool
 	}{
 		{
 			name:            "Save valid entries to file",
@@ -724,11 +724,11 @@ func TestProcessAllSources(t *testing.T) {
 	constants.SummaryDir = summaryDir
 
 	tests := []struct {
+		setupFunc         func()
 		name              string
 		downloadSummaries []c.DownloadSummary
-		setupFunc         func()
-		expectError       bool
 		expectedProcessed int
+		expectError       bool
 		contextCancelled  bool
 	}{
 		{
@@ -1149,8 +1149,8 @@ func TestCreateProcessedFileWithChecksum(t *testing.T) {
 
 	tests := []struct {
 		name              string
-		checksumEnabled   bool
 		checksumAlgorithm string
+		checksumEnabled   bool
 		expectChecksum    bool
 	}{
 		{
@@ -1358,8 +1358,8 @@ func TestProcessAllSourcesEdgeCases(t *testing.T) {
 	constants.SummaryDir = summaryDir
 
 	tests := []struct {
-		name      string
 		setupFunc func()
+		name      string
 		shouldLog bool
 	}{
 		{

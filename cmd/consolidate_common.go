@@ -159,13 +159,13 @@ func consolidateGeneric(
 }
 
 // ProcessingConfig holds configuration for processing consolidation
-type ProcessingConfig struct { // nolint:govet
+type ProcessingConfig struct {
 	GetFilesFunc       func([]c.ProcessedFile, string) []c.ProcessedFile
 	ConsolidateFunc    func(*multilog.Logger, string, string, string, u.StringSet, []c.ProcessedFile) (u.StringSet, c.ConsolidatedSummary)
+	Identifier         string
+	IdentifierField    string
 	ProcessedFiles     []c.ProcessedFile
 	GenericSourceTypes []string
-	Identifier         string
-	IdentifierField    string // "Group" or "Category"
 }
 
 // processIdentifierConsolidation is a generic function for processing consolidation by identifier (group or category)
@@ -272,4 +272,32 @@ func processIdentifierConsolidation(
 	}
 
 	return consolidatedSummariesByIdentifier
+}
+
+// processConsolidationWithTransform is a generic function that handles both identifier-based consolidation
+// and transformation to source-type-based results
+func processConsolidationWithTransform(
+	logger *multilog.Logger,
+	config ProcessingConfig,
+) map[string][]c.ConsolidatedSummary {
+	// Get result keyed by identifier
+	resultByIdentifier := processIdentifierConsolidation(logger, config)
+
+	// Transform to result keyed by source type
+	resultBySourceType := make(map[string][]c.ConsolidatedSummary)
+	for _, summaries := range resultByIdentifier {
+		for _, summary := range summaries {
+			// Skip empty summaries
+			if summary.Type == "" {
+				continue
+			}
+			sourceType := summary.Type
+			if resultBySourceType[sourceType] == nil {
+				resultBySourceType[sourceType] = []c.ConsolidatedSummary{}
+			}
+			resultBySourceType[sourceType] = append(resultBySourceType[sourceType], summary)
+		}
+	}
+
+	return resultBySourceType
 }

@@ -61,8 +61,7 @@ func TestGenerateOutputBranchReadme(t *testing.T) {
 		require.NoError(t, os.WriteFile(filePath, []byte("test content"), 0644))
 	}
 
-	readme, err := generateOutputBranchReadme()
-	require.NoError(t, err)
+	readme := generateOutputBranchReadme()
 	assert.NotEmpty(t, readme)
 
 	assert.Contains(t, readme, "# DNS Toolkit - Daily Processing Results")
@@ -102,14 +101,12 @@ func TestCollectWorkflowSummary(t *testing.T) {
 
 	createTestSummaryFiles(t, outputSummariesDir)
 
-	summary, err := collectWorkflowSummary()
-	require.NoError(t, err)
+	summary := collectWorkflowSummary()
 	assert.NotNil(t, summary)
 	assert.NotEmpty(t, summary.LastRun)
 
 	require.NoError(t, os.RemoveAll(outputSummariesDir))
-	summary2, err := collectWorkflowSummary()
-	require.NoError(t, err)
+	summary2 := collectWorkflowSummary()
 	assert.NotNil(t, summary2)
 }
 
@@ -532,8 +529,8 @@ func TestFormatConsolidateCount(t *testing.T) {
 
 	tests := []struct {
 		name     string
-		stats    ConsolidateListStats
 		expected string
+		stats    ConsolidateListStats
 	}{
 		{
 			name:     "zero count",
@@ -568,8 +565,8 @@ func TestFormatConsolidateCount(t *testing.T) {
 func TestFormatNumber(t *testing.T) {
 
 	tests := []struct {
-		input    int
 		expected string
+		input    int
 	}{
 		{0, "0"},
 		{999, "999"},
@@ -675,11 +672,11 @@ func TestCollectTopStats(t *testing.T) {
 	constants.OutputSummariesDir = tempDir
 
 	tests := []struct {
-		name          string
 		setupFunc     func() error
-		expectedError bool
-		expectedFiles int
 		expectedTypes map[string]int
+		name          string
+		expectedFiles int
+		expectedError bool
 	}{
 		{
 			name: "missing top summary file",

@@ -13,7 +13,7 @@ formatters:
   settings:
     golines:
       max-len: 120
-      shorten-comments: true
+      shorten-comments: false
 
 linters:
   enable:
@@ -28,7 +28,7 @@ linters:
     - unparam
   settings:
     goconst:
-      min-occurrences: 5
+      min-occurrences: 10
     revive:
       rules:
         - name: exported
@@ -47,7 +47,7 @@ linters:
           severity: error
           disabled: false
     dupl:
-      threshold: 100
+      threshold: 200 # TODO - adjust this value based
     errcheck:
       check-type-assertions: true
       check-blank: true

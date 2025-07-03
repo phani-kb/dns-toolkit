@@ -52,18 +52,18 @@ type OverlapDetail struct {
 	Source     string
 	ListType   string
 	SourceType string
-	Count      int
-	Targets    []TargetDetail
 	LastUpdate string
+	Targets    []TargetDetail
+	Count      int
 }
 
 type TargetDetail struct {
 	Name           string
 	ListType       string
 	SourceType     string
+	OverlapPercent float64
 	Count          int
 	OverlapCount   int
-	OverlapPercent float64
 }
 
 func generateDetailedOverlapAnalysis() (string, error) {
@@ -89,9 +89,13 @@ func generateDetailedOverlapAnalysis() (string, error) {
 	var sb strings.Builder
 
 	sb.WriteString("# DNS Toolkit - Detailed Overlap Analysis\n\n")
-	sb.WriteString("This document provides comprehensive overlap analysis between different DNS sources, ")
+	sb.WriteString(
+		"This document provides comprehensive overlap analysis between different DNS sources, ",
+	)
 	sb.WriteString("showing how entries are shared across blocklists and allowlists.\n\n")
-	sb.WriteString(fmt.Sprintf("**Last Updated:** %s\n\n", time.Now().Format("2006-01-02 15:04:05 UTC")))
+	sb.WriteString(
+		fmt.Sprintf("**Last Updated:** %s\n\n", time.Now().Format("2006-01-02 15:04:05 UTC")),
+	)
 
 	// Summary overview
 	sb.WriteString("## Overview\n\n")
@@ -156,8 +160,12 @@ func generateDetailedOverlapAnalysis() (string, error) {
 		// Targets analysis
 		if len(summary.TargetsList) > 0 {
 			sb.WriteString("**Overlap with Other Sources:**\n\n")
-			sb.WriteString("| Target Source | List Type | Source Type | Target Count | Overlap Count | Overlap % |\n")
-			sb.WriteString("|---------------|-----------|-------------|--------------|---------------|----------|\n")
+			sb.WriteString(
+				"| Target Source | List Type | Source Type | Target Count | Overlap Count | Overlap % |\n",
+			)
+			sb.WriteString(
+				"|---------------|-----------|-------------|--------------|---------------|----------|\n",
+			)
 
 			for _, targetStr := range summary.TargetsList {
 				target := parseTargetString(targetStr)
@@ -187,7 +195,9 @@ func generateDetailedOverlapAnalysis() (string, error) {
 	sb.WriteString(
 		"High overlap percentages may indicate redundant sources, while low overlap percentages suggest unique content.\n\n",
 	)
-	sb.WriteString("**Note:** Overlap percentages are calculated as: (overlap_count / source_total_count) × 100\n\n")
+	sb.WriteString(
+		"**Note:** Overlap percentages are calculated as: (overlap_count / source_total_count) × 100\n\n",
+	)
 
 	return sb.String(), nil
 }

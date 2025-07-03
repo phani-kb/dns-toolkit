@@ -186,9 +186,9 @@ func TestGenerateFileName(t *testing.T) {
 
 type mockConsolidator struct {
 	mockEntries     u.StringSet
-	mockFiles       []c.FileInfo
 	filteredEntries u.StringSet
 	ignoredEntries  u.StringSet
+	mockFiles       []c.FileInfo
 }
 
 func (m *mockConsolidator) Consolidate(_ *multilog.Logger, _ []c.ProcessedFile) (u.StringSet, []c.FileInfo) {
