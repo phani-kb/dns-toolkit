@@ -194,7 +194,26 @@ func processCategoryConsolidation(
 		ConsolidateFunc:    consolidateByCategory,
 	}
 
-	return processIdentifierConsolidation(logger, config)
+	// Get result keyed by identifier
+	resultByIdentifier := processIdentifierConsolidation(logger, config)
+
+	// Transform to result keyed by source type
+	resultBySourceType := make(map[string][]c.ConsolidatedSummary)
+	for _, summaries := range resultByIdentifier {
+		for _, summary := range summaries {
+			// Skip empty summaries
+			if summary.Type == "" {
+				continue
+			}
+			sourceType := summary.Type
+			if resultBySourceType[sourceType] == nil {
+				resultBySourceType[sourceType] = []c.ConsolidatedSummary{}
+			}
+			resultBySourceType[sourceType] = append(resultBySourceType[sourceType], summary)
+		}
+	}
+
+	return resultBySourceType
 }
 
 // consolidateByCategory consolidates files for a specific category

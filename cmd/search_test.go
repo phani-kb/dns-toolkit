@@ -285,3 +285,133 @@ func Test_resolveDomainToIPs(t *testing.T) {
 		})
 	}
 }
+
+func TestGetProcessedFiles(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "processed-files-test")
+	require.NoError(t, err)
+	defer func() {
+		if err := os.RemoveAll(tempDir); err != nil {
+			t.Logf("Failed to remove temporary directory: %v", err)
+		}
+	}()
+
+	// Create test processed summary file
+	summaryFile := filepath.Join(tempDir, "processed_summary.json")
+	summaryContent := `[
+		{
+			"name": "test-source",
+			"valid_files": [
+				{
+					"filepath": "/path/to/domain1.txt",
+					"generic_source_type": "domain"
+				},
+				{
+					"filepath": "/path/to/domain2.txt", 
+					"generic_source_type": "domain"
+				},
+				{
+					"filepath": "/path/to/ipv4.txt",
+					"generic_source_type": "ipv4"
+				}
+			]
+		}
+	]`
+	require.NoError(t, os.WriteFile(summaryFile, []byte(summaryContent), 0644))
+
+	// Test getting domain files
+	files, err := getProcessedFiles("domain", summaryFile)
+	require.NoError(t, err)
+	assert.Len(t, files, 2)
+	assert.Contains(t, files, "/path/to/domain1.txt")
+	assert.Contains(t, files, "/path/to/domain2.txt")
+
+	// Test getting ipv4 files
+	files, err = getProcessedFiles("ipv4", summaryFile)
+	require.NoError(t, err)
+	assert.Len(t, files, 1)
+	assert.Contains(t, files, "/path/to/ipv4.txt")
+
+	// Test with non-existent source type
+	files, err = getProcessedFiles("unknown", summaryFile)
+	require.NoError(t, err)
+	assert.Len(t, files, 0)
+
+	// Test with non-existent file
+	_, err = getProcessedFiles("domain", "/non/existent/file.json")
+	assert.Error(t, err)
+}
+
+func TestGetConsolidatedFiles(t *testing.T) {
+	tempDir, err := os.MkdirTemp("", "consolidated-files-test")
+	require.NoError(t, err)
+	defer func() {
+		if err := os.RemoveAll(tempDir); err != nil {
+			t.Logf("Failed to remove temporary directory: %v", err)
+		}
+	}()
+
+	// Create test consolidated summary file
+	summaryFile := filepath.Join(tempDir, "consolidated_summary.json")
+	summaryContent := `[
+		{
+			"type": "domain",
+			"list_type": "blocklist",
+			"filepath": "/path/to/domain_blocklist.txt"
+		},
+		{
+			"type": "domain",
+			"list_type": "allowlist", 
+			"filepath": "/path/to/domain_allowlist.txt"
+		},
+		{
+			"type": "ipv4",
+			"list_type": "blocklist",
+			"filepath": "/path/to/ipv4_blocklist.txt"
+		}
+	]`
+	require.NoError(t, os.WriteFile(summaryFile, []byte(summaryContent), 0644))
+
+	// Test getting domain files
+	files, err := getConsolidatedFiles("domain", summaryFile)
+	require.NoError(t, err)
+	assert.Len(t, files, 2)
+	assert.Contains(t, files, "/path/to/domain_blocklist.txt")
+	assert.Contains(t, files, "/path/to/domain_allowlist.txt")
+
+	// Test getting ipv4 files
+	files, err = getConsolidatedFiles("ipv4", summaryFile)
+	require.NoError(t, err)
+	assert.Len(t, files, 1)
+	assert.Contains(t, files, "/path/to/ipv4_blocklist.txt")
+
+	files, err = getConsolidatedFiles("unknown", summaryFile)
+	require.NoError(t, err)
+	assert.Len(t, files, 0)
+
+	_, err = getConsolidatedFiles("domain", "/non/existent/file.json")
+	assert.Error(t, err)
+}
+
+func TestDisplayCnameResults(t *testing.T) {
+	displayCnameResults([]string{}, map[string][]string{})
+
+	cnames := []string{"cdn.example.com"}
+	cnameResults := map[string][]string{
+		"source1": {"/path/to/file1.txt", "/path/to/file2.txt"},
+		"source2": {"/path/to/file3.txt"},
+	}
+
+	displayCnameResults(cnames, cnameResults)
+	displayCnameResults([]string{"test.com"}, map[string][]string{})
+	displayCnameResults([]string{}, map[string][]string{"source1": {"/file.txt"}})
+}
+
+func TestDisplayDomainResults(t *testing.T) {
+	domainResults := map[string][]string{
+		"source1": {"/path/to/file1.txt", "/path/to/file2.txt"},
+		"source2": {"/path/to/file3.txt"},
+	}
+	displayDomainResults("example.com", domainResults)
+	displayDomainResults("notfound.com", map[string][]string{})
+	displayDomainResults("", map[string][]string{})
+}
