@@ -28,10 +28,11 @@ var consolidateCategoriesCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		processedSummaries, genericSourceTypes, processedFiles := cfg.GetProcessedSummaries(
+		processedSummaries, genericSourceTypes, processedFiles := cfg.GetProcessedSummariesForConsolidation(
 			Logger,
 			SourcesConfigs,
 			*AppConfig,
+			"categories",
 		)
 		if len(processedSummaries) == 0 {
 			Logger.Errorf("No processed summaries found")

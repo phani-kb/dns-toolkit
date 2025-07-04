@@ -27,10 +27,11 @@ var consolidateGroupsCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		processedSummaries, genericSourceTypes, processedFiles := cfg.GetProcessedSummaries(
+		processedSummaries, genericSourceTypes, processedFiles := cfg.GetProcessedSummariesForConsolidation(
 			Logger,
 			SourcesConfigs,
 			*AppConfig,
+			"groups",
 		)
 
 		if len(processedSummaries) == 0 {

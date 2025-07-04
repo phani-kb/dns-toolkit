@@ -235,7 +235,7 @@ func TestGetAllProcessedFiles(t *testing.T) {
 	assert.Len(t, files, 4) // 3 from source1 + 1 from source2
 }
 
-func TestFilterEnabledSummaries(t *testing.T) {
+func TestFilterEnabledSummariesForConsolidation(t *testing.T) {
 	t.Parallel()
 
 	testSummaries := []c.ProcessedSummary{
@@ -267,7 +267,12 @@ func TestFilterEnabledSummaries(t *testing.T) {
 		},
 	}
 
-	enabled := filterEnabledSummaries(testSummaries, []SourcesConfig{sourceConfig}, appConfig)
+	enabled := filterEnabledSummariesForConsolidation(
+		testSummaries,
+		[]SourcesConfig{sourceConfig},
+		appConfig,
+		"general",
+	)
 
 	assert.Len(t, enabled, 1)
 	assert.Equal(t, "enabled-source", enabled[0].Name)

@@ -744,3 +744,79 @@ func TestCfgGetUserAgentFunction(t *testing.T) {
 	assert.Contains(t, defaultUserAgent, constants.AppVersion)
 	assert.Contains(t, defaultUserAgent, constants.AppDescription)
 }
+
+// TestSkipGeneralConsolidation tests the skip_general_consolidation functionality
+func TestSkipGeneralConsolidation(t *testing.T) {
+	config := SourcesConfig{
+		Sources: []Source{
+			{
+				Name:                     "regular-source",
+				URL:                      "http://example.com/regular.txt",
+				SkipGeneralConsolidation: false,
+				Types: []c.SourceType{
+					{Name: "domain"},
+				},
+			},
+			{
+				Name:                     "skip-general-source",
+				URL:                      "http://example.com/skip.txt",
+				SkipGeneralConsolidation: true,
+				Types: []c.SourceType{
+					{Name: "domain"},
+				},
+			},
+			{
+				Name:     "disabled-source",
+				URL:      "http://example.com/disabled.txt",
+				Disabled: true,
+				Types: []c.SourceType{
+					{Name: "domain"},
+				},
+			},
+		},
+	}
+
+	t.Run("GetEnabledSources returns all enabled sources", func(t *testing.T) {
+		sources := config.GetEnabledSources(SourceFilters{})
+		assert.Equal(t, 2, len(sources))
+
+		sourceNames := make(map[string]bool)
+		for _, s := range sources {
+			sourceNames[s.Name] = true
+		}
+		assert.True(t, sourceNames["regular-source"])
+		assert.True(t, sourceNames["skip-general-source"])
+		assert.False(t, sourceNames["disabled-source"])
+	})
+
+	t.Run("GetSourcesForGeneralConsolidation excludes skip_general_consolidation sources", func(t *testing.T) {
+		sources := config.GetSourcesForGeneralConsolidation(SourceFilters{})
+		assert.Equal(t, 1, len(sources))
+		assert.Equal(t, "regular-source", sources[0].Name)
+	})
+
+	t.Run("GetSourcesForGroupsAndCategories includes skip_general_consolidation sources", func(t *testing.T) {
+		sources := config.GetSourcesForGroupsAndCategories(SourceFilters{})
+		assert.Equal(t, 2, len(sources))
+
+		sourceNames := make(map[string]bool)
+		for _, s := range sources {
+			sourceNames[s.Name] = true
+		}
+		assert.True(t, sourceNames["regular-source"])
+		assert.True(t, sourceNames["skip-general-source"])
+		assert.False(t, sourceNames["disabled-source"])
+	})
+
+	t.Run("ShouldIncludeInGeneralConsolidation method works correctly", func(t *testing.T) {
+		assert.True(t, config.Sources[0].ShouldIncludeInGeneralConsolidation())  // regular-source
+		assert.False(t, config.Sources[1].ShouldIncludeInGeneralConsolidation()) // skip-general-source
+		assert.False(t, config.Sources[2].ShouldIncludeInGeneralConsolidation()) // disabled-source
+	})
+
+	t.Run("ShouldIncludeInGroupsAndCategories method works correctly", func(t *testing.T) {
+		assert.True(t, config.Sources[0].ShouldIncludeInGroupsAndCategories())  // regular-source
+		assert.True(t, config.Sources[1].ShouldIncludeInGroupsAndCategories())  // skip-general-source
+		assert.False(t, config.Sources[2].ShouldIncludeInGroupsAndCategories()) // disabled-source
+	})
+}
