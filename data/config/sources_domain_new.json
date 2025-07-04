@@ -2,8 +2,10 @@
   "sources": [
     {
       "name": "nrd-14day-mini",
+      "disabled": true,
       "frequency": "weekly",
       "license": "MIT",
+      "notes": "Huge list with low unique contribution",
       "types": [
         {
           "name": "domain",
