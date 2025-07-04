@@ -581,3 +581,75 @@ func TestSourceUnmarshalJSON(t *testing.T) {
 	err = json.Unmarshal([]byte(invalidJSON), &source3)
 	assert.Error(t, err)
 }
+
+// TestConsolidationTypeFunctions tests the consolidation type filtering functions
+func TestConsolidationTypeFunctions(t *testing.T) {
+	t.Parallel()
+
+	appConfig := AppConfig{
+		DNSToolkit: DNSToolkitConfig{
+			MaxWorkers: 4,
+		},
+	}
+
+	sourcesConfig := SourcesConfig{
+		Sources: []Source{
+			{
+				Name:                     "regular-source",
+				URL:                      "http://example.com/regular.txt",
+				SkipGeneralConsolidation: false,
+				Disabled:                 false,
+				Types: []c.SourceType{
+					{Name: "domain"},
+				},
+			},
+			{
+				Name:                     "skip-general-source",
+				URL:                      "http://example.com/skip.txt",
+				SkipGeneralConsolidation: true,
+				Disabled:                 false,
+				Types: []c.SourceType{
+					{Name: "domain"},
+				},
+			},
+			{
+				Name:     "disabled-source",
+				URL:      "http://example.com/disabled.txt",
+				Disabled: true,
+				Types: []c.SourceType{
+					{Name: "domain"},
+				},
+			},
+		},
+	}
+
+	sourceConfigs := []SourcesConfig{sourcesConfig}
+
+	t.Run("IsEnabledSourceForConsolidation - general consolidation", func(t *testing.T) {
+		assert.True(t, IsEnabledSourceForConsolidation("regular-source", sourceConfigs, appConfig, "general"))
+		assert.False(t, IsEnabledSourceForConsolidation("skip-general-source", sourceConfigs, appConfig, "general"))
+		assert.False(t, IsEnabledSourceForConsolidation("disabled-source", sourceConfigs, appConfig, "general"))
+	})
+
+	t.Run("IsEnabledSourceForConsolidation - groups consolidation", func(t *testing.T) {
+		assert.True(t, IsEnabledSourceForConsolidation("regular-source", sourceConfigs, appConfig, "groups"))
+		assert.True(t, IsEnabledSourceForConsolidation("skip-general-source", sourceConfigs, appConfig, "groups"))
+		assert.False(t, IsEnabledSourceForConsolidation("disabled-source", sourceConfigs, appConfig, "groups"))
+	})
+
+	t.Run("IsEnabledSourceForConsolidation - categories consolidation", func(t *testing.T) {
+		assert.True(t, IsEnabledSourceForConsolidation("regular-source", sourceConfigs, appConfig, "categories"))
+		assert.True(t, IsEnabledSourceForConsolidation("skip-general-source", sourceConfigs, appConfig, "categories"))
+		assert.False(t, IsEnabledSourceForConsolidation("disabled-source", sourceConfigs, appConfig, "categories"))
+	})
+
+	t.Run("IsEnabledSourceForConsolidation - unknown consolidation type", func(t *testing.T) {
+		assert.True(t, IsEnabledSourceForConsolidation("regular-source", sourceConfigs, appConfig, "unknown"))
+		assert.False(t, IsEnabledSourceForConsolidation("skip-general-source", sourceConfigs, appConfig, "unknown"))
+		assert.False(t, IsEnabledSourceForConsolidation("disabled-source", sourceConfigs, appConfig, "unknown"))
+	})
+
+	t.Run("IsEnabledSourceForConsolidation - non-existent source", func(t *testing.T) {
+		assert.False(t, IsEnabledSourceForConsolidation("non-existent", sourceConfigs, appConfig, "general"))
+	})
+}

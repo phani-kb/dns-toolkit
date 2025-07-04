@@ -348,9 +348,10 @@ func TestProcessIdentifierConsolidation(t *testing.T) {
 		}
 
 		// Set identifier field based on the function call
-		if identifier == "test-group" {
+		switch identifier {
+		case "test-group":
 			summary.Group = identifier
-		} else if identifier == "test-category" {
+		case "test-category":
 			summary.Category = identifier
 		}
 
@@ -548,9 +549,10 @@ func TestProcessIdentifierConsolidation(t *testing.T) {
 			allowlistCount := 0
 			blocklistCount := 0
 			for _, summary := range summaries {
-				if summary.ListType == constants.ListTypeAllowlist {
+				switch summary.ListType {
+				case constants.ListTypeAllowlist:
 					allowlistCount++
-				} else if summary.ListType == constants.ListTypeBlocklist {
+				case constants.ListTypeBlocklist:
 					blocklistCount++
 				}
 
