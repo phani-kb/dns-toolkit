@@ -832,6 +832,8 @@
       "name": "OISD Blocklist Big",
       "categories": "ads, malware, trackers",
       "license": "GPL-3.0",
+      "skip_general_consolidation": true,
+      "notes": "Large source excluded from general consolidation",
       "types": [
         {
           "name": "adguard"

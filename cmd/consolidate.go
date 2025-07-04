@@ -18,7 +18,6 @@ var ignoreAllowlist bool
 var includeInvalid bool
 var calculateChecksum bool
 var skipConsolidatedSummary bool
-var skipConsolidate bool
 
 var consolidateCmd = &cobra.Command{
 	Use:   "consolidate",
