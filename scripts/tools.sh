@@ -77,6 +77,23 @@ print_types_names() {
   find data/config -name "sources_[i|d|l]*.json" -type f | xargs jq -r '.sources[] | select(.types != null) | .types[] | select(.name != null) | .name' | sort -u
 }
 
+print_types_with_counts() {
+  echo "Source types and their counts:"
+  echo "============================="
+  
+  # Get all type names and count occurrences
+  find data/config -name "sources_*.json" -type f ! -name "*schema*" | \
+  xargs jq -r '.sources[] | select(.types != null) | .types[] | select(.name != null) | .name' | \
+  sort | uniq -c | sort -nr | \
+  while read count type; do
+    printf "%-30s %3d\n" "$type" "$count"
+  done
+  
+  echo ""
+  echo "Total unique types: $(find data/config -name "sources_*.json" -type f ! -name "*schema*" | xargs jq -r '.sources[] | select(.types != null) | .types[] | select(.name != null) | .name' | sort -u | wc -l)"
+  echo "Total type instances: $(find data/config -name "sources_*.json" -type f ! -name "*schema*" | xargs jq -r '.sources[] | select(.types != null) | .types[] | select(.name != null) | .name' | wc -l)"
+}
+
 case "$1" in
 fmt)
   fmt
@@ -93,8 +110,11 @@ sort-config-sources)
 print-source-types-names)
   print_types_names
   ;;
+print-source-types-counts)
+  print_types_with_counts
+  ;;
 *)
-  echo "Usage: $0 {fmt|install-tools|clean-tools|sort-config-sources|print-source-types-names}"
+  echo "Usage: $0 {fmt|install-tools|clean-tools|sort-config-sources|print-source-types-names|print-source-types-counts}"
   exit 1
   ;;
 esac

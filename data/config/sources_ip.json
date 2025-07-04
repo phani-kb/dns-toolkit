@@ -4,6 +4,7 @@
       "name": "AlienVault_Reputation",
       "categories": "anonymizer, botnet, exploit, malicious, malware, phishing, proxy, ransomware, spam, trojan",
       "disabled": true,
+      "notes": "Not available anymore. The service has been discontinued.",
       "types": [
         {
           "name": "ipv4_find",
@@ -21,7 +22,6 @@
     },
     {
       "name": "BinaryDefense_Banlist",
-      "disabled": true,
       "notes": "This is for public use only.",
       "types": [
         {
@@ -52,6 +52,7 @@
     },
     {
       "name": "BlockListDE_Brute",
+      "disabled": true,
       "notes": "100% overlap with Firehol_level2",
       "types": [
         {
@@ -79,9 +80,47 @@
       "website": "https://www.blocklist.de"
     },
     {
+      "name": "Borestad_AbuseIPDB",
+      "types": [
+        {
+          "name": "ipv4_find"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/borestad/blocklist-abuseipdb/main/abuseipdb-s100-1d.ipv4",
+      "website": "https://github.com/borestad/blocklist-abuseipdb"
+    },
+    {
+      "name": "BruteforceBlocker",
+      "disabled": true,
+      "notes": ">98% overlap with EmergingThreats_CompromisedIPs",
+      "types": [
+        {
+          "name": "ipv4_find"
+        }
+      ],
+      "url": "http://danger.rulez.sk/projects/bruteforceblocker/blist.php",
+      "website": "http://danger.rulez.sk"
+    },
+    {
+      "name": "CINSScore_BadGuys_Army",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "lite"
+            }
+          ]
+        }
+      ],
+      "url": "http://cinsscore.com/list/ci-badguys.txt",
+      "website": "http://cinsscore.com"
+    },
+    {
       "name": "DoH_IP_blocklists",
       "categories": "dns",
-      "disabled": true,
       "exclude": true,
       "license": "GPL-3.0",
       "types": [
@@ -96,6 +135,20 @@
       "website": "https://github.com/dibdot/DoH-IP-blocklists"
     },
     {
+      "name": "DoH_IP_list",
+      "categories": "dns",
+      "exclude": true,
+      "frequency": "monthly",
+      "license": "MIT",
+      "types": [
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/oneoffdallas/dohservers/master/iplist.txt",
+      "website": "https://github.com/oneoffdallas/dohservers"
+    },
+    {
       "name": "DShield",
       "disabled": true,
       "notes": "100% overlap with Firehol_level2/Firehol_level3",
@@ -106,6 +159,48 @@
       ],
       "url": "https://opendbl.net/lists/dshield.list",
       "website": "https://opendbl.net"
+    },
+    {
+      "name": "EmergingThreats_CompromisedIPs",
+      "license": "GPL-2.0",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "lite"
+            }
+          ]
+        }
+      ],
+      "url": "https://rules.emergingthreats.net/open/suricata/rules/compromised-ips.txt",
+      "website": "http://www.emergingthreats.net"
+    },
+    {
+      "name": "ET_fwip",
+      "license": "GPL-2.0",
+      "types": [
+        {
+          "name": "cidr_ipv4"
+        }
+      ],
+      "url": "https://rules.emergingthreats.net/fwrules/emerging-Block-IPs.txt",
+      "website": "http://www.emergingthreats.net"
+    },
+    {
+      "name": "FabrizioSalmi_DNS",
+      "categories": "dns",
+      "frequency": "monthly",
+      "license": "GPL-3.0",
+      "types": [
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/fabriziosalmi/blacklists/refs/heads/main/dns_servers.txt",
+      "website": "https://fabriziosalmi.github.io/blacklists"
     },
     {
       "name": "Firehol_abusers_30d",
@@ -122,8 +217,164 @@
       "website": "https://iplists.firehol.org"
     },
     {
-      "name": "MyIP_MS_Blocklist",
+      "name": "Firehol_BitcoinNodes_1d",
+      "types": [
+        {
+          "name": "ipv4"
+        },
+        {
+          "name": "ipv4_cidr_expand"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/bitcoin_nodes_1d.ipset",
+      "website": "https://getaddr.bitnodes.io"
+    },
+    {
+      "name": "Firehol_Botscout_1d",
+      "types": [
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/botscout_1d.ipset",
+      "website": "https://botscout.com"
+    },
+    {
+      "name": "Firehol_GPF_Comics",
+      "types": [
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://iplists.firehol.org/files/gpf_comics.ipset",
+      "website": "https://www.gpf-comics.com/dnsbl/export.php"
+    },
+    {
+      "name": "Firehol_level1",
+      "license": "GPL-2.0",
+      "types": [
+        {
+          "name": "cidr_ipv4"
+        }
+      ],
+      "url": "https://iplists.firehol.org/files/firehol_level1.netset",
+      "website": "https://iplists.firehol.org"
+    },
+    {
+      "name": "Firehol_level2",
+      "license": "GPL-2.0",
+      "types": [
+        {
+          "name": "ipv4"
+        },
+        {
+          "name": "ipv4_cidr_expand"
+        }
+      ],
+      "url": "https://iplists.firehol.org/files/firehol_level2.netset",
+      "website": "https://iplists.firehol.org"
+    },
+    {
+      "name": "Firehol_level3",
+      "license": "GPL-2.0",
+      "types": [
+        {
+          "name": "ipv4"
+        },
+        {
+          "name": "ipv4_cidr_expand"
+        }
+      ],
+      "url": "https://iplists.firehol.org/files/firehol_level3.netset",
+      "website": "https://iplists.firehol.org"
+    },
+    {
+      "name": "Firehol_SocksProxy_7d",
+      "categories": "anonymizer, proxy",
+      "frequency": "weekly",
+      "types": [
+        {
+          "name": "ipv4"
+        },
+        {
+          "name": "ipv4_cidr_expand"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/socks_proxy_7d.ipset",
+      "website": "http://www.socks-proxy.net"
+    },
+    {
+      "name": "Firehol_SSLProxies_1d",
+      "categories": "anonymizer, proxy",
+      "frequency": "weekly",
+      "types": [
+        {
+          "name": "ipv4"
+        },
+        {
+          "name": "ipv4_cidr_expand"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/firehol/blocklist-ipsets/master/sslproxies_1d.ipset",
+      "website": "http://www.sslproxies.org"
+    },
+    {
+      "name": "GlobalAntiScamOrg-blocklist",
+      "license": "BSD 3-Clause",
+      "types": [
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/elliotwutingfeng/GlobalAntiScamOrg-blocklist/refs/heads/main/global-anti-scam-org-scam-ips.txt",
+      "website": "https://github.com/elliotwutingfeng/GlobalAntiScamOrg-blocklist"
+    },
+    {
+      "name": "Greensnow",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "mini"
+            }
+          ]
+        }
+      ],
+      "url": "https://blocklist.greensnow.co/greensnow.txt",
+      "website": "https://greensnow.co"
+    },
+    {
+      "name": "HaGeZi_DoH",
+      "categories": "dns",
       "disabled": true,
+      "license": "GPL-3.0",
+      "notes": ">98% overlap with DoH_IP_blocklists",
+      "types": [
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/refs/heads/main/ips/doh.txt",
+      "website": "https://github.com/hagezi/dns-blocklists"
+    },
+    {
+      "name": "HaGeZi_TIF",
+      "disabled": true,
+      "license": "GPL-3.0",
+      "notes": "No unique contribution",
+      "types": [
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/ips/tif.txt",
+      "website": "https://github.com/hagezi/dns-blocklists"
+    },
+    {
+      "name": "MyIP_MS_Blocklist",
       "types": [
         {
           "name": "ipv4_find"
@@ -136,8 +387,51 @@
       "website": "https://myip.ms/browse/blacklist"
     },
     {
+      "name": "Public_DNS4",
+      "types": [
+        {
+          "name": "ipv4"
+        },
+        {
+          "name": "ipv6"
+        }
+      ],
+      "url": "https://public-dns.info/nameservers.txt",
+      "website": "https://public-dns.info"
+    },
+    {
+      "name": "Rutgers_DROP",
+      "types": [
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://report.cs.rutgers.edu/DROP/attackers",
+      "website": "https://report.cs.rutgers.edu"
+    },
+    {
+      "name": "Sblam_Blocklist",
+      "types": [
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://sblam.com/blacklist.txt",
+      "website": "https://sblam.com"
+    },
+    {
+      "name": "ScriptzTeam_BadIPS",
+      "frequency": "monthly",
+      "types": [
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/scriptzteam/badIPS/main/ips.txt",
+      "website": "https://github.com/scriptzteam/badIPS"
+    },
+    {
       "name": "Sentinel_Greylist",
-      "disabled": true,
       "license": "CC BY-NC-SA 4.0",
       "types": [
         {
@@ -151,6 +445,52 @@
       "website": "https://view.sentinel.turris.cz"
     },
     {
+      "name": "spamhaus_drop",
+      "types": [
+        {
+          "name": "cidr_ipv4"
+        }
+      ],
+      "url": "http://www.spamhaus.org/drop/drop.txt",
+      "website": "http://www.spamhaus.org"
+    },
+    {
+      "name": "T145_allowlist",
+      "disabled": true,
+      "license": "AGPL-3.0",
+      "notes": "Too many allowlist IPs, use with caution.",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://github.com/T145/black-mirror/releases/download/latest/ALLOW_IPV4.txt",
+      "website": "https://github.com/T145/black-mirror"
+    },
+    {
+      "name": "T145_blocklist",
+      "disabled": true,
+      "license": "AGPL-3.0",
+      "notes": "Too many blocklist IPs, use with caution.",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist"
+            }
+          ]
+        }
+      ],
+      "url": "https://github.com/T145/black-mirror/releases/download/latest/BLOCK_IPV4.txt",
+      "website": "https://github.com/T145/black-mirror"
+    },
+    {
       "name": "URLHaus_Text",
       "types": [
         {
@@ -162,6 +502,17 @@
       ],
       "url": "https://urlhaus.abuse.ch/downloads/text/",
       "website": "https://urlhaus.abuse.ch"
+    },
+    {
+      "name": "USOM-Blocklists",
+      "license": "BSD 3-Clause",
+      "types": [
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/elliotwutingfeng/USOM-Blocklists/refs/heads/main/ips.txt",
+      "website": "https://github.com/elliotwutingfeng/USOM-Blocklists"
     },
     {
       "name": "Yoyo AdServers",

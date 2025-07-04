@@ -6,10 +6,10 @@
       "notes": ">97% overlap with Firehol_level3",
       "types": [
         {
-          "name": "domain"
+          "name": "domain_http_url"
         },
         {
-          "name": "ipv4"
+          "name": "ipv4_http_url"
         }
       ],
       "url": "https://vxvault.net/URL_List.php"
