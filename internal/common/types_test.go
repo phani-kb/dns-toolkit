@@ -627,3 +627,82 @@ func TestComplexScenarios(t *testing.T) {
 		assert.Empty(t, pf.Categories)
 	})
 }
+
+func TestDownloadSummaryToJSON(t *testing.T) {
+	tests := []struct {
+		name     string
+		summary  DownloadSummary
+		expected string
+	}{
+		{
+			name: "valid summary",
+			summary: DownloadSummary{
+				Name: "test-source",
+				URL:  "https://example.com",
+				Types: []SourceType{
+					{Name: "domain"},
+				},
+			},
+			expected: `{"name":"test-source","url":"https://example.com","filepath":"","frequency":"","checksum":"","error":"","last_download_timestamp":"","last_checked_timestamp":"","types":[{"name":"domain"}],"type_count":0}`,
+		},
+		{
+			name:     "empty summary",
+			summary:  DownloadSummary{},
+			expected: `{"name":"","url":"","filepath":"","frequency":"","checksum":"","error":"","last_download_timestamp":"","last_checked_timestamp":"","types":null,"type_count":0}`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := tt.summary.ToJSON()
+			assert.JSONEq(t, tt.expected, result)
+		})
+	}
+}
+
+func TestTopSummaryMarshalJSON(t *testing.T) {
+	tests := []struct {
+		name    string
+		summary TopSummary
+		wantErr bool
+	}{
+		{
+			name: "valid top summary",
+			summary: TopSummary{
+				GenericSourceType: "domain",
+				ListType:          "blocklist",
+				MinSources:        3,
+				Count:             1000,
+				Filepath:          "/test/path.txt",
+				TopEntries:        []EntryCountPair{{Entry: "example.com", Count: 5}},
+			},
+			wantErr: false,
+		},
+		{
+			name:    "empty top summary",
+			summary: TopSummary{},
+			wantErr: false,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			data, err := tt.summary.MarshalJSON()
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.NotEmpty(t, data)
+
+				var unmarshaled TopSummary
+				err = json.Unmarshal(data, &unmarshaled)
+				assert.NoError(t, err)
+				assert.Equal(t, tt.summary.GenericSourceType, unmarshaled.GenericSourceType)
+				assert.Equal(t, tt.summary.ListType, unmarshaled.ListType)
+				assert.Equal(t, tt.summary.MinSources, unmarshaled.MinSources)
+				assert.Equal(t, len(tt.summary.TopEntries), unmarshaled.Count)
+				assert.Equal(t, tt.summary.Filepath, unmarshaled.Filepath)
+			}
+		})
+	}
+}
