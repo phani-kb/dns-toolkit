@@ -20,12 +20,13 @@ fi
 # o  - overlap
 # op - output
 # r  - output README
+# or - overlap README
 # cp - copy summaries
 
 if [ "$#" -gt 0 ]; then
     IFS=',' read -ra steps <<< "$1"
 else
-    steps=("d" "p" "c" "cg" "cc" "t" "o" "op" "cp")
+    steps=("d" "p" "c" "cg" "cc" "t" "o" "r" "op" "or" "cp")
 fi
 
 for step in "${steps[@]}"; do
@@ -52,7 +53,7 @@ for step in "${steps[@]}"; do
             ;;
         t)
             echo "Step 6: Generating top entries..."
-            ./bin/dns-toolkit top --min-sources 2 # until all the processors are implemented
+            ./bin/dns-toolkit top #--min-sources 2 # until all the processors are implemented
             ;;
         o)
             echo "Step 7: Finding overlaps..."
@@ -66,8 +67,12 @@ for step in "${steps[@]}"; do
             echo "Step 9: Generating output README..."
             ./bin/dns-toolkit generate output-readme
             ;;
+        or)
+            echo "Step 10: Generating overlap README..."
+            ./bin/dns-toolkit generate overlap-readme
+            ;;
         cp)
-            echo "Step 10: Copy summary files to archive..."
+            echo "Step 11: Copy summary files to archive..."
             cp data/output/summaries/* data/archive/
             ;;
         *)
