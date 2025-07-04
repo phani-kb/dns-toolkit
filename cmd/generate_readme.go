@@ -232,7 +232,16 @@ func generateOutputBranchReadme() string {
 		sb.WriteString("**Sources by Type:**\n\n")
 		sb.WriteString("| Source Type | Count |\n")
 		sb.WriteString("|-------------|-------|\n")
-		for sourceType, count := range summary.Download.SourcesByType {
+
+		// Sort source types alphabetically
+		var sourceTypes []string
+		for sourceType := range summary.Download.SourcesByType {
+			sourceTypes = append(sourceTypes, sourceType)
+		}
+		sort.Strings(sourceTypes)
+
+		for _, sourceType := range sourceTypes {
+			count := summary.Download.SourcesByType[sourceType]
 			sb.WriteString(fmt.Sprintf("| %s | %d |\n", sourceType, count))
 		}
 		sb.WriteString("\n")

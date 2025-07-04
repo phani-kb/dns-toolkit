@@ -16,12 +16,12 @@ import (
 )
 
 var generateOverlapCmd = &cobra.Command{
-	Use:   "overlap",
+	Use:   "overlap-readme",
 	Short: "Generate detailed overlap analysis markdown file",
 	Long:  "Generate a detailed overlap.md file containing overlap analysis between different sources including overlap percentages, targets, and detailed statistics",
 	Run: func(cmd *cobra.Command, args []string) {
 		if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
-			Logger.Debug("Skipping generate overlap command in test mode")
+			Logger.Debug("Skipping generate overlap-readme command in test mode")
 			return
 		}
 
@@ -34,7 +34,7 @@ var generateOverlapCmd = &cobra.Command{
 
 		overlapMd, err := generateDetailedOverlapAnalysis()
 		if err != nil {
-			Logger.Errorf("Failed to generate overlap analysis: %v", err)
+			Logger.Errorf("Failed to generate overlap-readme analysis: %v", err)
 			os.Exit(1)
 		}
 
@@ -141,21 +141,18 @@ func generateDetailedOverlapAnalysis() (string, error) {
 	sb.WriteString("## Detailed Source Analysis\n\n")
 
 	sort.Slice(overlapSummaries, func(i, j int) bool {
-		return overlapSummaries[i].Source < overlapSummaries[j].Source
+		return strings.ToLower(overlapSummaries[i].Source) < strings.ToLower(overlapSummaries[j].Source)
 	})
 
 	for _, summary := range overlapSummaries {
 		sb.WriteString(fmt.Sprintf("### %s\n\n", summary.Source))
 
-		// Source details
-		sb.WriteString("| Property | Value |\n")
-		sb.WriteString("|----------|-------|\n")
-		sb.WriteString(fmt.Sprintf("| List Type | %s |\n", summary.ListType))
-		sb.WriteString(fmt.Sprintf("| Source Type | %s |\n", summary.Type))
-		sb.WriteString(fmt.Sprintf("| Total Entries | %s |\n", formatNumber(summary.Count)))
-		sb.WriteString(fmt.Sprintf("| Unique Entries | %s |\n", formatNumber(summary.Unique)))
-		sb.WriteString(fmt.Sprintf("| Target Sources | %d |\n", summary.TargetsCount))
-		sb.WriteString("\n")
+		// Source details - flattened format
+		sb.WriteString(fmt.Sprintf("**List Type:** %s | ", summary.ListType))
+		sb.WriteString(fmt.Sprintf("**Source Type:** %s | ", summary.Type))
+		sb.WriteString(fmt.Sprintf("**Total Entries:** %s | ", formatNumber(summary.Count)))
+		sb.WriteString(fmt.Sprintf("**Unique Entries:** %s | ", formatNumber(summary.Unique)))
+		sb.WriteString(fmt.Sprintf("**Target Sources:** %d\n\n", summary.TargetsCount))
 
 		// Targets analysis
 		if len(summary.TargetsList) > 0 {
