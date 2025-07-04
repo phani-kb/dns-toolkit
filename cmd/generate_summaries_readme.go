@@ -396,7 +396,7 @@ func getDetailedStatsForSummaryType(filename string) string {
 				types = append(types, t)
 			}
 			sort.Strings(types)
-			
+
 			var details []string
 			for _, t := range types {
 				minList := typeMinSources[t]
