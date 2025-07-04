@@ -18,6 +18,7 @@ var ignoreAllowlist bool
 var includeInvalid bool
 var calculateChecksum bool
 var skipConsolidatedSummary bool
+var skipConsolidate bool
 
 var consolidateCmd = &cobra.Command{
 	Use:   "consolidate",
@@ -287,9 +288,9 @@ func init() {
 		BoolVar(&includeInvalid, "include-invalid", false, "Include invalid entry(s) during consolidation")
 	consolidateCmd.PersistentFlags().
 		BoolVar(&calculateChecksum, "calculate-checksum", false, "Calculate checksum on the consolidated files")
-	consolidateCategoriesCmd.Flags().
+	consolidateCategoriesCmd.PersistentFlags().
 		BoolVar(&skipConsolidatedSummary, "skip-consolidated-summary", false, "Skip creating the consolidated summary file")
-	consolidateGroupsCmd.Flags().
+	consolidateGroupsCmd.PersistentFlags().
 		BoolVar(&skipConsolidatedSummary, "skip-consolidated-summary", false, "Skip creating the regular consolidated summary file")
 	consolidateCmd.AddCommand(consolidateAllCmd)
 	consolidateCmd.AddCommand(consolidateGroupsCmd)
