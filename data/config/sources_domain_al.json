@@ -20,8 +20,25 @@
       "website": "https://github.com/anudeepND/whitelist"
     },
     {
+      "name": "fabriziosalmi_allowlist",
+      "license": "GPL-3.0",
+      "notes": "Needs review, as it contains domains that may not be suitable for an allowlist.",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist",
+              "groups": "lite"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/fabriziosalmi/blacklists/refs/heads/main/whitelist.txt",
+      "website": "https://github.com/fabriziosalmi/blacklists"
+    },
+    {
       "name": "ShadowWhisperer_Allowlist",
-      "disabled": true,
       "types": [
         {
           "name": "domain_with_comment_suffix",
@@ -35,6 +52,24 @@
       ],
       "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/refs/heads/master/Whitelists/Whitelist",
       "website": "https://github.com/ShadowWhisperer/BlockLists"
+    },
+    {
+      "name": "T145_allowlist",
+      "disabled": true,
+      "license": "AGPL-3.0",
+      "notes": "Too many allowlist domains, use with caution.",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://github.com/T145/black-mirror/releases/download/latest/ALLOW_DOMAIN.txt",
+      "website": "https://github.com/T145/black-mirror"
     }
   ]
 }
