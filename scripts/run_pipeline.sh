@@ -21,12 +21,13 @@ fi
 # op - output
 # r  - output README
 # or - overlap README
+# sr - summaries README
 # cp - copy summaries
 
 if [ "$#" -gt 0 ]; then
     IFS=',' read -ra steps <<< "$1"
 else
-    steps=("d" "p" "c" "cg" "cc" "t" "o" "r" "op" "or" "cp")
+    steps=("d" "p" "c" "cg" "cc" "t" "o" "r" "op" "or" "sr" "cp")
 fi
 
 for step in "${steps[@]}"; do
@@ -71,8 +72,12 @@ for step in "${steps[@]}"; do
             echo "Step 10: Generating overlap README..."
             ./bin/dns-toolkit generate overlap-readme
             ;;
+        sr)
+            echo "Step 11: Generating summaries README..."
+            ./bin/dns-toolkit generate summaries-readme
+            ;;
         cp)
-            echo "Step 11: Copy summary files to archive..."
+            echo "Step 12: Copy summary files to archive..."
             cp data/output/summaries/* data/archive/
             ;;
         *)
