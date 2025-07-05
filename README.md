@@ -10,6 +10,19 @@
 A Go-based command-line utility for downloading, processing, resolving, and consolidating DNS blocklists and allowlists from multiple sources. Performs DNS-to-IP resolution, reverse lookups, and overlap detection. Generates ready-to-use lists for DNS sinkholes, Pi-hole, AdGuard Home, and other network security tools.
 
 <!-- STATS_START -->
+## Source Statistics
+
+*Automatically generated statistics from source configuration files*
+
+| Metric | Count | Details |
+|--------|-------|---------|
+| **Total Sources** | 134 | 91 enabled, 43 disabled |
+| **Blocklist Sources** | 126 | Sources providing blocking rules |
+| **Allowlist Sources** | 20 | Sources providing exception rules |
+| **Categories** | 24 | ads, adult, annoyance, anonymizer, botnet, dns, doh, exploit, fakenews, gambling, malicious, malware, mobile, others, phishing, privacy, proxy, ransomware, scam, security, spam, threat, trackers, trojan |
+| **Source Types** | 25 | adguard, cidr_ipv4, domain, domain_adguard, domain_comment, domain_csv_http_url_find, domain_custom_csv_blackbook, domain_custom_csv_maltrail, domain_custom_html_ccam, domain_custom_html_puppyscams, domain_http_url, domain_top, domain_url, domain_with_comment_suffix, hostname, ipv4, ipv4_cidr_expand, ipv4_custom_html_ccam, ipv4_find, ipv4_http_url, ipv4_range_expand, ipv4_url, ipv6, ipv6_find, ipv6_htaccess |
+| **Geographic Coverage** | 21 countries | CN, CZ, DE, ES, FI, FR, HU, ID, IL, IT, KR, LV, MY, NL, RO, RU, SA, SK, UA, US, VN |
+| **Last Updated** | 2025-07-05 03:08:24 UTC | Statistics generation time |
 
 <!-- STATS_END -->
 
