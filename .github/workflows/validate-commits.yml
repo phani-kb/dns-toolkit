@@ -58,7 +58,10 @@ jobs:
               
               # Check for issue references
               if ! echo "$MESSAGE" | grep -qE '\b(#[0-9]+|fix(es)?\s*#[0-9]+|close(s)?\s*#[0-9]+|resolve(s)?\s*#[0-9]+)\b'; then
-                INVALID_COMMITS+="${HASH}: ${MESSAGE}\n"
+                if [ -n "$INVALID_COMMITS" ]; then
+                  INVALID_COMMITS+=$'\n'
+                fi
+                INVALID_COMMITS+="${HASH}: ${MESSAGE}"
               fi
             fi
           done <<< "$COMMITS"
