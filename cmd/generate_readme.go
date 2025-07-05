@@ -359,16 +359,41 @@ func generateOutputBranchReadme() string {
 		sb.WriteString("| Type | List Type | Min Sources | Entries Count | Files Generated |\n")
 		sb.WriteString("|------|-----------|-------------|---------------|----------------|\n")
 
+		// Create a sorted list of all entries
+		type sortableTopEntry struct {
+			sourceType string
+			detail     TopFileDetail
+		}
+
+		var allEntries []sortableTopEntry
 		for _, sourceType := range types {
 			if details, exists := summary.Top.FileDetails[sourceType]; exists && len(details) > 0 {
 				for _, detail := range details {
-					sb.WriteString(fmt.Sprintf("| %s | %s | %d | %s | 1 |\n",
-						sourceType,
-						detail.ListType,
-						detail.MinSources,
-						formatNumber(detail.Count)))
+					allEntries = append(allEntries, sortableTopEntry{
+						sourceType: sourceType,
+						detail:     detail,
+					})
 				}
 			}
+		}
+
+		// Sort entries: by source type, then by list type (allowlist first), then by min sources desc
+		sort.Slice(allEntries, func(i, j int) bool {
+			if allEntries[i].sourceType != allEntries[j].sourceType {
+				return allEntries[i].sourceType < allEntries[j].sourceType
+			}
+			if allEntries[i].detail.ListType != allEntries[j].detail.ListType {
+				return allEntries[i].detail.ListType == "allowlist"
+			}
+			return allEntries[i].detail.MinSources > allEntries[j].detail.MinSources
+		})
+
+		for _, entry := range allEntries {
+			sb.WriteString(fmt.Sprintf("| %s | %s | %d | %s | 1 |\n",
+				entry.sourceType,
+				entry.detail.ListType,
+				entry.detail.MinSources,
+				formatNumber(entry.detail.Count)))
 		}
 		sb.WriteString(fmt.Sprintf("| **Last Update** | | | | %s |\n", summary.Top.LastUpdateTime))
 		sb.WriteString("\n")

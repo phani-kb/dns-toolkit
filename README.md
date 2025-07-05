@@ -9,6 +9,10 @@
 
 A Go-based command-line utility for downloading, processing, and consolidating DNS blocklists and allowlists from multiple sources. Generates ready-to-use lists for DNS sinkholes, Pi-hole, AdGuard Home, and other network security tools.
 
+<!-- STATS_START -->
+
+<!-- STATS_END -->
+
 ## Published Outputs
 
 **Ready-to-use blocklist files are published daily to the [`output`](https://github.com/phani-kb/dns-toolkit/tree/output) branch:**
@@ -98,13 +102,6 @@ data/output/
 └── summaries/                 # Processing metadata and statistics
 ```
 
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes with tests
-4. Submit a pull request
-
 ## Credits
 
 This project is made possible by the following blocklist and allowlist sources:
@@ -112,6 +109,13 @@ This project is made possible by the following blocklist and allowlist sources:
 1Hosts (Lite), abpvn_hosts, Adaway, AdBlockID, AdGuard Base filter, AdGuard DNS filter, AlienVault_Reputation, AntiAdBlockFilters, anudeepND_adservers, anudeepND_Allowlist, bigdargon_hostsVN, BinaryDefense_Banlist, Blackhole_Today, BlockListDE_Brute, BlockListDE_Strong, Blocklists UT1 Cryptojacking, Blocklists UT1 Malware, Blocklists UT1 Publicite, Borestad_AbuseIPDB, BruteforceBlocker, Cameleon, CINSScore_BadGuys_Army, CJX Annoyance, CybercrimeTracker_All, CybercrimeTracker_CCAM, CybercrimeTracker_CCPMGate, cyberhost_malware-blocklist, Dan Pollock's List, DandelionSprout-Anti-Malware-List, DoH_IP_blocklists, DoH_IP_list, DShield, Easy Privacy, EasyList, EmergingThreats_CompromisedIPs, ET_fwip, fabriziosalmi_allowlist, fabriziosalmi_blocklists, FabrizioSalmi_DNS, FadeMind_2o7Net, FakeWebshopListHUN, Firehol_abusers_30d, Firehol_BitcoinNodes_1d, Firehol_Botscout_1d, Firehol_GPF_Comics, Firehol_level1, Firehol_level2, Firehol_level3, Firehol_SocksProxy_7d, Firehol_SSLProxies_1d, Frogeye trackers, GetAdmiral Domains Filter List, GlobalAntiScamOrg-blocklist, Greensnow, HaGeZi Amazon Tracker, HaGeZi Apple Tracker, HaGeZi DNS TIF Mini, HaGeZi_DoH, HaGeZi Encrypted DNS Servers, HaGeZi Gambling Only Domains, HaGeZi Microsoft Tracker, HaGeZi Most Abused TLDs, HaGeZi Normal, HaGeZi Pro, HaGeZi's Pro Blocklist, HaGeZi_TIF, HaGeZi Xiaomi Tracker, Hestat_Minerchk, Hostsfile, hufilter, iam-py-test_my-filters-001-antitypo, jarelllama_Scam-Blocklist, kadantiscam, Malicious URL Blocklist (URLHaus), Maltrail_StaticTrails, malware-filter_phishing-filter, MyIP_MS_Blocklist, nrd-14day-mini, OISD Blocklist Big, OpenPhish_Feed, Peter Lowe's Blocklist, phishing_army, Policeman_SimpleDomainsBlocklist, Public_DNS4, PuppyScams, quidsup_notrack-annoyance, quidsup_notrack-malware, quidsup_notrack-tracker, RedDragonWebDesign_block-everything, RPiList_specials-malware, RPiList_specials-phishing, Rutgers_DROP, Sblam_Blocklist, ScriptzTeam_BadIPS, Sentinel_Greylist, ShadowWhisperer_Allowlist, ShadowWhisperer_BlockLists Ads, ShadowWhisperer_BlockLists Adult, ShadowWhisperer_BlockLists Malware, ShadowWhisperer_BlockLists Scam, ShadowWhisperer's Dating List, Spam404, spamhaus_drop, Stamparm_Blackbook, StevenBlack_Adhoc_list, StevenBlack_Fake_Gambling_Porn, T145_allowlist, T145_black-mirror, T145_blocklist, transco, Ukrainian Ad Filter, Ukrainian Annoyance Filter, Ukrainian Privacy Filter, Ukrainian Security Filter, UncheckyAds, URLHaus (Abuse.ch), URLHaus_Text, USOM-Blocklists, Viriback_Dump, VXVault_URLList, WaLLy3K, WindowsSpyBlocker_Hosts_spy, Winhelp2002, YousList, YousList-AdGuard, youtube_GoodbyeAds, Yoyo AdServers, Yoyo Adservers.
 
 **Note:** Detailed information about each source including URLs, licenses, categories, and website links can be found in the configuration files located in `data/config/sources*.json`.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes with tests
+4. Submit a pull request
 
 ## License
 
