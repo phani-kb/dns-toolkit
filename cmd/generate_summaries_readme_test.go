@@ -165,8 +165,16 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 				}
 				return os.WriteFile(path, content, 0644)
 			},
-			expectStats:  true,
-			expectedText: []string{"Sources:", "2 total", "1 successful", "1 failed", "Types:", "domain (2)", "ipv4 (1)"},
+			expectStats: true,
+			expectedText: []string{
+				"Sources:",
+				"2 total",
+				"1 successful",
+				"1 failed",
+				"Types:",
+				"domain (2)",
+				"ipv4 (1)",
+			},
 		},
 		{
 			name:     "processed_summary.json",
@@ -190,8 +198,16 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 				}
 				return os.WriteFile(path, content, 0644)
 			},
-			expectStats:  true,
-			expectedText: []string{"Sources:", "1 processed", "Files:", "2 valid, 1 invalid", "Types:", "domain (1)", "ipv4 (1)"},
+			expectStats: true,
+			expectedText: []string{
+				"Sources:",
+				"1 processed",
+				"Files:",
+				"2 valid, 1 invalid",
+				"Types:",
+				"domain (1)",
+				"ipv4 (1)",
+			},
 		},
 		{
 			name:     "consolidated_summary.json",
@@ -215,8 +231,16 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 				}
 				return os.WriteFile(path, content, 0644)
 			},
-			expectStats:  true,
-			expectedText: []string{"Files:", "8 consolidated", "Entries:", "1.5K total", "Types:", "domain (1)", "ipv4 (1)"},
+			expectStats: true,
+			expectedText: []string{
+				"Files:",
+				"8 consolidated",
+				"Entries:",
+				"1.5K total",
+				"Types:",
+				"domain (1)",
+				"ipv4 (1)",
+			},
 		},
 		{
 			name:     "consolidated_categories_summary.json",
@@ -240,8 +264,18 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 				}
 				return os.WriteFile(path, content, 0644)
 			},
-			expectStats:  true,
-			expectedText: []string{"Categories:", "2 processed", "Files:", "5 consolidated", "Entries:", "1.0K total", "Categories:", "ads (1)", "malware (1)"},
+			expectStats: true,
+			expectedText: []string{
+				"Categories:",
+				"2 processed",
+				"Files:",
+				"5 consolidated",
+				"Entries:",
+				"1.0K total",
+				"Categories:",
+				"ads (1)",
+				"malware (1)",
+			},
 		},
 		{
 			name:     "consolidated_groups_summary.json",
@@ -265,8 +299,18 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 				}
 				return os.WriteFile(path, content, 0644)
 			},
-			expectStats:  true,
-			expectedText: []string{"Groups:", "2 processed", "Files:", "6 consolidated", "Entries:", "1.0K total", "Groups:", "lite (1)", "mini (1)"},
+			expectStats: true,
+			expectedText: []string{
+				"Groups:",
+				"2 processed",
+				"Files:",
+				"6 consolidated",
+				"Entries:",
+				"1.0K total",
+				"Groups:",
+				"lite (1)",
+				"mini (1)",
+			},
 		},
 		{
 			name:     "top_summary.json",
@@ -290,8 +334,16 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 				}
 				return os.WriteFile(path, content, 0644)
 			},
-			expectStats:  true,
-			expectedText: []string{"Types:", "2 analyzed", "Top Entries:", "0 total", "Details:", "domain (3+ min (0))", "ipv4 (2+ min (0))"},
+			expectStats: true,
+			expectedText: []string{
+				"Types:",
+				"2 analyzed",
+				"Top Entries:",
+				"0 total",
+				"Details:",
+				"domain (3+ (0))",
+				"ipv4 (2+ (0))",
+			},
 		},
 		{
 			name:     "overlap_summary.json",
@@ -315,8 +367,18 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 				}
 				return os.WriteFile(path, content, 0644)
 			},
-			expectStats:  true,
-			expectedText: []string{"Sources:", "2 analyzed", "Total Entries:", "1.5K", "Unique Entries:", "1.2K (83.3%)", "Types:", "domain (1)", "ipv4 (1)"},
+			expectStats: true,
+			expectedText: []string{
+				"Sources:",
+				"2 analyzed",
+				"Total Entries:",
+				"1.5K",
+				"Unique Entries:",
+				"1.2K (83.3%)",
+				"Types:",
+				"domain (1)",
+				"ipv4 (1)",
+			},
 		},
 		{
 			name:     "unknown file type",

@@ -15,6 +15,9 @@ func validateConfig(configPath string) error {
 		slog.Debug("Skipping validation as it has already been performed")
 		return nil
 	}
+	if configPath == "" {
+		return fmt.Errorf("config validation error: %s", "config path is empty")
+	}
 
 	appConfig, sourcesConfigs, err := config.LoadAppConfig(Logger, configPath)
 	if err != nil {
