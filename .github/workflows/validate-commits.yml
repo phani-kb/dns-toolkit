@@ -1,0 +1,76 @@
+name: Validate Commit Messages
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-commits:
+    name: Validate Commit Messages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Validate commit messages
+        run: |
+          echo "Gathering commits to validate..."
+          
+          # Determine commit range
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          else
+            BASE_SHA="${{ github.event.before }}"
+            HEAD_SHA="${{ github.event.after }}"
+          fi
+          
+          # Handle edge cases
+          if [ "$BASE_SHA" = "0000000000000000000000000000000000000000" ]; then
+            echo "New branch detected, skipping validation"
+            exit 0
+          fi
+          
+          echo "Comparing commits from $BASE_SHA to $HEAD_SHA"
+          COMMITS=$(git log --format="%H:%s" "$BASE_SHA".."$HEAD_SHA")
+          
+          if [ -z "$COMMITS" ]; then
+            echo "ℹNo commits to validate"
+            exit 0
+          fi
+          
+          echo "Checking commit messages for issue references..."
+          INVALID_COMMITS=""
+          
+          while IFS= read -r line; do
+            if [ -n "$line" ]; then
+              HASH="${line%%:*}"
+              MESSAGE="${line#*:}"
+              
+              # Skip merge commits
+              if echo "$MESSAGE" | grep -q "^Merge "; then
+                continue
+              fi
+              
+              # Check for issue reference (improved regex)
+              if ! echo "$MESSAGE" | grep -qE '\b(#[0-9]+|fix(es)?\s*#[0-9]+|close(s)?\s*#[0-9]+|resolve(s)?\s*#[0-9]+)\b'; then
+                INVALID_COMMITS+="${HASH}: ${MESSAGE}\n"
+              fi
+            fi
+          done <<< "$COMMITS"
+          
+          if [ -n "$INVALID_COMMITS" ]; then
+            echo "The following commits are missing issue references:"
+            echo ""
+            echo "$INVALID_COMMITS"
+            echo ""
+            echo "Each commit message must reference an issue number."
+            echo "Valid examples: '#123', 'fixes #123', 'closes #123', 'resolves #123'"
+            exit 1
+          else
+            echo "All commits valid!"
+          fi
