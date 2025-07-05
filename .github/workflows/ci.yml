@@ -1,0 +1,395 @@
+name: DNS Toolkit Daily Processing
+
+on:
+  schedule:
+    - cron: '0 14 * * *'  # Daily at 2 PM UTC
+  workflow_dispatch:
+    inputs:
+      skip_cache:
+        description: 'Skip cache and force fresh download'
+        required: false
+        default: false
+        type: boolean
+      skip_download:
+        description: 'Skip download step (use existing data)'
+        required: false
+        default: false
+        type: boolean
+      dry_run:
+        description: 'Run without publishing (dry run)'
+        required: false
+        default: false
+        type: boolean
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+env:
+  GO_VERSION: "1.23"
+  COVERAGE_THRESHOLD: 80
+  GOLANGCI_LINT_VERSION: v2.1.6
+
+jobs:
+  test-and-build:
+    name: Test and Build
+    runs-on: ubuntu-latest
+    outputs:
+      should-publish: ${{ steps.check-publish.outputs.should-publish }}
+      file-counts: ${{ steps.count-files.outputs.counts }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Install golangci-lint
+        run: |
+          curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin ${{ env.GOLANGCI_LINT_VERSION }}
+
+      - name: Cache lint results
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/golangci-lint
+          key: ${{ runner.os }}-golangci-lint-${{ hashFiles('.golangci.yml', 'go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-golangci-lint-
+
+      - name: Lint and test
+        env:
+          DNS_TOOLKIT_TEST_MODE: true
+          DNS_TOOLKIT_TEST_CONFIG_PATH: ${{ github.workspace }}/testdata/config.yml
+        run: |
+          echo "Running linter..."
+          golangci-lint run ./... --timeout=5m
+          
+          echo "Building application..."
+          go build ./...
+          
+          echo "Running tests with coverage..."
+          PACKAGES=$(go list ./... | grep -v "/mocks" | grep -v "constants")
+          go test -v -race -coverprofile=coverage.out -covermode=atomic $PACKAGES
+
+      - name: Check coverage
+        run: |
+          if [ -f coverage.out ]; then
+            COVERAGE=$(go tool cover -func=coverage.out | grep total: | awk '{print $3}' | sed 's/%//')
+            echo "Coverage: ${COVERAGE}%"
+            if (( $(echo "$COVERAGE < $COVERAGE_THRESHOLD" | bc -l) )); then
+              echo "::error::Coverage ${COVERAGE}% is below threshold ${COVERAGE_THRESHOLD}%"
+              exit 1
+            fi
+            echo "::notice::Coverage check passed: ${COVERAGE}%"
+          else
+            echo "::warning::No coverage file found"
+          fi
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.out
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+          verbose: false 
+          override_commit: ${{ github.sha }}
+
+      - name: Check if should publish
+        id: check-publish
+        run: |
+          SHOULD_PUBLISH="false"
+          
+          if [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
+            echo "Dry run mode enabled - skipping publish"
+            SHOULD_PUBLISH="false"
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "Push to main branch - will publish"
+            SHOULD_PUBLISH="true"
+          elif [[ "${{ github.event_name }}" == "schedule" ]]; then
+            echo "Scheduled run - will publish"
+            SHOULD_PUBLISH="true"
+          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "Manual dispatch - will publish"
+            SHOULD_PUBLISH="true"
+          else
+            echo "Not a publishing event - skipping publish"
+            SHOULD_PUBLISH="false"
+          fi
+          
+          echo "should-publish=$SHOULD_PUBLISH" >> $GITHUB_OUTPUT
+          echo "::notice::Should publish: $SHOULD_PUBLISH"
+
+  publish:
+    name: Process and Publish
+    runs-on: ubuntu-latest
+    needs: test-and-build
+    if: needs.test-and-build.outputs.should-publish == 'true'
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0  # Need full history for branch operations
+          
+      - name: Configure Git for branch operations
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git config pull.rebase false
+          git config push.default simple
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Cache downloaded data and summaries
+        if: github.event.inputs.skip_cache != 'true'
+        uses: actions/cache@v4
+        with:
+          path: |
+            data/download
+            data/download_summary.json
+          key: data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-v1
+          restore-keys: |
+            data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-
+            data-download-${{ runner.os }}-
+
+      - name: Build DNS toolkit
+        run: |
+          echo "Building DNS toolkit..."
+          go build -o bin/dns-toolkit .
+          chmod +x bin/dns-toolkit
+          
+          # Verify the build
+          ./bin/dns-toolkit version || echo "Version command not available"
+          
+          # Ensure directories exist
+          mkdir -p data/{download,output}
+          echo "Build completed successfully"
+
+      - name: Check if download needed
+        id: check-download
+        run: |
+          SKIP_DOWNLOAD="false"
+          
+          # Check if user explicitly requested to skip download
+          if [[ "${{ github.event.inputs.skip_download }}" == "true" ]]; then
+            echo "User requested to skip download step"
+            SKIP_DOWNLOAD="true"
+          fi
+          
+          echo "skip-download=$SKIP_DOWNLOAD" >> $GITHUB_OUTPUT
+          echo "::notice::Skip download: $SKIP_DOWNLOAD"
+
+      - name: Run DNS toolkit pipeline
+        run: |
+          echo "Starting DNS toolkit pipeline..."
+          
+          # Run the full pipeline with error handling
+          set -e
+          
+          if [[ "${{ steps.check-download.outputs.skip-download }}" == "true" ]]; then
+            echo "Step 1: Skipping download (using cached data)..."
+          else
+            echo "Step 1: Downloading data..."
+            ./bin/dns-toolkit download
+          fi
+          
+          echo "Step 2: Processing data..."
+          ./bin/dns-toolkit process
+          
+          echo "Step 3: Consolidating data..."
+          ./bin/dns-toolkit consolidate
+          
+          echo "Step 4: Consolidating groups..."
+          ./bin/dns-toolkit consolidate groups
+          
+          echo "Step 5: Consolidating categories..."
+          ./bin/dns-toolkit consolidate categories
+          
+          echo "Step 6: Generating top lists..."
+          ./bin/dns-toolkit top
+          
+          echo "Step 7: Calculating overlaps..."
+          ./bin/dns-toolkit overlap
+          
+          echo "Step 8: Generating output..."
+          ./bin/dns-toolkit generate output -i
+          
+          echo "Step 9: Generating output README..."
+          ./bin/dns-toolkit generate output-readme
+          
+          echo "Step 10: Generating overlap README..."
+          ./bin/dns-toolkit generate overlap-readme
+          
+          echo "Step 11: Generating summaries README..."
+          ./bin/dns-toolkit generate summaries-readme
+          
+          echo "Step 12: Generating stats README..."
+          ./bin/dns-toolkit generate stats-readme
+          
+          echo "DNS toolkit pipeline completed successfully"
+
+      - name: Count and validate output files
+        id: count-files
+        run: |
+          # Count files in different directories
+          OUTPUT_COUNT=0
+          SUMMARY_COUNT=0
+          
+          if [ -d "data/output" ]; then
+            OUTPUT_COUNT=$(find data/output -type f ! -path "*/summaries/*" 2>/dev/null | wc -l)
+          fi
+          
+          if [ -d "data/output/summaries" ]; then
+            SUMMARY_COUNT=$(find data/output/summaries -name "*.json" 2>/dev/null | wc -l)
+          fi
+          
+          echo "output-count=$OUTPUT_COUNT" >> $GITHUB_OUTPUT
+          echo "summary-count=$SUMMARY_COUNT" >> $GITHUB_OUTPUT
+          
+          echo "::notice::Output files: $OUTPUT_COUNT"
+          echo "::notice::Summary files: $SUMMARY_COUNT"
+          
+          # Validate we have some output
+          if [ "$OUTPUT_COUNT" -eq 0 ] && [ "$SUMMARY_COUNT" -eq 0 ]; then
+            echo "::error::No output files generated"
+            exit 1
+          fi
+
+      - name: Prepare files for publishing
+        run: |
+          echo "Preparing files for publishing..."
+          
+          # Create temporary directories for publishing
+          mkdir -p /tmp/publish-data/{output,summaries,download}
+
+          # Backup download directory for caching
+          if [ -d "data/download" ]; then
+            echo "Backing up download directory for caching..."
+            cp -r data/download/* /tmp/publish-data/download/ 2>/dev/null || true
+          fi
+
+          # Prepare output files (excluding summaries subdirectory)
+          if [ -d "data/output" ]; then
+            echo "Preparing output files..."
+            rsync -av --exclude='summaries/' data/output/ /tmp/publish-data/output/ 2>/dev/null || true
+          fi
+
+          # Prepare summary files separately
+          if [ -d "data/output/summaries" ]; then
+            echo "Preparing summary files..."
+            cp -r data/output/summaries/* /tmp/publish-data/summaries/ 2>/dev/null || true
+          fi
+          
+          # Log what we're publishing
+          echo "Files prepared for publishing:"
+          echo "- Output files: $(find /tmp/publish-data/output -type f 2>/dev/null | wc -l)"
+          echo "- Summary files: $(find /tmp/publish-data/summaries -type f 2>/dev/null | wc -l)"
+
+      - name: Store original branch
+        run: |
+          ORIGINAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          echo "ORIGINAL_BRANCH=$ORIGINAL_BRANCH" >> $GITHUB_ENV
+          echo "Stored original branch: $ORIGINAL_BRANCH"
+
+      - name: Make publish script executable and backup
+        run: |
+          chmod +x .github/scripts/publish-to-branch.sh
+          # Copy script to temp location so it's available after branch switches
+          cp .github/scripts/publish-to-branch.sh /tmp/publish-to-branch.sh
+          chmod +x /tmp/publish-to-branch.sh
+
+      - name: Commit README changes if any
+        run: |
+          echo "Checking for README changes..."
+          if git diff --name-only | grep -q "README.md"; then
+            echo "README.md has been modified, committing changes..."
+            
+            # Only commit and push if this is not a pull request
+            if [[ "${{ github.event_name }}" != "pull_request" ]]; then
+              git add README.md
+              git commit -m "Update README.md with latest statistics [skip ci]"
+              git push origin main
+              echo "README changes committed and pushed"
+            else
+              echo "Pull request detected - skipping README commit to avoid conflicts"
+              git checkout -- README.md  # Revert README changes for PRs
+            fi
+          else
+            echo "No README changes to commit"
+          fi
+
+      - name: Verify clean working directory
+        run: |
+          echo "Verifying working directory is clean..."
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "Warning: Unexpected local changes detected:"
+            git status --porcelain
+            echo "These changes will be ignored during publish operations"
+          else
+            echo "Working directory is clean - ready for publishing"
+          fi
+
+      - name: Publish to output branch
+        if: steps.count-files.outputs.output-count > 0
+        run: |
+          OUTPUT_COUNT="${{ steps.count-files.outputs.output-count }}"
+          echo "Publishing $OUTPUT_COUNT files to output branch..."
+          cd "${{ github.workspace }}"
+          GITHUB_WORKSPACE="${{ github.workspace }}" /tmp/publish-to-branch.sh output /tmp/publish-data/output
+
+      - name: Publish to summaries branch
+        if: steps.count-files.outputs.summary-count > 0
+        run: |
+          SUMMARY_COUNT="${{ steps.count-files.outputs.summary-count }}"
+          echo "Publishing $SUMMARY_COUNT summary files to summaries branch..."
+          cd "${{ github.workspace }}"
+          GITHUB_WORKSPACE="${{ github.workspace }}" /tmp/publish-to-branch.sh summaries /tmp/publish-data/summaries --monthly
+
+      - name: Restore original branch
+        if: always()
+        run: |
+          echo "Restoring original branch..."
+          git checkout "$ORIGINAL_BRANCH" 2>/dev/null || echo "Could not restore original branch"
+          echo "Branch restoration completed"
+          
+      - name: Restore download directory for caching
+        if: always()
+        run: |
+          # Restore download directory so the cache action can find it
+          if [ -d "/tmp/publish-data/download" ]; then
+            echo "Restoring download directory for caching..."
+            mkdir -p data/download
+            cp -r /tmp/publish-data/download/* data/download/ 2>/dev/null || true
+          fi
+
+
+      - name: Cleanup temporary files
+        if: always()
+        run: |
+          echo "Cleaning up temporary files..."
+          rm -rf /tmp/publish-data/ 2>/dev/null || true
+          rm -f /tmp/publish-to-branch.sh 2>/dev/null || true
+          echo "Cleanup completed"
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Workflow Summary" >> $GITHUB_STEP_SUMMARY
+          echo "- **Output files published**: ${{ steps.count-files.outputs.output-count }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Summary files published**: ${{ steps.count-files.outputs.summary-count }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Workflow status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Completed at**: $(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
