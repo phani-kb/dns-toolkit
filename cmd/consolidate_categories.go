@@ -15,7 +15,7 @@ import (
 
 var consolidateCategoriesCmd = &cobra.Command{
 	Use:   "categories",
-	Short: "Generate category-based consolidated lists (advertising, malware, privacy, etc)",
+	Short: "Generate category-based consolidated lists (ads, malware, privacy, etc)",
 	Run: func(cmd *cobra.Command, args []string) {
 		Logger.Infof("Generating category-based consolidated lists...")
 
