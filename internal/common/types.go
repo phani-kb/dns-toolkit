@@ -308,7 +308,7 @@ type ConsolidatedSummary struct {
 	IgnoredFilepath           string   `json:"ignored_filepath,omitempty"`      // Path to the ignored entries file
 	LastConsolidatedTimestamp string   `json:"last_consolidated_timestamp"`     // When consolidation completed
 	Group                     string   `json:"group,omitempty"`                 // Size group (mini, lite, normal, big)
-	Category                  string   `json:"category,omitempty"`              // Category (advertising, malware, privacy, etc.)
+	Category                  string   `json:"category,omitempty"`              // Category (ads, malware, privacy, etc.)
 	Files                     []string `json:"files"`                           // List of source files that were consolidated
 	FilesCount                int      `json:"files_count"`                     // Number of source files consolidated
 	Count                     int      `json:"count"`                           // Number of entries in the file
@@ -351,7 +351,7 @@ func (css *ConsolidatedGroupsSummary) GetName() string {
 
 // ConsolidatedCategoriesSummary represents consolidated summaries grouped by category.
 type ConsolidatedCategoriesSummary struct {
-	Category                  string                `json:"category"`                    // Category name (advertising, malware, privacy, etc)
+	Category                  string                `json:"category"`                    // Category name (ads, malware, privacy, etc)
 	LastConsolidatedTimestamp string                `json:"last_consolidated_timestamp"` // When consolidation was completed
 	ConsolidatedSummaries     []ConsolidatedSummary `json:"consolidated_summaries"`      // Consolidated summaries for this category
 }
