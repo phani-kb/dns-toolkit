@@ -165,14 +165,15 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
           cache: true
 
-      - name: Cache downloaded data and summaries
+      - name: Restore cached data
         if: github.event.inputs.skip_cache != 'true'
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
+        id: cache-restore
         with:
           path: |
             data/download
             data/download_summary.json
-          key: data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-v1
+          key: data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-v3
           restore-keys: |
             data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-
             data-download-${{ runner.os }}-
@@ -199,6 +200,29 @@ jobs:
           if [[ "${{ github.event.inputs.skip_download }}" == "true" ]]; then
             echo "User requested to skip download step"
             SKIP_DOWNLOAD="true"
+          elif [[ "${{ github.event.inputs.skip_cache }}" == "true" ]]; then
+            echo "User requested to skip cache - will download fresh data"
+            SKIP_DOWNLOAD="false"
+          else
+            # Always download fresh data by default
+            echo "Will download fresh data (cache is only for backup/fallback)"
+            SKIP_DOWNLOAD="false"
+            
+            # Log cache status for information
+            HAS_DATA="false"
+            if [ -d "data/download" ] && [ "$(find data/download -type f 2>/dev/null | wc -l)" -gt 0 ]; then
+              HAS_DATA="true"
+              CACHE_AGE="unknown"
+              if [ -f "data/download_summary.json" ]; then
+                # Try to extract timestamp from summary if available
+                CACHE_AGE=$(stat -c %Y data/download_summary.json 2>/dev/null | xargs -I {} date -d @{} '+%Y-%m-%d %H:%M UTC' 2>/dev/null || echo "unknown")
+              fi
+              echo "Cache available from: $CACHE_AGE (will be updated with fresh data)"
+            else
+              echo "No cached data available"
+            fi
+            
+            echo "Cache hit: ${{ steps.cache-restore.outputs.cache-hit }}, Has data: $HAS_DATA"
           fi
           
           echo "skip-download=$SKIP_DOWNLOAD" >> $GITHUB_OUTPUT
@@ -253,6 +277,36 @@ jobs:
           
           echo "DNS toolkit pipeline completed successfully"
 
+      - name: Update cache timestamp
+        if: steps.check-download.outputs.skip-download == 'false'
+        run: |
+          # Add timestamp to indicate when cache was last updated with fresh data
+          if [ -d "data/download" ]; then
+            echo "Cache updated at: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" > data/download/.cache_timestamp
+            echo "Cache update timestamp recorded (fresh download)"
+          fi
+
+      - name: Verify cache content for next run
+        run: |
+          echo "Verifying download directory for caching..."
+          if [ -d "data/download" ]; then
+            DOWNLOAD_SIZE=$(du -sh data/download 2>/dev/null | cut -f1 || echo "unknown")
+            DOWNLOAD_FILES=$(find data/download -type f 2>/dev/null | wc -l)
+            
+            # Check cache timestamp
+            CACHE_TIMESTAMP="unknown"
+            if [ -f "data/download/.cache_timestamp" ]; then
+              CACHE_TIMESTAMP=$(cat data/download/.cache_timestamp 2>/dev/null || echo "unknown")
+            fi
+            
+            echo "Download directory size: $DOWNLOAD_SIZE"
+            echo "Download files count: $DOWNLOAD_FILES"
+            echo "Last cache update: $CACHE_TIMESTAMP"
+            echo "::notice::Cache content ready - Size: $DOWNLOAD_SIZE, Files: $DOWNLOAD_FILES, Updated: $CACHE_TIMESTAMP"
+          else
+            echo "::warning::Download directory not found for caching"
+          fi
+
       - name: Count and validate output files
         id: count-files
         run: |
@@ -287,7 +341,7 @@ jobs:
           # Create temporary directories for publishing
           mkdir -p /tmp/publish-data/{output,summaries,download}
 
-          # Backup download directory for caching
+          # Backup download directory for caching (before branch operations)
           if [ -d "data/download" ]; then
             echo "Backing up download directory for caching..."
             cp -r data/download/* /tmp/publish-data/download/ 2>/dev/null || true
@@ -309,6 +363,7 @@ jobs:
           echo "Files prepared for publishing:"
           echo "- Output files: $(find /tmp/publish-data/output -type f 2>/dev/null | wc -l)"
           echo "- Summary files: $(find /tmp/publish-data/summaries -type f 2>/dev/null | wc -l)"
+          echo "- Download backup: $(find /tmp/publish-data/download -type f 2>/dev/null | wc -l) files"
 
       - name: Store original branch
         run: |
@@ -386,7 +441,7 @@ jobs:
           echo "Restoring original branch..."
           git checkout "$ORIGINAL_BRANCH" 2>/dev/null || echo "Could not restore original branch"
           echo "Branch restoration completed"
-          
+
       - name: Restore download directory for caching
         if: always()
         run: |
@@ -395,7 +450,22 @@ jobs:
             echo "Restoring download directory for caching..."
             mkdir -p data/download
             cp -r /tmp/publish-data/download/* data/download/ 2>/dev/null || true
+            
+            # Verify restoration
+            RESTORED_FILES=$(find data/download -type f 2>/dev/null | wc -l)
+            echo "Restored $RESTORED_FILES files to download directory"
+          else
+            echo "No download backup found to restore"
           fi
+
+      - name: Save cache for next run
+        if: github.event.inputs.skip_cache != 'true' && hashFiles('data/download/**') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            data/download
+            data/download_summary.json
+          key: data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-v3
 
 
       - name: Cleanup temporary files
