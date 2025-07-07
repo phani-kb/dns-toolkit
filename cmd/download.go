@@ -47,6 +47,16 @@ var downloadCmd = &cobra.Command{
 			}
 		}
 
+		domainTopDownloader := d.NewDomainTopDownloaderWithRetries(maxRetries)
+		if domainTopDownloader == nil {
+			Logger.Warnf("Failed to create domain top downloader with retry settings")
+		} else {
+			domainTopErr := d.RegisterDownloader(domainTopDownloader)
+			if domainTopErr != nil {
+				Logger.Warnf("Failed to register domain top downloader: %v", domainTopErr)
+			}
+		}
+
 		summaries := make([]c.DownloadSummary, 0)
 		var mu sync.Mutex
 
