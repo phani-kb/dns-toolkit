@@ -16,16 +16,15 @@ import (
 func TestGenerateOutputCmdRun(t *testing.T) {
 	err := os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
 	require.NoError(t, err)
-	err = os.Setenv("DNS_TOOLKIT_TEST_CONFIG_PATH", "/home/bpk/projects/dns-toolkit/testdata/config.yml")
-	require.NoError(t, err)
+	configPath := os.Getenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
+	if configPath == "" {
+		t.Skip("DNS_TOOLKIT_TEST_CONFIG_PATH is not set, skipping test")
+		return
+	}
 	defer func() {
 		err := os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
 		if err != nil {
 			t.Logf("Failed to unset DNS_TOOLKIT_TEST_MODE: %v", err)
-		}
-		err = os.Unsetenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
-		if err != nil {
-			t.Logf("Failed to unset DNS_TOOLKIT_TEST_CONFIG_PATH: %v", err)
 		}
 	}()
 
@@ -173,16 +172,15 @@ func TestLoadTemplates(t *testing.T) {
 
 	err := os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
 	assert.NoError(t, err)
-	err = os.Setenv("DNS_TOOLKIT_TEST_CONFIG_PATH", "/home/bpk/projects/dns-toolkit/testdata/config.yml")
-	assert.NoError(t, err)
+	configPath := os.Getenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
+	if configPath == "" {
+		t.Skip("DNS_TOOLKIT_TEST_CONFIG_PATH is not set, skipping test")
+		return
+	}
 	defer func() {
 		err := os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
 		if err != nil {
 			t.Logf("Failed to unset DNS_TOOLKIT_TEST_MODE: %v", err)
-		}
-		err = os.Unsetenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
-		if err != nil {
-			t.Logf("Failed to unset DNS_TOOLKIT_TEST_CONFIG_PATH: %v", err)
 		}
 	}()
 
