@@ -33,9 +33,9 @@ func (d *DomainTopDownloader) Download(
 }
 
 func (d *DomainTopDownloader) PostDownloadProcess(logger *multilog.Logger, filePath string, count int) error {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return err
+	file, ferr := os.Open(filePath)
+	if ferr != nil {
+		return ferr
 	}
 
 	scanner := bufio.NewScanner(file)
