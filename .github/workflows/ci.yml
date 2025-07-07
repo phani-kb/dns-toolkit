@@ -198,6 +198,26 @@ jobs:
           mkdir -p data/{download,output}
           echo "Build completed successfully"
 
+      - name: Verify cached data
+        run: |
+          echo "Checking cached data restoration..."
+          echo "Download directory contents:"
+          if [ -d "data/download" ]; then
+            ls -la data/download/ | head -10
+            echo "Download files count: $(find data/download -type f 2>/dev/null | wc -l)"
+          else
+            echo "No download directory found"
+          fi
+          
+          echo "Download summary file:"
+          if [ -f "data/download_summary.json" ]; then
+            echo "download_summary.json exists ($(stat -c%s data/download_summary.json) bytes)"
+            echo "Summary preview:"
+            head -5 data/download_summary.json 2>/dev/null || echo "Cannot read summary file"
+          else
+            echo "download_summary.json missing"
+          fi
+
       - name: Check if download needed
         id: check-download
         run: |
@@ -251,6 +271,29 @@ jobs:
           echo "skip-download=$SKIP_DOWNLOAD" >> $GITHUB_OUTPUT
           echo "::notice::Skip download: $SKIP_DOWNLOAD"
 
+      - name: Validate required files for processing
+        run: |
+          if [[ "${{ steps.check-download.outputs.skip-download }}" == "true" ]]; then
+            echo "Validating required files for processing without download..."
+            
+            if [ ! -f "data/download_summary.json" ]; then
+              echo "::error::Cannot proceed without download_summary.json when skipping download"
+              echo "::error::The summary file is required for processing"
+              exit 1
+            fi
+            
+            if [ ! -d "data/download" ] || [ "$(find data/download -type f 2>/dev/null | wc -l)" -eq 0 ]; then
+              echo "::error::Cannot proceed without download data when skipping download"
+              echo "::error::No download files found in cache"
+              echo "::error::Please run with fresh download"
+              exit 1
+            fi
+            
+            echo "Required files validated - ready to process with cached data"
+          else
+            echo "Download will be performed - validation not needed"
+          fi
+
       - name: Run DNS toolkit pipeline
         run: |
           echo "Starting DNS toolkit pipeline..."
@@ -301,10 +344,9 @@ jobs:
           echo "DNS toolkit pipeline completed successfully"
 
       - name: Update cache timestamp
-        if: steps.check-download.outputs.skip-download == 'false'
         run: |
           # Add timestamp to indicate when cache was last updated with fresh data
-          if [ -d "data/download" ]; then
+          if [[ "${{ steps.check-download.outputs.skip-download }}" == "false" ]] && [ -d "data/download" ]; then
             echo "Cache updated at: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" > data/download/.cache_timestamp
             echo "Cache update timestamp recorded (fresh download)"
           fi
@@ -482,7 +524,7 @@ jobs:
           fi
 
       - name: Save cache for next run
-        if: github.event.inputs.skip_cache != 'true' && hashFiles('data/download/**') != ''
+        if: github.event.inputs.skip_cache != 'true' && (hashFiles('data/download/**') != '' || hashFiles('data/download_summary.json') != '')
         uses: actions/cache/save@v4
         with:
           path: |
