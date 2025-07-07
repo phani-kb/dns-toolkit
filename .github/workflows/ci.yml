@@ -82,6 +82,13 @@ jobs:
           echo "Running tests with coverage..."
           PACKAGES=$(go list ./... | grep -v "/mocks" | grep -v "constants")
           go test -v -race -coverprofile=coverage.out -covermode=atomic $PACKAGES
+          
+          # Filter out test helpers
+          if [ -f coverage.out ]; then
+            echo "Filtering coverage report..."
+            grep -v "test_helpers.go" coverage.out > filtered_coverage.out
+            mv filtered_coverage.out coverage.out
+          fi
 
       - name: Check coverage
         run: |
