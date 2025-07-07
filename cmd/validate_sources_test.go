@@ -11,8 +11,6 @@ import (
 )
 
 func TestValidateConfig(t *testing.T) {
-	t.Parallel()
-
 	err := os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
 	assert.NoError(t, err)
 	configPath := os.Getenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
@@ -23,7 +21,7 @@ func TestValidateConfig(t *testing.T) {
 
 	oldLogger := Logger
 	Logger = config.CreateTestLogger()
-	defer func() { 
+	defer func() {
 		Logger = oldLogger
 		err := os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
 		if err != nil {
