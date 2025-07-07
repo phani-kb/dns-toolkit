@@ -1,5 +1,12 @@
 name: DNS Toolkit Daily Processing
 
+# This workflow has two main jobs:
+# 1. test-and-build: Always runs for all events (push, PR, schedule, manual)
+# 2. publish: Only runs for main branch pushes, scheduled runs, or manual dispatch (NOT for PRs)
+# 
+# README stats are only updated during scheduled runs and manual dispatch to avoid 
+# conflicts with protected branch rules during PR merges.
+
 on:
   schedule:
     - cron: '0 14 * * *'  # Daily at 2 PM UTC
@@ -39,7 +46,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       should-publish: ${{ steps.check-publish.outputs.should-publish }}
-      file-counts: ${{ steps.count-files.outputs.counts }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -109,6 +115,9 @@ jobs:
           if [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
             echo "Dry run mode enabled - skipping publish"
             SHOULD_PUBLISH="false"
+          elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "Pull request - skipping publish (tests only)"
+            SHOULD_PUBLISH="false"
           elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
             echo "Push to main branch - will publish"
             SHOULD_PUBLISH="true"
@@ -134,12 +143,14 @@ jobs:
     timeout-minutes: 20
     permissions:
       contents: write
+      actions: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0  # Need full history for branch operations
+          persist-credentials: true  # Keep credentials for pushing
           
       - name: Configure Git for branch operations
         run: |
@@ -316,17 +327,27 @@ jobs:
         run: |
           echo "Checking for README changes..."
           if git diff --name-only | grep -q "README.md"; then
-            echo "README.md has been modified, committing changes..."
+            echo "README.md has been modified during processing..."
             
-            # Only commit and push if this is not a pull request
-            if [[ "${{ github.event_name }}" != "pull_request" ]]; then
+            # Only update README for scheduled runs or manual dispatch
+            # Skip for push events (including PR merges) to avoid branch protection issues
+            if [[ "${{ github.event_name }}" == "schedule" ]] || [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+              echo "Scheduled or manual run - attempting to commit README changes..."
+              
+              # For scheduled/manual runs, commit README updates
               git add README.md
               git commit -m "Update README.md with latest statistics [skip ci]"
-              git push origin main
-              echo "README changes committed and pushed"
+              
+              if git push origin main; then
+                echo "README changes committed and pushed successfully"
+              else
+                echo "::error::Failed to push README changes for scheduled/manual run"
+                exit 1
+              fi
             else
-              echo "Pull request detected - skipping README commit to avoid conflicts"
-              git checkout -- README.md  # Revert README changes for PRs
+              echo "Skipping README commit for ${{ github.event_name }} event (only updated for scheduled/manual runs)"
+              echo "::notice::README was updated during processing but not committed"
+              git checkout -- README.md
             fi
           else
             echo "No README changes to commit"
