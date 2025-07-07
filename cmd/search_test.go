@@ -15,8 +15,6 @@ import (
 )
 
 func TestEntryContains(t *testing.T) {
-	t.Parallel()
-
 	err := os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
 	assert.NoError(t, err)
 	configPath := os.Getenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
