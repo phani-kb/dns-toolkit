@@ -2,8 +2,11 @@ package cmd
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
+	"github.com/phani-kb/dns-toolkit/internal/config"
+	"github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -18,12 +21,23 @@ func TestValidateConfig(t *testing.T) {
 		return
 	}
 
-	defer func() {
+	oldLogger := Logger
+	Logger = config.CreateTestLogger()
+	defer func() { 
+		Logger = oldLogger
 		err := os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
 		if err != nil {
 			t.Logf("Failed to unset DNS_TOOLKIT_TEST_MODE: %v", err)
 		}
 	}()
+
+	if !filepath.IsAbs(configPath) {
+		wd, err := os.Getwd()
+		assert.NoError(t, err)
+		projectRoot, err := utils.FindProjectRoot(wd)
+		assert.NoError(t, err)
+		configPath = filepath.Join(projectRoot, configPath)
+	}
 
 	tests := []struct {
 		setupFunc   func()
