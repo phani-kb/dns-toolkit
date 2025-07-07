@@ -211,9 +211,17 @@ jobs:
             echo "User requested to skip cache - will download fresh data"
             SKIP_DOWNLOAD="false"
           else
-            # Always download fresh data by default
-            echo "Will download fresh data (cache is only for backup/fallback)"
-            SKIP_DOWNLOAD="false"
+            # Only download fresh data for scheduled runs and manual dispatch
+            if [[ "${{ github.event_name }}" == "schedule" ]]; then
+              echo "Scheduled run - will download fresh data (on top of cache)"
+              SKIP_DOWNLOAD="false"
+            elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+              echo "Manual dispatch - will download fresh data (on top of cache)"
+              SKIP_DOWNLOAD="false"
+            else
+              echo "PR/Push event - using cached data only"
+              SKIP_DOWNLOAD="true"
+            fi
             
             # Log cache status for information
             HAS_DATA="false"
@@ -224,9 +232,17 @@ jobs:
                 # Try to extract timestamp from summary if available
                 CACHE_AGE=$(stat -c %Y data/download_summary.json 2>/dev/null | xargs -I {} date -d @{} '+%Y-%m-%d %H:%M UTC' 2>/dev/null || echo "unknown")
               fi
-              echo "Cache available from: $CACHE_AGE (will be updated with fresh data)"
+              if [[ "$SKIP_DOWNLOAD" == "false" ]]; then
+                echo "Cache available from: $CACHE_AGE (will be updated with fresh data)"
+              else
+                echo "Cache available from: $CACHE_AGE (will be used as-is)"
+              fi
             else
-              echo "No cached data available"
+              if [[ "$SKIP_DOWNLOAD" == "false" ]]; then
+                echo "No cached data available - will download fresh data"
+              else
+                echo "::warning::No cached data available and download skipped - pipeline may fail"
+              fi
             fi
             
             echo "Cache hit: ${{ steps.cache-restore.outputs.cache-hit }}, Has data: $HAS_DATA"
