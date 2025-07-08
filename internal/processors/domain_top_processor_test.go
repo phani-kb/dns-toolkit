@@ -9,8 +9,6 @@ import (
 )
 
 func TestNewDomainTopProcessor(t *testing.T) {
-	t.Parallel()
-
 	sourceType := "domain_top"
 	listType := "allowlist"
 
@@ -22,8 +20,6 @@ func TestNewDomainTopProcessor(t *testing.T) {
 }
 
 func TestDomainTopProcessor_Process(t *testing.T) {
-	t.Parallel()
-
 	logger := multilog.NewLogger()
 	processor := processors.NewDomainTopProcessor("domain_top", "allowlist")
 
@@ -173,8 +169,6 @@ func TestDomainTopProcessor_Process(t *testing.T) {
 }
 
 func TestDomainTopProcessor_Integration(t *testing.T) {
-	t.Parallel()
-
 	logger := multilog.NewLogger()
 	processor := processors.NewDomainTopProcessor("domain_top", "allowlist")
 
@@ -207,8 +201,6 @@ invalid_entry_without_rank
 }
 
 func TestDomainTopProcessor_EdgeCases(t *testing.T) {
-	t.Parallel()
-
 	logger := multilog.NewLogger()
 	processor := processors.NewDomainTopProcessor("domain_top", "allowlist")
 
