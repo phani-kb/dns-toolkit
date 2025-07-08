@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Script to validate commit messages locally before pushing
+# Based on the same validation logic as .github/workflows/validate-commits.yml
 
 set -e
 
@@ -26,8 +27,15 @@ EOF
 
 validate_commit() {
     local message="$1"
-    [[ "$message" =~ ^Merge ]] && return 0
-    [[ "$message" =~ (#[0-9]+|fix(es)?[[:space:]]*#[0-9]+|close(s)?[[:space:]]*#[0-9]+|resolve(s)?[[:space:]]*#[0-9]+) ]]
+    if echo "$message" | grep -q "^Merge "; then
+        return 0
+    fi
+
+    if echo "$message" | grep -qE '#[0-9]+|fix(es)?\s*#[0-9]+|close(s)?\s*#[0-9]+|resolve(s)?\s*#[0-9]+'; then
+        return 0
+    else
+        return 1
+    fi
 }
 
 show_fix_instructions() {
@@ -36,14 +44,18 @@ show_fix_instructions() {
 HOW TO FIX INVALID COMMITS:
 
 1. Fix most recent commit:
-   git commit --amend -m "Your new message #123"
+   git commit --amend -m "#123: Your new message"
 
-2. Fix older commits:
+2. Fix older commits (interactive rebase):
    git rebase -i <commit-hash>^
-   Change 'pick' to 'reword' for invalid commits
-   Update commit message to include issue reference
+   # Change 'pick' to 'reword' for invalid commits
+   # Update commit message to include issue reference
 
-3. If commits are already pushed:
+3. Fix multiple commits with soft reset:
+   git reset --soft HEAD~N  # N = number of commits to undo
+   git commit -m "#123: Combined fix message"
+
+4. If commits are already pushed:
    git push --force-with-lease origin <branch-name>
 
 EOF
@@ -76,15 +88,23 @@ elif git merge-base --is-ancestor "$BRANCH" HEAD 2>/dev/null; then
     RANGE="$BRANCH..HEAD"
     echo "Checking commits between $BRANCH and current branch"
     COMMITS=$(git log --format="%h %s" "$RANGE")
+    if [[ -z "$COMMITS" ]]; then
+        echo "No commits found between $BRANCH and current branch"
+        echo "Current branch is up to date with $BRANCH"
+        exit 0
+    fi
 else
     echo "Checking last $NUMBER commits"
     COMMITS=$(git log --format="%h %s" -n "$NUMBER")
 fi
 
-[[ -z "$COMMITS" ]] && { echo "No commits to validate"; exit 0; }
+if [[ -z "$COMMITS" ]]; then
+    echo "No commits to validate"
+    exit 0
+fi
 
 echo
-echo "Analyzing commits..."
+echo "Found $(echo "$COMMITS" | wc -l) commit(s) to analyze..."
 echo
 
 INVALID_COMMITS=""
@@ -98,38 +118,45 @@ while IFS= read -r line; do
     HASH="${line%% *}"
     MESSAGE="${line#* }"
     
-    if [[ "$MESSAGE" =~ ^Merge ]]; then
+    if echo "$MESSAGE" | grep -q "^Merge "; then
         echo "MERGE (skipped): $HASH $MESSAGE"
-        ((SKIPPED_COUNT++))
+        SKIPPED_COUNT=$((SKIPPED_COUNT + 1))
     elif validate_commit "$MESSAGE"; then
         echo "VALID: $HASH $MESSAGE"
-        ((VALID_COUNT++))
+        VALID_COUNT=$((VALID_COUNT + 1))
     else
         echo "INVALID: $HASH $MESSAGE"
-        INVALID_COMMITS+="$HASH: $MESSAGE"$'\n'
-        ((INVALID_COUNT++))
+        if [[ -n "$INVALID_COMMITS" ]]; then
+            INVALID_COMMITS+=$'\n'
+        fi
+        INVALID_COMMITS+="$HASH: $MESSAGE"
+        INVALID_COUNT=$((INVALID_COUNT + 1))
     fi
 done <<< "$COMMITS"
 
-echo ""
-print_header "VALIDATION SUMMARY"
+echo
 echo "Valid commits: $VALID_COUNT"
 echo "Skipped commits (merges): $SKIPPED_COUNT"
 echo "Invalid commits: $INVALID_COUNT"
+echo "Total commits analyzed: $((VALID_COUNT + SKIPPED_COUNT + INVALID_COUNT))"
 echo
 
 if [[ $INVALID_COUNT -eq 0 ]]; then
-    echo "All commit messages are valid!"
+    echo "All commit messages are valid! The validate-commits workflow will pass."
     exit 0
 else
-    echo "Found $INVALID_COUNT invalid commit(s)"
+    echo "Found $INVALID_COUNT invalid commit(s) that will fail the validate-commits workflow:"
     echo
-    echo "The following commits are missing issue references:"
     echo "$INVALID_COMMITS"
+    echo
     
-    [[ "$SHOW_FIX" == true ]] && show_fix_instructions || echo "Run '$0 --fix' to see detailed fix instructions."
+    if [[ "$SHOW_FIX" == true ]]; then
+        show_fix_instructions
+    else
+        echo "Run '$0 --fix' to see detailed fix instructions."
+    fi
     
     echo
-    echo "These commits will fail the validate-commits workflow."
+    echo "These commits will fail the validate-commits workflow on GitHub."
     exit 1
 fi
