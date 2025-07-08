@@ -856,6 +856,11 @@ func extractZipFile(logger *multilog.Logger, f *zip.File, destFolder string) err
 		return err
 	}
 
+	// Explicitly check for directory traversal elements in the file name
+	if strings.Contains(f.Name, "..") {
+		return fmt.Errorf("invalid file path in archive: %s", f.Name)
+	}
+
 	filePath := filepath.Join(destFolder, f.Name)
 
 	if !isWithinDirectory(destFolder, filePath) {
