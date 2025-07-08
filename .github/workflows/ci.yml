@@ -3,7 +3,6 @@ name: DNS Toolkit Daily Processing
 # This workflow has two main jobs:
 # 1. test-and-build: Always runs for all events (push, PR, schedule, manual)
 # 2. publish: Only runs for main branch pushes, scheduled runs, or manual dispatch (NOT for PRs)
-#
 
 on:
   schedule:
@@ -39,7 +38,7 @@ permissions:
   contents: read
 
 env:
-  GO_VERSION: "1.24"
+  GO_VERSION: "1.23"
   COVERAGE_THRESHOLD: 80
   GOLANGCI_LINT_VERSION: v2.1.6
 
@@ -114,39 +113,31 @@ jobs:
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
-          verbose: false 
+          verbose: false
           override_commit: ${{ github.sha }}
 
       - name: Check if should publish
         id: check-publish
         run: |
-          SHOULD_PUBLISH="false"
-          
+          # Determine publishing mode
           if [[ "${{ github.event.inputs.download_only }}" == "true" ]]; then
-            echo "Download only mode enabled - will run limited download job only"
-            SHOULD_PUBLISH="download-only"
+            echo "should-publish=download-only" >> $GITHUB_OUTPUT
+            echo "::notice::Download only mode enabled"
           elif [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
-            echo "Dry run mode enabled - skipping publish"
-            SHOULD_PUBLISH="false"
+            echo "should-publish=false" >> $GITHUB_OUTPUT
+            echo "::notice::Dry run mode - skipping publish"
           elif [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            echo "Pull request - skipping publish (tests only)"
-            SHOULD_PUBLISH="false"
-          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
-            echo "Push to main branch - will publish"
-            SHOULD_PUBLISH="true"
-          elif [[ "${{ github.event_name }}" == "schedule" ]]; then
-            echo "Scheduled run - will publish"
-            SHOULD_PUBLISH="true"
-          elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "Manual dispatch - will publish"
-            SHOULD_PUBLISH="true"
+            echo "should-publish=false" >> $GITHUB_OUTPUT
+            echo "::notice::Pull request - tests only"
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]] || 
+               [[ "${{ github.event_name }}" == "schedule" ]] || 
+               [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "should-publish=true" >> $GITHUB_OUTPUT
+            echo "::notice::Will publish - Event: ${{ github.event_name }}"
           else
-            echo "Not a publishing event - skipping publish"
-            SHOULD_PUBLISH="false"
+            echo "should-publish=false" >> $GITHUB_OUTPUT
+            echo "::notice::Not a publishing event"
           fi
-          
-          echo "should-publish=$SHOULD_PUBLISH" >> $GITHUB_OUTPUT
-          echo "::notice::Should publish: $SHOULD_PUBLISH"
 
   publish:
     name: Download, Process and Publish
@@ -157,34 +148,17 @@ jobs:
     permissions:
       contents: write
       actions: read
+    env:
+      DOWNLOAD_ONLY: ${{ needs.test-and-build.outputs.should-publish == 'download-only' }}
     steps:
-      - name: Determine execution mode
-        run: |
-          echo "=== Execution Mode Detection ==="
-          echo "Event name: ${{ github.event_name }}"
-          echo "Should publish: ${{ needs.test-and-build.outputs.should-publish }}"
-          echo "Download only: ${{ github.event.inputs.download_only }}"
-          echo "Dry run: ${{ github.event.inputs.dry_run }}"
-          echo "Skip cache: ${{ github.event.inputs.skip_cache }}"
-          echo "Skip download: ${{ github.event.inputs.skip_download }}"
-          
-          if [[ "${{ github.event.inputs.download_only }}" == "true" ]]; then
-            echo "::notice::Running in DOWNLOAD-ONLY mode - will always perform fresh download to update cache"
-          elif [[ "${{ needs.test-and-build.outputs.should-publish }}" == "true" ]]; then
-            echo "::notice::Running in FULL PIPELINE mode - will download, process, and publish"
-          else
-            echo "::warning::Unexpected execution mode"
-          fi
-          echo "==============================="
-
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0  # Need full history for branch operations
-          persist-credentials: true  # Keep credentials for pushing
-          
-      - name: Configure Git for branch operations
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Configure Git
         run: |
           git config user.name "GitHub Actions Bot"
           git config user.email "actions@github.com"
@@ -215,148 +189,83 @@ jobs:
           echo "Building DNS toolkit..."
           go build -o bin/dns-toolkit .
           chmod +x bin/dns-toolkit
-          
-          # Verify the build
-          ./bin/dns-toolkit version || echo "Version command not available"
-          
-          # Ensure directories exist
           mkdir -p data/{download,output}
           echo "Build completed successfully"
 
-      - name: Verify cached data
-        run: |
-          echo "Checking cached data restoration..."
-          echo "Download directory contents:"
-          if [ -d "data/download" ]; then
-            ls -la data/download/ | head -10
-            echo "Download files count: $(find data/download -type f 2>/dev/null | wc -l)"
-          else
-            echo "No download directory found"
-          fi
-          
-          echo "Download summary file:"
-          if [ -f "data/download_summary.json" ]; then
-            echo "download_summary.json exists ($(stat -c%s data/download_summary.json) bytes)"
-            echo "Summary preview:"
-            head -5 data/download_summary.json 2>/dev/null || echo "Cannot read summary file"
-          else
-            echo "download_summary.json missing"
-          fi
-
-      - name: Check if download needed
-        id: check-download
+      - name: Determine download strategy
+        id: download-strategy
         run: |
           SKIP_DOWNLOAD="false"
           
-          # Check if this is download-only mode
-          if [[ "${{ github.event.inputs.download_only }}" == "true" ]]; then
-            echo "Download-only mode - will always perform fresh download to update cache"
+          if [[ "${{ env.DOWNLOAD_ONLY }}" == "true" ]]; then
+            echo "::notice::Download-only mode - will always download fresh data to update cache"
             SKIP_DOWNLOAD="false"
-          # Check if user explicitly requested to skip download
           elif [[ "${{ github.event.inputs.skip_download }}" == "true" ]]; then
-            echo "User requested to skip download step"
+            echo "::notice::User requested to skip download"
             SKIP_DOWNLOAD="true"
           elif [[ "${{ github.event.inputs.skip_cache }}" == "true" ]]; then
-            echo "User requested to skip cache - will download fresh data"
+            echo "::notice::User requested to skip cache - downloading fresh"
+            SKIP_DOWNLOAD="false"
+          elif [[ "${{ github.event_name }}" == "schedule" ]] || 
+               [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "::notice::Scheduled/manual run - downloading fresh data"
             SKIP_DOWNLOAD="false"
           else
-            # Only download fresh data for scheduled runs and manual dispatch
-            if [[ "${{ github.event_name }}" == "schedule" ]]; then
-              echo "Scheduled run - will download fresh data (on top of cache)"
-              SKIP_DOWNLOAD="false"
-            elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-              echo "Manual dispatch - will download fresh data (on top of cache)"
-              SKIP_DOWNLOAD="false"
-            else
-              echo "PR/Push event - using cached data only"
-              SKIP_DOWNLOAD="true"
-            fi
-            
-            # Log cache status for information
-            HAS_DATA="false"
-            if [ -d "data/download" ] && [ "$(find data/download -type f 2>/dev/null | wc -l)" -gt 0 ]; then
-              HAS_DATA="true"
-              CACHE_AGE="unknown"
-              if [ -f "data/download_summary.json" ]; then
-                # Try to extract timestamp from summary if available
-                CACHE_AGE=$(stat -c %Y data/download_summary.json 2>/dev/null | xargs -I {} date -d @{} '+%Y-%m-%d %H:%M UTC' 2>/dev/null || echo "unknown")
-              fi
-              if [[ "$SKIP_DOWNLOAD" == "false" ]]; then
-                echo "Cache available from: $CACHE_AGE (will be updated with fresh data)"
-              else
-                echo "Cache available from: $CACHE_AGE (will be used as-is)"
-              fi
-            else
-              if [[ "$SKIP_DOWNLOAD" == "false" ]]; then
-                echo "No cached data available - will download fresh data"
-              else
-                echo "::warning::No cached data available and download skipped - pipeline may fail"
-              fi
-            fi
-            
-            echo "Cache hit: ${{ steps.cache-restore.outputs.cache-hit }}, Has data: $HAS_DATA"
+            echo "::notice::Using cached data only"
+            SKIP_DOWNLOAD="true"
           fi
           
           echo "skip-download=$SKIP_DOWNLOAD" >> $GITHUB_OUTPUT
-          echo "::notice::Skip download: $SKIP_DOWNLOAD"
-
-      - name: Validate required files for processing
-        if: github.event.inputs.download_only != 'true'
-        run: |
-          if [[ "${{ steps.check-download.outputs.skip-download }}" == "true" ]]; then
-            echo "Validating required files for processing without download..."
-            
-            if [ ! -f "data/download_summary.json" ]; then
-              echo "::error::Cannot proceed without download_summary.json when skipping download"
-              echo "::error::The summary file is required for processing"
-              exit 1
-            fi
-            
-            if [ ! -d "data/download" ] || [ "$(find data/download -type f 2>/dev/null | wc -l)" -eq 0 ]; then
+          
+          # Validate cache availability if skipping download (only for full pipeline)
+          if [[ "$SKIP_DOWNLOAD" == "true" && "${{ env.DOWNLOAD_ONLY }}" != "true" ]]; then
+            if [[ ! -f "data/download_summary.json" ]] || [[ ! -d "data/download" ]]; then
               echo "::error::Cannot proceed without download data when skipping download"
-              echo "::error::No download files found in cache"
-              echo "::error::Please run with fresh download"
               exit 1
             fi
-            
-            echo "Required files validated - ready to process with cached data"
-          else
-            echo "Download will be performed - validation not needed"
           fi
 
       - name: Run download-only pipeline
-        if: github.event.inputs.download_only == 'true'
+        if: env.DOWNLOAD_ONLY == 'true'
         run: |
           echo "Running download-only pipeline..."
-          echo "Cache status:"
-          if [ -d "data/download" ] && [ "$(find data/download -type f 2>/dev/null | wc -l)" -gt 0 ]; then
-            echo "- Existing cache found (will be updated with fresh data)"
-            echo "- Cache files: $(find data/download -type f 2>/dev/null | wc -l)"
+          
+          # Check if we have existing cache
+          if [[ -d "data/download" && "$(find data/download -type f 2>/dev/null | wc -l)" -gt 0 ]]; then
+            echo "Existing cache found - will update with fresh data"
+            CACHED_FILES=$(find data/download -type f 2>/dev/null | wc -l)
+            echo "Current cache contains: $CACHED_FILES files"
           else
-            echo "- No existing cache (will create fresh cache)"
+            echo "No existing cache - will create fresh cache"
           fi
           
-          echo "Performing fresh download to update cache..."
+          # Always download fresh data in download-only mode to update cache
+          echo "Downloading fresh data to update cache..."
           ./bin/dns-toolkit download
-          echo "::notice::Download-only mode completed - fresh data downloaded and cache updated"
           
-          echo "Download-only pipeline completed successfully"
+          # Update cache timestamp
+          echo "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" > data/download/.cache_timestamp
+          
+          # Verify updated cache
+          UPDATED_FILES=$(find data/download -type f 2>/dev/null | wc -l)
+          echo "Updated cache now contains: $UPDATED_FILES files"
+          echo "::notice::Download-only mode completed - cache updated with fresh data"
 
-      - name: Run DNS toolkit pipeline
-        if: github.event.inputs.download_only != 'true'
+      - name: Run full DNS toolkit pipeline
+        if: env.DOWNLOAD_ONLY != 'true'
         run: |
           echo "Starting DNS toolkit pipeline..."
           
-          # Run the full pipeline with error handling
-          set -e
-          
-          if [[ "${{ steps.check-download.outputs.skip-download }}" == "true" ]]; then
+          # Conditional download step
+          if [[ "${{ steps.download-strategy.outputs.skip-download }}" == "true" ]]; then
             echo "Step 1: Skipping download (using cached data)..."
           else
             echo "Step 1: Downloading data..."
             ./bin/dns-toolkit download
+            echo "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" > data/download/.cache_timestamp
           fi
           
+          # Processing pipeline
           echo "Step 2: Processing data..."
           ./bin/dns-toolkit process
           
@@ -389,52 +298,12 @@ jobs:
           
           echo "DNS toolkit pipeline completed successfully"
 
-      - name: Update cache timestamp
-        if: github.event.inputs.download_only != 'true'
-        run: |
-          # Add timestamp to indicate when cache was last updated with fresh data
-          if [[ "${{ steps.check-download.outputs.skip-download }}" == "false" ]] && [ -d "data/download" ]; then
-            echo "Cache updated at: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" > data/download/.cache_timestamp
-            echo "Cache update timestamp recorded (fresh download)"
-          fi
-
-      - name: Verify cache content for next run
-        if: github.event.inputs.download_only != 'true'
-        run: |
-          echo "Verifying download directory for caching..."
-          if [ -d "data/download" ]; then
-            DOWNLOAD_SIZE=$(du -sh data/download 2>/dev/null | cut -f1 || echo "unknown")
-            DOWNLOAD_FILES=$(find data/download -type f 2>/dev/null | wc -l)
-            
-            # Check cache timestamp
-            CACHE_TIMESTAMP="unknown"
-            if [ -f "data/download/.cache_timestamp" ]; then
-              CACHE_TIMESTAMP=$(cat data/download/.cache_timestamp 2>/dev/null || echo "unknown")
-            fi
-            
-            echo "Download directory size: $DOWNLOAD_SIZE"
-            echo "Download files count: $DOWNLOAD_FILES"
-            echo "Last cache update: $CACHE_TIMESTAMP"
-            echo "::notice::Cache content ready - Size: $DOWNLOAD_SIZE, Files: $DOWNLOAD_FILES, Updated: $CACHE_TIMESTAMP"
-          else
-            echo "::warning::Download directory not found for caching"
-          fi
-
       - name: Count and validate output files
-        if: github.event.inputs.download_only != 'true'
+        if: env.DOWNLOAD_ONLY != 'true'
         id: count-files
         run: |
-          # Count files in different directories
-          OUTPUT_COUNT=0
-          SUMMARY_COUNT=0
-          
-          if [ -d "data/output" ]; then
-            OUTPUT_COUNT=$(find data/output -type f ! -path "*/summaries/*" 2>/dev/null | wc -l)
-          fi
-          
-          if [ -d "data/output/summaries" ]; then
-            SUMMARY_COUNT=$(find data/output/summaries -name "*.json" 2>/dev/null | wc -l)
-          fi
+          OUTPUT_COUNT=$(find data/output -type f ! -path "*/summaries/*" 2>/dev/null | wc -l)
+          SUMMARY_COUNT=$(find data/output/summaries -name "*.json" 2>/dev/null | wc -l)
           
           echo "output-count=$OUTPUT_COUNT" >> $GITHUB_OUTPUT
           echo "summary-count=$SUMMARY_COUNT" >> $GITHUB_OUTPUT
@@ -442,117 +311,64 @@ jobs:
           echo "::notice::Output files: $OUTPUT_COUNT"
           echo "::notice::Summary files: $SUMMARY_COUNT"
           
-          # Validate we have some output
-          if [ "$OUTPUT_COUNT" -eq 0 ] && [ "$SUMMARY_COUNT" -eq 0 ]; then
+          if [[ "$OUTPUT_COUNT" -eq 0 && "$SUMMARY_COUNT" -eq 0 ]]; then
             echo "::error::No output files generated"
             exit 1
           fi
 
-      - name: Prepare files for publishing
-        if: github.event.inputs.download_only != 'true'
+      - name: Prepare and publish files
+        if: env.DOWNLOAD_ONLY != 'true'
         run: |
           echo "Preparing files for publishing..."
           
-          # Create temporary directories for publishing
+          # Create temporary directories
           mkdir -p /tmp/publish-data/{output,summaries,download}
-
-          # Backup download directory for caching (before branch operations)
-          if [ -d "data/download" ]; then
-            echo "Backing up download directory for caching..."
+          
+          # Backup download directory and summary file for caching
+          if [[ -d "data/download" ]]; then
             cp -r data/download/* /tmp/publish-data/download/ 2>/dev/null || true
           fi
-
-          # Prepare output files (excluding summaries subdirectory)
-          if [ -d "data/output" ]; then
-            echo "Preparing output files..."
+          
+          if [[ -f "data/download_summary.json" ]]; then
+            cp data/download_summary.json /tmp/publish-data/download_summary.json
+          fi
+          
+          # Prepare output and summary files
+          if [[ -d "data/output" ]]; then
             rsync -av --exclude='summaries/' data/output/ /tmp/publish-data/output/ 2>/dev/null || true
           fi
-
-          # Prepare summary files separately
-          if [ -d "data/output/summaries" ]; then
-            echo "Preparing summary files..."
+          
+          if [[ -d "data/output/summaries" ]]; then
             cp -r data/output/summaries/* /tmp/publish-data/summaries/ 2>/dev/null || true
           fi
           
-          # Log what we're publishing
-          echo "Files prepared for publishing:"
-          echo "- Output files: $(find /tmp/publish-data/output -type f 2>/dev/null | wc -l)"
-          echo "- Summary files: $(find /tmp/publish-data/summaries -type f 2>/dev/null | wc -l)"
-          echo "- Download backup: $(find /tmp/publish-data/download -type f 2>/dev/null | wc -l) files"
-
-      - name: Store original branch
-        if: github.event.inputs.download_only != 'true'
-        run: |
-          ORIGINAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-          echo "ORIGINAL_BRANCH=$ORIGINAL_BRANCH" >> $GITHUB_ENV
-          echo "Stored original branch: $ORIGINAL_BRANCH"
-
-      - name: Make publish script executable and backup
-        if: github.event.inputs.download_only != 'true'
-        run: |
+          # Store original branch and prepare publish script
+          echo "ORIGINAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
           chmod +x .github/scripts/publish-to-branch.sh
-          # Copy script to temp location so it's available after branch switches
           cp .github/scripts/publish-to-branch.sh /tmp/publish-to-branch.sh
-          chmod +x /tmp/publish-to-branch.sh
-
-      - name: Verify clean working directory
-        if: github.event.inputs.download_only != 'true'
-        run: |
-          echo "Verifying working directory is clean..."
-          if [[ -n "$(git status --porcelain)" ]]; then
-            echo "Warning: Unexpected local changes detected:"
-            git status --porcelain
-            echo "These changes will be ignored during publish operations"
-          else
-            echo "Working directory is clean - ready for publishing"
+          
+          # Publish to branches
+          if [[ "${{ steps.count-files.outputs.output-count }}" -gt 0 ]]; then
+            echo "Publishing to output branch..."
+            GITHUB_WORKSPACE="${{ github.workspace }}" /tmp/publish-to-branch.sh output /tmp/publish-data/output
           fi
-
-      - name: Publish to output branch
-        if: github.event.inputs.download_only != 'true' && steps.count-files.outputs.output-count > 0
-        run: |
-          OUTPUT_COUNT="${{ steps.count-files.outputs.output-count }}"
-          echo "Publishing $OUTPUT_COUNT files to output branch..."
-          cd "${{ github.workspace }}"
-          GITHUB_WORKSPACE="${{ github.workspace }}" /tmp/publish-to-branch.sh output /tmp/publish-data/output
-
-      - name: Publish to summaries branch
-        if: github.event.inputs.download_only != 'true' && steps.count-files.outputs.summary-count > 0
-        run: |
-          SUMMARY_COUNT="${{ steps.count-files.outputs.summary-count }}"
-          echo "Publishing $SUMMARY_COUNT summary files to summaries branch..."
-          cd "${{ github.workspace }}"
-          GITHUB_WORKSPACE="${{ github.workspace }}" /tmp/publish-to-branch.sh summaries /tmp/publish-data/summaries --monthly
-
-      - name: Restore original branch
-        if: always() && github.event.inputs.download_only != 'true'
-        run: |
-          echo "Restoring original branch..."
-          git checkout "$ORIGINAL_BRANCH" 2>/dev/null || echo "Could not restore original branch"
-          echo "Branch restoration completed"
-
-      - name: Update cache timestamp for download-only mode
-        if: github.event.inputs.download_only == 'true'
-        run: |
-          # Add timestamp to indicate when cache was last updated with fresh data
-          if [ -d "data/download" ]; then
-            echo "Cache updated at: $(date -u '+%Y-%m-%d %H:%M:%S UTC')" > data/download/.cache_timestamp
-            echo "Cache update timestamp recorded (download-only mode)"
+          
+          if [[ "${{ steps.count-files.outputs.summary-count }}" -gt 0 ]]; then
+            echo "Publishing to summaries branch..."
+            GITHUB_WORKSPACE="${{ github.workspace }}" /tmp/publish-to-branch.sh summaries /tmp/publish-data/summaries --monthly
           fi
-
-      - name: Restore download directory for caching
-        if: always()
-        run: |
-          # Restore download directory so the cache action can find it
-          if [ -d "/tmp/publish-data/download" ]; then
-            echo "Restoring download directory for caching..."
+          
+          # Restore original branch
+          git checkout "$ORIGINAL_BRANCH" 2>/dev/null || true
+          
+          # Restore download directory and summary file for caching
+          if [[ -d "/tmp/publish-data/download" ]]; then
             mkdir -p data/download
             cp -r /tmp/publish-data/download/* data/download/ 2>/dev/null || true
-            
-            # Verify restoration
-            RESTORED_FILES=$(find data/download -type f 2>/dev/null | wc -l)
-            echo "Restored $RESTORED_FILES files to download directory"
-          else
-            echo "No download backup found to restore"
+          fi
+          
+          if [[ -f "/tmp/publish-data/download_summary.json" ]]; then
+            cp /tmp/publish-data/download_summary.json data/download_summary.json
           fi
 
       - name: Save cache for next run
@@ -564,25 +380,19 @@ jobs:
             data/download_summary.json
           key: data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-v3
 
-
-      - name: Cleanup temporary files
-        if: always() && github.event.inputs.download_only != 'true'
-        run: |
-          echo "Cleaning up temporary files..."
-          rm -rf /tmp/publish-data/ 2>/dev/null || true
-          rm -f /tmp/publish-to-branch.sh 2>/dev/null || true
-          echo "Cleanup completed"
-
-      - name: Summary
+      - name: Cleanup and summary
         if: always()
         run: |
+          # Cleanup temporary files
+          rm -rf /tmp/publish-data/ /tmp/publish-to-branch.sh 2>/dev/null || true
+          
+          # Generate summary
           echo "## Workflow Summary" >> $GITHUB_STEP_SUMMARY
           
-          if [[ "${{ github.event.inputs.download_only }}" == "true" ]]; then
+          if [[ "${{ env.DOWNLOAD_ONLY }}" == "true" ]]; then
             echo "- **Mode**: Download Only" >> $GITHUB_STEP_SUMMARY
             echo "- **Download**: Fresh download completed (cache updated)" >> $GITHUB_STEP_SUMMARY
             echo "- **Processing**: Skipped (download-only mode)" >> $GITHUB_STEP_SUMMARY
-            echo "- **Publishing**: Skipped (download-only mode)" >> $GITHUB_STEP_SUMMARY
           else
             echo "- **Mode**: Full Pipeline" >> $GITHUB_STEP_SUMMARY
             echo "- **Output files published**: ${{ steps.count-files.outputs.output-count }}" >> $GITHUB_STEP_SUMMARY

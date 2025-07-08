@@ -128,7 +128,8 @@ This project is made possible by the following blocklist and allowlist sources:
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes with tests
-4. Submit a pull request
+4. **Validate commit messages** before pushing. All commit message must reference a GitHub issue.
+5. Submit a pull request
 
 ## License
 
