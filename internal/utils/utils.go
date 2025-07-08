@@ -735,6 +735,10 @@ func extractTarGz(logger *multilog.Logger, archivePath, destFolder string) error
 		}
 
 		// Determine the correct path for extraction
+		// Ensure the file path does not contain directory traversal elements
+		if strings.Contains(head.Name, "..") {
+			return fmt.Errorf("invalid file path in archive: %s (contains '..')", head.Name)
+		}
 		if err := validateArchiveFilePath(head.Name); err != nil {
 			return err
 		}
@@ -774,6 +778,10 @@ func extractTarGz(logger *multilog.Logger, archivePath, destFolder string) error
 			// also create a copy in a subdirectory named after the archive base name
 			// This helps with archives that contain files directly at the root
 			if !strings.Contains(head.Name, "/") && !strings.Contains(head.Name, "\\") {
+				// Ensure the base name does not contain directory traversal elements
+				if strings.Contains(baseName, "..") {
+					return fmt.Errorf("invalid archive base name: %s (contains '..')", baseName)
+				}
 				if err := validateArchiveFilePath(baseName); err != nil {
 					return fmt.Errorf("invalid archive base name: %v", err)
 				}
