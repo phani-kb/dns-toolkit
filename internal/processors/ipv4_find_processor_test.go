@@ -11,8 +11,6 @@ import (
 )
 
 func TestNewIpv4FindProcessor(t *testing.T) {
-	t.Parallel()
-
 	sourceType := "ipv4_find"
 	listType := "blocklist"
 
@@ -24,8 +22,6 @@ func TestNewIpv4FindProcessor(t *testing.T) {
 }
 
 func TestIpv4FindProcessor_Process(t *testing.T) {
-	t.Parallel()
-
 	logger := multilog.NewLogger()
 	processor := processors.NewIpv4FindProcessor("ipv4_find", "blocklist")
 
@@ -101,8 +97,6 @@ func TestIpv4FindProcessor_Process(t *testing.T) {
 }
 
 func TestIpv4FindProcessor_Integration(t *testing.T) {
-	t.Parallel()
-
 	logger := multilog.NewLogger()
 	processor := processors.NewIpv4FindProcessor("ipv4_find", "blocklist")
 
@@ -183,8 +177,6 @@ Check logs at http://172.16.0.1/logs
 }
 
 func TestIpv4FindProcessor_EdgeCases(t *testing.T) {
-	t.Parallel()
-
 	logger := multilog.NewLogger()
 	processor := processors.NewIpv4FindProcessor("ipv4_find", "blocklist")
 
@@ -236,8 +228,6 @@ func TestIpv4FindProcessor_EdgeCases(t *testing.T) {
 }
 
 func TestIpv4FindProcessor_Registration(t *testing.T) {
-	t.Parallel()
-
 	processor, exists := processors.Processors.GetProcessor("ipv4_find", "blocklist")
 	assert.True(t, exists, "Processor should be registered")
 	assert.NotNil(t, processor)
@@ -249,8 +239,6 @@ func TestIpv4FindProcessor_Registration(t *testing.T) {
 }
 
 func TestIpv4FindProcessor_Performance(t *testing.T) {
-	t.Parallel()
-
 	logger := multilog.NewLogger()
 	processor := processors.NewIpv4FindProcessor("ipv4_find", "blocklist")
 
