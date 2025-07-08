@@ -3,9 +3,7 @@ name: DNS Toolkit Daily Processing
 # This workflow has two main jobs:
 # 1. test-and-build: Always runs for all events (push, PR, schedule, manual)
 # 2. publish: Only runs for main branch pushes, scheduled runs, or manual dispatch (NOT for PRs)
-# 
-# README stats are only updated during scheduled runs and manual dispatch to avoid 
-# conflicts with protected branch rules during PR merges.
+#
 
 on:
   schedule:
@@ -338,9 +336,6 @@ jobs:
           echo "Step 11: Generating summaries README..."
           ./bin/dns-toolkit generate summaries-readme
           
-          echo "Step 12: Generating stats README..."
-          ./bin/dns-toolkit generate stats-readme
-          
           echo "DNS toolkit pipeline completed successfully"
 
       - name: Update cache timestamp
@@ -442,36 +437,6 @@ jobs:
           # Copy script to temp location so it's available after branch switches
           cp .github/scripts/publish-to-branch.sh /tmp/publish-to-branch.sh
           chmod +x /tmp/publish-to-branch.sh
-
-      - name: Commit README changes if any
-        run: |
-          echo "Checking for README changes..."
-          if git diff --name-only | grep -q "README.md"; then
-            echo "README.md has been modified during processing..."
-            
-            # Only update README for scheduled runs or manual dispatch
-            # Skip for push events (including PR merges) to avoid branch protection issues
-            if [[ "${{ github.event_name }}" == "schedule" ]] || [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-              echo "Scheduled or manual run - attempting to commit README changes..."
-              
-              # For scheduled/manual runs, commit README updates
-              git add README.md
-              git commit -m "Update README.md with latest statistics [skip ci]"
-              
-              if git push origin main; then
-                echo "README changes committed and pushed successfully"
-              else
-                echo "::error::Failed to push README changes for scheduled/manual run"
-                exit 1
-              fi
-            else
-              echo "Skipping README commit for ${{ github.event_name }} event (only updated for scheduled/manual runs)"
-              echo "::notice::README was updated during processing but not committed"
-              git checkout -- README.md
-            fi
-          else
-            echo "No README changes to commit"
-          fi
 
       - name: Verify clean working directory
         run: |
