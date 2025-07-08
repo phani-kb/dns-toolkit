@@ -37,6 +37,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: dns-toolkit-pipeline
+  cancel-in-progress: false
+  
 env:
   GO_VERSION: "1.23"
   COVERAGE_THRESHOLD: 80
@@ -372,7 +376,7 @@ jobs:
           fi
 
       - name: Save cache for next run
-        if: github.event.inputs.skip_cache != 'true' && (hashFiles('data/download/**') != '' || hashFiles('data/download_summary.json') != '')
+        if: steps.cache-restore.outputs.cache-hit != 'true' && github.event.inputs.skip_cache != 'true' && (hashFiles('data/download/**') != '' || hashFiles('data/download_summary.json') != '')
         uses: actions/cache/save@v4
         with:
           path: |
