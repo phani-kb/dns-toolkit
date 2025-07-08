@@ -735,8 +735,16 @@ func extractTarGz(logger *multilog.Logger, archivePath, destFolder string) error
 		}
 
 		// Determine the correct path for extraction
+		if err := validateArchiveFilePath(head.Name); err != nil {
+			return err
+		}
+
 		// First try the default path in the destination folder
 		filePath := filepath.Join(destFolder, head.Name)
+
+		if !isWithinDirectory(destFolder, filePath) {
+			return fmt.Errorf("invalid file path in archive: %s", head.Name)
+		}
 
 		// Create the necessary directories
 		if head.Typeflag == tar.TypeDir {
@@ -766,12 +774,26 @@ func extractTarGz(logger *multilog.Logger, archivePath, destFolder string) error
 			// also create a copy in a subdirectory named after the archive base name
 			// This helps with archives that contain files directly at the root
 			if !strings.Contains(head.Name, "/") && !strings.Contains(head.Name, "\\") {
+				if err := validateArchiveFilePath(baseName); err != nil {
+					return fmt.Errorf("invalid archive base name: %v", err)
+				}
+
 				subDirPath := filepath.Join(destFolder, baseName)
+
+				if !isWithinDirectory(destFolder, subDirPath) {
+					return fmt.Errorf("invalid subdirectory path: %s", baseName)
+				}
+
 				if err := os.MkdirAll(subDirPath, os.ModePerm); err != nil {
 					return err
 				}
 
 				subFilePath := filepath.Join(subDirPath, head.Name)
+
+				if !isWithinDirectory(destFolder, subFilePath) {
+					return fmt.Errorf("invalid sub file path: %s", head.Name)
+				}
+
 				subFile, err := os.Create(subFilePath)
 				if err != nil {
 					return err
@@ -822,7 +844,16 @@ func extractZip(logger *multilog.Logger, archivePath, destFolder string) error {
 
 // extractZipFile extracts a single file from the zip archive
 func extractZipFile(logger *multilog.Logger, f *zip.File, destFolder string) error {
+	if err := validateArchiveFilePath(f.Name); err != nil {
+		return err
+	}
+
 	filePath := filepath.Join(destFolder, f.Name)
+
+	if !isWithinDirectory(destFolder, filePath) {
+		return fmt.Errorf("invalid file path in archive: %s", f.Name)
+	}
+
 	if f.FileInfo().IsDir() {
 		return os.MkdirAll(filePath, os.ModePerm)
 	}
@@ -972,6 +1003,42 @@ func ParsePercent(percentStr string) float64 {
 		return 0.0
 	}
 	return percent
+}
+
+// validateArchiveFilePath checks if an archive file path is safe from directory traversal attacks
+func validateArchiveFilePath(filePath string) error {
+	if filepath.IsAbs(filePath) {
+		return fmt.Errorf("absolute paths not allowed in archive: %s", filePath)
+	}
+
+	cleanPath := filepath.Clean(filePath)
+
+	if strings.HasPrefix(cleanPath, "..") || strings.Contains(cleanPath, "/../") {
+		return fmt.Errorf("path traversal detected in archive: %s", filePath)
+	}
+
+	return nil
+}
+
+// isWithinDirectory checks if the target path is within the base directory to prevent directory traversal attacks
+func isWithinDirectory(baseDir, targetPath string) bool {
+	absBaseDir, err := filepath.Abs(baseDir)
+	if err != nil {
+		return false
+	}
+	absTargetPath, err := filepath.Abs(targetPath)
+	if err != nil {
+		return false
+	}
+
+	absBaseDir = filepath.Clean(absBaseDir)
+	absTargetPath = filepath.Clean(absTargetPath)
+
+	if !strings.HasSuffix(absBaseDir, string(filepath.Separator)) {
+		absBaseDir += string(filepath.Separator)
+	}
+
+	return strings.HasPrefix(absTargetPath+string(filepath.Separator), absBaseDir)
 }
 
 // EnsureDirectoryExists creates a directory if it doesn't exist
