@@ -1,8 +1,8 @@
 name: DNS Toolkit Daily Processing
 
-# 1. cache-only: Download and update cache only (no processing/publishing)
-# 2. use-cache: Use existing cache, skip download, run full pipeline (exit if no cache)
-# 3. full-pipeline: Download fresh data, run full pipeline, publish (default)
+# - Scheduled runs: full-pipeline mode with publishing
+# - Push to main: use-cache mode without publishing (avoids cache conflicts)
+# - Manual dispatch: user-selected mode with conditional publishing (refresh-cache and use-cache don't publish)
 
 on:
   schedule:
@@ -16,8 +16,8 @@ on:
         type: choice
         options:
           - 'full-pipeline'
-          - 'cache-only'
           - 'use-cache'
+          - 'refresh-cache'
   push:
     branches: [main]
   pull_request:
@@ -120,13 +120,20 @@ jobs:
             echo "::notice::Pull request - tests only"
           elif [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             MODE="${{ github.event.inputs.mode }}"
-            PUBLISH="true"
+            if [[ "$MODE" == "refresh-cache" || "$MODE" == "use-cache" ]]; then
+              PUBLISH="false"
+            else
+              PUBLISH="true"
+            fi
             echo "::notice::Manual dispatch - Mode: $MODE"
-          elif [[ "${{ github.event_name }}" == "schedule" ]] || 
-               [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+          elif [[ "${{ github.event_name }}" == "schedule" ]]; then
             MODE="full-pipeline"
             PUBLISH="true"
-            echo "::notice::Scheduled/push event - Mode: $MODE"
+            echo "::notice::Scheduled event - Mode: $MODE"
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+            MODE="use-cache"
+            PUBLISH="false"
+            echo "::notice::Push to main - Mode: $MODE (use cache, no publish)"
           else
             MODE="test-only"
             PUBLISH="false"
@@ -140,7 +147,7 @@ jobs:
     name: DNS Toolkit Pipeline
     runs-on: ubuntu-latest
     needs: test-and-build
-    if: needs.test-and-build.outputs.should-publish == 'true'
+    if: needs.test-and-build.outputs.pipeline-mode != 'test-only'
     timeout-minutes: 20
     permissions:
       contents: write
@@ -179,26 +186,33 @@ jobs:
       - name: Display pipeline mode
         run: |
           echo "## Pipeline Mode: ${{ env.PIPELINE_MODE }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Publishing**: ${{ needs.test-and-build.outputs.should-publish }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           case "${{ env.PIPELINE_MODE }}" in
-            "cache-only")
-              echo "- **Goal**: Download and update cache only" >> $GITHUB_STEP_SUMMARY
-              echo "- **Actions**: Download fresh data, save to cache" >> $GITHUB_STEP_SUMMARY
-              echo "- **Skip**: Processing and publishing" >> $GITHUB_STEP_SUMMARY
-              ;;
             "use-cache")
               echo "- **Goal**: Use existing cache, run full pipeline" >> $GITHUB_STEP_SUMMARY
-              echo "- **Actions**: Restore cache, skip download, process, publish" >> $GITHUB_STEP_SUMMARY
+              echo "- **Actions**: Restore cache, skip download, process" >> $GITHUB_STEP_SUMMARY
+              if [[ "${{ needs.test-and-build.outputs.should-publish }}" == "true" ]]; then
+                echo "- **Publishing**: Enabled (results will be published)" >> $GITHUB_STEP_SUMMARY
+              else
+                echo "- **Publishing**: Disabled (no publishing to avoid cache conflicts)" >> $GITHUB_STEP_SUMMARY
+              fi
               echo "- **Requirement**: Cache must exist or pipeline will fail" >> $GITHUB_STEP_SUMMARY
+              ;;
+            "refresh-cache")
+              echo "- **Goal**: Download fresh data, process, and update cache" >> $GITHUB_STEP_SUMMARY
+              echo "- **Actions**: Download fresh data, process, save cache" >> $GITHUB_STEP_SUMMARY
+              echo "- **Publishing**: Disabled (focus on cache refresh)" >> $GITHUB_STEP_SUMMARY
+              echo "- **Benefit**: Fresh data processing + updated cache for next run" >> $GITHUB_STEP_SUMMARY
               ;;
             "full-pipeline")
               echo "- **Goal**: Complete pipeline with fresh data" >> $GITHUB_STEP_SUMMARY
               echo "- **Actions**: Download fresh data, process, publish, save cache" >> $GITHUB_STEP_SUMMARY
-              echo "- **Note**: This is the default mode" >> $GITHUB_STEP_SUMMARY
+              echo "- **Note**: This is the default mode for scheduled runs" >> $GITHUB_STEP_SUMMARY
               ;;
           esac
 
       - name: Restore cache
-        if: env.PIPELINE_MODE == 'use-cache' || env.PIPELINE_MODE == 'full-pipeline'
         uses: actions/cache/restore@v4
         id: cache-restore
         with:
@@ -211,7 +225,7 @@ jobs:
             data-download-${{ runner.os }}-
 
       - name: Validate cache for use-cache mode
-        if: env.PIPELINE_MODE == 'use-cache'
+        if: env.PIPELINE_MODE == 'use-cache' || env.PIPELINE_MODE == 'refresh-cache'
         run: |
           echo "Validating cache availability..."
           
@@ -242,45 +256,40 @@ jobs:
             echo "::error::Cache directory not found"
             exit 1
           fi
-
-      - name: Cache-only pipeline
-        if: env.PIPELINE_MODE == 'cache-only'
-        run: |
-          echo "Running cache-only pipeline..."
-          echo "Downloading fresh data to update cache..."
           
-          # Check existing cache first
-          if [[ -d "data/download" && "$(find data/download -type f 2>/dev/null | wc -l)" -gt 0 ]]; then
-            EXISTING_FILES=$(find data/download -type f 2>/dev/null | wc -l)
-            echo "Existing cache contains: $EXISTING_FILES files"
-          else
-            echo "No existing cache found"
+          # Check for download_summary.json for use-cache mode
+          if [[ "${{ env.PIPELINE_MODE }}" == "use-cache" && ! -f "data/download_summary.json" ]]; then
+            echo "::warning::download_summary.json not found - use-cache mode requires this file"
+            echo "::error::Cannot proceed with use-cache mode without download_summary.json"
+            exit 1
+          fi
+
+      - name: Backup data files
+        if: env.PIPELINE_MODE == 'full-pipeline' && needs.test-and-build.outputs.should-publish == 'true'
+        run: |
+          echo "Backing up data files for branch switching..."
+          mkdir -p /tmp/data-backup
+          
+          # Backup download directory and summary file
+          if [[ -d "data/download" ]]; then
+            cp -r data/download /tmp/data-backup/ 2>/dev/null || true
+            echo "Backed up data/download directory"
           fi
           
-          # Download fresh data
-          ./bin/dns-toolkit download
+          if [[ -f "data/download_summary.json" ]]; then
+            cp data/download_summary.json /tmp/data-backup/ 2>/dev/null || true
+            echo "Backed up data/download_summary.json"
+          fi
           
-          # Update cache timestamp
-          echo "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" > data/download/.cache_timestamp
-          
-          # Report results
-          UPDATED_FILES=$(find data/download -type f 2>/dev/null | wc -l)
-          echo "✅ Cache updated with: $UPDATED_FILES files"
-          echo "Cache timestamp: $(cat data/download/.cache_timestamp)"
-          
-          # Add to summary
-          echo "### Cache Update Results" >> $GITHUB_STEP_SUMMARY
-          echo "- **Files downloaded**: $UPDATED_FILES" >> $GITHUB_STEP_SUMMARY
-          echo "- **Cache timestamp**: $(cat data/download/.cache_timestamp)" >> $GITHUB_STEP_SUMMARY
-          echo "- **Status**: ✅ Cache updated successfully" >> $GITHUB_STEP_SUMMARY
+          echo "Data backup completed"
 
       - name: Full pipeline
-        if: env.PIPELINE_MODE == 'use-cache' || env.PIPELINE_MODE == 'full-pipeline'
+        if: env.PIPELINE_MODE == 'use-cache' || env.PIPELINE_MODE == 'full-pipeline' || env.PIPELINE_MODE == 'refresh-cache'
         run: |
           echo "🚀 Running full DNS toolkit pipeline..."
           
-          # Step 1: Download (only for full-pipeline mode)
-          if [[ "${{ env.PIPELINE_MODE }}" == "full-pipeline" ]]; then
+          # Step 1: Download (for full-pipeline and refresh-cache modes)
+          if [[ "${{ env.PIPELINE_MODE }}" == "full-pipeline" || "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]]; then
             echo "Step 1: Downloading fresh data..."
             ./bin/dns-toolkit download
             echo "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" > data/download/.cache_timestamp
@@ -327,7 +336,6 @@ jobs:
           echo "✅ Pipeline completed successfully"
 
       - name: Count and validate output files
-        if: env.PIPELINE_MODE == 'use-cache' || env.PIPELINE_MODE == 'full-pipeline'
         id: count-files
         run: |
           OUTPUT_COUNT=$(find data/output -type f ! -path "*/summaries/*" 2>/dev/null | wc -l)
@@ -349,23 +357,14 @@ jobs:
           fi
 
       - name: Publish results
-        if: env.PIPELINE_MODE == 'use-cache' || env.PIPELINE_MODE == 'full-pipeline'
+        if: env.PIPELINE_MODE == 'full-pipeline' && needs.test-and-build.outputs.should-publish == 'true'
         run: |
           echo "Publishing results..."
           
-          # Create temporary directories
-          mkdir -p /tmp/publish-data/{output,summaries,download}
+          # Create temporary directories for publishing
+          mkdir -p /tmp/publish-data/{output,summaries}
           
-          # Backup download directory and summary file for caching
-          if [[ -d "data/download" ]]; then
-            cp -r data/download/* /tmp/publish-data/download/ 2>/dev/null || true
-          fi
-          
-          if [[ -f "data/download_summary.json" ]]; then
-            cp data/download_summary.json /tmp/publish-data/download_summary.json
-          fi
-          
-          # Prepare output and summary files
+          # Prepare output and summary files for publishing
           if [[ -d "data/output" ]]; then
             rsync -av --exclude='summaries/' data/output/ /tmp/publish-data/output/ 2>/dev/null || true
           fi
@@ -390,22 +389,32 @@ jobs:
             GITHUB_WORKSPACE="${{ github.workspace }}" /tmp/publish-to-branch.sh summaries /tmp/publish-data/summaries --monthly
           fi
           
-          # Restore original branch and download data
+          # Restore original branch
           git checkout "$ORIGINAL_BRANCH" 2>/dev/null || true
-          
-          if [[ -d "/tmp/publish-data/download" ]]; then
-            mkdir -p data/download
-            cp -r /tmp/publish-data/download/* data/download/ 2>/dev/null || true
-          fi
-          
-          if [[ -f "/tmp/publish-data/download_summary.json" ]]; then
-            cp /tmp/publish-data/download_summary.json data/download_summary.json
-          fi
           
           echo "✅ Publishing completed"
 
+      - name: Restore data files
+        if: env.PIPELINE_MODE == 'full-pipeline' && needs.test-and-build.outputs.should-publish == 'true'
+        run: |
+          echo "Restoring data files after branch operations..."
+          
+          # Restore download directory and summary file from backup
+          if [[ -d "/tmp/data-backup/download" ]]; then
+            mkdir -p data
+            cp -r /tmp/data-backup/download data/ 2>/dev/null || true
+            echo "Restored data/download directory"
+          fi
+          
+          if [[ -f "/tmp/data-backup/download_summary.json" ]]; then
+            cp /tmp/data-backup/download_summary.json data/ 2>/dev/null || true
+            echo "Restored data/download_summary.json"
+          fi
+          
+          echo "Data restoration completed"
+
       - name: Save cache
-        if: env.PIPELINE_MODE == 'cache-only' || env.PIPELINE_MODE == 'full-pipeline'
+        if: env.PIPELINE_MODE == 'refresh-cache' || env.PIPELINE_MODE == 'full-pipeline'
         uses: actions/cache/save@v4
         with:
           path: |
@@ -417,25 +426,18 @@ jobs:
         if: always()
         run: |
           # Cleanup temporary files
-          rm -rf /tmp/publish-data/ /tmp/publish-to-branch.sh 2>/dev/null || true
+          rm -rf /tmp/publish-data/ /tmp/publish-to-branch.sh /tmp/data-backup/ 2>/dev/null || true
           
           # Generate detailed summary
           echo "## Pipeline Results" >> $GITHUB_STEP_SUMMARY
           echo "- **Mode**: ${{ env.PIPELINE_MODE }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Publish**: ${{ needs.test-and-build.outputs.should-publish }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
           echo "- **Completed**: $(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           
           case "${{ env.PIPELINE_MODE }}" in
-            "cache-only")
-              if [[ -f "data/download/.cache_timestamp" ]]; then
-                CACHE_FILES=$(find data/download -type f 2>/dev/null | wc -l)
-                echo "### Cache Results" >> $GITHUB_STEP_SUMMARY
-                echo "- **Files cached**: $CACHE_FILES" >> $GITHUB_STEP_SUMMARY
-                echo "- **Cache updated**: $(cat data/download/.cache_timestamp)" >> $GITHUB_STEP_SUMMARY
-              fi
-              ;;
-            "use-cache"|"full-pipeline")
+            "use-cache"|"full-pipeline"|"refresh-cache")
               echo "### File Counts" >> $GITHUB_STEP_SUMMARY
               echo "- **Download files**: ${{ steps.count-files.outputs.download-count }}" >> $GITHUB_STEP_SUMMARY
               echo "- **Output files**: ${{ steps.count-files.outputs.output-count }}" >> $GITHUB_STEP_SUMMARY
@@ -443,6 +445,8 @@ jobs:
               
               if [[ "${{ env.PIPELINE_MODE }}" == "use-cache" ]]; then
                 echo "- **Download source**: Existing cache" >> $GITHUB_STEP_SUMMARY
+              elif [[ "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]]; then
+                echo "- **Download source**: Fresh download" >> $GITHUB_STEP_SUMMARY
               else
                 echo "- **Download source**: Fresh download" >> $GITHUB_STEP_SUMMARY
               fi
