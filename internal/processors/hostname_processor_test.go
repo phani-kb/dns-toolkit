@@ -76,10 +76,14 @@ func TestHostnameProcessor_Process(t *testing.T) {
 			expectedInvalid: nil,
 		},
 		{
-			name:            "invalid domain entries",
-			content:         "127.0.0.1 invalid..domain\n0.0.0.0 .invalid.domain\n127.0.0.1 invalid-.domain",
-			expectedValid:   nil,
-			expectedInvalid: []string{"127.0.0.1 invalid..domain", "0.0.0.0 .invalid.domain", "127.0.0.1 invalid-.domain"},
+			name:          "invalid domain entries",
+			content:       "127.0.0.1 invalid..domain\n0.0.0.0 .invalid.domain\n127.0.0.1 invalid-.domain",
+			expectedValid: nil,
+			expectedInvalid: []string{
+				"127.0.0.1 invalid..domain",
+				"0.0.0.0 .invalid.domain",
+				"127.0.0.1 invalid-.domain",
+			},
 		},
 		{
 			name:            "mixed valid and invalid entries",
@@ -148,8 +152,19 @@ func TestHostnameProcessor_Process(t *testing.T) {
 # More valid entries
 127.0.0.1       sub.domain.com
 0.0.0.0         another.test.org`,
-			expectedValid:   []string{"example.com", "malicious.com", "ads.tracker.com", "sub.domain.com", "another.test.org"},
-			expectedInvalid: []string{"127.0.0.1       localhost", "::1             localhost", "127.0.0.1       invalid..domain", "0.0.0.0         .bad.start"},
+			expectedValid: []string{
+				"example.com",
+				"malicious.com",
+				"ads.tracker.com",
+				"sub.domain.com",
+				"another.test.org",
+			},
+			expectedInvalid: []string{
+				"127.0.0.1       localhost",
+				"::1             localhost",
+				"127.0.0.1       invalid..domain",
+				"0.0.0.0         .bad.start",
+			},
 		},
 	}
 
