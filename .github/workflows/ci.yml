@@ -227,12 +227,20 @@ jobs:
         if: env.PIPELINE_MODE == 'use-cache' || env.PIPELINE_MODE == 'refresh-cache'
         run: |
           echo "Validating cache availability..."
-          if [[ "${{ steps.cache-restore.outputs.cache-hit }}" != "true" ]]; then
+          echo "Cache key used: data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-v3"
+          echo "Cache hit: ${{ steps.cache-restore.outputs.cache-hit }}"
+          
+          # Check if cache was restored (either exact match or via restore-keys)
+          CACHE_RESTORED_FROM="${{ steps.cache-restore.outputs.cache-primary-key }}"
+          if [[ -z "$CACHE_RESTORED_FROM" ]]; then
+            CACHE_RESTORED_FROM="${{ steps.cache-restore.outputs.cache-matched-key }}"
+          fi
+          if [[ "${{ steps.cache-restore.outputs.cache-hit }}" != "true" && -z "$CACHE_RESTORED_FROM" ]]; then
             echo "::error::Cache MISS. '${{ env.PIPELINE_MODE }}' mode requires an existing cache."
             exit 1
           fi
           
-          if [[ ! -d "data/download" || -z "$(ls -A data/download)" ]]; then
+          if [[ ! -d "data/download" ]] || [[ -z "$(ls -A data/download 2>/dev/null)" ]]; then
             echo "::error::Cache hit reported, but data/download directory is empty or missing."
             exit 1
           fi
@@ -243,6 +251,15 @@ jobs:
           fi
           
           echo "✅ Cache validated successfully."
+          
+          if [[ "${{ steps.cache-restore.outputs.cache-hit }}" == "true" ]]; then
+            echo "Cache: Exact key match"
+            echo "Key: ${{ steps.cache-restore.outputs.cache-primary-key }}"
+          else
+            echo "Cache: Restored via fallback key"
+            echo "Matched key: $CACHE_RESTORED_FROM"
+          fi
+
           echo "Cache contains $(find data/download -type f 2>/dev/null | wc -l) files."
           DOWNLOAD_SIZE=$(du -sh data/download 2>/dev/null | cut -f1 || echo "0")
           echo "Cache size: $DOWNLOAD_SIZE"
