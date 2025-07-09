@@ -244,6 +244,8 @@ jobs:
           
           echo "✅ Cache validated successfully."
           echo "Cache contains $(find data/download -type f 2>/dev/null | wc -l) files."
+          DOWNLOAD_SIZE=$(du -sh data/download 2>/dev/null | cut -f1 || echo "0")
+          echo "Cache size: $DOWNLOAD_SIZE"
           if [[ -f "data/download/.cache_timestamp" ]]; then
             echo "Cache timestamp: $(cat data/download/.cache_timestamp)"
           fi
@@ -276,10 +278,14 @@ jobs:
             echo "Step 1: Downloading fresh data..."
             ./bin/dns-toolkit download
             echo "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" > data/download/.cache_timestamp
-            echo "Downloaded: $(find data/download -type f 2>/dev/null | wc -l) files"
+            DOWNLOAD_COUNT=$(find data/download -type f 2>/dev/null | wc -l)
+            DOWNLOAD_SIZE=$(du -sh data/download 2>/dev/null | cut -f1 || echo "0")
+            echo "Downloaded: $DOWNLOAD_COUNT files ($DOWNLOAD_SIZE)"
           else
             echo "Step 1: Using cached data (skipping download)"
-            echo "Using cache: $(find data/download -type f 2>/dev/null | wc -l) files"
+            CACHED_COUNT=$(find data/download -type f 2>/dev/null | wc -l)
+            CACHED_SIZE=$(du -sh data/download 2>/dev/null | cut -f1 || echo "0")
+            echo "Using cache: $CACHED_COUNT files ($CACHED_SIZE)"
           fi
           
           # Core Processing Steps
@@ -303,15 +309,17 @@ jobs:
           OUTPUT_COUNT=$(find data/output -type f ! -path "*/summaries/*" 2>/dev/null | wc -l)
           SUMMARY_COUNT=$(find data/output/summaries -name "*.json" 2>/dev/null | wc -l)
           DOWNLOAD_COUNT=$(find data/download -type f 2>/dev/null | wc -l)
+          DOWNLOAD_SIZE=$(du -sh data/download 2>/dev/null | cut -f1 || echo "0")
           
           echo "output-count=$OUTPUT_COUNT" >> $GITHUB_OUTPUT
           echo "summary-count=$SUMMARY_COUNT" >> $GITHUB_OUTPUT
           echo "download-count=$DOWNLOAD_COUNT" >> $GITHUB_OUTPUT
+          echo "download-size=$DOWNLOAD_SIZE" >> $GITHUB_OUTPUT
           
           echo "Files generated:"
           echo "  - Output files: $OUTPUT_COUNT"
           echo "  - Summary files: $SUMMARY_COUNT"
-          echo "  - Download files: $DOWNLOAD_COUNT"
+          echo "  - Download files: $DOWNLOAD_COUNT ($DOWNLOAD_SIZE)"
           
           if [[ "$OUTPUT_COUNT" -eq 0 && "$SUMMARY_COUNT" -eq 0 ]]; then
             echo "::error::No output files generated. Pipeline might have failed silently."
@@ -393,6 +401,7 @@ jobs:
         run: |
           if [[ "${{ steps.cache-save-attempt.outcome }}" == "success" ]]; then
             echo "✅ Data cache saved successfully."
+            echo "Cached: ${{ steps.count-files.outputs.download-count }} files (${{ steps.count-files.outputs.download-size }})"
           else
             echo "⚠️ Data cache save failed or was skipped."
           fi
@@ -418,7 +427,7 @@ jobs:
           # Add file counts
           if [[ "${{ env.PIPELINE_MODE }}" == "use-cache" || "${{ env.PIPELINE_MODE }}" == "full-pipeline" || "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]] && [[ "${{ job.status }}" == "success" ]]; then
             echo "### File Counts" >> $GITHUB_STEP_SUMMARY
-            echo "- **Downloaded Files**: \`${{ steps.count-files.outputs.download-count || 0 }}\`" >> $GITHUB_STEP_SUMMARY
+            echo "- **Downloaded Files**: \`${{ steps.count-files.outputs.download-count || 0 }}\` (\`${{ steps.count-files.outputs.download-size || '0' }}\`)" >> $GITHUB_STEP_SUMMARY
             echo "- **Generated Output Files**: \`${{ steps.count-files.outputs.output-count || 0 }}\`" >> $GITHUB_STEP_SUMMARY
             echo "- **Generated Summary Files**: \`${{ steps.count-files.outputs.summary-count || 0 }}\`" >> $GITHUB_STEP_SUMMARY
             if [[ -f "data/download/.cache_timestamp" ]]; then

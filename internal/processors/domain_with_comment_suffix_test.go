@@ -40,10 +40,13 @@ func TestDomainWithCommentSuffixProcessor_Process(t *testing.T) {
 			expectedInvalid: nil,
 		},
 		{
-			name:            "mixed valid and invalid entries",
-			content:         "mock-analytics.example.com #Norton Won't Login\n192.168.1.1 #Software IP Address\nmock-updates.example.org #Sophos Updates\ninvalid_domain #Software Invalid underscore",
-			expectedValid:   []string{"mock-analytics.example.com", "mock-updates.example.org"},
-			expectedInvalid: []string{"192.168.1.1 #Software IP Address", "invalid_domain #Software Invalid underscore"},
+			name:          "mixed valid and invalid entries",
+			content:       "mock-analytics.example.com #Norton Won't Login\n192.168.1.1 #Software IP Address\nmock-updates.example.org #Sophos Updates\ninvalid_domain #Software Invalid underscore",
+			expectedValid: []string{"mock-analytics.example.com", "mock-updates.example.org"},
+			expectedInvalid: []string{
+				"192.168.1.1 #Software IP Address",
+				"invalid_domain #Software Invalid underscore",
+			},
 		},
 		{
 			name:            "empty lines and whitespace",
