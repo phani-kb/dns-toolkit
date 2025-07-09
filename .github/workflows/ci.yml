@@ -416,7 +416,7 @@ jobs:
           fi
           
           # Add file counts
-          if contains(fromJSON('["use-cache", "full-pipeline", "refresh-cache"]'), env.PIPELINE_MODE) && success(); then
+          if [[ "${{ env.PIPELINE_MODE }}" == "use-cache" || "${{ env.PIPELINE_MODE }}" == "full-pipeline" || "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]] && [[ "${{ job.status }}" == "success" ]]; then
             echo "### File Counts" >> $GITHUB_STEP_SUMMARY
             echo "- **Downloaded Files**: \`${{ steps.count-files.outputs.download-count || 0 }}\`" >> $GITHUB_STEP_SUMMARY
             echo "- **Generated Output Files**: \`${{ steps.count-files.outputs.output-count || 0 }}\`" >> $GITHUB_STEP_SUMMARY
