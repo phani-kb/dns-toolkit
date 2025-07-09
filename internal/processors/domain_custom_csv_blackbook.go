@@ -29,25 +29,23 @@ func (p *DomainCustomCsvBlackbookProcessor) Process(_ *multilog.Logger, content 
 		return validEntries, invalidEntries
 	}
 
-	for _, line := range lines {
+	// Skip header line
+	for i, line := range lines {
 		line = strings.TrimSpace(line)
 
-		// Skip empty lines and comments
-		if line == "" || utils.IsComment(line) {
+		// Skip header, empty lines, and comments
+		if i == 0 || utils.IsComment(line) {
 			continue
 		}
 
-		// Blackbook format: "domain_name    #Software    Description"
-		// Extract domain from the first field (before whitespace or #)
-		fields := strings.Fields(line)
+		// Split the CSV line and get the first column (domain)
+		fields := strings.Split(line, ",")
 		if len(fields) > 0 {
 			domain := strings.TrimSpace(fields[0])
-			if domain != "" {
-				if utils.IsDomain(domain) {
-					validEntries = append(validEntries, domain)
-				} else {
-					invalidEntries = append(invalidEntries, domain)
-				}
+			if utils.IsDomain(domain) {
+				validEntries = append(validEntries, domain)
+			} else {
+				invalidEntries = append(invalidEntries, domain)
 			}
 		}
 	}
