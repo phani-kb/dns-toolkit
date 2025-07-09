@@ -40,43 +40,44 @@ func TestDomainCustomCsvBlackbookProcessor_Process(t *testing.T) {
 			expectedInvalid: nil,
 		},
 		{
-			name:    "blackbook format with spaces",
-			content: "mock-win.av-example.com                                    #AVG         Activate Free Version\nmock-ping.av-example.com                                   #AVG         Install Freezes\nmock-static.av-example.net                                 #AVG         Website Login",
+			name:            "basic CSV format with header",
+			content:         "Domain,Malware,Date added,Source\nstatsrvv.com,keitaro,2024-09-01,ViriBack\n1312services.ru,1312,2024-09-01,ViriBack\nkaspersky-secure.ru,unam,2024-08-31,ViriBack",
+			expectedValid:   []string{"statsrvv.com", "1312services.ru", "kaspersky-secure.ru"},
+			expectedInvalid: nil,
+		},
+		{
+			name:            "CSV with invalid domains",
+			content:         "Domain,Malware,Date added,Source\ninvalid..domain.com,malware1,2024-09-01,Source1\nvalid-domain.com,malware2,2024-09-01,Source2\n192.168.1.1,malware3,2024-09-01,Source3",
+			expectedValid:   []string{"valid-domain.com"},
+			expectedInvalid: []string{"invalid..domain.com", "192.168.1.1"},
+		},
+		{
+			name:            "CSV with empty lines and whitespace",
+			content:         "Domain,Malware,Date added,Source\nwerdotx.shop,lokibot,2024-08-28,ViriBack\n\n   \nsodiumlaurethsulfatedesyroyer.com,lokibot,2024-08-18,ViriBack",
+			expectedValid:   []string{"werdotx.shop", "sodiumlaurethsulfatedesyroyer.com"},
+			expectedInvalid: nil,
+		},
+		{
+			name:            "CSV with comments mixed in",
+			content:         "Domain,Malware,Date added,Source\n# This is a comment\nsimple-updatereport.com,amadey,2024-08-13,ViriBack\n# Another comment\nruspyc.top,amadey,2024-08-11,ViriBack",
+			expectedValid:   []string{"simple-updatereport.com", "ruspyc.top"},
+			expectedInvalid: nil,
+		},
+		{
+			name:            "CSV with domain containing port (invalid)",
+			content:         "Domain,Malware,Date added,Source\nactualisation-service.com,amadey,2024-08-11,ViriBack\napi.garageserviceoperation.com:8080,amadey,2024-08-11,ViriBack\nsync.hiddenvnc.com,anonvnc,2024-08-11,ViriBack",
+			expectedValid:   []string{"actualisation-service.com", "sync.hiddenvnc.com"},
+			expectedInvalid: []string{"api.garageserviceoperation.com:8080"},
+		},
+		{
+			name:    "CSV with various TLDs and subdomains",
+			content: "Domain,Malware,Date added,Source\nsyn.hiddenvnc.com,anonvnc,2024-08-11,ViriBack\nsync.smartcloudflare.com,anonvnc,2024-08-11,ViriBack\nsync.smart-vnc.com,anonvnc,2024-08-11,ViriBack\ninvoice-traffic.com,anonvnc,2024-08-11,ViriBack",
 			expectedValid: []string{
-				"mock-win.av-example.com",
-				"mock-ping.av-example.com",
-				"mock-static.av-example.net",
+				"syn.hiddenvnc.com",
+				"sync.smartcloudflare.com",
+				"sync.smart-vnc.com",
+				"invoice-traffic.com",
 			},
-			expectedInvalid: nil,
-		},
-		{
-			name:            "with comments header",
-			content:         "#####################################################\n# Antivirus\n#####################################################\nmock-av.example.com #AVG Activate Free Version\nmock-scan.example.com #Kaspersky Scans Webpages",
-			expectedValid:   []string{"mock-av.example.com", "mock-scan.example.com"},
-			expectedInvalid: nil,
-		},
-		{
-			name:            "invalid domains with ports",
-			content:         "mock-update.example.com:8080 #McAfee Installer\nmock-valid.example.com #Norton Valid Domain\nmock-cloud.example.com:443 #Norton Check account",
-			expectedValid:   []string{"mock-valid.example.com"},
-			expectedInvalid: []string{"mock-update.example.com:8080", "mock-cloud.example.com:443"},
-		},
-		{
-			name:            "invalid domain formats",
-			content:         "invalid..domain #Software Bad domain\n.invalid.start #Software Bad start\nmock-valid.example.com #Software Good domain",
-			expectedValid:   []string{"mock-valid.example.com"},
-			expectedInvalid: []string{"invalid..domain", ".invalid.start"},
-		},
-		{
-			name:            "mixed valid and invalid entries",
-			content:         "mock-analytics.example.com #Norton Won't Login\n192.168.1.1 #Software IP Address\nmock-updates.example.org #Sophos Updates\ninvalid_domain #Software Invalid underscore",
-			expectedValid:   []string{"mock-analytics.example.com", "mock-updates.example.org"},
-			expectedInvalid: []string{"192.168.1.1", "invalid_domain"},
-		},
-		{
-			name:            "empty lines and whitespace",
-			content:         "mock-first.example.com #Software Description\n\n   \nmock-second.example.com #Software Another description\n   mock-third.example.com   #Software Trimmed",
-			expectedValid:   []string{"mock-first.example.com", "mock-second.example.com", "mock-third.example.com"},
 			expectedInvalid: nil,
 		},
 	}
@@ -103,42 +104,40 @@ func TestDomainCustomCsvBlackbookProcessor_EdgeCases(t *testing.T) {
 		expectedInvalid []string
 	}{
 		{
-			name:            "single line without newline",
-			content:         "mock-single.example.com #Software Single entry",
-			expectedValid:   []string{"mock-single.example.com"},
-			expectedInvalid: nil,
-		},
-		{
-			name:            "only comments and headers",
-			content:         "# Comment 1\n! Comment 2\n// Comment 3\n#####################################################",
+			name:            "header only",
+			content:         "Domain,Malware,Date added,Source",
 			expectedValid:   nil,
 			expectedInvalid: nil,
 		},
 		{
-			name:            "domains with special characters",
-			content:         "mock-site.example.com #Software Hyphen domain\nmock_site.example.org #Software Underscore domain\nmock123.example.net #Software Numeric domain",
-			expectedValid:   []string{"mock-site.example.com", "mock123.example.net"},
-			expectedInvalid: []string{"mock_site.example.org"},
-		},
-		{
-			name:    "vendor software blackbook format",
-			content: "mock-dellupdater.example.com                                #Dell   Download \"Alienware Command Center\"\nmock-supportkb.example.com                                  #Dell   Support Page Images\nmock-www1.ins.example.com                                   #Dell   TechDirect - Parts Page\nmock-web-chat-e2ee.example.com                         #Facebook    Breaks 'To' in messages\nmock-mqtt-us-2.example.com                              #Roborock               Connect to Wifi / Check for firmware updates *Vacuum\nmock-media.dds.example.com                                #Lenovo   Media Creation Tool (Download)\nmock-tags.tiqcdn-example.com                             #Tracker - Breaks Download Link",
-			expectedValid: []string{
-				"mock-dellupdater.example.com",
-				"mock-supportkb.example.com",
-				"mock-www1.ins.example.com",
-				"mock-web-chat-e2ee.example.com",
-				"mock-mqtt-us-2.example.com",
-				"mock-media.dds.example.com",
-				"mock-tags.tiqcdn-example.com",
-			},
+			name:            "CSV with missing fields",
+			content:         "Domain,Malware,Date added,Source\ntop.enkey.xyz\nsuburand.com,matanbuchus,2024-08-01,ViriBack",
+			expectedValid:   []string{"top.enkey.xyz", "suburand.com"},
 			expectedInvalid: nil,
 		},
 		{
-			name:            "international domains",
-			content:         "mock-test.co.uk #Software UK domain\nmock-site.com.au #Software Australian domain\nmock-example.de #Software German domain",
-			expectedValid:   []string{"mock-test.co.uk", "mock-site.com.au", "mock-example.de"},
+			name:            "CSV with extra commas",
+			content:         "Domain,Malware,Date added,Source\nrebistars.com,matanbuchus,2024-08-01,ViriBack,extra,field\nserak.top,lokibot,2024-07-31,ViriBack",
+			expectedValid:   []string{"rebistars.com", "serak.top"},
 			expectedInvalid: nil,
+		},
+		{
+			name:            "domains with underscores (invalid)",
+			content:         "Domain,Malware,Date added,Source\nvalid-domain.com,malware1,2024-09-01,Source1\ninvalid_domain.com,malware2,2024-09-01,Source2\nanother-valid.org,malware3,2024-09-01,Source3",
+			expectedValid:   []string{"valid-domain.com", "another-valid.org"},
+			expectedInvalid: []string{"invalid_domain.com"},
+		},
+		{
+			name:            "domains starting with dots (invalid)",
+			content:         "Domain,Malware,Date added,Source\n.invalid.start.com,malware1,2024-09-01,Source1\nvalid.domain.com,malware2,2024-09-01,Source2\n..double.dot.com,malware3,2024-09-01,Source3",
+			expectedValid:   []string{"valid.domain.com"},
+			expectedInvalid: []string{".invalid.start.com", "..double.dot.com"},
+		},
+		{
+			name:            "CSV with quoted fields",
+			content:         "Domain,Malware,Date added,Source\n\"quoted.domain.com\",\"malware with spaces\",\"2024-09-01\",\"Source Name\"\nnormal.domain.com,normalmalware,2024-09-01,NormalSource",
+			expectedValid:   []string{"normal.domain.com"},
+			expectedInvalid: []string{"\"quoted.domain.com\""},
 		},
 	}
 
@@ -151,49 +150,100 @@ func TestDomainCustomCsvBlackbookProcessor_EdgeCases(t *testing.T) {
 	}
 }
 
-func TestDomainCustomCsvBlackbookProcessor_AntivirusFormat(t *testing.T) {
+func TestDomainCustomCsvBlackbookProcessor_ActualData(t *testing.T) {
 	t.Parallel()
 
 	logger := multilog.NewLogger()
 	processor := processors.NewDomainCustomCsvBlackbookProcessor("domain_custom_csv_blackbook", "blocklist")
 
-	content := `#####################################################
-# Antivirus
-#####################################################
-mock-win.av-example.com                                    #AVG         Activate Free Version
-mock-keepalive.security-example.com                        #McAfee      Installer (Internet Connection Test)
-mock-provision.security-example.com                        #McAfee      Installer / Activation Key (Internet Connection Test)
-mock-apps.security-example.com                             #McAfee      Installer (Errors out)
-mock-analytics.security-example.com                        #Norton      Won't Login
-mock-dellupdater.example.com                               #Dell        Download "Alienware Command Center"
-mock-www1.ins.example.com                                  #Dell        TechDirect - Parts Page
-mock-web-chat-e2ee.example.com                            #Facebook     Breaks 'To' in messages
-mock-mqtt-us-2.example.com                                 #Roborock     Connect to Wifi / Check for firmware updates *Vacuum
-mock-media.dds.example.com                                 #Lenovo      Media Creation Tool (Download)
-mock-d17vo8z6jop21h.cloudfront-example.net                                 #Amazon - Music - Breaks it (App) - Audio
-mock-ygf52iv00zfnxdocs4kfzcalhg.appsync-api.us-east-1.amazonaws-example.com #Amazon - Music - Breaks it (App) - Load Album Art
-mock-tags.tiqcdn-example.com                               #Tracker     Breaks Download Link`
+	content := `Domain,Malware,Date added,Source
+statsrvv.com,keitaro,2024-09-01,ViriBack
+1312services.ru,1312,2024-09-01,ViriBack
+kaspersky-secure.ru,unam,2024-08-31,ViriBack
+werdotx.shop,lokibot,2024-08-28,ViriBack
+sodiumlaurethsulfatedesyroyer.com,lokibot,2024-08-18,ViriBack
+simple-updatereport.com,amadey,2024-08-13,ViriBack
+ruspyc.top,amadey,2024-08-11,ViriBack
+actualisation-service.com,amadey,2024-08-11,ViriBack
+api.garageserviceoperation.com,amadey,2024-08-11,ViriBack
+sync.hiddenvnc.com,anonvnc,2024-08-11,ViriBack
+syn.hiddenvnc.com,anonvnc,2024-08-11,ViriBack
+sync.smartcloudflare.com,anonvnc,2024-08-11,ViriBack
+sync.smart-vnc.com,anonvnc,2024-08-11,ViriBack
+invoice-traffic.com,anonvnc,2024-08-11,ViriBack
+top.enkey.xyz,pony,2024-08-04,ViriBack
+suburand.com,matanbuchus,2024-08-01,ViriBack
+rebistars.com,matanbuchus,2024-08-01,ViriBack
+serak.top,lokibot,2024-07-31,ViriBack`
 
 	expectedValid := []string{
-		"mock-win.av-example.com",
-		"mock-keepalive.security-example.com",
-		"mock-provision.security-example.com",
-		"mock-apps.security-example.com",
-		"mock-analytics.security-example.com",
-		"mock-dellupdater.example.com",
-		"mock-www1.ins.example.com",
-		"mock-web-chat-e2ee.example.com",
-		"mock-mqtt-us-2.example.com",
-		"mock-media.dds.example.com",
-		"mock-d17vo8z6jop21h.cloudfront-example.net",
-		"mock-ygf52iv00zfnxdocs4kfzcalhg.appsync-api.us-east-1.amazonaws-example.com",
-		"mock-tags.tiqcdn-example.com",
+		"statsrvv.com",
+		"1312services.ru",
+		"kaspersky-secure.ru",
+		"werdotx.shop",
+		"sodiumlaurethsulfatedesyroyer.com",
+		"simple-updatereport.com",
+		"ruspyc.top",
+		"actualisation-service.com",
+		"api.garageserviceoperation.com",
+		"sync.hiddenvnc.com",
+		"syn.hiddenvnc.com",
+		"sync.smartcloudflare.com",
+		"sync.smart-vnc.com",
+		"invoice-traffic.com",
+		"top.enkey.xyz",
+		"suburand.com",
+		"rebistars.com",
+		"serak.top",
 	}
 
 	valid, invalid := processor.Process(logger, content)
 
-	assert.Equal(t, expectedValid, valid, "Valid antivirus domains should match expected")
-	assert.Empty(t, invalid, "No invalid entries expected for valid antivirus format")
+	assert.Equal(t, expectedValid, valid, "Valid domains should match expected from real-world data")
+	assert.Empty(t, invalid, "No invalid entries expected for real-world CSV data")
+}
+
+func TestDomainCustomCsvBlackbookProcessor_MixedValidInvalid(t *testing.T) {
+	t.Parallel()
+
+	logger := multilog.NewLogger()
+	processor := processors.NewDomainCustomCsvBlackbookProcessor("domain_custom_csv_blackbook", "blocklist")
+
+	content := `Domain,Malware,Date added,Source
+# This is a comment line that should be skipped
+valid-domain1.com,malware1,2024-09-01,Source1
+invalid..domain.com,malware2,2024-09-01,Source2
+192.168.1.100,malware3,2024-09-01,Source3
+valid-domain2.org,malware4,2024-09-01,Source4
+domain_with_underscore.net,malware5,2024-09-01,Source5
+.starts.with.dot.com,malware6,2024-09-01,Source6
+normal.domain.edu,malware7,2024-09-01,Source7
+domain.with.port.com:8080,malware8,2024-09-01,Source8
+another-valid.co.uk,malware9,2024-09-01,Source9
+
+# Another comment
+final.valid.domain.io,malware10,2024-09-01,Source10`
+
+	expectedValid := []string{
+		"valid-domain1.com",
+		"valid-domain2.org",
+		"normal.domain.edu",
+		"another-valid.co.uk",
+		"final.valid.domain.io",
+	}
+
+	expectedInvalid := []string{
+		"invalid..domain.com",
+		"192.168.1.100",
+		"domain_with_underscore.net",
+		".starts.with.dot.com",
+		"domain.with.port.com:8080",
+	}
+
+	valid, invalid := processor.Process(logger, content)
+
+	assert.Equal(t, expectedValid, valid, "Valid entries should match expected")
+	assert.Equal(t, expectedInvalid, invalid, "Invalid entries should match expected")
 }
 
 func TestDomainCustomCsvBlackbookProcessor_Integration(t *testing.T) {
@@ -202,48 +252,40 @@ func TestDomainCustomCsvBlackbookProcessor_Integration(t *testing.T) {
 	logger := multilog.NewLogger()
 	processor := processors.NewDomainCustomCsvBlackbookProcessor("domain_custom_csv_blackbook", "blocklist")
 
-	content := `#####################################################
-# Software Blackbook Export
-#####################################################
-# Format: domain    #software    description
-mock-telemetry.software-example.com #Software A Telemetry collection
-mock-analytics.software-example.com #Software B Analytics tracking
-# Invalid entries below
-invalid..domain.com #Software C Invalid domain format
-mock-ads.software-example.com:8080 #Software D Domain with port (invalid)
-192.168.1.100 #Software E IP address (invalid)
-.invalid.start.com #Software F Invalid start (invalid)
+	content := `Domain,Malware,Date added,Source
+# CSV format for malware domains
+example1.com,trojan,2024-09-01,ThreatFeed
+example2.org,ransomware,2024-08-30,SecurityVendor
+# Invalid entries for testing
+invalid..domain.net,virus,2024-08-29,Source3
+192.168.1.1,botnet,2024-08-28,Source4
+valid.domain.co.uk,malware,2024-08-27,Source5
+.invalid.start.com,spyware,2024-08-26,Source6
 
-# Valid entries with special cases (blackbook format)
-mock-hyphen-domain.software-example.com           #Software G    Domain with hyphens
-mock123numeric.software-example.org               #Software H    Domain with numbers
-mock_underscore.software-example.net              #Software I    Domain with underscore (invalid)
+# Whitespace and edge cases
+  spaced.domain.com  ,adware,2024-08-25,Source7
+domain_underscore.org,rootkit,2024-08-24,Source8
+normal-hyphen.net,keylogger,2024-08-23,Source9
 
-# Empty and whitespace handling
-mock-whitespace.software-example.com   #Software K Domain with trailing space
-   mock-leading.software-example.com #Software L Domain with leading space
-
-# International domains (blackbook format)
-mock-uk.software-example.co.uk #Software M UK domain
-mock-de.software-example.de                       #Software N    German domain`
+# International domains
+german.example.de,trojan,2024-08-22,GermanSource
+australian.example.com.au,virus,2024-08-21,AustralianSource`
 
 	expectedValid := []string{
-		"mock-telemetry.software-example.com",
-		"mock-analytics.software-example.com",
-		"mock-hyphen-domain.software-example.com",
-		"mock123numeric.software-example.org",
-		"mock-whitespace.software-example.com",
-		"mock-leading.software-example.com",
-		"mock-uk.software-example.co.uk",
-		"mock-de.software-example.de",
+		"example1.com",
+		"example2.org",
+		"valid.domain.co.uk",
+		"spaced.domain.com",
+		"normal-hyphen.net",
+		"german.example.de",
+		"australian.example.com.au",
 	}
 
 	expectedInvalid := []string{
-		"invalid..domain.com",
-		"mock-ads.software-example.com:8080",
-		"192.168.1.100",
+		"invalid..domain.net",
+		"192.168.1.1",
 		".invalid.start.com",
-		"mock_underscore.software-example.net",
+		"domain_underscore.org",
 	}
 
 	valid, invalid := processor.Process(logger, content)
