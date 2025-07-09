@@ -660,6 +660,55 @@ func GetMapKeys[K comparable, V any](m map[K]V) []K {
 	return keys
 }
 
+// ExpandIpv4Cidr expands a CIDR notation IPv4 address into individual addresses.
+//
+// Parameters:
+//   - logger: Logger for recording operations and errors
+//   - cidr: A string containing an IPv4 address in CIDR notation
+//
+// Returns:
+//   - A slice of strings with all individual IP addresses in the CIDR range
+func ExpandIpv4Cidr(logger *multilog.Logger, cidr string) ([]string, error) {
+	var ips []string
+	_, ipNet, err := net.ParseCIDR(cidr)
+	if err != nil {
+		logger.Errorf("Invalid CIDR format: %s. Error: %v", cidr, err)
+		return nil, fmt.Errorf("invalid CIDR format: %w", err)
+	}
+	ip := ipNet.IP.To4()
+	if ip == nil {
+		logger.Errorf("Invalid IPv4 address in CIDR (or IPv6 given): %s", cidr)
+		return nil, fmt.Errorf("invalid IPv4 address or non-IPv4 CIDR: %s", cidr)
+	}
+	maskSize, bits := ipNet.Mask.Size()
+	if bits != 32 {
+		logger.Errorf("Not an IPv4 mask in CIDR: %s (bits=%d)", cidr, bits)
+		return nil, fmt.Errorf("CIDR is not for IPv4: %s", cidr)
+	}
+	hostBits := bits - maskSize
+	if hostBits > 24 {
+		logger.Errorf("CIDR range too large to expand: %s", cidr)
+		return nil, fmt.Errorf("CIDR range too large to expand: %s", cidr)
+	}
+	numIPs := uint64(1) << hostBits // 2^hostBits
+	ips = make([]string, 0, numIPs)
+	startIPInt := uint32(ip[0])<<24 | uint32(ip[1])<<16 | uint32(ip[2])<<8 | uint32(ip[3])
+	mask := uint32(0xFFFFFFFF) << uint(hostBits)
+	startIPInt = startIPInt & mask
+	for i := uint32(0); i < uint32(numIPs); i++ {
+		currentIPVal := startIPInt + i
+		ipAddr := net.IPv4(
+			byte((currentIPVal)>>24), // Extract the first byte
+			byte((currentIPVal)>>16), // Extract the second byte
+			byte((currentIPVal)>>8),  // Extract the third byte
+			byte(currentIPVal&0xFF),  // Extract the fourth byte
+		)
+		ips = append(ips, ipAddr.String())
+	}
+
+	return ips, nil
+}
+
 // IsArchive checks if a file is an archive based on its extension.
 func IsArchive(filePath string) bool {
 	for _, ext := range constants.ArchiveExtensions {
