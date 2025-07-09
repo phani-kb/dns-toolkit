@@ -43,7 +43,7 @@ jobs:
     outputs:
       should-publish: ${{ steps.determine-mode.outputs.should-publish }}
       pipeline-mode: ${{ steps.determine-mode.outputs.pipeline-mode }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -156,11 +156,11 @@ jobs:
     permissions:
       contents: write
       actions: read
-    
+
     env:
       PIPELINE_MODE: ${{ needs.test-and-build.outputs.pipeline-mode }}
       SHOULD_PUBLISH: ${{ needs.test-and-build.outputs.should-publish }}
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
