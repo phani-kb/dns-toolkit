@@ -54,9 +54,16 @@ func TestIpv4CidrProcessor_Process(t *testing.T) {
 			expectedInvalid: nil,
 		},
 		{
-			name:            "multiple CIDRs",
-			content:         "192.168.1.0/30\n10.0.0.0/31",
-			expectedValid:   []string{"192.168.1.0", "192.168.1.1", "192.168.1.2", "192.168.1.3", "10.0.0.0", "10.0.0.1"},
+			name:    "multiple CIDRs",
+			content: "192.168.1.0/30\n10.0.0.0/31",
+			expectedValid: []string{
+				"192.168.1.0",
+				"192.168.1.1",
+				"192.168.1.2",
+				"192.168.1.3",
+				"10.0.0.0",
+				"10.0.0.1",
+			},
 			expectedInvalid: nil,
 		},
 		{
@@ -78,9 +85,16 @@ func TestIpv4CidrProcessor_Process(t *testing.T) {
 			expectedInvalid: []string{"not a cidr", "192.168.1.1", "random text"},
 		},
 		{
-			name:            "mixed valid and invalid",
-			content:         "192.168.1.0/30\ninvalid line\n10.0.0.0/31",
-			expectedValid:   []string{"192.168.1.0", "192.168.1.1", "192.168.1.2", "192.168.1.3", "10.0.0.0", "10.0.0.1"},
+			name:    "mixed valid and invalid",
+			content: "192.168.1.0/30\ninvalid line\n10.0.0.0/31",
+			expectedValid: []string{
+				"192.168.1.0",
+				"192.168.1.1",
+				"192.168.1.2",
+				"192.168.1.3",
+				"10.0.0.0",
+				"10.0.0.1",
+			},
 			expectedInvalid: []string{"invalid line"},
 		},
 	}
