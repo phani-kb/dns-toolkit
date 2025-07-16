@@ -9,8 +9,6 @@ import (
 )
 
 func TestNewDomainWithCommentSuffixProcessor(t *testing.T) {
-	t.Parallel()
-
 	sourceType := "domain_with_comment_suffix"
 	listType := "allowlist"
 
@@ -22,8 +20,6 @@ func TestNewDomainWithCommentSuffixProcessor(t *testing.T) {
 }
 
 func TestDomainWithCommentSuffixProcessor_Process(t *testing.T) {
-	t.Parallel()
-
 	logger := multilog.NewLogger()
 	processor := processors.NewDomainWithCommentSuffixProcessor("domain_with_comment_suffix", "allowlist")
 
@@ -66,8 +62,6 @@ func TestDomainWithCommentSuffixProcessor_Process(t *testing.T) {
 }
 
 func TestDomainWithCommentSuffixProcessor_MixedFormat(t *testing.T) {
-	t.Parallel()
-
 	logger := multilog.NewLogger()
 	processor := processors.NewDomainWithCommentSuffixProcessor("domain_with_comment_suffix", "allowlist")
 
@@ -111,8 +105,6 @@ mock-tags.tiqcdn-example.com                               #Tracker     Breaks D
 }
 
 func TestDomainWithCommentSuffixProcessor_Integration(t *testing.T) {
-	t.Parallel()
-
 	logger := multilog.NewLogger()
 	processor := processors.NewDomainWithCommentSuffixProcessor("domain_with_comment_suffix", "allowlist")
 
@@ -165,8 +157,6 @@ mock-de.software-example.de                       #Software N    German domain`
 }
 
 func TestDomainWithCommentSuffixProcessor_RegistryIntegration(t *testing.T) {
-	t.Parallel()
-
 	processor, exists := processors.Processors.GetProcessor("domain_with_comment_suffix", "allowlist")
 	assert.True(t, exists, "Processor should be registered")
 	assert.NotNil(t, processor, "Processor should not be nil")

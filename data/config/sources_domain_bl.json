@@ -661,7 +661,9 @@
     },
     {
       "name": "HaGeZi Normal",
+      "disabled": true,
       "license": "GPL-3.0",
+      "notes": "100% overlap with HaGeZi Pro",
       "types": [
         {
           "name": "hostname"
@@ -832,8 +834,8 @@
       "name": "OISD Blocklist Big",
       "categories": "ads, malware, trackers",
       "license": "GPL-3.0",
-      "skip_general_consolidation": true,
       "notes": "Large source excluded from general consolidation",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "adguard"
@@ -1112,7 +1114,9 @@
     {
       "name": "StevenBlack_Adhoc_list",
       "categories": "ads, malware, trackers",
+      "disabled": true,
       "license": "MIT",
+      "notes": "100% overlap with StevenBlack Fake Gambling list",
       "types": [
         {
           "name": "hostname",
