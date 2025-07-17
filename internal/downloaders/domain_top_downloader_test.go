@@ -22,14 +22,14 @@ func TestNewDomainTopDownloaderWithRetries(t *testing.T) {
 	downloader := NewDomainTopDownloaderWithRetries(maxRetries)
 
 	assert.NotNil(t, downloader, "Downloader should not be nil")
-	assert.Equal(t, "transco", downloader.Name(), "Downloader name should be 'transco'")
+	assert.Equal(t, "tranco", downloader.Name(), "Downloader name should be 'tranco'")
 }
 
 func TestDomainTopDownloader_Name(t *testing.T) {
 	t.Parallel()
 
 	downloader := NewDomainTopDownloaderWithRetries(1)
-	assert.Equal(t, "transco", downloader.Name(), "Downloader name should be 'transco'")
+	assert.Equal(t, "tranco", downloader.Name(), "Downloader name should be 'tranco'")
 }
 
 func TestDomainTopDownloader_Download(t *testing.T) {
@@ -491,7 +491,7 @@ func TestDomainTopDownloader_Registration(t *testing.T) {
 	err := RegisterDownloader(downloader)
 	assert.NoError(t, err, "Registration should succeed")
 
-	retrievedDownloader, exists := GetDownloader("transco")
+	retrievedDownloader, exists := GetDownloader("tranco")
 	assert.True(t, exists, "Downloader should exist after registration")
 	assert.Equal(t, downloader.Name(), retrievedDownloader.Name(), "Retrieved downloader should have same name")
 
