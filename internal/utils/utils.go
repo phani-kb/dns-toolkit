@@ -660,6 +660,63 @@ func GetMapKeys[K comparable, V any](m map[K]V) []K {
 	return keys
 }
 
+// ExpandIpv4Range expands a range of IPv4 addresses into individual addresses.
+// The expected format is "startIP-endIP", e.g., "194.180.49.0-194.180.49.255".
+//
+// Parameters:
+//   - logger: Logger for recording operations and errors
+//   - ipRange: A string containing the IP range in the format "startIP-endIP"
+//
+// Returns:
+//   - A slice of strings with all individual IP addresses in the range (inclusive)
+func ExpandIpv4Range(logger *multilog.Logger, ipRange string) []string {
+	ips := make([]string, 0, 256)
+
+	// Split the range into start and end IPs
+	parts := strings.Split(ipRange, "-")
+	if len(parts) != 2 {
+		logger.Errorf("Invalid IP range format: %s", ipRange)
+		return ips
+	}
+
+	startIP := net.ParseIP(strings.TrimSpace(parts[0]))
+	endIP := net.ParseIP(strings.TrimSpace(parts[1]))
+
+	if startIP == nil || endIP == nil {
+		logger.Errorf("Invalid IP range format: %s", ipRange)
+		return ips
+	}
+
+	startIP = startIP.To4()
+	endIP = endIP.To4()
+
+	if startIP == nil || endIP == nil {
+		logger.Errorf("Invalid IP range format: %s", ipRange)
+		return ips
+	}
+
+	startNum := uint32(startIP[0])<<24 | uint32(startIP[1])<<16 | uint32(startIP[2])<<8 | uint32(startIP[3])
+	endNum := uint32(endIP[0])<<24 | uint32(endIP[1])<<16 | uint32(endIP[2])<<8 | uint32(endIP[3])
+
+	if startNum > endNum {
+		logger.Errorf("Invalid IP range format: %s", ipRange)
+		return ips
+	}
+
+	// Generate all IPs in the range (inclusive)
+	for i := startNum; i <= endNum; i++ {
+		ip := net.IPv4(
+			byte(i>>24),
+			byte(i>>16),
+			byte(i>>8),
+			byte(i),
+		)
+		ips = append(ips, ip.String())
+	}
+
+	return ips
+}
+
 // ExpandIpv4Cidr expands a CIDR notation IPv4 address into individual addresses.
 //
 // Parameters:

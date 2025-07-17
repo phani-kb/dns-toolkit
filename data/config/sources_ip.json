@@ -150,7 +150,6 @@
     },
     {
       "name": "DShield",
-      "disabled": true,
       "notes": "100% overlap with Firehol_level2/Firehol_level3",
       "types": [
         {
