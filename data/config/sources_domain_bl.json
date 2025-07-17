@@ -688,6 +688,7 @@
       "name": "HaGeZi Xiaomi Tracker",
       "categories": "trackers",
       "license": "GPL-3.0",
+      "notes": ">95% overlap with HaGeZi Pro",
       "types": [
         {
           "name": "domain"
