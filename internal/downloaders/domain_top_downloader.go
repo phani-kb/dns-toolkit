@@ -9,7 +9,7 @@ import (
 	"github.com/phani-kb/multilog"
 )
 
-const domainTopDownloaderName = "transco"
+const domainTopDownloaderName = "tranco"
 
 type DomainTopDownloader struct {
 	DefaultDownloader

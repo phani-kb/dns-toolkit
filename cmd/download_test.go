@@ -83,10 +83,10 @@ func TestDownloadCommand_DownloaderRegistration(t *testing.T) {
 	assert.True(t, exists, "Default downloader should be registered")
 	assert.NotNil(t, defaultDownloader, "Default downloader should not be nil")
 
-	domainTopDownloader, exists := d.GetDownloader("transco")
+	domainTopDownloader, exists := d.GetDownloader("tranco")
 	assert.True(t, exists, "Domain top downloader should be registered")
 	assert.NotNil(t, domainTopDownloader, "Domain top downloader should not be nil")
-	assert.Equal(t, "transco", domainTopDownloader.Name(), "Domain top downloader should have correct name")
+	assert.Equal(t, "tranco", domainTopDownloader.Name(), "Domain top downloader should have correct name")
 }
 
 // TestDownloadCommand_WithRetryConfiguration tests downloader initialization with retry settings
