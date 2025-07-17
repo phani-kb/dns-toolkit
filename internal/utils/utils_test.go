@@ -1069,3 +1069,53 @@ func TestIsCIDR(t *testing.T) {
 		})
 	}
 }
+
+func TestExpandIpv4Range(t *testing.T) {
+	logger := multilog.NewLogger()
+
+	tests := []struct {
+		name    string
+		ipRange string
+		want    []string
+	}{
+		{
+			name:    "Valid range",
+			ipRange: "192.168.1.1-192.168.1.3",
+			want:    []string{"192.168.1.1", "192.168.1.2", "192.168.1.3"},
+		},
+		{
+			name:    "Single IP",
+			ipRange: "10.0.0.1-10.0.0.1",
+			want:    []string{"10.0.0.1"},
+		},
+		{
+			name:    "Invalid format",
+			ipRange: "192.168.1.1/24",
+			want:    []string{},
+		},
+		{
+			name:    "Start > End",
+			ipRange: "192.168.1.10-192.168.1.1",
+			want:    []string{},
+		},
+		{
+			name:    "Non-IPv4",
+			ipRange: "abcd-efgh",
+			want:    []string{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := ExpandIpv4Range(logger, tt.ipRange)
+			if len(got) != len(tt.want) {
+				t.Errorf("ExpandIpv4Range(%q) got %d IPs, want %d", tt.ipRange, len(got), len(tt.want))
+			}
+			for i := range got {
+				if i >= len(tt.want) || got[i] != tt.want[i] {
+					t.Errorf("ExpandIpv4Range(%q)[%d] = %q, want %q", tt.ipRange, i, got[i], tt.want[i])
+				}
+			}
+		})
+	}
+}

@@ -9,6 +9,18 @@
 
 A Go-based command-line utility for downloading, processing, resolving, and consolidating DNS blocklists and allowlists from multiple sources. Performs DNS-to-IP resolution, reverse lookups, and overlap detection. Generates ready-to-use lists for DNS sinkholes, Pi-hole, AdGuard Home, and other network security tools.
 
+---
+
+## Source Configuration (Important!)
+
+All source details—including URLs, categories, licenses, update frequency, and website links—are managed in the configuration files located in the `data/config` folder (`sources*.json`).
+
+[View and edit source configuration files in `data/config/`](https://github.com/phani-kb/dns-toolkit/tree/main/data/config)
+
+> **To add, modify, or review sources, always refer to the files in `data/config/`.**
+
+---
+
 <!-- STATS_START -->
 ## Source Statistics
 
