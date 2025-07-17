@@ -26,9 +26,9 @@ Sources are configured in `data/config/sources*.json` files. Each source specifi
 
 > **To add, modify, or review sources, always refer to the files in `data/config/`.**
 
-## Special Note on Top Domains (Transco.eu)
+## Special Note on Top Domains (tranco-list.eu)
 
-Top domains sourced from the Transco.eu list (`domain_top` type) are treated as an allowlist. You can configure the `count_to_consider` value in the relevant config file (`data/config/sources_domain_top.json`) to increase the number of top domains included in the allowlist. This is useful for fine-tuning the strictness or permissiveness of your DNS filtering setup.
+Top domains sourced from the tranco-list.eu list (`domain_top` type) are treated as an allowlist. You can configure the `count_to_consider` value in the relevant config file (`data/config/sources_domain_top.json`) to increase the number of top domains included in the allowlist. This is useful for fine-tuning the strictness or permissiveness of your DNS filtering setup.
 
 ---
 
