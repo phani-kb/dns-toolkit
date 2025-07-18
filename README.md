@@ -15,8 +15,6 @@ A Go-based command-line utility for downloading, processing, resolving, and cons
 
 ## Source Configuration (Important!)
 
-All source details—including URLs, categories, licenses, update frequency, and website links—are managed in the configuration files located in the `data/config` folder (`sources*.json`).
-
 Sources are configured in `data/config/sources*.json` files. Each source specifies:
 
 - Download URL and frequency
@@ -158,6 +156,10 @@ This project is made possible by the following blocklist and allowlist sources:
 3. Make your changes with tests
 4. **Validate commit messages** before pushing. All commit message must reference a GitHub issue.
 5. Submit a pull request
+
+## Issues
+
+If you encounter a bug, have a feature request, or want to suggest an improvement, please open an issue in the [GitHub Issues](https://github.com/phani-kb/dns-toolkit/issues) page.
 
 ## License
 
