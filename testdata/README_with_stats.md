@@ -2,6 +2,16 @@
 
 This is a test README file for testing the generate stats functionality.
 
+<!-- BRANCH_SIZES_START -->
+## Branch Sizes
+
+**Note:** The repo size badge above only reflects the default branch (`main`).
+
+- **Output branch size:** _OUTPUT_BRANCH_SIZE_ MB
+- **Summaries branch size:** _SUMMARIES_BRANCH_SIZE_ MB
+
+<!-- BRANCH_SIZES_END -->
+
 <!-- STATS_START -->
 ## Source Statistics (Old)
 
@@ -11,10 +21,10 @@ This is a test README file for testing the generate stats functionality.
 | **Last Updated** | 2024-01-01 00:00:00 UTC | Statistics generation time |
 <!-- STATS_END -->
 
-## Published Outputs
+## Installation
 
-This section contains information about the published outputs of the DNS toolkit.
+This section contains information about the installation instructions for the DNS toolkit.
 
-- Various blocklists and allowlists
-- Statistics and summaries
-- Regular updates and maintenance
+- Clone the repository
+- Build the binary
+- Run the binary

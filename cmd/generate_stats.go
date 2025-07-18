@@ -1,9 +1,12 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -40,7 +43,12 @@ var generateStatsCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		Logger.Infof("Successfully updated README.md with source statistics")
+		if err := updateBranchSizes("README.md"); err != nil {
+			Logger.Errorf("Failed to update README with branch sizes: %v", err)
+			os.Exit(1)
+		}
+
+		Logger.Infof("Successfully updated README.md with source statistics and branch sizes")
 		Logger.Infof("Total sources: %d (%d enabled, %d disabled)",
 			stats.TotalSources, stats.EnabledSources, stats.DisabledSources)
 		Logger.Infof("Categories: %d, Source types: %d, Countries: %d",
@@ -155,14 +163,14 @@ func updateReadmeWithStats(stats *SourceStats, readmePath string) error {
 		after := readmeContent[endIndex+len(endMarker):]
 		newContent = before + statsSection + after
 	} else {
-		// Add new section before "## Published Outputs"
-		publishedOutputsIndex := strings.Index(readmeContent, "## Published Outputs")
-		if publishedOutputsIndex == -1 {
-			return fmt.Errorf("could not find '## Published Outputs' section in README.md")
+		// Add new section before "## Installation"
+		installationIndex := strings.Index(readmeContent, "## Installation")
+		if installationIndex == -1 {
+			return fmt.Errorf("could not find '## Installation' section in README.md")
 		}
 
-		before := readmeContent[:publishedOutputsIndex]
-		after := readmeContent[publishedOutputsIndex:]
+		before := readmeContent[:installationIndex]
+		after := readmeContent[installationIndex:]
 		newContent = before + statsSection + "\n" + after
 	}
 
@@ -201,6 +209,100 @@ func generateStatsSection(stats *SourceStats) string {
 	sb.WriteString("<!-- STATS_END -->")
 
 	return sb.String()
+}
+
+// getBranchSizeMB returns the size of a remote branch.
+func getBranchSizeMB(branch string) (string, error) {
+	cmd := "git"
+	args := []string{"rev-list", "--objects", "origin/" + branch}
+	revList, err := exec.Command(cmd, args...).Output()
+	if err != nil {
+		return "", err
+	}
+
+	catFile := exec.Command("git", "cat-file", "--batch-check=%(objecttype) %(objectname) %(objectsize) %(rest)")
+	catFile.Stdin = strings.NewReader(string(revList))
+	catOut, err := catFile.Output()
+	if err != nil {
+		return "", err
+	}
+
+	var sum int64
+	scanner := bufio.NewScanner(strings.NewReader(string(catOut)))
+	for scanner.Scan() {
+		fields := strings.Fields(scanner.Text())
+		if len(fields) >= 3 && fields[0] == "blob" {
+			size, err := strconv.ParseInt(fields[2], 10, 64)
+			if err != nil {
+				return "", err
+			}
+			sum += size
+		}
+	}
+	mb := float64(sum) / 1024.0 / 1024.0
+	return fmt.Sprintf("%.2f MB", mb), nil
+}
+
+// function variable for testability
+var getBranchSizeMBFunc = getBranchSizeMB
+
+// generateBranchSizesSection creates the markdown section for branch sizes.
+func generateBranchSizesSection(outputSize, summariesSize string) string {
+	var sb strings.Builder
+	sb.WriteString("<!-- BRANCH_SIZES_START -->\n")
+	sb.WriteString("## Branch Sizes\n\n")
+	sb.WriteString("**Note:** The repo size badge above only reflects the default branch (`main`).\n\n")
+	sb.WriteString(fmt.Sprintf("- **Output branch size:** %s\n", outputSize))
+	sb.WriteString(fmt.Sprintf("- **Summaries branch size:** %s\n", summariesSize))
+	sb.WriteString("\n<!-- BRANCH_SIZES_END -->")
+	return sb.String()
+}
+
+// updateBranchSizes updates the README.md with the output/summaries branch sizes section.
+func updateBranchSizes(readmePath string) error {
+	outputSize, err := getBranchSizeMBFunc("output")
+	if err != nil {
+		outputSize = "N/A"
+	}
+	summariesSize, err := getBranchSizeMBFunc("summaries")
+	if err != nil {
+		summariesSize = "N/A"
+	}
+
+	content, err := os.ReadFile(readmePath)
+	if err != nil {
+		return fmt.Errorf("failed to read %s: %w", readmePath, err)
+	}
+	readmeContent := string(content)
+
+	branchSection := generateBranchSizesSection(outputSize, summariesSize)
+	startMarker := "<!-- BRANCH_SIZES_START -->"
+	endMarker := "<!-- BRANCH_SIZES_END -->"
+
+	startIndex := strings.Index(readmeContent, startMarker)
+	endIndex := strings.Index(readmeContent, endMarker)
+
+	var newContent string
+	if startIndex != -1 && endIndex != -1 {
+		before := readmeContent[:startIndex]
+		after := readmeContent[endIndex+len(endMarker):]
+		newContent = before + branchSection + after
+	} else {
+		// Add new section before "## Source Statistics" or at the top
+		statsIndex := strings.Index(readmeContent, "## Source Statistics")
+		if statsIndex == -1 {
+			newContent = branchSection + "\n" + readmeContent
+		} else {
+			before := readmeContent[:statsIndex]
+			after := readmeContent[statsIndex:]
+			newContent = before + branchSection + "\n" + after
+		}
+	}
+
+	if err := os.WriteFile(readmePath, []byte(newContent), 0644); err != nil {
+		return fmt.Errorf("failed to write %s: %w", readmePath, err)
+	}
+	return nil
 }
 
 func init() {
