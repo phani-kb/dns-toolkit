@@ -94,6 +94,19 @@ print_types_with_counts() {
   echo "Total type instances: $(find data/config -name "sources_*.json" -type f ! -name "*schema*" | xargs jq -r '.sources[] | select(.types != null) | .types[] | select(.name != null) | .name' | wc -l)"
 }
 
+print_source_names() {
+  find data/config -name "sources_*.json" -type f ! -name "*schema*" | \
+    xargs jq -r '.sources[] | select(.name != null) | .name' | \
+    sort | \
+    awk '{printf "%s%s", sep, $0; sep=", "}' && echo
+}
+
+print_duplicate_source_names() {
+  find data/config -name "sources_*.json" -type f ! -name "*schema*" | \
+    xargs jq -r '.sources[] | select(.name != null) | .name' | \
+    sort | uniq -c | awk '$1 > 1 {print $2 " (" $1 " times)"}'
+}
+
 case "$1" in
 fmt)
   fmt
@@ -113,8 +126,14 @@ print-source-types-names)
 print-source-types-counts)
   print_types_with_counts
   ;;
+print-source-names)
+  print_source_names
+  ;;
+print-duplicate-source-names)
+  print_duplicate_source_names
+  ;;
 *)
-  echo "Usage: $0 {fmt|install-tools|clean-tools|sort-config-sources|print-source-types-names|print-source-types-counts}"
+  echo "Usage: $0 {fmt|install-tools|clean-tools|sort-config-sources|print-source-types-names|print-source-types-counts|print-source-names|print-duplicate-source-names}"
   exit 1
   ;;
 esac

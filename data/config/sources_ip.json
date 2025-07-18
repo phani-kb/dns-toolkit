@@ -318,7 +318,7 @@
       "website": "http://www.sslproxies.org"
     },
     {
-      "name": "GlobalAntiScamOrg-blocklist",
+      "name": "GlobalAntiScamOrg-blocklist-ips",
       "license": "BSD 3-Clause",
       "types": [
         {
@@ -454,7 +454,7 @@
       "website": "http://www.spamhaus.org"
     },
     {
-      "name": "T145_allowlist",
+      "name": "T145_allowlist-ips",
       "disabled": true,
       "license": "AGPL-3.0",
       "notes": "Too many allowlist IPs, use with caution.",
@@ -503,7 +503,7 @@
       "website": "https://urlhaus.abuse.ch"
     },
     {
-      "name": "USOM-Blocklists",
+      "name": "USOM-Blocklists-ips",
       "license": "BSD 3-Clause",
       "types": [
         {
@@ -514,7 +514,7 @@
       "website": "https://github.com/elliotwutingfeng/USOM-Blocklists"
     },
     {
-      "name": "Yoyo AdServers",
+      "name": "Yoyo AdServers-IPList",
       "license": "MIT",
       "types": [
         {

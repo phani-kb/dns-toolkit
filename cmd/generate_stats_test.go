@@ -182,7 +182,7 @@ func TestUpdateReadmeWithStats(t *testing.T) {
 		assert.Contains(t, contentStr, "2025-01-01 12:00:00 UTC")
 
 		assert.Contains(t, contentStr, "# DNS Toolkit Test")
-		assert.Contains(t, contentStr, "## Published Outputs")
+		assert.Contains(t, contentStr, "## Installation")
 	})
 
 	t.Run("Add new stats section", func(t *testing.T) {
@@ -217,11 +217,11 @@ func TestUpdateReadmeWithStats(t *testing.T) {
 		assert.Contains(t, contentStr, "| **Total Sources** | 3 | 2 enabled, 1 disabled |")
 
 		statsIndex := strings.Index(contentStr, "## Source Statistics")
-		outputsIndex := strings.Index(contentStr, "## Published Outputs")
+		outputsIndex := strings.Index(contentStr, "## Installation")
 		assert.Greater(t, outputsIndex, statsIndex)
 	})
 
-	t.Run("Error when no Published Outputs section", func(t *testing.T) {
+	t.Run("Error when no Installation section", func(t *testing.T) {
 		tempFile := filepath.Join(t.TempDir(), "README.md")
 		testContent := `# Test Project
 
@@ -244,7 +244,7 @@ Some description here.
 
 		err = updateReadmeWithStats(stats, tempFile)
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "could not find '## Published Outputs' section")
+		assert.Contains(t, err.Error(), "could not find '## Installation' section")
 	})
 
 	t.Run("Error with malformed markers - only STATS_START", func(t *testing.T) {
@@ -257,7 +257,7 @@ Some description here.
 ## Old Statistics
 Old content here
 
-## Published Outputs
+## Installation
 Output information here.
 `
 		err := os.WriteFile(tempFile, []byte(testContent), 0644)
@@ -299,7 +299,7 @@ Some description here.
 Old content here
 <!-- STATS_END -->
 
-## Published Outputs
+## Installation
 Output information here.
 `
 		err := os.WriteFile(tempFile, []byte(testContent), 0644)
@@ -512,4 +512,54 @@ func TestCollectSourceStatsWithComplexData(t *testing.T) {
 
 	expectedSourceTypes := []string{"domain", "domain_adguard", "ipv4"}
 	assert.Equal(t, expectedSourceTypes, stats.SourceTypes)
+}
+
+func TestGenerateBranchSizesSection(t *testing.T) {
+	outputSize := "12.34 MB"
+	summariesSize := "56.78 MB"
+	section := generateBranchSizesSection(outputSize, summariesSize)
+
+	assert.Contains(t, section, "<!-- BRANCH_SIZES_START -->")
+	assert.Contains(t, section, "<!-- BRANCH_SIZES_END -->")
+	assert.Contains(t, section, "## Branch Sizes")
+	assert.Contains(t, section, "**Note:** The repo size badge above only reflects the default branch (`main`).")
+	assert.Contains(t, section, "- **Output branch size:** 12.34 MB")
+	assert.Contains(t, section, "- **Summaries branch size:** 56.78 MB")
+	assert.True(t, strings.HasSuffix(section, "<!-- BRANCH_SIZES_END -->"))
+}
+
+func TestUpdateReadmeWithBranchSizes(t *testing.T) {
+	tempFile := filepath.Join(t.TempDir(), "README.md")
+	testFile := filepath.Join("..", "testdata", "README_with_stats.md")
+
+	content, err := os.ReadFile(testFile)
+	require.NoError(t, err)
+	err = os.WriteFile(tempFile, content, 0644)
+	require.NoError(t, err)
+
+	// Patch getBranchSizeMBFunc to return fixed values for testing
+	origGetBranchSizeMBFunc := getBranchSizeMBFunc
+	getBranchSizeMBFunc = func(branch string) (string, error) {
+		switch branch {
+		case "output":
+			return "12.34 MB", nil
+		case "summaries":
+			return "56.78 MB", nil
+		}
+		return "N/A", nil
+	}
+	defer func() { getBranchSizeMBFunc = origGetBranchSizeMBFunc }()
+
+	err = updateBranchSizes(tempFile)
+	require.NoError(t, err)
+
+	updatedContent, err := os.ReadFile(tempFile)
+	require.NoError(t, err)
+	contentStr := string(updatedContent)
+
+	assert.Contains(t, contentStr, "<!-- BRANCH_SIZES_START -->")
+	assert.Contains(t, contentStr, "<!-- BRANCH_SIZES_END -->")
+	assert.Contains(t, contentStr, "## Branch Sizes")
+	assert.Contains(t, contentStr, "- **Output branch size:** 12.34 MB")
+	assert.Contains(t, contentStr, "- **Summaries branch size:** 56.78 MB")
 }

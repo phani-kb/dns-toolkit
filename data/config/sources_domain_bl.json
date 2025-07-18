@@ -396,6 +396,8 @@
     {
       "name": "Dan Pollock's List",
       "categories": "ads, trackers",
+      "frequency": "weekly",
+      "notes": "Frequent Access forbidden (403) errors",
       "types": [
         {
           "name": "hostname",
@@ -548,7 +550,7 @@
       "website": "https://github.com/LanikSJ/ubo-filters"
     },
     {
-      "name": "GlobalAntiScamOrg-blocklist",
+      "name": "GlobalAntiScamOrg-blocklist-domains",
       "categories": "scam",
       "license": "BSD 3-Clause",
       "notes": "To be reviewed",
@@ -1261,7 +1263,7 @@
       "website": "https://urlhaus.abuse.ch"
     },
     {
-      "name": "USOM-Blocklists",
+      "name": "USOM-Blocklists-domains",
       "disabled": true,
       "license": "BSD 3-Clause",
       "notes": "Huge list",
@@ -1379,7 +1381,7 @@
       "website": "https://github.com/jerryn70/GoodbyeAds"
     },
     {
-      "name": "Yoyo Adservers",
+      "name": "Yoyo Adservers-Hosts",
       "license": "MIT",
       "types": [
         {
