@@ -2,10 +2,10 @@
 
 This is a test README file for testing the generate stats functionality.
 
-## Published Outputs
+## Installation
 
-This section contains information about the published outputs of the DNS toolkit.
+This section contains information about the installation instructions for the DNS toolkit.
 
-- Various blocklists and allowlists
-- Statistics and summaries
-- Regular updates and maintenance
+- Clone the repository
+- Build the binary
+- Run the binary

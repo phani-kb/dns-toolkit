@@ -54,7 +54,7 @@
       "website": "https://github.com/ShadowWhisperer/BlockLists"
     },
     {
-      "name": "T145_allowlist",
+      "name": "T145_allowlist-domains",
       "disabled": true,
       "license": "AGPL-3.0",
       "notes": "Too many allowlist domains, use with caution.",

@@ -9,8 +9,6 @@ import (
 )
 
 func TestNewDomainCustomCsvBlackbookProcessor(t *testing.T) {
-	t.Parallel()
-
 	sourceType := "domain_custom_csv_blackbook"
 	listType := "blocklist"
 
@@ -22,8 +20,6 @@ func TestNewDomainCustomCsvBlackbookProcessor(t *testing.T) {
 }
 
 func TestDomainCustomCsvBlackbookProcessor_Process(t *testing.T) {
-	t.Parallel()
-
 	logger := multilog.NewLogger()
 	processor := processors.NewDomainCustomCsvBlackbookProcessor("domain_custom_csv_blackbook", "blocklist")
 
@@ -92,8 +88,6 @@ func TestDomainCustomCsvBlackbookProcessor_Process(t *testing.T) {
 }
 
 func TestDomainCustomCsvBlackbookProcessor_EdgeCases(t *testing.T) {
-	t.Parallel()
-
 	logger := multilog.NewLogger()
 	processor := processors.NewDomainCustomCsvBlackbookProcessor("domain_custom_csv_blackbook", "blocklist")
 
@@ -151,8 +145,6 @@ func TestDomainCustomCsvBlackbookProcessor_EdgeCases(t *testing.T) {
 }
 
 func TestDomainCustomCsvBlackbookProcessor_ActualData(t *testing.T) {
-	t.Parallel()
-
 	logger := multilog.NewLogger()
 	processor := processors.NewDomainCustomCsvBlackbookProcessor("domain_custom_csv_blackbook", "blocklist")
 
@@ -204,8 +196,6 @@ serak.top,lokibot,2024-07-31,ViriBack`
 }
 
 func TestDomainCustomCsvBlackbookProcessor_MixedValidInvalid(t *testing.T) {
-	t.Parallel()
-
 	logger := multilog.NewLogger()
 	processor := processors.NewDomainCustomCsvBlackbookProcessor("domain_custom_csv_blackbook", "blocklist")
 
@@ -247,8 +237,6 @@ final.valid.domain.io,malware10,2024-09-01,Source10`
 }
 
 func TestDomainCustomCsvBlackbookProcessor_Integration(t *testing.T) {
-	t.Parallel()
-
 	logger := multilog.NewLogger()
 	processor := processors.NewDomainCustomCsvBlackbookProcessor("domain_custom_csv_blackbook", "blocklist")
 
@@ -295,8 +283,6 @@ australian.example.com.au,virus,2024-08-21,AustralianSource`
 }
 
 func TestDomainCustomCsvBlackbookProcessor_RegistryIntegration(t *testing.T) {
-	t.Parallel()
-
 	processor, exists := processors.Processors.GetProcessor("domain_custom_csv_blackbook", "blocklist")
 	assert.True(t, exists, "Processor should be registered")
 	assert.NotNil(t, processor, "Processor should not be nil")
