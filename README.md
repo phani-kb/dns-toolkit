@@ -13,6 +13,40 @@ A Go-based command-line utility for downloading, processing, resolving, and cons
 
 ---
 
+## Pipeline Flow
+
+```mermaid
+---
+config:
+  theme: mc
+---
+flowchart LR
+    B["Process<br>via Processors"] --> C["Consolidate<br>Group<br>Categorize<br>Top Entries<br>Overlaps"]
+    C --> D["Blocklist/Allowlist Files"] & E["Main README"] & F["Overlap Analysis"] & G["Summary Report"] & H["Statistics Report"] & n2["Format Conversion<br>via Converters"] & n4["Graph Generation<br>via Graphers"]
+    D --> I["Archive"]
+    E --> I
+    F --> I
+    H --> I
+    G --> I
+    n1["Data files"] --> B
+    A["Download<br>via Downloaders"] --> n1
+    n2 --> n3["Converted Files"]
+    n4 --> n5["Graph Images"]
+    n3 --> I
+    n5 --> I
+    B@{ shape: procs}
+    C@{ shape: h-cyl}
+    D@{ shape: docs}
+    n2@{ shape: h-cyl}
+    n4@{ shape: paper-tape}
+    n1@{ shape: docs}
+    n3@{ shape: docs}
+    style C stroke-width:4px,stroke-dasharray: 0
+    style n2 stroke-width:2px,stroke-dasharray: 2
+```
+
+---
+
 ## Source Configuration (Important!)
 
 Sources are configured in `data/config/sources*.json` files. Each source specifies:
