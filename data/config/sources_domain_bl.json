@@ -314,10 +314,22 @@
       "license": "CC0",
       "types": [
         {
-          "name": "domain_url"
+          "name": "domain_url",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
         },
         {
-          "name": "ipv4_url"
+          "name": "ipv4_url",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
         }
       ],
       "url": "https://cybercrime-tracker.net/all.php",
@@ -326,7 +338,9 @@
     {
       "name": "CybercrimeTracker_CCAM",
       "categories": "trackers",
+      "disabled": true,
       "license": "CC0",
+      "notes": "No regular updates",
       "types": [
         {
           "name": "domain_custom_html_ccam",
