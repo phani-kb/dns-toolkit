@@ -83,7 +83,7 @@ Top domains sourced from the tranco-list.eu list (`domain_top` type) are treated
 
 **Note:** The repo size badge above only reflects the default branch (`main`).
 
-- **Output branch size:** 202.77 MB
+- **Output branch size:** 205.70 MB
 - **Summaries branch size:** 0.44 MB
 
 <!-- BRANCH_SIZES_END -->
@@ -97,13 +97,13 @@ Top domains sourced from the tranco-list.eu list (`domain_top` type) are treated
 
 | Metric | Count | Details |
 |--------|-------|---------|
-| **Total Sources** | 134 | 90 enabled, 44 disabled |
+| **Total Sources** | 134 | 89 enabled, 45 disabled |
 | **Blocklist Sources** | 126 | Sources providing blocking rules |
 | **Allowlist Sources** | 20 | Sources providing exception rules |
 | **Categories** | 24 | ads, adult, annoyance, anonymizer, botnet, dns, doh, exploit, fakenews, gambling, malicious, malware, mobile, others, phishing, privacy, proxy, ransomware, scam, security, spam, threat, trackers, trojan |
 | **Source Types** | 25 | adguard, cidr_ipv4, domain, domain_adguard, domain_comment, domain_csv_http_url_find, domain_custom_csv_blackbook, domain_custom_csv_maltrail, domain_custom_html_ccam, domain_custom_html_puppyscams, domain_http_url, domain_top, domain_url, domain_with_comment_suffix, hostname, ipv4, ipv4_cidr_expand, ipv4_custom_html_ccam, ipv4_find, ipv4_http_url, ipv4_range_expand, ipv4_url, ipv6, ipv6_find, ipv6_htaccess |
 | **Geographic Coverage** | 21 countries | CN, CZ, DE, ES, FI, FR, HU, ID, IL, IT, KR, LV, MY, NL, RO, RU, SA, SK, UA, US, VN |
-| **Last Updated** | 2025-07-17 21:08:35 UTC | Statistics generation time |
+| **Last Updated** | 2025-07-23 23:52:45 UTC | Statistics generation time |
 
 <!-- STATS_END -->
 
