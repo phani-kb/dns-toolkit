@@ -389,10 +389,17 @@ func generateOutputBranchReadme() string {
 		})
 
 		for _, entry := range allEntries {
-			sb.WriteString(fmt.Sprintf("| %s | %s | %d | %s | 1 |\n",
+			url := fmt.Sprintf("%s/top/top_%s_%s_min%d.txt",
+				constants.GitHubRawURL,
 				entry.sourceType,
 				entry.detail.ListType,
 				entry.detail.MinSources,
+			)
+			minSourcesLink := fmt.Sprintf("[%d](%s)", entry.detail.MinSources, url)
+			sb.WriteString(fmt.Sprintf("| %s | %s | %s | %s | 1 |\n",
+				entry.sourceType,
+				entry.detail.ListType,
+				minSourcesLink,
 				formatNumber(entry.detail.Count)))
 		}
 		sb.WriteString(fmt.Sprintf("| **Last Update** | | | | %s |\n", summary.Top.LastUpdateTime))
@@ -400,9 +407,10 @@ func generateOutputBranchReadme() string {
 	}
 
 	sb.WriteString("## About\n\n")
-	sb.WriteString(
-		"These lists are automatically generated daily by the [DNS Toolkit](https://github.com/phani-kb/dns-toolkit) ",
-	)
+	sb.WriteString(fmt.Sprintf(
+		"These lists are automatically generated daily by the [DNS Toolkit](%s) ",
+		constants.GitHubRepoURL,
+	))
 	sb.WriteString("from multiple reputable sources.\n\n")
 
 	return sb.String()
