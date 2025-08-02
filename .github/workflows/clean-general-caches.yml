@@ -54,6 +54,7 @@ jobs:
       - name: Fetch and Filter Caches
         id: fetch-caches
         env:
+          GH_TOKEN: ${{ github.token }}
           CACHE_KEY_PATTERNS: ${{ github.event.inputs.cache_key_patterns || 'data-download-,Linux-golangci-lint-' }}
           DAYS_OLD: ${{ github.event.inputs.days_old || 2 }}
           REPO_OWNER: ${{ github.repository_owner }}
@@ -123,6 +124,7 @@ jobs:
       - name: Delete Old Caches
         if: ${{ steps.run-mode.outputs.IS_DRY_RUN == 'false' && steps.fetch-caches.outputs.num-caches-to-delete > 0 }}
         env:
+          GH_TOKEN: ${{ github.token }}
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
           CACHE_IDS_TO_DELETE: ${{ steps.fetch-caches.outputs.caches-to-delete-ids }}
