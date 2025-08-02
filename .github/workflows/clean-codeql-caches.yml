@@ -75,15 +75,19 @@ jobs:
           echo "Created at: $most_recent_cache_created_at"
 
           caches_to_delete_ids=$(echo "$all_matching_caches_json" | jq -r ".[1:] | .[].id")
+          num_caches_to_delete=$(echo "$all_matching_caches_json" | jq ".[1:] | length")
           
-          if [ -z "$caches_to_delete_ids" ]; then
+          if [ -z "$caches_to_delete_ids" ] || [ "$num_caches_to_delete" -eq 0 ]; then
             echo "::notice::Only one matching cache found, nothing else to delete."
             echo "caches-to-delete-ids=[]" >> $GITHUB_OUTPUT # Ensure output is set
+            echo "num-caches-to-delete=0" >> $GITHUB_OUTPUT
           else
             echo "The following cache IDs will be DELETED (older ones):"
             echo "$caches_to_delete_ids"
             # Output the IDs as a JSON array for the next step
-            echo "caches-to-delete-ids=$(echo "$caches_to_delete_ids" | jq -R . | jq -s .)" >> $GITHUB_OUTPUT
+            cache_ids_json=$(echo "$all_matching_caches_json" | jq -c ".[1:] | map(.id)")
+            echo "caches-to-delete-ids=$cache_ids_json" >> $GITHUB_OUTPUT
+            echo "num-caches-to-delete=$num_caches_to_delete" >> $GITHUB_OUTPUT
           fi
 
       - name: Delete Old Caches
