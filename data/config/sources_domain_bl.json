@@ -1296,7 +1296,7 @@
           "name": "domain_csv_http_url_find"
         },
         {
-          "name": "ipv4_find"
+          "name": "ipv4_csv_http_url_find"
         }
       ],
       "url": "https://tracker.viriback.com/dump.php"
