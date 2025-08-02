@@ -24,7 +24,7 @@ jobs:
   cleanup-caches:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code (optional, but good practice if other scripts are needed)
+      - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Set up GitHub CLI
@@ -38,7 +38,7 @@ jobs:
           
           if [[ "${{ github.event_name }}" == "schedule" ]]; then
             IS_DRY_RUN="false"
-            echo "::notice::Scheduled run detected. Performing actual deletion unless dry_run input was true."
+            echo "::notice::Scheduled run detected. Performing actual deletion."
           else
             IS_DRY_RUN="$DRY_RUN_INPUT"
           fi
@@ -85,7 +85,7 @@ jobs:
             echo "caches-to-delete-ids=$(echo "$caches_to_delete_ids" | jq -R . | jq -s .)" >> $GITHUB_OUTPUT
           fi
 
-      - name: Delete Older Caches
+      - name: Delete Old Caches
         if: ${{ steps.run-mode.outputs.IS_DRY_RUN == 'false' && steps.fetch-caches.outputs.num-caches-to-delete > 0 }}
         env:
           REPO_OWNER: ${{ github.repository_owner }}

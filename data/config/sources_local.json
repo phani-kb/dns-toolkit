@@ -33,13 +33,31 @@
       "url": "file://data/custom/allowlist_domain.txt"
     },
     {
+      "name": "Local Allowlist (ipv4)",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "allowlist",
+              "must_consider": true,
+              "groups": "mini"
+            }
+          ]
+        }
+      ],
+      "url": "file://data/custom/allowlist_ipv4.txt"
+    },
+    {
       "name": "Local Blocklist (AdGuard)",
       "types": [
         {
           "name": "adguard",
           "list_types": [
             {
-              "name": "blocklist"
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "mini"
             }
           ]
         }

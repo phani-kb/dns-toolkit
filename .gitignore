@@ -44,6 +44,7 @@ data/archive/
 data/backup/
 data/profiles/
 data/*.json
+data/whitelist_*.txt
 
 # Test files
 testdata/**/*.json

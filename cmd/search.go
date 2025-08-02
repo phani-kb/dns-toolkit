@@ -198,7 +198,7 @@ func displayDomainResults(query string, domainResults map[string][]string) {
 		for source, files := range domainResults {
 			Logger.Infof("Source: %s", source)
 			for _, file := range files {
-				Logger.Infof("  - %s", filepath.Base(file))
+				Logger.Infof("  - %s", file)
 			}
 			Logger.Infof("Total files: %d", len(files))
 		}
@@ -219,7 +219,7 @@ func displayCnameResults(cnames []string, cnameResults map[string][]string) {
 			for source, files := range cnameResults {
 				Logger.Infof("Source: %s", source)
 				for _, file := range files {
-					Logger.Infof("  - %s", filepath.Base(file))
+					Logger.Infof("  - %s", file)
 				}
 				Logger.Infof("Total files: %d", len(files))
 			}
@@ -241,7 +241,7 @@ func displayIpResults(ipAddresses u.StringSet, ipResults map[string][]string) {
 				for source, files := range ipSourceResults {
 					Logger.Infof("Source: %s", source)
 					for _, file := range files {
-						Logger.Infof("  - %s", filepath.Base(file))
+						Logger.Infof("  - %s", file)
 					}
 					Logger.Infof("Total files: %d", len(files))
 				}
