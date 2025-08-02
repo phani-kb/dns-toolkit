@@ -109,7 +109,9 @@
             },
             {
               "name": "allowlist",
-              "groups": "lite"
+              "groups": "lite",
+              "disabled": true,
+              "notes": "Too many conflicts with other sources"
             }
           ]
         },
@@ -117,7 +119,9 @@
           "name": "domain_adguard",
           "list_types": [
             {
-              "name": "allowlist"
+              "name": "allowlist",
+              "disabled": true,
+              "notes": "Too many conflicts with other sources"
             }
           ]
         }
