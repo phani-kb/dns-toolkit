@@ -148,6 +148,7 @@ const (
 	SourceTypeDomainUrl                  = "domain_url"
 	SourceTypeDomainWithCommentSuffix    = "domain_with_comment_suffix"
 	SourceTypeIpv4CustomHtmlCcam         = "ipv4_custom_html_ccam"
+	SourceTypeIpv4CsvHttpUrlFind         = "ipv4_csv_http_url_find"
 	SourceTypeIpv4Find                   = "ipv4_find"
 	SourceTypeIpv4HttpUrl                = "ipv4_http_url"
 	SourceTypeIpv4Url                    = "ipv4_url"
@@ -184,6 +185,7 @@ var (
 		SourceTypeDomainUrl:                  true,
 		SourceTypeDomainWithCommentSuffix:    true,
 		SourceTypeIpv4CustomHtmlCcam:         true,
+		SourceTypeIpv4CsvHttpUrlFind:         true,
 		SourceTypeIpv4Find:                   true,
 		SourceTypeIpv4HttpUrl:                true,
 		SourceTypeIpv4Url:                    true,
@@ -306,7 +308,7 @@ const (
 	MaxSampleLinesToCategorize    = 100
 	TimestampFormat               = "20060102_150405"
 	BackupFileTimestampFormat     = "20060102_150405"
-	DownloadInterval              = 2000 * time.Millisecond
+	DownloadInterval              = 1500 * time.Millisecond
 	DefaultHashAlgorithm          = "md5"
 	DefaultMaxRetries             = 3
 	DefaultRetryDelayInSeconds    = 10
