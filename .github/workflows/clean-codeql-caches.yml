@@ -35,14 +35,14 @@ jobs:
         id: run-mode
         run: |
           DRY_RUN_INPUT="${{ github.event.inputs.dry_run || 'true' }}"
-          
+
           if [[ "${{ github.event_name }}" == "schedule" ]]; then
             IS_DRY_RUN="false"
             echo "::notice::Scheduled run detected. Performing actual deletion."
           else
             IS_DRY_RUN="$DRY_RUN_INPUT"
           fi
-          
+
           echo "IS_DRY_RUN=$IS_DRY_RUN" >> $GITHUB_OUTPUT
           echo "::notice::Dry run mode: $IS_DRY_RUN"
 
@@ -76,7 +76,7 @@ jobs:
 
           caches_to_delete_ids=$(echo "$all_matching_caches_json" | jq -r ".[1:] | .[].id")
           num_caches_to_delete=$(echo "$all_matching_caches_json" | jq ".[1:] | length")
-          
+
           if [ -z "$caches_to_delete_ids" ] || [ "$num_caches_to_delete" -eq 0 ]; then
             echo "::notice::Only one matching cache found, nothing else to delete."
             echo "caches-to-delete-ids=[]" >> $GITHUB_OUTPUT # Ensure output is set
@@ -99,7 +99,7 @@ jobs:
           CACHE_IDS_TO_DELETE: ${{ steps.fetch-caches.outputs.caches-to-delete-ids }}
         run: |
           echo "Starting deletion of older caches..."
-          
+
           # Use jq to iterate over the JSON array of IDs
           echo "$CACHE_IDS_TO_DELETE" | jq -r '.[]' | while read id; do
             echo "Deleting cache ID: $id"
