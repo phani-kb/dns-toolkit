@@ -80,27 +80,35 @@ jobs:
           IFS=',' read -ra PATTERNS <<< "$CACHE_KEY_PATTERNS"
           
           # Build jq filter for patterns
-          pattern_filter=""
           if [ ${#PATTERNS[@]} -gt 0 ] && [ "${PATTERNS[0]}" != "" ]; then
-            for pattern in "${PATTERNS[@]}"; do
-              pattern=$(echo "$pattern" | xargs)  # trim whitespace
-              if [ -n "$pattern_filter" ]; then
-                pattern_filter="$pattern_filter or "
+            jq_pattern_args=""
+            jq_pattern_filter=""
+            for i in "${!PATTERNS[@]}"; do
+              pattern=$(echo "${PATTERNS[$i]}" | xargs)  # trim whitespace
+              if [ -n "$pattern" ]; then
+                jq_pattern_args="$jq_pattern_args --arg pattern$i \"$pattern\""
+                if [ -n "$jq_pattern_filter" ]; then
+                  jq_pattern_filter="$jq_pattern_filter or "
+                fi
+                jq_pattern_filter="${jq_pattern_filter}(.key | startswith(\$pattern$i))"
               fi
-              pattern_filter="${pattern_filter}(.key | startswith(\"$pattern\"))"
             done
+            
+            echo "Using pattern filter: $jq_pattern_filter"
+            
+            # Filter caches by pattern and age
+            filtered_caches=$(echo "$all_caches_json" | jq -s --arg cutoff "$CUTOFF_DATE" $jq_pattern_args "
+              map(select(($jq_pattern_filter) and (.created_at < \$cutoff)))
+              | sort_by(.created_at)
+            ")
           else
             # If no patterns specified, exclude CodeQL caches (handled by separate workflow)
-            pattern_filter="(.key | startswith(\"codeql-\") | not)"
+            echo "Using filter: exclude CodeQL caches"
+            filtered_caches=$(echo "$all_caches_json" | jq -s --arg cutoff "$CUTOFF_DATE" "
+              map(select((.key | startswith(\"codeql-\") | not) and (.created_at < \$cutoff)))
+              | sort_by(.created_at)
+            ")
           fi
-
-          echo "Using filter: $pattern_filter"
-
-          # Filter caches by pattern and age
-          filtered_caches=$(echo "$all_caches_json" | jq -s --arg cutoff "$CUTOFF_DATE" --arg filter "$pattern_filter" "
-            map(select($filter and (.created_at < \$cutoff)))
-            | sort_by(.created_at)
-          ")
 
           num_caches=$(echo "$filtered_caches" | jq 'length')
           echo "Found $num_caches caches matching criteria"

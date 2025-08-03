@@ -933,6 +933,8 @@
     {
       "name": "PuppyScams",
       "categories": "scam",
+      "disabled": false,
+      "notes": "List of top 100 pet scams is not being shared anymore, https://puppyscams.org/top-100-pet-scams",
       "types": [
         {
           "name": "domain_custom_html_puppyscams",
@@ -944,7 +946,7 @@
           ]
         }
       ],
-      "url": "https://puppyscams.org/top-100-pet-scams",
+      "url": "https://web.archive.org/web/20250403122633/https://puppyscams.org/top-100-pet-scams/",
       "website": "https://puppyscams.org"
     },
     {
