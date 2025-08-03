@@ -123,6 +123,7 @@
       "categories": "dns",
       "exclude": true,
       "license": "GPL-3.0",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "domain_comment"
@@ -140,6 +141,7 @@
       "exclude": true,
       "frequency": "monthly",
       "license": "MIT",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "ipv4"
@@ -193,6 +195,7 @@
       "categories": "dns",
       "frequency": "monthly",
       "license": "GPL-3.0",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "ipv4"
@@ -351,6 +354,7 @@
       "disabled": true,
       "license": "GPL-3.0",
       "notes": ">98% overlap with DoH_IP_blocklists",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "ipv4"

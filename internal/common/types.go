@@ -70,18 +70,21 @@ func (lt *ListType) Validate() error {
 // DownloadSummary represents information about a downloaded DNS blocklist file.
 // It contains metadata about the source, content types, and download status.
 type DownloadSummary struct {
-	Name                  string       `json:"name"`                        // Name of the source
-	URL                   string       `json:"url"`                         // URL where the list was downloaded from
-	Filepath              string       `json:"filepath"`                    // Path to the downloaded file
-	Frequency             string       `json:"frequency"`                   // Frequency of updates
-	Checksum              string       `json:"checksum"`                    // Checksum of the file content
-	Error                 string       `json:"error"`                       // Error message if download failed
-	LastDownloadTimestamp string       `json:"last_download_timestamp"`     // Timestamp of the last successful download
-	LastCheckedTimestamp  string       `json:"last_checked_timestamp"`      // Timestamp when last checked for updates
-	Types                 []SourceType `json:"types"`                       // Array of entry types (ipv4, domain, etc.)
-	Categories            []string     `json:"categories,omitempty"`        // Categories this source belongs to
-	TypeCount             int          `json:"type_count"`                  // Number of entry types in the source
-	CountToConsider       int          `json:"count_to_consider,omitempty"` // Number of entries to consider
+	Name                        string       `json:"name"`                                    // Name of the source
+	URL                         string       `json:"url"`                                     // URL where the list was downloaded from
+	Filepath                    string       `json:"filepath"`                                // Path to the downloaded file
+	Frequency                   string       `json:"frequency"`                               // Frequency of updates
+	Checksum                    string       `json:"checksum"`                                // Checksum of the file content
+	Error                       string       `json:"error"`                                   // Error message if download failed
+	LastDownloadTimestamp       string       `json:"last_download_timestamp"`                 // Timestamp of the last successful download
+	LastCheckedTimestamp        string       `json:"last_checked_timestamp"`                  // Timestamp when last checked for updates
+	Types                       []SourceType `json:"types"`                                   // Array of entry types (ipv4, domain, etc.)
+	Categories                  []string     `json:"categories,omitempty"`                    // Categories this source belongs to
+	TypeCount                   int          `json:"type_count"`                              // Number of entry types in the source
+	CountToConsider             int          `json:"count_to_consider,omitempty"`             // Number of entries to consider
+	SkipGeneralConsolidation    bool         `json:"skip_general_consolidation,omitempty"`    // Whether to skip general consolidation
+	SkipGroupsConsolidation     bool         `json:"skip_groups_consolidation,omitempty"`     // Whether to skip group consolidation
+	SkipCategoriesConsolidation bool         `json:"skip_categories_consolidation,omitempty"` // Whether to skip category consolidation
 }
 
 func (ds *DownloadSummary) ToJSON() string {
@@ -217,17 +220,20 @@ type DownloadTarget struct {
 // ProcessedFile contains information about a file after it has been processed.
 // It includes metadata about the content type and validation results.
 type ProcessedFile struct {
-	Name              string   `json:"name"`                    // Name of the source
-	GenericSourceType string   `json:"generic_source_type"`     // Generic categorization of the content (domain, ipv4, etc.)
-	ActualSourceType  string   `json:"actual_source_type"`      // Specific source type detected
-	ListType          string   `json:"list_type"`               // Type of list (blocklist or allowlist)
-	Filepath          string   `json:"filepath"`                // Path of the processed file
-	Checksum          string   `json:"checksum"`                // Checksum of the file content
-	Groups            []string `json:"groups,omitempty"`        // Size groups this file belongs to (mini, lite, normal, big)
-	Categories        []string `json:"categories,omitempty"`    // Categories this file belongs to
-	NumberOfEntries   int      `json:"number_of_entries"`       // Count of entries in the file
-	MustConsider      bool     `json:"must_consider,omitempty"` // Whether the file must be considered
-	Valid             bool     `json:"valid"`                   // Whether the file contains valid entries
+	Name                        string   `json:"name"`                                    // Name of the source
+	GenericSourceType           string   `json:"generic_source_type"`                     // Generic categorization of the content (domain, ipv4, etc.)
+	ActualSourceType            string   `json:"actual_source_type"`                      // Specific source type detected
+	ListType                    string   `json:"list_type"`                               // Type of list (blocklist or allowlist)
+	Filepath                    string   `json:"filepath"`                                // Path of the processed file
+	Checksum                    string   `json:"checksum"`                                // Checksum of the file content
+	Groups                      []string `json:"groups,omitempty"`                        // Size groups this file belongs to (mini, lite, normal, big)
+	Categories                  []string `json:"categories,omitempty"`                    // Categories this file belongs to
+	NumberOfEntries             int      `json:"number_of_entries"`                       // Count of entries in the file
+	MustConsider                bool     `json:"must_consider,omitempty"`                 // Whether the file must be considered
+	Valid                       bool     `json:"valid"`                                   // Whether the file contains valid entries
+	SkipGeneralConsolidation    bool     `json:"skip_general_consolidation,omitempty"`    // Whether to skip general consolidation
+	SkipGroupsConsolidation     bool     `json:"skip_groups_consolidation,omitempty"`     // Whether to skip group consolidation
+	SkipCategoriesConsolidation bool     `json:"skip_categories_consolidation,omitempty"` // Whether to skip category consolidation
 }
 
 // UnmarshalJSON implements custom JSON unmarshalling for ProcessedFile to handle the group array

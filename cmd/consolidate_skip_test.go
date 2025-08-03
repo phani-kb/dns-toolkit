@@ -51,7 +51,7 @@ func TestSkipGeneralConsolidationFeature(t *testing.T) {
 	})
 
 	t.Run("Groups consolidation includes skip_general_consolidation sources", func(t *testing.T) {
-		groupsSources := sourcesConfig.GetSourcesForGroupsAndCategories(appConfig.DNSToolkit.SourceFilters)
+		groupsSources := sourcesConfig.GetSourcesForGroupsConsolidation(appConfig.DNSToolkit.SourceFilters)
 		assert.Len(t, groupsSources, 2)
 
 		sourceNames := make(map[string]bool)
@@ -66,7 +66,7 @@ func TestSkipGeneralConsolidationFeature(t *testing.T) {
 	})
 
 	t.Run("Categories consolidation includes skip_general_consolidation sources", func(t *testing.T) {
-		categoriesSources := sourcesConfig.GetSourcesForGroupsAndCategories(appConfig.DNSToolkit.SourceFilters)
+		categoriesSources := sourcesConfig.GetSourcesForCategoriesConsolidation(appConfig.DNSToolkit.SourceFilters)
 		assert.Len(t, categoriesSources, 2)
 
 		assert.True(t, config.IsEnabledSourceForConsolidation("regular-source", sourceConfigs, appConfig, "categories"))
@@ -78,9 +78,9 @@ func TestSkipGeneralConsolidationFeature(t *testing.T) {
 		largeSource := sourcesConfig.Sources[1]
 
 		assert.True(t, regularSource.ShouldIncludeInGeneralConsolidation())
-		assert.True(t, regularSource.ShouldIncludeInGroupsAndCategories())
+		assert.True(t, regularSource.ShouldIncludeInGroupsConsolidation())
 
 		assert.False(t, largeSource.ShouldIncludeInGeneralConsolidation())
-		assert.True(t, largeSource.ShouldIncludeInGroupsAndCategories())
+		assert.True(t, largeSource.ShouldIncludeInGroupsConsolidation())
 	})
 }

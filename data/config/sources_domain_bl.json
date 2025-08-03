@@ -628,6 +628,7 @@
       "name": "HaGeZi Encrypted DNS Servers",
       "categories": "dns, doh",
       "license": "GPL-3.0",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "adguard"
@@ -855,14 +856,25 @@
       "name": "OISD Blocklist Big",
       "categories": "ads, malware, trackers",
       "license": "GPL-3.0",
-      "notes": "Large source excluded from general consolidation",
-      "skip_general_consolidation": true,
+      "skip_general_consolidation": false,
       "types": [
         {
-          "name": "adguard"
+          "name": "adguard",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
         },
         {
-          "name": "domain_adguard"
+          "name": "domain_adguard",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
         }
       ],
       "url": "https://big.oisd.nl/",

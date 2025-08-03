@@ -181,8 +181,15 @@ func GetGenericSourceType(sourceType string) string {
 	return sourceType
 }
 
-func IsEnabledSource(sourceName string, sourceConfigs []SourcesConfig, appConfig AppConfig) bool {
-	return IsEnabledSourceForConsolidation(sourceName, sourceConfigs, appConfig, "general")
+func IsEnabledSource(sourceName string, sourceConfigs []SourcesConfig, _ AppConfig) bool {
+	for _, sourcesConfig := range sourceConfigs {
+		for _, source := range sourcesConfig.Sources {
+			if source.Name == sourceName {
+				return source.IsEnabled()
+			}
+		}
+	}
+	return false
 }
 
 // IsEnabledSourceForConsolidation checks if a source is enabled for a specific consolidation type.
@@ -198,8 +205,10 @@ func IsEnabledSourceForConsolidation(
 		switch consolidationType {
 		case "general":
 			sources = sourcesConfig.GetSourcesForGeneralConsolidation(appConfig.DNSToolkit.SourceFilters)
-		case "groups", "categories":
-			sources = sourcesConfig.GetSourcesForGroupsAndCategories(appConfig.DNSToolkit.SourceFilters)
+		case "groups":
+			sources = sourcesConfig.GetSourcesForGroupsConsolidation(appConfig.DNSToolkit.SourceFilters)
+		case "categories":
+			sources = sourcesConfig.GetSourcesForCategoriesConsolidation(appConfig.DNSToolkit.SourceFilters)
 		default:
 			// For unknown consolidation types, default to general consolidation behavior
 			sources = sourcesConfig.GetSourcesForGeneralConsolidation(appConfig.DNSToolkit.SourceFilters)
@@ -245,7 +254,13 @@ func GetProcessedSummariesForConsolidation(
 		return nil, nil, nil
 	}
 
-	enabledSummaries := filterEnabledSummariesForConsolidation(summaries, sourcesConfigs, appConfig, consolidationType)
+	enabledSummaries := filterEnabledSummariesForConsolidation(
+		logger,
+		summaries,
+		sourcesConfigs,
+		appConfig,
+		consolidationType,
+	)
 	sort.Slice(enabledSummaries, func(i, j int) bool {
 		return enabledSummaries[i].Name < enabledSummaries[j].Name
 	})
@@ -275,6 +290,7 @@ func GetAllProcessedFiles(
 }
 
 func filterEnabledSummariesForConsolidation(
+	logger *multilog.Logger,
 	summaries []c.ProcessedSummary,
 	sourcesConfigs []SourcesConfig,
 	appConfig AppConfig,
@@ -284,6 +300,8 @@ func filterEnabledSummariesForConsolidation(
 	for _, summary := range summaries {
 		if IsEnabledSourceForConsolidation(summary.Name, sourcesConfigs, appConfig, consolidationType) {
 			enabledSummaries = append(enabledSummaries, summary)
+		} else {
+			logger.Infof("Skipping summary %s: not enabled for consolidation", summary.Name)
 		}
 	}
 	return enabledSummaries

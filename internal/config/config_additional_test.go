@@ -238,6 +238,8 @@ func TestGetAllProcessedFiles(t *testing.T) {
 func TestFilterEnabledSummariesForConsolidation(t *testing.T) {
 	t.Parallel()
 
+	logger := createTestLogger(t)
+
 	testSummaries := []c.ProcessedSummary{
 		{Name: "enabled-source"},
 		{Name: "disabled-source"},
@@ -268,6 +270,7 @@ func TestFilterEnabledSummariesForConsolidation(t *testing.T) {
 	}
 
 	enabled := filterEnabledSummariesForConsolidation(
+		logger,
 		testSummaries,
 		[]SourcesConfig{sourceConfig},
 		appConfig,

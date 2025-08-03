@@ -43,20 +43,22 @@ func (sc *SourcesConfig) ValidateWithConfig(appConfig *AppConfig) error {
 }
 
 type Source struct {
-	Name                     string         `json:"name"`
-	URL                      string         `json:"url"`
-	Frequency                string         `json:"frequency,omitempty"`
-	License                  string         `json:"license,omitempty"`
-	Website                  string         `json:"website,omitempty"`
-	Notes                    string         `json:"notes,omitempty"`
-	Types                    []c.SourceType `json:"types"`
-	Files                    []string       `json:"files,omitempty"`
-	Categories               []string       `json:"categories,omitempty"`
-	Countries                []string       `json:"countries,omitempty"`
-	TypeCount                int            `json:"type_count"`
-	CountToConsider          int            `json:"count_to_consider,omitempty"`
-	Disabled                 bool           `json:"disabled,omitempty"`
-	SkipGeneralConsolidation bool           `json:"skip_general_consolidation,omitempty"`
+	Name                        string         `json:"name"`
+	URL                         string         `json:"url"`
+	Frequency                   string         `json:"frequency,omitempty"`
+	License                     string         `json:"license,omitempty"`
+	Website                     string         `json:"website,omitempty"`
+	Notes                       string         `json:"notes,omitempty"`
+	Types                       []c.SourceType `json:"types"`
+	Files                       []string       `json:"files,omitempty"`
+	Categories                  []string       `json:"categories,omitempty"`
+	Countries                   []string       `json:"countries,omitempty"`
+	TypeCount                   int            `json:"type_count"`
+	CountToConsider             int            `json:"count_to_consider,omitempty"`
+	Disabled                    bool           `json:"disabled,omitempty"`
+	SkipGeneralConsolidation    bool           `json:"skip_general_consolidation,omitempty"`
+	SkipGroupsConsolidation     bool           `json:"skip_groups_consolidation,omitempty"`
+	SkipCategoriesConsolidation bool           `json:"skip_categories_consolidation,omitempty"`
 }
 
 func (s *Source) Validate() error {
@@ -354,12 +356,31 @@ func (sc *SourcesConfig) GetSourcesForGeneralConsolidation(filters SourceFilters
 	return sources
 }
 
-// GetSourcesForGroupsAndCategories returns sources that should be included in groups and categories consolidation.
+// GetSourcesForGroupsConsolidation returns sources that should be included in groups consolidation.
 // This includes all enabled sources, regardless of SkipGeneralConsolidation setting.
-func (sc *SourcesConfig) GetSourcesForGroupsAndCategories(filters SourceFilters) []Source {
+func (sc *SourcesConfig) GetSourcesForGroupsConsolidation(filters SourceFilters) []Source {
 	uniqueSources := make(map[string]Source)
 	for _, source := range sc.Sources {
-		if source.ShouldIncludeInGroupsAndCategories() && matchesFilters(source, filters) {
+		if source.ShouldIncludeInGroupsConsolidation() && matchesFilters(source, filters) {
+			key := fmt.Sprintf("%s_%s", source.Name, source.Types[0].Name)
+			uniqueSources[key] = source
+		}
+	}
+	var sources []Source
+	for _, source := range uniqueSources {
+		sources = append(sources, source)
+	}
+	sort.Slice(sources, func(i, j int) bool {
+		return strings.ToLower(sources[i].Name) < strings.ToLower(sources[j].Name)
+	})
+	return sources
+}
+
+// GetSourcesForCategoriesConsolidation returns sources that should be included in categories consolidation.
+func (sc *SourcesConfig) GetSourcesForCategoriesConsolidation(filters SourceFilters) []Source {
+	uniqueSources := make(map[string]Source)
+	for _, source := range sc.Sources {
+		if source.ShouldIncludeInCategoriesConsolidation() && matchesFilters(source, filters) {
 			key := fmt.Sprintf("%s_%s", source.Name, source.Types[0].Name)
 			uniqueSources[key] = source
 		}
@@ -634,10 +655,14 @@ func (s *Source) ShouldIncludeInGeneralConsolidation() bool {
 	return s.IsEnabled() && !s.SkipGeneralConsolidation
 }
 
-// ShouldIncludeInGroupsAndCategories returns true if the source should be included in groups and categories consolidation.
-// This includes all enabled sources, regardless of the SkipGeneralConsolidation setting.
-func (s *Source) ShouldIncludeInGroupsAndCategories() bool {
-	return s.IsEnabled()
+// ShouldIncludeInGroupsConsolidation returns true if the source should be included in groups consolidation.
+func (s *Source) ShouldIncludeInGroupsConsolidation() bool {
+	return s.IsEnabled() && !s.SkipGroupsConsolidation
+}
+
+// ShouldIncludeInCategoriesConsolidation returns true if the source should be included in categories consolidation.
+func (s *Source) ShouldIncludeInCategoriesConsolidation() bool {
+	return s.IsEnabled() && !s.SkipCategoriesConsolidation
 }
 
 // GetUserAgent returns a user agent string using the util function.
