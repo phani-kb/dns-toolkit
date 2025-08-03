@@ -8,16 +8,11 @@ on:
         required: false
         default: true
         type: boolean
-      cache_key_patterns:
-        description: 'Comma-separated cache key patterns to target (leave empty for all non-CodeQL caches)'
+      cache_key_prefix:
+        description: 'Prefix of cache keys to target'
         required: false
-        default: 'data-download-,Linux-golangci-lint-'
+        default: 'data-download-'
         type: string
-      days_old:
-        description: 'Delete caches older than this many days'
-        required: false
-        default: 2
-        type: number
   schedule:
     - cron: '0 2 */3 * *'
 
@@ -55,70 +50,45 @@ jobs:
         id: fetch-caches
         env:
           GH_TOKEN: ${{ github.token }}
-          CACHE_KEY_PATTERNS: ${{ github.event.inputs.cache_key_patterns || 'data-download-,Linux-golangci-lint-' }}
-          DAYS_OLD: ${{ github.event.inputs.days_old || 2 }}
+          CACHE_KEY_PREFIX: ${{ github.event.inputs.cache_key_prefix || 'data-download-' }}
           REPO_OWNER: ${{ github.repository_owner }}
           REPO_NAME: ${{ github.event.repository.name }}
         run: |
-          echo "Fetching caches older than $DAYS_OLD days matching patterns: $CACHE_KEY_PATTERNS in $REPO_OWNER/$REPO_NAME"
+          echo "Fetching caches matching prefix: $CACHE_KEY_PREFIX in $REPO_OWNER/$REPO_NAME"
 
-          # Calculate the cutoff date
-          CUTOFF_DATE=$(date -d "$DAYS_OLD days ago" --iso-8601=seconds)
-          echo "Cutoff date: $CUTOFF_DATE"
+          all_matching_caches_json=$(gh api "repos/$REPO_OWNER/$REPO_NAME/actions/caches" --paginate \
+            | jq --arg prefix "$CACHE_KEY_PREFIX" '[.actions_caches[] | select(.key | startswith($prefix))] | sort_by(.created_at) | reverse')
 
-          # Fetch all caches
-          all_caches_json=$(gh api "repos/$REPO_OWNER/$REPO_NAME/actions/caches" --paginate | jq -s 'map(.actions_caches) | flatten')
-
-          if [ "$(echo "$all_caches_json" | jq '. | length')" -eq 0 ]; then
-            echo "::notice::No caches found in the repository."
+          if [ "$(echo "$all_matching_caches_json" | jq '. | length')" -eq 0 ]; then
+            echo "::notice::No caches found matching the prefix '$CACHE_KEY_PREFIX'."
             echo "caches-to-delete-ids=[]" >> $GITHUB_OUTPUT
             echo "num-caches-to-delete=0" >> $GITHUB_OUTPUT
             exit 0
           fi
 
-          # Filter caches based on patterns and age
-          if [ -n "$CACHE_KEY_PATTERNS" ] && [ "$CACHE_KEY_PATTERNS" != "" ]; then
-            # Build jq filter for specific patterns
-            echo "Filtering for specific patterns: $CACHE_KEY_PATTERNS"
-            
-            # Convert comma-separated patterns to jq array format
-            patterns_json=$(echo "$CACHE_KEY_PATTERNS" | jq -R 'split(",") | map(gsub("^\\s+|\\s+$"; "")) | map(select(length > 0))')
-            echo "Patterns as JSON: $patterns_json"
-            
-            # Filter caches by pattern and age
-            filtered_caches=$(echo "$all_caches_json" | jq --argjson patterns "$patterns_json" --arg cutoff "$CUTOFF_DATE" '
-              map(select(
-                (.created_at < $cutoff) and 
-                (any($patterns[]; . as $pattern | ($pattern != "" and (.key | startswith($pattern)))))
-              )) | sort_by(.created_at)
-            ')
-          else
-            # If no patterns specified, exclude CodeQL caches (handled by separate workflow)
-            echo "No specific patterns provided, excluding CodeQL caches only"
-            filtered_caches=$(echo "$all_caches_json" | jq --arg cutoff "$CUTOFF_DATE" '
-              map(select(
-                (.created_at < $cutoff) and 
-                (.key | startswith("codeql-") | not)
-              )) | sort_by(.created_at)
-            ')
-          fi
+          most_recent_cache_id=$(echo "$all_matching_caches_json" | jq -r '.[0].id')
+          most_recent_cache_key=$(echo "$all_matching_caches_json" | jq -r '.[0].key')
+          most_recent_cache_created_at=$(echo "$all_matching_caches_json" | jq -r '.[0].created_at')
 
-          num_caches=$(echo "$filtered_caches" | jq 'length')
-          echo "Found $num_caches caches matching criteria"
+          echo "Most recent cache to KEEP:"
+          echo "ID: $most_recent_cache_id"
+          echo "Key: $most_recent_cache_key"
+          echo "Created at: $most_recent_cache_created_at"
 
-          if [ "$num_caches" -eq 0 ]; then
-            echo "::notice::No caches found matching the specified patterns and age criteria."
+          caches_to_delete_ids=$(echo "$all_matching_caches_json" | jq -r ".[1:] | .[].id")
+          num_caches_to_delete=$(echo "$all_matching_caches_json" | jq ".[1:] | length")
+
+          if [ -z "$caches_to_delete_ids" ] || [ "$num_caches_to_delete" -eq 0 ]; then
+            echo "::notice::Only one matching cache found, nothing else to delete."
             echo "caches-to-delete-ids=[]" >> $GITHUB_OUTPUT
             echo "num-caches-to-delete=0" >> $GITHUB_OUTPUT
           else
-            echo "The following caches will be DELETED (older than $DAYS_OLD days):"
-            echo "$filtered_caches" | jq -r '.[] | "ID: \(.id) | Key: \(.key) | Created: \(.created_at) | Size: \(.size_in_bytes) bytes"'
-            
-            # Extract IDs for deletion as JSON array
-            cache_ids_json=$(echo "$filtered_caches" | jq -c 'map(.id)')
-            
+            echo "The following cache IDs will be DELETED (older ones):"
+            echo "$caches_to_delete_ids"
+            # Output the IDs as a JSON array for the next step
+            cache_ids_json=$(echo "$all_matching_caches_json" | jq -c ".[1:] | map(.id)")
             echo "caches-to-delete-ids=$cache_ids_json" >> $GITHUB_OUTPUT
-            echo "num-caches-to-delete=$num_caches" >> $GITHUB_OUTPUT
+            echo "num-caches-to-delete=$num_caches_to_delete" >> $GITHUB_OUTPUT
           fi
 
       - name: Delete Old Caches
@@ -129,7 +99,7 @@ jobs:
           REPO_NAME: ${{ github.event.repository.name }}
           CACHE_IDS_TO_DELETE: ${{ steps.fetch-caches.outputs.caches-to-delete-ids }}
         run: |
-          echo "Starting deletion of old caches..."
+          echo "Starting deletion of older caches..."
 
           deleted_count=0
           failed_count=0
@@ -154,10 +124,9 @@ jobs:
         if: ${{ steps.run-mode.outputs.IS_DRY_RUN == 'true' }}
         env:
           NUM_TO_DELETE: ${{ steps.fetch-caches.outputs.num-caches-to-delete || 0 }}
-          DAYS_OLD: ${{ github.event.inputs.days_old || 2 }}
         run: |
           echo "::notice::Dry run completed. No caches were deleted."
-          echo "Found $NUM_TO_DELETE caches older than $DAYS_OLD days that would have been deleted."
+          echo "Found $NUM_TO_DELETE caches that would have been deleted."
 
           if [ "$NUM_TO_DELETE" -gt 0 ]; then
             echo "::warning::$NUM_TO_DELETE caches are eligible for deletion. Set dry_run to false to delete them."
@@ -169,9 +138,8 @@ jobs:
         run: |
           echo "## Cache Cleanup Summary" >> $GITHUB_STEP_SUMMARY
           echo "- **Mode**: ${{ steps.run-mode.outputs.IS_DRY_RUN == 'true' && 'Dry Run' || 'Actual Deletion' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Age Threshold**: ${{ github.event.inputs.days_old || 2 }} days" >> $GITHUB_STEP_SUMMARY
-          echo "- **Patterns**: ${{ github.event.inputs.cache_key_patterns || 'data-download-,Linux-golangci-lint-' }}" >> $GITHUB_STEP_SUMMARY
-          echo "- **Caches Found**: ${{ steps.fetch-caches.outputs.num-caches-to-delete || 0 }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Cache Key Prefix**: ${{ github.event.inputs.cache_key_prefix || 'data-download-' }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Caches Found to Delete**: ${{ steps.fetch-caches.outputs.num-caches-to-delete || 0 }}" >> $GITHUB_STEP_SUMMARY
 
           if [[ "${{ steps.run-mode.outputs.IS_DRY_RUN }}" == "true" ]]; then
             echo "- **Action**: Listed caches only (dry run)" >> $GITHUB_STEP_SUMMARY
