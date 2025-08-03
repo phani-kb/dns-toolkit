@@ -4,6 +4,15 @@ on:
   schedule:
     - cron: '0 10 * * 0'  # Weekly on Sunday at 10AM UTC
   workflow_dispatch:
+    inputs:
+      retain_days:
+        description: 'Number of days to keep workflow runs (0 to include today)'
+        required: false
+        default: '1'
+      keep_minimum_runs:
+        description: 'Minimum number of workflow runs to keep'
+        required: false
+        default: '2'
 
 jobs:
   cleanup:
@@ -18,6 +27,5 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           repository: ${{ github.repository }}
-          retain_days: 1
-          keep_minimum_runs: 2
-        
+          retain_days: ${{ github.event.inputs.retain_days || '1' }}
+          keep_minimum_runs: ${{ github.event.inputs.keep_minimum_runs || '2' }}
