@@ -71,6 +71,7 @@ func (bc *BaseConsolidator) Consolidate(
 			Name:         processedFile.Name,
 			Filepath:     processedFile.Filepath,
 			MustConsider: processedFile.MustConsider,
+			Count:        len(entries),
 		})
 	}
 

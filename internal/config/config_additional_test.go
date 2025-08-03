@@ -188,7 +188,7 @@ func TestGetProcessedSummaries(t *testing.T) {
 	assert.Equal(t, "enabled-source", summaries[0].Name)
 	assert.Contains(t, genericTypes, "domain")
 	assert.Contains(t, genericTypes, "ip")
-	assert.Len(t, processedFiles, 3)
+	assert.Len(t, processedFiles, 2)
 
 	err = os.Remove(summaryFile)
 	require.NoError(t, err)

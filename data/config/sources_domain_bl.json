@@ -215,9 +215,10 @@
     },
     {
       "name": "Blocklists UT1 Cryptojacking",
-      "categories": "malware",
+      "categories": "cryptocurrency, malware",
       "files": "cryptojacking/domains",
       "license": "CC BY-SA 4.0",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "domain",
@@ -237,6 +238,7 @@
       "files": "phishing/domains",
       "license": "CC BY-SA 4.0",
       "notes": ">79% overlap with phishing_army)",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "domain",
@@ -682,6 +684,7 @@
     },
     {
       "name": "HaGeZi Normal",
+      "categories": "ads, gambling, malware, phishing, scam, spam, trackers",
       "disabled": true,
       "license": "GPL-3.0",
       "notes": "100% overlap with HaGeZi Pro",
@@ -695,7 +698,7 @@
     },
     {
       "name": "HaGeZi Pro",
-      "categories": "ads",
+      "categories": "ads, cryptocurrency, gambling, malware, phishing, scam, spam, trackers",
       "license": "GPL-3.0",
       "types": [
         {
@@ -830,6 +833,8 @@
     },
     {
       "name": "Maltrail_StaticTrails",
+      "categories": "malware",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "domain_custom_csv_maltrail"

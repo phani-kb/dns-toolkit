@@ -266,7 +266,7 @@ func GetProcessedSummariesForConsolidation(
 	})
 
 	genericSourceTypes := extractGenericSourceTypes(enabledSummaries)
-	processedFiles := GetAllProcessedFiles(summaries)
+	processedFiles := GetAllProcessedFiles(enabledSummaries)
 	logger.Infof(
 		"Processed summaries count: %d, generic source types count: %d, files count: %d, consolidation type: %s",
 		len(enabledSummaries),

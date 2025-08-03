@@ -440,11 +440,12 @@ type FileInfo struct {
 	Name         string `json:"name"`                    // Name of the file source
 	Filepath     string `json:"filepath"`                // Path to the file
 	MustConsider bool   `json:"must_consider,omitempty"` // Whether the file must be considered
+	Count        int    `json:"count"`                   // Number of entries
 }
 
 // GetString returns a formatted string representation of file info.
 func (fi *FileInfo) GetString() string {
-	return fmt.Sprintf("%s [%s]%s", fi.Name, fi.Filepath,
+	return fmt.Sprintf("%s [%s] [%d]%s", fi.Name, fi.Filepath, fi.Count,
 		func() string {
 			if fi.MustConsider {
 				return " [must consider]"
