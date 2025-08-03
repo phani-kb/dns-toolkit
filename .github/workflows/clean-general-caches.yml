@@ -67,7 +67,7 @@ jobs:
           echo "Cutoff date: $CUTOFF_DATE"
 
           # Fetch all caches
-          all_caches_json=$(gh api "repos/$REPO_OWNER/$REPO_NAME/actions/caches" --paginate | jq '[.actions_caches[]]')
+          all_caches_json=$(gh api "repos/$REPO_OWNER/$REPO_NAME/actions/caches" --paginate | jq '.actions_caches')
 
           if [ "$(echo "$all_caches_json" | jq '. | length')" -eq 0 ]; then
             echo "::notice::No caches found in the repository."
