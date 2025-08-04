@@ -2,7 +2,7 @@
   "sources": [
     {
       "name": "AlienVault_Reputation",
-      "categories": "anonymizer, botnet, exploit, malicious, malware, phishing, proxy, ransomware, spam, trojan",
+      "categories": "malicious, threat",
       "disabled": true,
       "notes": "Not available anymore. The service has been discontinued.",
       "types": [
@@ -22,6 +22,7 @@
     },
     {
       "name": "BinaryDefense_Banlist",
+      "categories": "malicious, threat",
       "notes": "This is for public use only.",
       "types": [
         {
@@ -40,6 +41,7 @@
     },
     {
       "name": "Blackhole_Today",
+      "categories": "malicious, threat",
       "disabled": true,
       "notes": "Download fails frequently due to network instability or potential blocking.",
       "types": [
@@ -52,6 +54,7 @@
     },
     {
       "name": "BlockListDE_Brute",
+      "categories": "threat",
       "disabled": true,
       "notes": "100% overlap with Firehol_level2",
       "types": [
@@ -64,6 +67,7 @@
     },
     {
       "name": "BlockListDE_Strong",
+      "categories": "malicious, threat",
       "types": [
         {
           "name": "ipv4",
@@ -81,6 +85,7 @@
     },
     {
       "name": "Borestad_AbuseIPDB",
+      "categories": "malicious, threat",
       "types": [
         {
           "name": "ipv4_find"
@@ -91,6 +96,7 @@
     },
     {
       "name": "BruteforceBlocker",
+      "categories": "threat",
       "disabled": true,
       "notes": ">98% overlap with EmergingThreats_CompromisedIPs",
       "types": [
@@ -103,6 +109,7 @@
     },
     {
       "name": "CINSScore_BadGuys_Army",
+      "categories": "malicious, threat",
       "types": [
         {
           "name": "ipv4",
@@ -120,7 +127,7 @@
     },
     {
       "name": "DoH_IP_blocklists",
-      "categories": "dns",
+      "categories": "dns, doh",
       "exclude": true,
       "license": "GPL-3.0",
       "skip_general_consolidation": true,
@@ -137,7 +144,7 @@
     },
     {
       "name": "DoH_IP_list",
-      "categories": "dns",
+      "categories": "dns, doh",
       "exclude": true,
       "frequency": "monthly",
       "license": "MIT",
@@ -152,6 +159,7 @@
     },
     {
       "name": "DShield",
+      "categories": "malicious, threat",
       "notes": "100% overlap with Firehol_level2/Firehol_level3",
       "types": [
         {
@@ -163,6 +171,7 @@
     },
     {
       "name": "EmergingThreats_CompromisedIPs",
+      "categories": "malicious, threat",
       "license": "GPL-2.0",
       "types": [
         {
@@ -181,6 +190,7 @@
     },
     {
       "name": "ET_fwip",
+      "categories": "malicious, threat",
       "license": "GPL-2.0",
       "types": [
         {
@@ -206,6 +216,7 @@
     },
     {
       "name": "Firehol_abusers_30d",
+      "categories": "malicious, threat",
       "license": "GPL-2.0",
       "types": [
         {
@@ -220,6 +231,7 @@
     },
     {
       "name": "Firehol_BitcoinNodes_1d",
+      "categories": "cryptocurrency",
       "types": [
         {
           "name": "ipv4"
@@ -233,6 +245,7 @@
     },
     {
       "name": "Firehol_Botscout_1d",
+      "categories": "malicious, threat",
       "types": [
         {
           "name": "ipv4"
@@ -243,6 +256,7 @@
     },
     {
       "name": "Firehol_GPF_Comics",
+      "categories": "malicious, threat",
       "types": [
         {
           "name": "ipv4"
@@ -253,6 +267,7 @@
     },
     {
       "name": "Firehol_level1",
+      "categories": "malicious, threat",
       "license": "GPL-2.0",
       "types": [
         {
@@ -264,6 +279,7 @@
     },
     {
       "name": "Firehol_level2",
+      "categories": "malicious, threat",
       "license": "GPL-2.0",
       "types": [
         {
@@ -278,6 +294,7 @@
     },
     {
       "name": "Firehol_level3",
+      "categories": "malicious, threat",
       "license": "GPL-2.0",
       "types": [
         {
@@ -292,7 +309,7 @@
     },
     {
       "name": "Firehol_SocksProxy_7d",
-      "categories": "anonymizer, proxy",
+      "categories": "anonymizer, privacy, proxy",
       "frequency": "weekly",
       "types": [
         {
@@ -307,7 +324,7 @@
     },
     {
       "name": "Firehol_SSLProxies_1d",
-      "categories": "anonymizer, proxy",
+      "categories": "anonymizer, privacy, proxy",
       "frequency": "weekly",
       "types": [
         {
@@ -322,6 +339,7 @@
     },
     {
       "name": "GlobalAntiScamOrg-blocklist-ips",
+      "categories": "scam",
       "license": "BSD 3-Clause",
       "types": [
         {
@@ -333,6 +351,7 @@
     },
     {
       "name": "Greensnow",
+      "categories": "malicious, malware, threat",
       "types": [
         {
           "name": "ipv4",
@@ -350,7 +369,7 @@
     },
     {
       "name": "HaGeZi_DoH",
-      "categories": "dns",
+      "categories": "dns, doh",
       "disabled": true,
       "license": "GPL-3.0",
       "notes": ">98% overlap with DoH_IP_blocklists",
@@ -365,6 +384,7 @@
     },
     {
       "name": "HaGeZi_TIF",
+      "categories": "malicious, threat",
       "disabled": true,
       "license": "GPL-3.0",
       "notes": "No unique contribution",
@@ -378,6 +398,7 @@
     },
     {
       "name": "MyIP_MS_Blocklist",
+      "categories": "malicious, threat",
       "types": [
         {
           "name": "ipv4_find"
@@ -391,6 +412,7 @@
     },
     {
       "name": "Public_DNS4",
+      "categories": "dns",
       "types": [
         {
           "name": "ipv4"
@@ -404,6 +426,7 @@
     },
     {
       "name": "Rutgers_DROP",
+      "categories": "malicious, threat",
       "types": [
         {
           "name": "ipv4"
@@ -414,6 +437,7 @@
     },
     {
       "name": "Sblam_Blocklist",
+      "categories": "spam",
       "types": [
         {
           "name": "ipv4"
@@ -424,6 +448,7 @@
     },
     {
       "name": "ScriptzTeam_BadIPS",
+      "categories": "malicious, threat",
       "frequency": "monthly",
       "types": [
         {
@@ -435,6 +460,7 @@
     },
     {
       "name": "Sentinel_Greylist",
+      "categories": "malicious, threat",
       "license": "CC BY-NC-SA 4.0",
       "types": [
         {
@@ -449,6 +475,7 @@
     },
     {
       "name": "spamhaus_drop",
+      "categories": "spam, threat",
       "types": [
         {
           "name": "cidr_ipv4"
@@ -459,6 +486,7 @@
     },
     {
       "name": "T145_allowlist-ips",
+      "categories": "others",
       "disabled": true,
       "license": "AGPL-3.0",
       "notes": "Too many allowlist IPs, use with caution.",
@@ -477,6 +505,7 @@
     },
     {
       "name": "T145_blocklist",
+      "categories": "malicious, malware, threat",
       "disabled": true,
       "license": "AGPL-3.0",
       "notes": "Too many blocklist IPs, use with caution.",
@@ -495,6 +524,7 @@
     },
     {
       "name": "URLHaus_Text",
+      "categories": "malware",
       "types": [
         {
           "name": "ipv4_http_url"
@@ -505,6 +535,7 @@
     },
     {
       "name": "USOM-Blocklists-ips",
+      "categories": "malicious, threat",
       "license": "BSD 3-Clause",
       "types": [
         {
@@ -516,6 +547,7 @@
     },
     {
       "name": "Yoyo AdServers-IPList",
+      "categories": "ads",
       "license": "MIT",
       "types": [
         {
