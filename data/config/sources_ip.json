@@ -413,6 +413,7 @@
     {
       "name": "Public_DNS4",
       "categories": "dns",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "ipv4"
