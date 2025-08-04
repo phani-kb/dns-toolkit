@@ -646,7 +646,7 @@
     },
     {
       "name": "HaGeZi Encrypted DNS Servers",
-      "categories": "dns, doh",
+      "categories": "doh",
       "license": "GPL-3.0",
       "skip_general_consolidation": true,
       "types": [

@@ -127,7 +127,7 @@
     },
     {
       "name": "DoH_IP_blocklists",
-      "categories": "dns, doh",
+      "categories": "doh",
       "exclude": true,
       "license": "GPL-3.0",
       "skip_general_consolidation": true,
@@ -144,7 +144,7 @@
     },
     {
       "name": "DoH_IP_list",
-      "categories": "dns, doh",
+      "categories": "doh",
       "exclude": true,
       "frequency": "monthly",
       "license": "MIT",
@@ -369,7 +369,7 @@
     },
     {
       "name": "HaGeZi_DoH",
-      "categories": "dns, doh",
+      "categories": "doh",
       "disabled": true,
       "license": "GPL-3.0",
       "notes": ">98% overlap with DoH_IP_blocklists",
