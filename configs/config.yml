@@ -25,17 +25,17 @@ dns_toolkit:
     - data/config/sources_mis.json
   files_checksum:
     enabled: true
-    algorithm: "md5" # md5, sha256
+    algorithm: 'md5' # md5, sha256
   skip_unchanged_downloads: true
   skip_name_special_chars_check: true
   skip_cert_verification: true
   skip_cert_verification_hosts:
-    - "raw.githubusercontent.com"
-    - "tranco-list.eu"
-    - "github.com"
-    - "rules.emergingthreats.net"
-    - "myip.ms"
-    - "vxvault.net"
+    - 'raw.githubusercontent.com'
+    - 'tranco-list.eu'
+    - 'github.com'
+    - 'rules.emergingthreats.net'
+    - 'myip.ms'
+    - 'vxvault.net'
   max_workers: 1
   max_retries: 3
   source_filters:
@@ -49,12 +49,12 @@ multilog:
       level: perf
       enabled: true
       use_single_letter_level: true
-      pattern: "[[time]]-[[level]] [msg]"
+      pattern: '[[time]]-[[level]] [msg]'
     - type: file
       subtype: text
       level: debug
       enabled: true
-      pattern: "[date] - [[time]] [[level]] [[source]] [msg]"
+      pattern: '[date] - [[time]] [[level]] [[source]] [msg]'
       file: logs/dns-toolkit.log
       max_size: 5 # MB
       max_backups: 7

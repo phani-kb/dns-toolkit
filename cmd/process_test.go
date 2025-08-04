@@ -653,6 +653,9 @@ func TestCreateProcessedFile(t *testing.T) {
 		true,
 		groups,
 		categories,
+		false, // skipGeneralConsolidation
+		false, // skipGroupsConsolidation
+		false, // skipCategoriesConsolidation
 	)
 	if pf.Name != name {
 		t.Errorf("Expected Name %s, got %s", name, pf.Name)
@@ -1191,6 +1194,9 @@ func TestCreateProcessedFileWithChecksum(t *testing.T) {
 				true,
 				[]string{"group1"},
 				[]string{"category1"},
+				false, // skipGeneralConsolidation
+				false, // skipGroupsConsolidation
+				false, // skipCategoriesConsolidation
 			)
 
 			if tt.expectChecksum {

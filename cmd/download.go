@@ -133,14 +133,17 @@ var downloadCmd = &cobra.Command{
 					for _, target := range downloadFile.Targets {
 						targetFilePath := filepath.Join(target.TargetFolder, target.TargetFile)
 						summary := c.DownloadSummary{
-							Name:            source.Name,
-							URL:             downloadFile.URL,
-							TypeCount:       source.TypeCount,
-							Types:           source.Types,
-							Filepath:        targetFilePath,
-							Frequency:       source.Frequency,
-							CountToConsider: source.CountToConsider,
-							Categories:      source.Categories,
+							Name:                        source.Name,
+							URL:                         downloadFile.URL,
+							TypeCount:                   source.TypeCount,
+							Types:                       source.Types,
+							Filepath:                    targetFilePath,
+							Frequency:                   source.Frequency,
+							CountToConsider:             source.CountToConsider,
+							Categories:                  source.Categories,
+							SkipGeneralConsolidation:    source.SkipGeneralConsolidation,
+							SkipGroupsConsolidation:     source.SkipGroupsConsolidation,
+							SkipCategoriesConsolidation: source.SkipCategoriesConsolidation,
 						}
 
 						if err != nil {

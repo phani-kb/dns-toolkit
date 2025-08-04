@@ -381,7 +381,7 @@ func TestFileInfo_GetString(t *testing.T) {
 				Filepath:     "/path/to/file",
 				MustConsider: false,
 			},
-			expected: "test [/path/to/file]",
+			expected: "test [/path/to/file] [0]",
 		},
 		{
 			name: "with must consider",
@@ -390,7 +390,7 @@ func TestFileInfo_GetString(t *testing.T) {
 				Filepath:     "/path/to/file",
 				MustConsider: true,
 			},
-			expected: "test [/path/to/file] [must consider]",
+			expected: "test [/path/to/file] [0] [must consider]",
 		},
 	}
 

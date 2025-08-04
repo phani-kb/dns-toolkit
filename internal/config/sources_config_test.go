@@ -795,8 +795,8 @@ func TestSkipGeneralConsolidation(t *testing.T) {
 		assert.Equal(t, "regular-source", sources[0].Name)
 	})
 
-	t.Run("GetSourcesForGroupsAndCategories includes skip_general_consolidation sources", func(t *testing.T) {
-		sources := config.GetSourcesForGroupsAndCategories(SourceFilters{})
+	t.Run("GetSourcesForGroupsConsolidation includes skip_general_consolidation sources", func(t *testing.T) {
+		sources := config.GetSourcesForGroupsConsolidation(SourceFilters{})
 		assert.Equal(t, 2, len(sources))
 
 		sourceNames := make(map[string]bool)
@@ -814,9 +814,15 @@ func TestSkipGeneralConsolidation(t *testing.T) {
 		assert.False(t, config.Sources[2].ShouldIncludeInGeneralConsolidation()) // disabled-source
 	})
 
-	t.Run("ShouldIncludeInGroupsAndCategories method works correctly", func(t *testing.T) {
-		assert.True(t, config.Sources[0].ShouldIncludeInGroupsAndCategories())  // regular-source
-		assert.True(t, config.Sources[1].ShouldIncludeInGroupsAndCategories())  // skip-general-source
-		assert.False(t, config.Sources[2].ShouldIncludeInGroupsAndCategories()) // disabled-source
+	t.Run("ShouldIncludeInGroupsConsolidation method works correctly", func(t *testing.T) {
+		assert.True(t, config.Sources[0].ShouldIncludeInGroupsConsolidation())  // regular-source
+		assert.True(t, config.Sources[1].ShouldIncludeInGroupsConsolidation())  // skip-general-source
+		assert.False(t, config.Sources[2].ShouldIncludeInGroupsConsolidation()) // disabled-source
+	})
+
+	t.Run("ShouldIncludeInCategoriesConsolidation method works correctly", func(t *testing.T) {
+		assert.True(t, config.Sources[0].ShouldIncludeInCategoriesConsolidation())  // regular-source
+		assert.True(t, config.Sources[1].ShouldIncludeInCategoriesConsolidation())  // skip-general-source
+		assert.False(t, config.Sources[2].ShouldIncludeInCategoriesConsolidation()) // disabled-source
 	})
 }

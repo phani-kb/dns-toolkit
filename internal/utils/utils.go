@@ -298,6 +298,18 @@ func IsIP(line string) bool {
 	return net.ParseIP(line) != nil
 }
 
+// IsIPv6 checks if a string is a valid IPv6 address.
+//
+// Parameters:
+//   - line: The string to check
+//
+// Returns:
+//   - true if the string is a valid IPv6 address, false otherwise
+func IsIPv6(line string) bool {
+	ip := net.ParseIP(line)
+	return ip != nil && ip.To4() == nil
+}
+
 // IsCIDR checks if a string is a valid CIDR notation address.
 //
 // Parameters:
