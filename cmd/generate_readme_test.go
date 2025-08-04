@@ -287,10 +287,10 @@ func TestCollectGroupsStats(t *testing.T) {
 	assert.Equal(t, "2023-01-01T13:00:00Z", stats.LastUpdateTime)
 	assert.Equal(t, 150, stats.GroupSummary["mini"])
 	assert.Equal(t, 200, stats.GroupSummary["lite"])
-	assert.Contains(t, stats.GroupListTypes["mini"], "blocklist")
-	assert.Contains(t, stats.GroupListTypes["mini"], "allowlist")
-	assert.Contains(t, stats.GroupListTypes["lite"], "blocklist")
-	assert.NotContains(t, stats.GroupListTypes["lite"], "allowlist")
+	assert.Contains(t, stats.GroupListTypes["mini"], "domain_blocklist")
+	assert.Contains(t, stats.GroupListTypes["mini"], "domain_allowlist")
+	assert.Contains(t, stats.GroupListTypes["lite"], "domain_blocklist")
+	assert.NotContains(t, stats.GroupListTypes["lite"], "domain_allowlist")
 }
 
 func TestCollectCategoriesStats(t *testing.T) {
@@ -353,10 +353,11 @@ func TestCollectCategoriesStats(t *testing.T) {
 	assert.Equal(t, "2023-01-01T14:00:00Z", stats.LastUpdateTime)
 	assert.Equal(t, 450, stats.CategorySummary["malware"])
 	assert.Equal(t, 75, stats.CategorySummary["ads"])
-	assert.Contains(t, stats.CategoryListTypes["malware"], "blocklist")
-	assert.NotContains(t, stats.CategoryListTypes["malware"], "allowlist")
-	assert.Contains(t, stats.CategoryListTypes["ads"], "allowlist")
-	assert.NotContains(t, stats.CategoryListTypes["ads"], "blocklist")
+	assert.Contains(t, stats.CategoryListTypes["malware"], "domain_blocklist")
+	assert.Contains(t, stats.CategoryListTypes["malware"], "ipv4_blocklist")
+	assert.NotContains(t, stats.CategoryListTypes["malware"], "domain_allowlist")
+	assert.Contains(t, stats.CategoryListTypes["ads"], "domain_allowlist")
+	assert.NotContains(t, stats.CategoryListTypes["ads"], "domain_blocklist")
 }
 
 func TestCollectConsolidateStats(t *testing.T) {

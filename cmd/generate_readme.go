@@ -153,8 +153,10 @@ func generateOutputBranchReadme() string {
 
 		for _, group := range groups {
 			if listTypes, exists := summary.Groups.GroupListTypes[group]; exists {
-				for _, listType := range listTypes {
-					sb.WriteString(fmt.Sprintf("%s/groups/%s_domain_%s.txt\n", constants.GitHubRawURL, group, listType))
+				for _, typeListCombination := range listTypes {
+					sb.WriteString(
+						fmt.Sprintf("%s/groups/%s_%s.txt\n", constants.GitHubRawURL, group, typeListCombination),
+					)
 				}
 			}
 		}
@@ -171,9 +173,9 @@ func generateOutputBranchReadme() string {
 
 		for _, category := range categories {
 			if listTypes, exists := summary.Categories.CategoryListTypes[category]; exists {
-				for _, listType := range listTypes {
+				for _, typeListCombination := range listTypes {
 					sb.WriteString(
-						fmt.Sprintf("%s/categories/%s_domain_%s.txt\n", constants.GitHubRawURL, category, listType),
+						fmt.Sprintf("%s/categories/%s_%s.txt\n", constants.GitHubRawURL, category, typeListCombination),
 					)
 				}
 			}
@@ -621,15 +623,16 @@ func collectConsolidatedStatsGeneric(
 				}
 
 				// Add list type if not already present
+				typeListCombination := fmt.Sprintf("%s_%s", consolidatedSummary.Type, consolidatedSummary.ListType)
 				listTypeExists := false
 				for _, existingType := range listTypes[identifier] {
-					if existingType == consolidatedSummary.ListType {
+					if existingType == typeListCombination {
 						listTypeExists = true
 						break
 					}
 				}
 				if !listTypeExists {
-					listTypes[identifier] = append(listTypes[identifier], consolidatedSummary.ListType)
+					listTypes[identifier] = append(listTypes[identifier], typeListCombination)
 				}
 			}
 		}
