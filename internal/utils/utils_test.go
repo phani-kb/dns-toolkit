@@ -1022,6 +1022,33 @@ func TestIsIP(t *testing.T) {
 	}
 }
 
+func TestIsIPv6(t *testing.T) {
+	tests := []struct {
+		name     string
+		input    string
+		expected bool
+	}{
+		{"Valid - localhost", "::1", true},
+		{"Valid - full", "2001:0db8:85a3:0000:0000:8a2e:0370:7334", true},
+		{"Valid - compressed", "2001:db8:85a3::8a2e:370:7334", true},
+		{"Valid - all zeros", "::", true},
+		{"Invalid - empty string", "", false},
+		{"Invalid - IPv4 address", "192.168.1.1", false},
+		{"Invalid - IPv4 localhost", "127.0.0.1", false},
+		{"Invalid - domain name", "example.com", false},
+		{"Invalid - IPv6 with port", "[::1]:8080", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := IsIPv6(tt.input)
+			if result != tt.expected {
+				t.Errorf("IsIPv6(%q) = %v, want %v", tt.input, result, tt.expected)
+			}
+		})
+	}
+}
+
 func TestIsCIDR(t *testing.T) {
 	tests := []struct {
 		name     string

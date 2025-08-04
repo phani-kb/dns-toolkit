@@ -106,6 +106,15 @@ print_duplicate_source_names() {
     sort | uniq -c | awk '$1 > 1 {print $2 " (" $1 " times)"}'
 }
 
+print_source_urls() {
+  echo "Blocklist URLs:"
+  print_blocklist_urls
+  echo ""
+
+  echo "Allowlist URLs:"
+  print_allowlist_urls
+}
+
 generate_wl() {
   echo "Generating whitelist files..."
   
@@ -171,6 +180,24 @@ generate_wl() {
   echo "Total unique IPv4 addresses: $(wc -l < "$ipv4_file")" 
 }
 
+print_blocklist_urls() {
+  find data/config -name "sources_*.json" -type f ! -name "*schema*" | \
+    xargs jq -r '
+      .sources[] |
+      select((.types[]? | (.list_types == null or (.list_types[]?.name == "blocklist"))) ) |
+      select(.url != null) | .url
+    ' | sort -u
+}
+
+print_allowlist_urls() {
+  find data/config -name "sources_*.json" -type f ! -name "*schema*" | \
+    xargs jq -r '
+      .sources[] |
+      select((.types[]? | (.list_types[]?.name == "allowlist"))) |
+      select(.url != null) | .url
+    ' | sort -u
+}
+
 case "$1" in
 fmt)
   fmt
@@ -196,11 +223,14 @@ print-source-names)
 print-duplicate-source-names)
   print_duplicate_source_names
   ;;
+print-source-urls)
+  print_source_urls
+  ;;
 generate-wl)
   generate_wl
   ;;
 *)
-  echo "Usage: $0 {fmt|install-tools|clean-tools|sort-config-sources|print-source-types-names|print-source-types-counts|print-source-names|print-duplicate-source-names|generate-wl}"
+  echo "Usage: $0 {fmt|install-tools|clean-tools|sort-config-sources|print-source-types-names|print-source-types-counts|print-source-names|print-duplicate-source-names|print-source-urls|generate-wl}"
   exit 1
   ;;
 esac

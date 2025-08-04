@@ -22,6 +22,7 @@
     },
     {
       "name": "abpvn_hosts",
+      "categories": "ads",
       "countries": "VN",
       "license": "GPL-3.0",
       "types": [
@@ -50,7 +51,7 @@
     },
     {
       "name": "Adaway",
-      "categories": "mobile",
+      "categories": "ads",
       "frequency": "weekly",
       "license": "CC Attribution 3.0",
       "types": [
@@ -69,6 +70,7 @@
     },
     {
       "name": "AdBlockID",
+      "categories": "ads",
       "countries": "ID, MY",
       "license": "MIT",
       "types": [
@@ -97,7 +99,7 @@
     },
     {
       "name": "AdGuard Base filter",
-      "categories": "ads",
+      "categories": "ads, trackers",
       "license": "GPL-3.0",
       "types": [
         {
@@ -131,7 +133,7 @@
     },
     {
       "name": "AdGuard DNS filter",
-      "categories": "ads, malware, trackers",
+      "categories": "ads, trackers",
       "license": "GPL-3.0",
       "types": [
         {
@@ -162,6 +164,7 @@
     },
     {
       "name": "AntiAdBlockFilters",
+      "categories": "annoyance",
       "countries": "SA, CN, CZ, NL, US, FI, FR, DE, IL, ID, IT, LV, RO, RU, SK, ES",
       "license": "CC BY-SA 3.0",
       "types": [
@@ -190,6 +193,7 @@
     },
     {
       "name": "anudeepND_adservers",
+      "categories": "ads",
       "disabled": true,
       "license": "MIT",
       "notes": "No update since 2023-01-16",
@@ -203,6 +207,7 @@
     },
     {
       "name": "bigdargon_hostsVN",
+      "categories": "ads",
       "countries": "VN",
       "license": "MIT",
       "types": [
@@ -215,9 +220,10 @@
     },
     {
       "name": "Blocklists UT1 Cryptojacking",
-      "categories": "malware",
+      "categories": "cryptocurrency",
       "files": "cryptojacking/domains",
       "license": "CC BY-SA 4.0",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "domain",
@@ -233,10 +239,12 @@
     },
     {
       "name": "Blocklists UT1 Malware",
-      "categories": "malware, phishing",
+      "categories": "malware",
       "files": "phishing/domains",
       "license": "CC BY-SA 4.0",
       "notes": ">79% overlap with phishing_army)",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "domain",
@@ -273,6 +281,7 @@
     },
     {
       "name": "Cameleon",
+      "categories": "ads",
       "disabled": true,
       "notes": "No update since 2018-03-17",
       "types": [
@@ -314,7 +323,7 @@
     },
     {
       "name": "CybercrimeTracker_All",
-      "categories": "trackers",
+      "categories": "botnet, malicious, malware",
       "license": "CC0",
       "types": [
         {
@@ -341,7 +350,7 @@
     },
     {
       "name": "CybercrimeTracker_CCAM",
-      "categories": "trackers",
+      "categories": "botnet, malicious, malware",
       "disabled": true,
       "license": "CC0",
       "notes": "No regular updates",
@@ -370,6 +379,7 @@
     },
     {
       "name": "CybercrimeTracker_CCPMGate",
+      "categories": "botnet, malicious, malware",
       "license": "CC0",
       "types": [
         {
@@ -413,7 +423,7 @@
     },
     {
       "name": "Dan Pollock's List",
-      "categories": "ads, trackers",
+      "categories": "ads, malware, trackers",
       "frequency": "weekly",
       "notes": "Frequent Access forbidden (403) errors",
       "types": [
@@ -461,6 +471,7 @@
     },
     {
       "name": "Easy Privacy",
+      "categories": "privacy, trackers",
       "license": "CC BY-SA 3.0",
       "types": [
         {
@@ -488,6 +499,7 @@
     },
     {
       "name": "EasyList",
+      "categories": "ads",
       "disabled": true,
       "license": "CC BY-SA 3.0, GPL-3.0",
       "notes": "Covered by other sources",
@@ -501,9 +513,12 @@
     },
     {
       "name": "fabriziosalmi_blocklists",
+      "categories": "malicious, threat",
       "disabled": true,
       "license": "GPL-3.0",
       "notes": "Huge list",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "domain"
@@ -514,6 +529,7 @@
     },
     {
       "name": "FadeMind_2o7Net",
+      "categories": "ads, privacy, trackers",
       "disabled": true,
       "license": "MIT",
       "notes": "No update since 2023-11-30",
@@ -527,6 +543,7 @@
     },
     {
       "name": "FakeWebshopListHUN",
+      "categories": "fake, phishing, scam, threat",
       "types": [
         {
           "name": "domain"
@@ -537,6 +554,7 @@
     },
     {
       "name": "Frogeye trackers",
+      "categories": "trackers",
       "license": "CC BY 4.0",
       "types": [
         {
@@ -548,6 +566,7 @@
     },
     {
       "name": "GetAdmiral Domains Filter List",
+      "categories": "ads, annoyance",
       "license": "MIT",
       "types": [
         {
@@ -582,6 +601,7 @@
     },
     {
       "name": "HaGeZi Amazon Tracker",
+      "categories": "privacy, trackers",
       "disabled": true,
       "license": "GPL-3.0",
       "notes": ">98% overlap with HaGeZi Pro",
@@ -595,7 +615,7 @@
     },
     {
       "name": "HaGeZi Apple Tracker",
-      "categories": "trackers",
+      "categories": "privacy, trackers",
       "disabled": true,
       "license": "GPL-3.0",
       "notes": ">83% overlap with HaGeZi Pro",
@@ -609,7 +629,7 @@
     },
     {
       "name": "HaGeZi DNS TIF Mini",
-      "categories": "threat",
+      "categories": "malicious, threat",
       "disabled": true,
       "license": "GPL-3.0",
       "notes": "Covered by other sources",
@@ -628,6 +648,7 @@
       "name": "HaGeZi Encrypted DNS Servers",
       "categories": "dns, doh",
       "license": "GPL-3.0",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "adguard"
@@ -642,9 +663,10 @@
     {
       "name": "HaGeZi Gambling Only Domains",
       "categories": "gambling",
-      "disabled": true,
       "license": "GPL-3.0",
       "notes": "Disabled due to large size (202K entries) and gambling-specific focus",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "domain"
@@ -655,7 +677,7 @@
     },
     {
       "name": "HaGeZi Microsoft Tracker",
-      "categories": "trackers",
+      "categories": "privacy, trackers",
       "disabled": true,
       "license": "GPL-3.0",
       "notes": ">75% overlap with HaGeZi Pro",
@@ -681,6 +703,7 @@
     },
     {
       "name": "HaGeZi Normal",
+      "categories": "ads, malware, trackers",
       "disabled": true,
       "license": "GPL-3.0",
       "notes": "100% overlap with HaGeZi Pro",
@@ -694,7 +717,7 @@
     },
     {
       "name": "HaGeZi Pro",
-      "categories": "ads",
+      "categories": "ads, malware, phishing, trackers",
       "license": "GPL-3.0",
       "types": [
         {
@@ -706,7 +729,7 @@
     },
     {
       "name": "HaGeZi Xiaomi Tracker",
-      "categories": "trackers",
+      "categories": "privacy, trackers",
       "license": "GPL-3.0",
       "notes": ">95% overlap with HaGeZi Pro",
       "types": [
@@ -736,7 +759,7 @@
     },
     {
       "name": "Hestat_Minerchk",
-      "categories": "ads",
+      "categories": "cryptocurrency",
       "disabled": true,
       "frequency": "monthly",
       "license": "Apache-2.0",
@@ -751,6 +774,7 @@
     },
     {
       "name": "Hostsfile",
+      "categories": "ads",
       "disabled": true,
       "license": "LGPL as GPLv2",
       "notes": "No update since 2018-04-20",
@@ -777,7 +801,7 @@
     },
     {
       "name": "iam-py-test_my-filters-001-antitypo",
-      "categories": "scam",
+      "categories": "fake",
       "frequency": "monthly",
       "license": "CC0-1.0",
       "types": [
@@ -791,10 +815,11 @@
     {
       "name": "jarelllama_Scam-Blocklist",
       "categories": "scam",
-      "disabled": true,
       "frequency": "monthly",
       "license": "GPL-3.0",
       "notes": "Disabled due to very large size (457K entries) - scam-specific focus",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "domain"
@@ -805,6 +830,7 @@
     },
     {
       "name": "kadantiscam",
+      "categories": "ads",
       "disabled": true,
       "license": "CC BY-SA 4.0",
       "notes": ">87% overlap with phishing_army",
@@ -818,6 +844,7 @@
     },
     {
       "name": "Malicious URL Blocklist (URLHaus)",
+      "categories": "ads",
       "disabled": true,
       "notes": "Covered by other sources",
       "types": [
@@ -829,6 +856,8 @@
     },
     {
       "name": "Maltrail_StaticTrails",
+      "categories": "malware, threat",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "domain_custom_csv_maltrail"
@@ -855,14 +884,25 @@
       "name": "OISD Blocklist Big",
       "categories": "ads, malware, trackers",
       "license": "GPL-3.0",
-      "notes": "Large source excluded from general consolidation",
-      "skip_general_consolidation": true,
+      "skip_general_consolidation": false,
       "types": [
         {
-          "name": "adguard"
+          "name": "adguard",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
         },
         {
-          "name": "domain_adguard"
+          "name": "domain_adguard",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
         }
       ],
       "url": "https://big.oisd.nl/",
@@ -870,6 +910,7 @@
     },
     {
       "name": "OpenPhish_Feed",
+      "categories": "phishing",
       "types": [
         {
           "name": "domain_http_url"
@@ -879,7 +920,7 @@
     },
     {
       "name": "Peter Lowe's Blocklist",
-      "categories": "ads, trackers",
+      "categories": "ads",
       "disabled": true,
       "license": "MCRAE GENERAL PUBLIC LICENSE (version 4.r53)",
       "notes": "Covered by other sources",
@@ -919,6 +960,7 @@
     },
     {
       "name": "Policeman_SimpleDomainsBlocklist",
+      "categories": "malicious",
       "disabled": true,
       "license": "Unlicense",
       "notes": "Archived on 2021-12-26",
@@ -932,7 +974,7 @@
     },
     {
       "name": "PuppyScams",
-      "categories": "scam",
+      "categories": "fake, scam",
       "disabled": false,
       "notes": "List of top 100 pet scams is not being shared anymore, https://puppyscams.org/top-100-pet-scams",
       "types": [
@@ -989,6 +1031,7 @@
     },
     {
       "name": "RedDragonWebDesign_block-everything",
+      "categories": "ads, malicious, trackers",
       "types": [
         {
           "name": "adguard",
@@ -1031,9 +1074,10 @@
     {
       "name": "RPiList_specials-phishing",
       "categories": "phishing",
-      "disabled": true,
       "license": "CC BY-NC 4.0",
       "notes": "Huge list",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "adguard"
@@ -1043,6 +1087,7 @@
     },
     {
       "name": "ShadowWhisperer's Dating List",
+      "categories": "ads",
       "types": [
         {
           "name": "adguard"
@@ -1067,8 +1112,9 @@
     {
       "name": "ShadowWhisperer_BlockLists Adult",
       "categories": "adult",
-      "disabled": true,
       "notes": "Disabled due to large size and adult content focus",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "domain"
@@ -1101,7 +1147,7 @@
     },
     {
       "name": "Spam404",
-      "categories": "phishing, scam",
+      "categories": "spam",
       "license": "CC-BY-4.0",
       "types": [
         {
@@ -1118,7 +1164,7 @@
     },
     {
       "name": "Stamparm_Blackbook",
-      "categories": "malware",
+      "categories": "malicious, threat",
       "frequency": "monthly",
       "types": [
         {
@@ -1157,7 +1203,7 @@
     },
     {
       "name": "StevenBlack_Fake_Gambling_Porn",
-      "categories": "ads, adult, fakenews, gambling",
+      "categories": "ads, adult, fake, fakenews, gambling",
       "license": "MIT",
       "types": [
         {
@@ -1169,10 +1215,12 @@
     },
     {
       "name": "T145_black-mirror",
-      "categories": "malware",
+      "categories": "malicious, threat",
       "disabled": true,
       "license": "AGPL-3.0",
       "notes": "Huge list",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "domain"
@@ -1209,7 +1257,7 @@
     },
     {
       "name": "Ukrainian Privacy Filter",
-      "categories": "privacy",
+      "categories": "privacy, trackers",
       "countries": "UA",
       "license": "GPL-3.0",
       "types": [
@@ -1240,7 +1288,7 @@
     },
     {
       "name": "Ukrainian Security Filter",
-      "categories": "security",
+      "categories": "malicious, threat",
       "countries": "UA",
       "license": "GPL-3.0",
       "types": [
@@ -1253,7 +1301,7 @@
     },
     {
       "name": "UncheckyAds",
-      "categories": "ads",
+      "categories": "ads, privacy, trackers",
       "disabled": true,
       "license": "MIT",
       "notes": "No update since 2021",
@@ -1284,9 +1332,11 @@
     },
     {
       "name": "USOM-Blocklists-domains",
-      "disabled": true,
+      "categories": "malicious, threat",
       "license": "BSD 3-Clause",
       "notes": "Huge list",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "domain"
@@ -1297,6 +1347,7 @@
     },
     {
       "name": "Viriback_Dump",
+      "categories": "malware",
       "types": [
         {
           "name": "domain_csv_http_url_find"
@@ -1309,6 +1360,7 @@
     },
     {
       "name": "WaLLy3K",
+      "categories": "ads",
       "license": "CC BY 4.0",
       "types": [
         {
@@ -1320,6 +1372,7 @@
     },
     {
       "name": "WindowsSpyBlocker_Hosts_spy",
+      "categories": "privacy, trackers",
       "disabled": true,
       "license": "MIT",
       "notes": "No update since 2022-05-16",
@@ -1333,6 +1386,7 @@
     },
     {
       "name": "Winhelp2002",
+      "categories": "ads",
       "disabled": true,
       "license": "CC BY-NC-SA 3.0",
       "notes": "No update since 2021-03-06",
@@ -1402,6 +1456,7 @@
     },
     {
       "name": "Yoyo Adservers-Hosts",
+      "categories": "ads",
       "license": "MIT",
       "types": [
         {

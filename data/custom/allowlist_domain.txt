@@ -1,5 +1,6 @@
 click.redditmail.com
 drive.google.com
+# START source domains
 adaway.org
 adguardteam.github.io
 big.oisd.nl
@@ -34,5 +35,7 @@ tranco-list.eu
 urlhaus.abuse.ch
 v.firebog.net
 view.sentinel.turris.cz
+web.archive.org
 www.binarydefense.com
 www.spamhaus.org
+# END source domains

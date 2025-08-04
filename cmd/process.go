@@ -178,6 +178,9 @@ func processSourceFile(
 					true,
 					listTypeObj.Groups,
 					summary.Categories,
+					summary.SkipGeneralConsolidation,
+					summary.SkipGroupsConsolidation,
+					summary.SkipCategoriesConsolidation,
 				)
 			}
 			if invalidFilePath != "" {
@@ -192,6 +195,9 @@ func processSourceFile(
 					false,
 					listTypeObj.Groups,
 					summary.Categories,
+					summary.SkipGeneralConsolidation,
+					summary.SkipGroupsConsolidation,
+					summary.SkipCategoriesConsolidation,
 				)
 			}
 
@@ -226,10 +232,18 @@ func processSourceFile(
 //
 // Parameters:
 //   - logger: Logger for recording operations and errors
-//   - fileName: Name of the processed file
-//   - sourceType: Type of source (domain, ipv4, etc.)
-//   - listType: Type of list (blocklist, allowlist, etc.)
-//   - entries: The entries contained in the file
+//   - name: Name of the source
+//   - filePath: Path to the file
+//   - sourceType: Type of the source
+//   - listType: Type of the list (blocklist, allowlist, etc.)
+//   - entries: List of entries in the file
+//   - mustConsider: Whether the file must be considered for processing
+//   - valid: Whether the file contains valid entries
+//   - groups: Groups associated with the source type
+//   - categories: Categories associated with the source type
+//   - skipGeneralConsolidation: Whether to skip general consolidation
+//   - skipGroupsConsolidation: Whether to skip groups consolidation
+//   - skipCategoriesConsolidation: Whether to skip categories consolidation
 //
 // Returns:
 //   - A ProcessedFile struct with file metadata
@@ -241,6 +255,9 @@ func createProcessedFile(
 	valid bool,
 	groups []string,
 	categories []string,
+	skipGeneralConsolidation bool,
+	skipGroupsConsolidation bool,
+	skipCategoriesConsolidation bool,
 ) c.ProcessedFile {
 	var checksum string
 	if AppConfig.DNSToolkit.FilesChecksum.Enabled {
@@ -251,17 +268,20 @@ func createProcessedFile(
 		)
 	}
 	return c.ProcessedFile{
-		Name:              name,
-		GenericSourceType: cfg.GetGenericSourceType(sourceType),
-		ActualSourceType:  sourceType,
-		ListType:          listType,
-		Filepath:          filePath,
-		NumberOfEntries:   len(entries),
-		Checksum:          checksum,
-		MustConsider:      mustConsider,
-		Valid:             valid,
-		Groups:            groups,
-		Categories:        categories,
+		Name:                        name,
+		GenericSourceType:           cfg.GetGenericSourceType(sourceType),
+		ActualSourceType:            sourceType,
+		ListType:                    listType,
+		Filepath:                    filePath,
+		NumberOfEntries:             len(entries),
+		Checksum:                    checksum,
+		MustConsider:                mustConsider,
+		Valid:                       valid,
+		Groups:                      groups,
+		Categories:                  categories,
+		SkipGeneralConsolidation:    skipGeneralConsolidation,
+		SkipGroupsConsolidation:     skipGroupsConsolidation,
+		SkipCategoriesConsolidation: skipCategoriesConsolidation,
 	}
 }
 

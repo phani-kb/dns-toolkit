@@ -77,9 +77,10 @@ func TestGetFileStrings(t *testing.T) {
 				{
 					Name:     "test.txt",
 					Filepath: "/path/to/test.txt",
+					Count:    100,
 				},
 			},
-			expected: []string{"test.txt [/path/to/test.txt]"},
+			expected: []string{"test.txt [/path/to/test.txt] [100]"},
 		},
 		{
 			name: "multiple file infos",
@@ -87,21 +88,24 @@ func TestGetFileStrings(t *testing.T) {
 				{
 					Name:     "file1.txt",
 					Filepath: "/path/to/file1.txt",
+					Count:    50,
 				},
 				{
 					Name:         "file2.txt",
 					Filepath:     "/path/to/file2.txt",
+					Count:        250,
 					MustConsider: true,
 				},
 				{
 					Name:     "file3.txt",
 					Filepath: "/path/to/file3.txt",
+					Count:    75,
 				},
 			},
 			expected: []string{
-				"file1.txt [/path/to/file1.txt]",
-				"file2.txt [/path/to/file2.txt] [must consider]",
-				"file3.txt [/path/to/file3.txt]",
+				"file1.txt [/path/to/file1.txt] [50]",
+				"file2.txt [/path/to/file2.txt] [250] [must consider]",
+				"file3.txt [/path/to/file3.txt] [75]",
 			},
 		},
 		{
@@ -110,10 +114,11 @@ func TestGetFileStrings(t *testing.T) {
 				{
 					Name:         "important.txt",
 					Filepath:     "/path/to/important.txt",
+					Count:        500,
 					MustConsider: true,
 				},
 			},
-			expected: []string{"important.txt [/path/to/important.txt] [must consider]"},
+			expected: []string{"important.txt [/path/to/important.txt] [500] [must consider]"},
 		},
 	}
 
@@ -218,7 +223,7 @@ func (m *mockConsolidator) GetListType() string {
 func TestConsolidateFilesBasedOnSTLT(t *testing.T) {
 	var (
 		mockEntries     = u.NewStringSet([]string{"a.com", "b.com"})
-		mockFiles       = []c.FileInfo{{Name: "file1.txt", Filepath: "/tmp/file1.txt"}}
+		mockFiles       = []c.FileInfo{{Name: "file1.txt", Filepath: "/tmp/file1.txt", Count: 10}}
 		filteredEntries = u.NewStringSet([]string{"a.com"})
 		ignoredEntries  = u.NewStringSet([]string{"b.com"})
 	)

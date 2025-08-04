@@ -101,7 +101,7 @@ func TestConsolidateGeneric(t *testing.T) {
 				mock := &mockConsolidatorCommon{
 					mockEntries: u.NewStringSet([]string{"example.com", "test.com"}),
 					mockFiles: []c.FileInfo{
-						{Name: "test1", Filepath: "/tmp/test1.txt"},
+						{Name: "test1", Filepath: "/tmp/test1.txt", Count: 100},
 					},
 					sourceType:        constants.SourceTypeDomain,
 					listType:          constants.ListTypeBlocklist,
@@ -137,7 +137,7 @@ func TestConsolidateGeneric(t *testing.T) {
 				mock := &mockConsolidatorCommon{
 					mockEntries: u.NewStringSet([]string{"malware.com", "phishing.com"}),
 					mockFiles: []c.FileInfo{
-						{Name: "test1", Filepath: "/tmp/test1.txt"},
+						{Name: "test1", Filepath: "/tmp/test1.txt", Count: 200},
 					},
 					sourceType:        constants.SourceTypeDomain,
 					listType:          constants.ListTypeBlocklist,
@@ -220,7 +220,7 @@ func TestConsolidateGeneric(t *testing.T) {
 				mock := &mockConsolidatorCommon{
 					mockEntries: u.NewStringSet([]string{"example.com", "ignore.com"}),
 					mockFiles: []c.FileInfo{
-						{Name: "test1", Filepath: "/tmp/test1.txt"},
+						{Name: "test1", Filepath: "/tmp/test1.txt", Count: 150},
 					},
 					filteredEntries:   u.NewStringSet([]string{"example.com"}),
 					ignoredEntries:    u.NewStringSet([]string{"ignore.com"}),
@@ -258,7 +258,7 @@ func TestConsolidateGeneric(t *testing.T) {
 				mock := &mockConsolidatorCommon{
 					mockEntries: u.NewStringSet([]string{"example.com"}),
 					mockFiles: []c.FileInfo{
-						{Name: "test1", Filepath: "/tmp/test1.txt"},
+						{Name: "test1", Filepath: "/tmp/test1.txt", Count: 75},
 					},
 					filteredEntries:   u.NewStringSet([]string{}), // No entries after filtering
 					ignoredEntries:    u.NewStringSet([]string{"example.com"}),
@@ -667,7 +667,7 @@ func TestConsolidateGeneric_FileSaveError(t *testing.T) {
 	mock := &mockConsolidatorCommon{
 		mockEntries: u.NewStringSet([]string{"example.com"}),
 		mockFiles: []c.FileInfo{
-			{Name: "test1", Filepath: "/tmp/test1.txt"},
+			{Name: "test1", Filepath: "/tmp/test1.txt", Count: 120},
 		},
 		filteredEntries:   u.NewStringSet([]string{"example.com"}),
 		ignoredEntries:    u.NewStringSet([]string{}),
@@ -747,7 +747,7 @@ func TestConsolidateGeneric_ChecksumCalculation(t *testing.T) {
 	baseMock := &mockConsolidatorCommon{
 		mockEntries: u.NewStringSet([]string{"example.com", "test.com"}),
 		mockFiles: []c.FileInfo{
-			{Name: "test1", Filepath: "/tmp/test1.txt"},
+			{Name: "test1", Filepath: "/tmp/test1.txt", Count: 80},
 		},
 		filteredEntries:   u.NewStringSet([]string{"example.com", "test.com"}), // Ensure entries are filtered
 		ignoredEntries:    u.NewStringSet([]string{}),
@@ -816,7 +816,7 @@ func TestConsolidateGeneric_EdgeCases(t *testing.T) {
 
 		mock := &mockConsolidatorCommon{
 			mockEntries:       u.NewStringSet([]string{"example.com"}),
-			mockFiles:         []c.FileInfo{{Name: "test", Filepath: "/tmp/test.txt"}},
+			mockFiles:         []c.FileInfo{{Name: "test", Filepath: "/tmp/test.txt", Count: 60}},
 			sourceType:        constants.SourceTypeDomain,
 			listType:          constants.ListTypeBlocklist,
 			shouldReturnValid: true,
@@ -855,7 +855,7 @@ func TestConsolidateGeneric_EdgeCases(t *testing.T) {
 
 		mock := &mockConsolidatorCommon{
 			mockEntries:       u.NewStringSet([]string{"example.com"}),
-			mockFiles:         []c.FileInfo{{Name: "test", Filepath: "/tmp/test.txt"}},
+			mockFiles:         []c.FileInfo{{Name: "test", Filepath: "/tmp/test.txt", Count: 70}},
 			sourceType:        constants.SourceTypeDomain,
 			listType:          constants.ListTypeBlocklist,
 			shouldReturnValid: true,
@@ -895,7 +895,7 @@ func TestConsolidateGeneric_EdgeCases(t *testing.T) {
 
 		mock := &mockConsolidatorCommon{
 			mockEntries:       nil, // Nil entries
-			mockFiles:         []c.FileInfo{{Name: "test", Filepath: "/tmp/test.txt"}},
+			mockFiles:         []c.FileInfo{{Name: "test", Filepath: "/tmp/test.txt", Count: 90}},
 			sourceType:        constants.SourceTypeDomain,
 			listType:          constants.ListTypeBlocklist,
 			shouldReturnValid: true,
@@ -1034,7 +1034,7 @@ func TestConsolidateGeneric_LargeDataset(t *testing.T) {
 	mock := &mockConsolidatorCommon{
 		mockEntries: u.NewStringSet(largeEntrySet),
 		mockFiles: []c.FileInfo{
-			{Name: "large_test", Filepath: "/tmp/large_test.txt"},
+			{Name: "large_test", Filepath: "/tmp/large_test.txt", Count: 10000},
 		},
 		filteredEntries:   u.NewStringSet(largeEntrySet), // Explicitly set filtered entries
 		ignoredEntries:    u.NewStringSet([]string{}),    // No ignored entries
@@ -1084,7 +1084,7 @@ func TestConsolidateGeneric_ConfigFlags(t *testing.T) {
 	baseMock := &mockConsolidatorCommon{
 		mockEntries: u.NewStringSet([]string{"example.com"}),
 		mockFiles: []c.FileInfo{
-			{Name: "test", Filepath: "/tmp/test.txt"},
+			{Name: "test", Filepath: "/tmp/test.txt", Count: 40},
 		},
 		filteredEntries:   u.NewStringSet([]string{"example.com"}), // Ensure filtering works
 		ignoredEntries:    u.NewStringSet([]string{}),

@@ -188,7 +188,7 @@ func TestGetProcessedSummaries(t *testing.T) {
 	assert.Equal(t, "enabled-source", summaries[0].Name)
 	assert.Contains(t, genericTypes, "domain")
 	assert.Contains(t, genericTypes, "ip")
-	assert.Len(t, processedFiles, 3)
+	assert.Len(t, processedFiles, 2)
 
 	err = os.Remove(summaryFile)
 	require.NoError(t, err)
@@ -238,6 +238,8 @@ func TestGetAllProcessedFiles(t *testing.T) {
 func TestFilterEnabledSummariesForConsolidation(t *testing.T) {
 	t.Parallel()
 
+	logger := createTestLogger(t)
+
 	testSummaries := []c.ProcessedSummary{
 		{Name: "enabled-source"},
 		{Name: "disabled-source"},
@@ -268,6 +270,7 @@ func TestFilterEnabledSummariesForConsolidation(t *testing.T) {
 	}
 
 	enabled := filterEnabledSummariesForConsolidation(
+		logger,
 		testSummaries,
 		[]SourcesConfig{sourceConfig},
 		appConfig,
