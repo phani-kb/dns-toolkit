@@ -136,7 +136,7 @@ func generateOutputBranchReadme() string {
 
 	topLevelFiles, err := getTopLevelTxtFiles()
 	if err == nil && len(topLevelFiles) > 0 {
-		sb.WriteString("# Blocklists or Allowlists\n")
+		sb.WriteString("# Consolidated Blocklists or Allowlists\n")
 		for _, filename := range topLevelFiles {
 			sb.WriteString(fmt.Sprintf("%s/%s\n", constants.GitHubRawURL, filename))
 		}
@@ -184,7 +184,7 @@ func generateOutputBranchReadme() string {
 	}
 
 	if summary.Top.TotalFiles > 0 {
-		sb.WriteString("# High-confidence lists (top entries)\n")
+		sb.WriteString("# High-confidence lists (top entries by number of sources)\n")
 		var types []string
 		for sourceType := range summary.Top.FilesByType {
 			types = append(types, sourceType)
