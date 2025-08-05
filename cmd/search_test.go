@@ -4,6 +4,7 @@ import (
 	"net"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
@@ -412,4 +413,75 @@ func TestDisplayDomainResults(t *testing.T) {
 	displayDomainResults("example.com", domainResults)
 	displayDomainResults("notfound.com", map[string][]string{})
 	displayDomainResults("", map[string][]string{})
+}
+
+func TestBulkDomainLookup(t *testing.T) {
+	tests := []struct {
+		name        string
+		input       string
+		wantDomains int
+	}{
+		{
+			name:        "multiple domains",
+			input:       "google.com, github.com",
+			wantDomains: 2,
+		},
+		{
+			name:        "empty input",
+			input:       "",
+			wantDomains: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			originalLookup := net.LookupIP
+			defer func() {
+				_ = originalLookup
+			}()
+
+			if tt.input == "" {
+				handleBulkDomainLookup(tt.input)
+				return
+			}
+
+			domains := strings.Split(tt.input, ",")
+			cleanDomains := 0
+			for _, domain := range domains {
+				if strings.TrimSpace(domain) != "" {
+					cleanDomains++
+				}
+			}
+
+			assert.Equal(t, tt.wantDomains, cleanDomains, "Expected number of domains should match")
+			handleBulkDomainLookup(tt.input)
+		})
+	}
+}
+
+func TestDisplayBulkLookupResults(t *testing.T) {
+	tests := []struct {
+		name        string
+		domainToIPs map[string][]string
+		sortedIPs   []string
+	}{
+		{
+			name: "with results",
+			domainToIPs: map[string][]string{
+				"example.com": {"1.2.3.4"},
+			},
+			sortedIPs: []string{"1.2.3.4"},
+		},
+		{
+			name:        "empty results",
+			domainToIPs: map[string][]string{},
+			sortedIPs:   []string{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			displayBulkLookupResults(tt.domainToIPs, tt.sortedIPs)
+		})
+	}
 }

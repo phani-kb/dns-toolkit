@@ -218,6 +218,8 @@
       "name": "Firehol_abusers_30d",
       "categories": "malicious, threat",
       "license": "GPL-2.0",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "ipv4"
@@ -255,8 +257,48 @@
       "website": "https://botscout.com"
     },
     {
+      "name": "Firehol_CleanTalk",
+      "categories": "malicious, threat",
+      "license": "GPL-2.0",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        }
+      ],
+      "url": "https://iplists.firehol.org/files/cleantalk.ipset",
+      "website": "https://iplists.firehol.org"
+    },
+    {
+      "name": "Firehol_CleanTalk_Top20",
+      "categories": "malicious, threat",
+      "license": "GPL-2.0",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "mini"
+            }
+          ]
+        }
+      ],
+      "url": "https://iplists.firehol.org/files/cleantalk_top20.ipset",
+      "website": "https://iplists.firehol.org"
+    },
+    {
       "name": "Firehol_GPF_Comics",
       "categories": "malicious, threat",
+      "license": "GPL-2.0",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "ipv4"

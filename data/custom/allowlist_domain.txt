@@ -1,5 +1,6 @@
 click.redditmail.com
 drive.google.com
+web.whatsapp.com
 # START source domains
 adaway.org
 adguardteam.github.io

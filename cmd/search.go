@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"bufio"
+	"fmt"
 	"net"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 
@@ -21,6 +23,7 @@ var (
 	performDNSLookup   bool
 	performCNAMELookup bool
 	searchAguard       bool
+	bulkDomainLookup   bool
 )
 
 var searchCmd = &cobra.Command{
@@ -30,6 +33,12 @@ var searchCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		query := strings.ToLower(args[0])
+
+		if bulkDomainLookup {
+			handleBulkDomainLookup(query)
+			return
+		}
+
 		Logger.Infof("Searching for: %s", query)
 
 		isIP := net.ParseIP(query) != nil
@@ -74,6 +83,69 @@ func collectQueryData(query string, isIP bool) (u.StringSet, []string) {
 	}
 
 	return ipAddresses, cnames
+}
+
+// handleBulkDomainLookup processes comma-separated domains and returns sorted IPs
+func handleBulkDomainLookup(input string) {
+	domains := strings.Split(input, ",")
+	if len(domains) == 0 {
+		Logger.Errorf("No domains provided")
+		return
+	}
+
+	for i, domain := range domains {
+		domains[i] = strings.TrimSpace(strings.ToLower(domain))
+	}
+
+	Logger.Infof("Domain lookup for %d domains", len(domains))
+
+	allIPs := u.NewStringSet(nil)
+	domainToIPs := make(map[string][]string)
+
+	for _, domain := range domains {
+		if domain == "" {
+			continue
+		}
+
+		Logger.Infof("Resolving domain: %s", domain)
+		domainIPs := u.NewStringSet(nil)
+
+		resolveDomainToIPs(domain, domainIPs, net.LookupIP)
+
+		ipList := domainIPs.ToSlice()
+		if len(ipList) > 0 {
+			domainToIPs[domain] = ipList
+			for _, ip := range ipList {
+				allIPs.Add(ip)
+			}
+		} else {
+			Logger.Warnf("No valid IPs found for domain: %s", domain)
+		}
+	}
+
+	sortedIPs := allIPs.ToSlice()
+	sort.Strings(sortedIPs)
+
+	displayBulkLookupResults(domainToIPs, sortedIPs)
+}
+
+// displayBulkLookupResults shows the results of bulk domain lookup
+func displayBulkLookupResults(domainToIPs map[string][]string, sortedIPs []string) {
+	Logger.Infof("=== Bulk Domain Lookup Results ===")
+
+	Logger.Infof("\nPer-domain IP resolution:")
+	for domain, ips := range domainToIPs {
+		Logger.Infof("Domain: %s", domain)
+		for _, ip := range ips {
+			Logger.Infof("  - %s", ip)
+		}
+	}
+
+	Logger.Infof("\nAll unique IPs (sorted):")
+	Logger.Infof("Total unique IPs: %d", len(sortedIPs))
+	for _, ip := range sortedIPs {
+		fmt.Printf("%s\n", ip)
+	}
 }
 
 // resolveDomainToIPs resolves a domain name to its IP addresses
@@ -410,4 +482,6 @@ func init() {
 		BoolVarP(&performCNAMELookup, "cname", "n", true, "Perform CNAME lookup for domain names and search for CNAME records")
 	searchCmd.Flags().
 		BoolVarP(&searchAguard, "adguard", "g", false, "Search in AdGuard files")
+	searchCmd.Flags().
+		BoolVarP(&bulkDomainLookup, "bulk", "b", false, "Perform bulk domain lookup on comma-separated domains and return sorted IPs")
 }
