@@ -13,6 +13,7 @@ import (
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	d "github.com/phani-kb/dns-toolkit/internal/downloaders"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
+	"github.com/phani-kb/multilog"
 
 	"github.com/spf13/cobra"
 )
@@ -179,10 +180,41 @@ var downloadCmd = &cobra.Command{
 								summary.LastDownloadTimestamp = time.Now().Format(constants.TimestampFormat)
 							}
 
-							if err := downloader.PostDownloadProcess(Logger, targetFilePath, summary.CountToConsider); err != nil {
-								Logger.Errorf("Post download process error for %s: %v", source.Name, err)
-								summary.Error = fmt.Sprintf("Post-download processing error: %v", err)
-							} else if AppConfig != nil && AppConfig.DNSToolkit.FilesChecksum.Enabled {
+							shouldReprocess := !fetchSkipped
+
+							if fetchSkipped {
+								summaryFile := filepath.Join(constants.SummaryDir, constants.DefaultSummaryFiles["download"])
+								if prevSummary, err := loadPreviousDownloadSummary(Logger, summaryFile, source.Name); err == nil && prevSummary != nil {
+									if prevSummary.CountToConsider != summary.CountToConsider {
+										Logger.Infof("Count to consider changed for %s: %d -> %d, re-processing...",
+											source.Name, prevSummary.CountToConsider, summary.CountToConsider)
+										shouldReprocess = true
+
+										if downloadFile.IsArchive {
+											Logger.Debugf("Re-extracting archive and copying target file for %s", source.Name)
+											if err = u.ForceCopySourceToTarget(Logger, target); err != nil {
+												Logger.Errorf("Failed to force re-copy target file for %s: %v", source.Name, err)
+												summary.Error = fmt.Sprintf("Force re-copy target file error: %v", err)
+												shouldReprocess = false
+											}
+										}
+									}
+								} else if err != nil {
+									Logger.Debugf("Could not load previous summary for %s: %v", source.Name, err)
+									shouldReprocess = true
+								} else {
+									shouldReprocess = true
+								}
+							}
+
+							if shouldReprocess {
+								if err := downloader.PostDownloadProcess(Logger, targetFilePath, summary.CountToConsider); err != nil {
+									Logger.Errorf("Post download process error for %s: %v", source.Name, err)
+									summary.Error = fmt.Sprintf("Post-download processing error: %v", err)
+								}
+							}
+
+							if AppConfig != nil && AppConfig.DNSToolkit.FilesChecksum.Enabled {
 								checksum := u.CalculateChecksum(Logger, filePath, AppConfig.DNSToolkit.FilesChecksum.Algorithm)
 								summary.Checksum = checksum
 							}
@@ -213,4 +245,20 @@ var downloadCmd = &cobra.Command{
 			Logger.Errorf("Saving summaries error: %v", err)
 		}
 	},
+}
+
+// loadPreviousDownloadSummaries loads the existing download summaries from the summary file
+func loadPreviousDownloadSummary(
+	logger *multilog.Logger,
+	summaryFile string,
+	sourceName string,
+) (*c.DownloadSummary, error) {
+	summary, err := u.GetLastSummary[c.DownloadSummary](logger, summaryFile, sourceName)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get last download summary for %s: %w", sourceName, err)
+	}
+	if summary.Name == "" {
+		return nil, nil
+	}
+	return &summary, nil
 }

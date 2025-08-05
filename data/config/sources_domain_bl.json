@@ -183,7 +183,9 @@
           "name": "domain_adguard",
           "list_types": [
             {
-              "name": "allowlist"
+              "name": "allowlist",
+              "disabled": true,
+              "notes": "Conflicts with other sources"
             }
           ]
         }
@@ -590,6 +592,8 @@
       "categories": "scam",
       "license": "BSD 3-Clause",
       "notes": "To be reviewed",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "domain"
@@ -882,6 +886,7 @@
     {
       "name": "OISD Blocklist Big",
       "categories": "ads, malware, trackers",
+      "disabled": true,
       "license": "GPL-3.0",
       "skip_general_consolidation": false,
       "types": [
@@ -905,6 +910,62 @@
         }
       ],
       "url": "https://big.oisd.nl/",
+      "website": "https://oisd.nl"
+    },
+    {
+      "name": "OISD Blocklist NSFW Small",
+      "categories": "adult",
+      "license": "GPL-3.0",
+      "skip_general_consolidation": false,
+      "skip_groups_consolidation": false,
+      "types": [
+        {
+          "name": "adguard",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        },
+        {
+          "name": "domain_adguard",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        }
+      ],
+      "url": "https://nsfw-small.oisd.nl",
+      "website": "https://oisd.nl"
+    },
+    {
+      "name": "OISD Blocklist Small",
+      "categories": "ads, cryptocurrency, malware, phishing, ransomware, trackers",
+      "license": "GPL-3.0",
+      "types": [
+        {
+          "name": "adguard",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        },
+        {
+          "name": "domain_adguard",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        }
+      ],
+      "url": "https://small.oisd.nl/",
       "website": "https://oisd.nl"
     },
     {

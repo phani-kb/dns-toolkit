@@ -594,7 +594,7 @@ func TestDownloadEdgeCases_Merged(t *testing.T) {
 				chunk[i] = 'A'
 			}
 
-			for i := 0; i < 100; i++ { // 100 chunks instead of 1024
+			for range 100 { // 100 chunks instead of 1024
 				_, _ = w.Write(chunk)
 			}
 		}))
