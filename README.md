@@ -97,13 +97,13 @@ Top domains sourced from the tranco-list.eu list (`domain_top` type) are treated
 
 | Metric | Count | Details |
 |--------|-------|---------|
-| **Total Sources** | 139 | 98 enabled, 41 disabled |
+| **Total Sources** | 139 | 97 enabled, 42 disabled |
 | **Blocklist Sources** | 130 | Sources providing blocking rules |
 | **Allowlist Sources** | 21 | Sources providing exception rules |
 | **Categories** | 22 | ads, adult, annoyance, anonymizer, botnet, cryptocurrency, dns, doh, fake, fakenews, gambling, malicious, malware, others, phishing, privacy, proxy, ransomware, scam, spam, threat, trackers |
 | **Source Types** | 26 | adguard, cidr_ipv4, domain, domain_adguard, domain_comment, domain_csv_http_url_find, domain_custom_csv_blackbook, domain_custom_csv_maltrail, domain_custom_html_ccam, domain_custom_html_puppyscams, domain_http_url, domain_top, domain_url, domain_with_comment_suffix, hostname, ipv4, ipv4_cidr_expand, ipv4_csv_http_url_find, ipv4_custom_html_ccam, ipv4_find, ipv4_http_url, ipv4_range_expand, ipv4_url, ipv6, ipv6_find, ipv6_htaccess |
 | **Geographic Coverage** | 21 countries | CN, CZ, DE, ES, FI, FR, HU, ID, IL, IT, KR, LV, MY, NL, RO, RU, SA, SK, UA, US, VN |
-| **Last Updated** | 2025-08-04 23:26:58 UTC | Statistics generation time |
+| **Last Updated** | 2025-08-05 01:21:33 UTC | Statistics generation time |
 
 <!-- STATS_END -->
 
