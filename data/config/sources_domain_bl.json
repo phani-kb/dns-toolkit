@@ -221,28 +221,7 @@
     {
       "name": "Blocklists UT1 Cryptojacking",
       "categories": "cryptocurrency",
-      "files": "cryptojacking/domains",
       "license": "CC BY-SA 4.0",
-      "skip_general_consolidation": true,
-      "types": [
-        {
-          "name": "domain",
-          "list_types": [
-            {
-              "name": "blocklist"
-            }
-          ]
-        }
-      ],
-      "url": "https://dsi.ut-capitole.fr/blacklists/download/cryptojacking.tar.gz",
-      "website": "https://dsi.ut-capitole.fr/blacklists"
-    },
-    {
-      "name": "Blocklists UT1 Malware",
-      "categories": "malware",
-      "files": "phishing/domains",
-      "license": "CC BY-SA 4.0",
-      "notes": ">79% overlap with phishing_army)",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
@@ -255,7 +234,27 @@
           ]
         }
       ],
-      "url": "https://dsi.ut-capitole.fr/blacklists/download/malware.tar.gz",
+      "url": "https://github.com/olbat/ut1-blacklists/raw/refs/heads/master/blacklists/cryptojacking/domains",
+      "website": "https://dsi.ut-capitole.fr/blacklists"
+    },
+    {
+      "name": "Blocklists UT1 Malware",
+      "categories": "malware",
+      "license": "CC BY-SA 4.0",
+      "notes": ">79% overlap with phishing_army",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "blocklist"
+            }
+          ]
+        }
+      ],
+      "url": "https://github.com/olbat/ut1-blacklists/raw/refs/heads/master/blacklists/malware/domains",
       "website": "https://dsi.ut-capitole.fr/blacklists"
     },
     {
@@ -664,7 +663,7 @@
       "name": "HaGeZi Gambling Only Domains",
       "categories": "gambling",
       "license": "GPL-3.0",
-      "notes": "Disabled due to large size (202K entries) and gambling-specific focus",
+      "notes": "Skipped due to large size (202K entries) and gambling-specific focus",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
