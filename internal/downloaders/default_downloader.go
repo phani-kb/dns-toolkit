@@ -154,7 +154,7 @@ func (d *DefaultDownloader) downloadFile(
 		localModTime = info.ModTime()
 		localFileSize = info.Size()
 	}
-	parsedURL, err := url.Parse(file.URL)
+	parsedURL, err := url.Parse(strings.TrimSpace(file.URL))
 	if err != nil {
 		logger.Errorf("Parsing URL error: %v", err)
 		return "", false, err

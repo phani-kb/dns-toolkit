@@ -84,14 +84,22 @@
       "website": "https://www.blocklist.de"
     },
     {
-      "name": "Borestad_AbuseIPDB",
+      "name": "Borestad_AbuseIPDB_S100_3d",
       "categories": "malicious, threat",
+      "frequency": "weekly",
+      "skip_general_consolidation": true,
       "types": [
         {
-          "name": "ipv4_find"
+          "name": "ipv4_find",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
         }
       ],
-      "url": "https://raw.githubusercontent.com/borestad/blocklist-abuseipdb/main/abuseipdb-s100-1d.ipv4",
+      "url": "https://raw.githubusercontent.com/borestad/blocklist-abuseipdb/refs/heads/main/abuseipdb-s100-3d.ipv4",
       "website": "https://github.com/borestad/blocklist-abuseipdb"
     },
     {
@@ -217,7 +225,9 @@
     {
       "name": "Firehol_abusers_30d",
       "categories": "malicious, threat",
+      "disabled": true,
       "license": "GPL-2.0",
+      "notes": "False positives are common, use with caution.",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
@@ -383,6 +393,8 @@
       "name": "GlobalAntiScamOrg-blocklist-ips",
       "categories": "scam",
       "license": "BSD 3-Clause",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "ipv4"

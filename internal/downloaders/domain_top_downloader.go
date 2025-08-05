@@ -74,6 +74,7 @@ func (d *DomainTopDownloader) PostDownloadProcess(logger *multilog.Logger, fileP
 			return err
 		}
 	}
+	logger.Infof("Post-processed %d domains from %s", len(domains), filePath)
 
 	return nil
 }

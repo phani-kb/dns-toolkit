@@ -1009,7 +1009,8 @@ func extractZipFile(logger *multilog.Logger, f *zip.File, destFolder string) err
 	return err
 }
 
-func CopySourceToTarget(logger *multilog.Logger, target c.DownloadTarget) error {
+// copySourceToTargetInternal is the internal implementation for copying files
+func copySourceToTargetInternal(logger *multilog.Logger, target c.DownloadTarget, forceOverwrite bool) error {
 	sourceFilepath := filepath.Join(target.SourceFolder, target.SourceFile)
 	if _, err := os.Stat(sourceFilepath); os.IsNotExist(err) {
 		return fmt.Errorf("source file not found: %s", sourceFilepath)
@@ -1020,9 +1021,13 @@ func CopySourceToTarget(logger *multilog.Logger, target c.DownloadTarget) error 
 		}
 	}
 	targetFilepath := filepath.Join(target.TargetFolder, target.TargetFile)
-	if _, err := os.Stat(targetFilepath); err == nil {
-		logger.Debugf("Target file already exists: %s", targetFilepath)
-		return nil
+
+	// Check if target exists and we shouldn't overwrite
+	if !forceOverwrite {
+		if _, err := os.Stat(targetFilepath); err == nil {
+			logger.Debugf("Target file already exists: %s", targetFilepath)
+			return nil
+		}
 	}
 
 	// copy a source file to a target file
@@ -1036,12 +1041,24 @@ func CopySourceToTarget(logger *multilog.Logger, target c.DownloadTarget) error 
 	if err != nil {
 		return err
 	}
+	defer CloseFile(logger, targetFile)
 
 	if _, err := io.Copy(targetFile, sourceFile); err != nil {
 		return err
 	}
 
+	if forceOverwrite {
+		logger.Debugf("Force copied %s to %s", sourceFilepath, targetFilepath)
+	}
 	return nil
+}
+
+func CopySourceToTarget(logger *multilog.Logger, target c.DownloadTarget) error {
+	return copySourceToTargetInternal(logger, target, false)
+}
+
+func ForceCopySourceToTarget(logger *multilog.Logger, target c.DownloadTarget) error {
+	return copySourceToTargetInternal(logger, target, true)
 }
 
 func CloseBody(logger *multilog.Logger, body io.Closer) {
