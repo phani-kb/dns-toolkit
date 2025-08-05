@@ -425,8 +425,9 @@
     {
       "name": "Dan Pollock's List",
       "categories": "ads, malware, trackers",
+      "disabled": true,
       "frequency": "weekly",
-      "notes": "Frequent Access forbidden (403) errors",
+      "notes": ">98% overlap with StevenBlack Fake Gambling list",
       "types": [
         {
           "name": "hostname",
@@ -733,6 +734,7 @@
     {
       "name": "HaGeZi Xiaomi Tracker",
       "categories": "privacy, trackers",
+      "disabled": true,
       "license": "GPL-3.0",
       "notes": ">95% overlap with HaGeZi Pro",
       "types": [
@@ -873,7 +875,7 @@
     },
     {
       "name": "malware-filter_phishing-filter",
-      "categories": "phishing",
+      "categories": "malware, phishing",
       "license": "MIT",
       "types": [
         {
@@ -960,7 +962,9 @@
           "list_types": [
             {
               "name": "blocklist",
-              "groups": "normal"
+              "groups": "normal",
+              "disabled": true,
+              "notes": ">97% overlap with HaGeZi Pro"
             }
           ]
         }
@@ -1517,7 +1521,9 @@
     {
       "name": "Yoyo Adservers-Hosts",
       "categories": "ads",
+      "disabled": true,
       "license": "MIT",
+      "notes": ">98% overlap with StevenBlack Fake Gambling list",
       "types": [
         {
           "name": "hostname"

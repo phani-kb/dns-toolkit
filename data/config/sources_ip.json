@@ -168,6 +168,7 @@
     {
       "name": "DShield",
       "categories": "malicious, threat",
+      "disabled": true,
       "notes": "100% overlap with Firehol_level2/Firehol_level3",
       "types": [
         {
@@ -455,7 +456,14 @@
       "categories": "malicious, threat",
       "types": [
         {
-          "name": "ipv4_find"
+          "name": "ipv4_find",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "disabled": true,
+              "notes": ">96% overlap with Firehol_level2/Firehol_level3"
+            }
+          ]
         },
         {
           "name": "ipv6_htaccess"
@@ -533,7 +541,14 @@
       "categories": "spam, threat",
       "types": [
         {
-          "name": "cidr_ipv4"
+          "name": "cidr_ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "disabled": true,
+              "notes": ">98% overlap with ET_fwip"
+            }
+          ]
         }
       ],
       "url": "http://www.spamhaus.org/drop/drop.txt",
