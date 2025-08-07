@@ -162,7 +162,7 @@ func generateFilesList(
 		}
 		lines = append(
 			lines,
-			fmt.Sprintf("#   - %s: %d entries%s", fileInfo.Name, fileInfo.Count, mustConsiderText),
+			fmt.Sprintf("#   - %s: %d%s", fileInfo.Name, fileInfo.Count, mustConsiderText),
 		)
 	}
 
@@ -320,7 +320,12 @@ func processRegularFiles(
 		fileName := filepath.Base(filePath)
 		format := constants.SummaryTypesMap[summaryType]
 		description := generateDescription(summaryType, fileName, format, listType)
-		files := generateFilesList(filePath, listType, summaryType, filesInvolved[filePath])
+
+		var files string
+		if summaryType != constants.SummaryTypeTop {
+			files = generateFilesList(filePath, listType, summaryType, filesInvolved[filePath])
+		}
+
 		outDir := constants.SummaryTypesOutputDirMap[summaryType]
 		outputFilePath := filepath.Join(outDir, fileName)
 

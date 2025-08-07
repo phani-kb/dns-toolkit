@@ -642,7 +642,7 @@ func TestGenerateFilesList(t *testing.T) {
 		{Name: "bar.txt", Count: 5, MustConsider: true},
 	}
 	got := generateFilesList("", "domain", "", files)
-	want := "# This domain list was consolidated from 2 source file(s):\n#   - foo.txt: 10 entries\n#   - bar.txt: 5 entries [must consider]"
+	want := "# This domain list was consolidated from 2 source file(s):\n#   - foo.txt: 10\n#   - bar.txt: 5 [must consider]"
 	if got != want {
 		t.Errorf("generateFilesList() = %q, want %q", got, want)
 	}
