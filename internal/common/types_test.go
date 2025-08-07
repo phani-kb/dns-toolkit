@@ -378,19 +378,21 @@ func TestFileInfo_GetString(t *testing.T) {
 			name: "without must consider",
 			fi: FileInfo{
 				Name:         "test",
+				SourceType:   "domain",
 				Filepath:     "/path/to/file",
 				MustConsider: false,
 			},
-			expected: "test [/path/to/file] [0]",
+			expected: "test_domain [/path/to/file] [0]",
 		},
 		{
 			name: "with must consider",
 			fi: FileInfo{
 				Name:         "test",
+				SourceType:   "ipv4",
 				Filepath:     "/path/to/file",
 				MustConsider: true,
 			},
-			expected: "test [/path/to/file] [0] [must consider]",
+			expected: "test_ipv4 [/path/to/file] [0] [must consider]",
 		},
 	}
 

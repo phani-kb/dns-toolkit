@@ -445,6 +445,7 @@ func (ot *OverlapTargetFileInfo) GetString() string {
 // FileInfo contains basic information about a file.
 type FileInfo struct {
 	Name         string `json:"name"`                    // Name of the file source
+	SourceType   string `json:"source_type"`             // Type of the source
 	Filepath     string `json:"filepath"`                // Path to the file
 	MustConsider bool   `json:"must_consider,omitempty"` // Whether the file must be considered
 	Count        int    `json:"count"`                   // Number of entries
@@ -452,7 +453,7 @@ type FileInfo struct {
 
 // GetString returns a formatted string representation of file info.
 func (fi *FileInfo) GetString() string {
-	return fmt.Sprintf("%s [%s] [%d]%s", fi.Name, fi.Filepath, fi.Count,
+	return fmt.Sprintf("%s_%s [%s] [%d]%s", fi.Name, fi.SourceType, fi.Filepath, fi.Count,
 		func() string {
 			if fi.MustConsider {
 				return " [must consider]"
