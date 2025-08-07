@@ -69,6 +69,7 @@ func (bc *BaseConsolidator) Consolidate(
 
 		fileInfos = append(fileInfos, c.FileInfo{
 			Name:         processedFile.Name,
+			SourceType:   processedFile.ActualSourceType,
 			Filepath:     processedFile.Filepath,
 			MustConsider: processedFile.MustConsider,
 			Count:        len(entries),

@@ -99,24 +99,26 @@ func loadTemplates() (*template.Template, []byte, error) {
 
 // parseFileInfoFromString parses a FileInfo string back to FileInfo struct
 func parseFileInfoFromString(fileStr string) (common.FileInfo, error) {
-	// Format: "name [filepath] [count] [must consider]"
-	re := regexp.MustCompile(`^(.+?) \[(.+?)\] \[(\d+)\]( \[must consider\])?$`)
+	// Format: "name_sourceType [filepath] [count] [must consider]"
+	re := regexp.MustCompile(`^(.+?)_(.+?) \[(.+?)\] \[(\d+)\]( \[must consider\])?$`)
 	matches := re.FindStringSubmatch(fileStr)
 
-	if len(matches) < 4 {
+	if len(matches) < 5 {
 		return common.FileInfo{}, fmt.Errorf("invalid file info string format: %s", fileStr)
 	}
 
 	name := matches[1]
-	filepath := matches[2]
-	count, err := strconv.Atoi(matches[3])
+	sourceType := matches[2]
+	filepath := matches[3]
+	count, err := strconv.Atoi(matches[4])
 	if err != nil {
-		return common.FileInfo{}, fmt.Errorf("invalid count in file info string: %s", matches[3])
+		return common.FileInfo{}, fmt.Errorf("invalid count in file info string: %s", matches[4])
 	}
-	mustConsider := len(matches) > 4 && matches[4] != ""
+	mustConsider := len(matches) > 5 && matches[5] != ""
 
 	return common.FileInfo{
 		Name:         name,
+		SourceType:   sourceType,
 		Filepath:     filepath,
 		Count:        count,
 		MustConsider: mustConsider,

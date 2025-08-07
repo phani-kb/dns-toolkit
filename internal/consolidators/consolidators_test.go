@@ -230,8 +230,9 @@ func TestGenericConsolidator(t *testing.T) {
 		result := utils.NewStringSet([]string{"test1.com", "test2.com"})
 		fileInfos := []common.FileInfo{
 			{
-				Name:     "test",
-				Filepath: "test/path",
+				Name:       "test",
+				SourceType: "test-source",
+				Filepath:   "test/path",
 			},
 		}
 		return result, fileInfos
