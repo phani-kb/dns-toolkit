@@ -52,8 +52,10 @@
     {
       "name": "Adaway",
       "categories": "ads",
+      "disabled": true,
       "frequency": "weekly",
       "license": "CC Attribution 3.0",
+        "notes": ">99% overlap with StevenBlack Fake Gambling list",
       "types": [
         {
           "name": "hostname",

@@ -19,9 +19,10 @@ fi
 # t  - top
 # o  - overlap
 # op - output
-# r  - output README
-# or - overlap README
-# sr - summaries README
+# gr - output README
+# gor- overlap README
+# gsr- summaries README
+# gs - stats README
 # cp - copy summaries
 
 if [ "$#" -gt 0 ]; then

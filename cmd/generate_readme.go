@@ -18,7 +18,7 @@ import (
 var generateReadmeCmd = &cobra.Command{
 	Use:   "output-readme",
 	Short: "Generate README.md for output branch with daily workflow summary",
-	Long:  "Generate a README.md for the output branch containing tabular summaries of daily workflow runs including download, processing, consolidation, and analysis statistics",
+	Long:  "Generate a README.md for the output branch containing tabular summaries of daily workflow runs including download, processing, consolidation, and analysis statistics", // nolint:lll
 	Run: func(cmd *cobra.Command, args []string) {
 		if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
 			Logger.Debug("Skipping generate readme command in test mode")

@@ -29,7 +29,7 @@ var (
 var searchCmd = &cobra.Command{
 	Use:   "search [domain or IP]",
 	Short: "Search for a domain or IP in the processed files",
-	Long:  `Search for a given domain among the valid processed domain files and report the sources in which it was found. Also looks for its IP address among the valid IPv4 processed files.`,
+	Long:  `Search for a given domain among the valid processed domain files and report the sources in which it was found. Also looks for its IP address among the valid IPv4 processed files.`, // nolint:lll
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		query := strings.ToLower(args[0])
@@ -210,8 +210,8 @@ func searchInAllFiles(
 
 // searchInFileType searches for the query in files of a specific type
 func searchInFileType(query string, isIP bool, ipAddresses u.StringSet, cnames []string,
-	fileType string, mu *sync.Mutex, domainResults, ipResults, cnameResults map[string][]string) {
-
+	fileType string, mu *sync.Mutex, domainResults, ipResults, cnameResults map[string][]string,
+) {
 	// Search for domain if a query is not an IP
 	if !isIP {
 		results := searchInFiles(query, constants.SourceTypeDomain, fileType, exactMatch)
@@ -246,8 +246,8 @@ func mergeSearchResults(target, source map[string][]string) {
 
 // displaySearchResults shows the search results in a formatted way
 func displaySearchResults(query string, isIP bool, domainResults, ipResults, cnameResults map[string][]string,
-	ipAddresses u.StringSet, cnames []string) {
-
+	ipAddresses u.StringSet, cnames []string,
+) {
 	// Display domain results
 	if !isIP {
 		displayDomainResults(query, domainResults)
@@ -471,8 +471,8 @@ func entryContains(query, filePath string, exactMatch bool) (bool, error) {
 	return false, nil
 }
 
+// nolint:lll
 func init() {
-
 	searchCmd.Flags().BoolVarP(&exactMatch, "exact", "e", false, "Perform exact match instead of substring match")
 	searchCmd.Flags().BoolVarP(&searchProcessed, "processed", "p", true, "Search in processed files")
 	searchCmd.Flags().BoolVarP(&searchConsolidated, "consolidated", "c", true, "Search in consolidated files")

@@ -483,7 +483,6 @@ func TestOverlapService_WriteCompactOverlapSummaries_ErrorCase(t *testing.T) {
 		[]string{"domain"},
 		4,
 	)
-
 	if err != nil {
 		assert.Error(t, err, "Expected an error when writing to a non-writable directory")
 	}

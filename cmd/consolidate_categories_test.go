@@ -25,7 +25,6 @@ func createTempFileWithContent(t *testing.T, content string) string {
 }
 
 func TestGetUniqueCategories(t *testing.T) {
-
 	tests := []struct {
 		name           string
 		processedFiles []c.ProcessedFile
@@ -86,7 +85,6 @@ func TestGetUniqueCategories(t *testing.T) {
 }
 
 func TestConsolidateByCategory(t *testing.T) {
-
 	logger := multilog.NewLogger()
 
 	tests := []struct {
@@ -169,7 +167,6 @@ func TestConsolidateByCategory(t *testing.T) {
 }
 
 func TestConsolidateCategoriesCommand(t *testing.T) {
-
 	assert.NotNil(t, consolidateCategoriesCmd)
 	assert.Equal(t, "categories", consolidateCategoriesCmd.Use)
 	assert.Contains(t, consolidateCategoriesCmd.Short, "category-based")

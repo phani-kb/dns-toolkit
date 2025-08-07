@@ -2,4 +2,6 @@
 # File name: {{.FileName}}
 # Last Updated: {{.LastUpdated}}
 # Format: {{.Description}}
-# Count: {{.Count}}
+# Count: {{.Count}}{{if .Files}}
+# Files:
+{{.Files}}{{end}}

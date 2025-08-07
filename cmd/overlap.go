@@ -13,18 +13,19 @@ import (
 )
 
 // Profiling flags for overlap command
-var overlapCPUProfile bool
-var overlapMemProfile bool
-var overlapGoroutineProfile bool
-var overlapBlockProfile bool
-var overlapProfileDir string
-var overlapMaxWorkers int
+var (
+	overlapCPUProfile       bool
+	overlapMemProfile       bool
+	overlapGoroutineProfile bool
+	overlapBlockProfile     bool
+	overlapProfileDir       string
+	overlapMaxWorkers       int
+)
 
 var overlapCmd = &cobra.Command{
 	Use:   "overlap",
 	Short: "Find overlap between source files",
 	Run: func(cmd *cobra.Command, args []string) {
-
 		overlapMaxWorkers = AppConfig.DNSToolkit.MaxWorkers
 		if overlapMaxWorkers <= 0 {
 			overlapMaxWorkers = runtime.GOMAXPROCS(0)
@@ -99,7 +100,6 @@ var overlapCmd = &cobra.Command{
 				genericSourceTypes,
 				overlapMaxWorkers,
 			)
-
 			if err != nil {
 				Logger.Errorf("Error writing overlap summaries: %v", err)
 			}

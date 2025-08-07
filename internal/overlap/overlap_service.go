@@ -209,7 +209,7 @@ func (s *DefaultOverlapService) WriteCompactOverlapSummaries(
 
 	workerPool := c.NewDTWorkerPool(maxWorkers)
 
-	var processedFilesMap = make(map[string][]c.ProcessedFile)
+	processedFilesMap := make(map[string][]c.ProcessedFile)
 	// group processed files by generic source type
 	for _, file := range processedFiles {
 		processedFilesMap[file.GenericSourceType] = append(processedFilesMap[file.GenericSourceType], file)
