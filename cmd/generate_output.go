@@ -150,7 +150,7 @@ func generateFilesList(
 
 	var lines []string
 	lines = append(lines, fmt.Sprintf(
-		"This %s list was consolidated from %d source file(s):",
+		"# This %s list was consolidated from %d source file(s):",
 		listType,
 		len(filesInvolved),
 	))
@@ -162,7 +162,7 @@ func generateFilesList(
 		}
 		lines = append(
 			lines,
-			fmt.Sprintf("  - %s: %d entries%s", fileInfo.Name, fileInfo.Count, mustConsiderText),
+			fmt.Sprintf("#   - %s: %d entries%s", fileInfo.Name, fileInfo.Count, mustConsiderText),
 		)
 	}
 
