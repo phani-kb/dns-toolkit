@@ -14,10 +14,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var ignoreAllowlist bool
-var includeInvalid bool
-var calculateChecksum bool
-var skipConsolidatedSummary bool
+var (
+	ignoreAllowlist         bool
+	includeInvalid          bool
+	calculateChecksum       bool
+	skipConsolidatedSummary bool
+)
 
 var consolidateCmd = &cobra.Command{
 	Use:   "consolidate",
@@ -46,7 +48,7 @@ var consolidateAllCmd = &cobra.Command{
 			*AppConfig,
 		)
 		var allConsolidatedSummaries []c.ConsolidatedSummary
-		var allowlistEntriesByType = make(map[string]u.StringSet)
+		allowlistEntriesByType := make(map[string]u.StringSet)
 		var mu sync.Mutex
 
 		// First phase: Process all allowlists synchronously
@@ -289,6 +291,7 @@ func init() {
 		BoolVar(&calculateChecksum, "calculate-checksum", false, "Calculate checksum on the consolidated files")
 	consolidateCategoriesCmd.PersistentFlags().
 		BoolVar(&skipConsolidatedSummary, "skip-consolidated-summary", false, "Skip creating the consolidated summary file")
+	// nolint:lll
 	consolidateGroupsCmd.PersistentFlags().
 		BoolVar(&skipConsolidatedSummary, "skip-consolidated-summary", false, "Skip creating the regular consolidated summary file")
 	consolidateCmd.AddCommand(consolidateAllCmd)

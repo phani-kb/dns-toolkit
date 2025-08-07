@@ -67,6 +67,7 @@ func (lt *ListType) Validate() error {
 	return nil
 }
 
+// nolint:lll
 // DownloadSummary represents information about a downloaded DNS blocklist file.
 // It contains metadata about the source, content types, and download status.
 type DownloadSummary struct {
@@ -217,6 +218,7 @@ type DownloadTarget struct {
 	TargetFile   string `json:"target_file"`
 }
 
+// nolint:lll
 // ProcessedFile contains information about a file after it has been processed.
 // It includes metadata about the content type and validation results.
 type ProcessedFile struct {
@@ -306,6 +308,8 @@ func (ps *ProcessedSummary) GetName() string {
 
 // ConsolidatedSummary represents information about consolidated files that combine
 // multiple source files of the same type into a single deduplicated file.
+//
+//nolint:lll
 type ConsolidatedSummary struct {
 	Type                      string   `json:"type"`                            // Type of entries (domain, ipv4, etc.)
 	Filepath                  string   `json:"filepath"`                        // Path to the consolidated file
@@ -344,6 +348,7 @@ func (cs *ConsolidatedSummary) GetName() string {
 	return cs.Type
 }
 
+// nolint:lll
 // ConsolidatedGroupsSummary represents a group of consolidated summaries organized by size.
 type ConsolidatedGroupsSummary struct {
 	Group                     string                `json:"group"`                       // Size group (mini, lite, normal, big)
@@ -356,6 +361,8 @@ func (css *ConsolidatedGroupsSummary) GetName() string {
 }
 
 // ConsolidatedCategoriesSummary represents consolidated summaries grouped by category.
+//
+//nolint:lll
 type ConsolidatedCategoriesSummary struct {
 	Category                  string                `json:"category"`                    // Category name (ads, malware, privacy, etc)
 	LastConsolidatedTimestamp string                `json:"last_consolidated_timestamp"` // When consolidation was completed

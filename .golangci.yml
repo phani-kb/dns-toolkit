@@ -20,6 +20,7 @@ linters:
   settings:
     lll:
       line-length: 120
+      tab-width: 1
     goconst:
       min-occurrences: 10
     revive:

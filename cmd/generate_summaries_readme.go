@@ -18,7 +18,7 @@ import (
 var generateSummariesReadmeCmd = &cobra.Command{
 	Use:   "summaries-readme",
 	Short: "Generate README.md for summaries with summary information",
-	Long:  "Generate a README.md for the summaries directory containing information about the last generated summary files.",
+	Long:  "Generate a README.md for the summaries directory containing information about the last generated summary files.", // nolint:lll
 	Run: func(cmd *cobra.Command, args []string) {
 		if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
 			Logger.Debug("Skipping generate summaries readme command in test mode")

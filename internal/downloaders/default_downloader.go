@@ -20,8 +20,10 @@ import (
 	"github.com/phani-kb/multilog"
 )
 
-const defaultDownloaderName string = "default"
-const retryDelay = time.Second * constants.DefaultRetryDelayInSeconds
+const (
+	defaultDownloaderName string = "default"
+	retryDelay                   = time.Second * constants.DefaultRetryDelayInSeconds
+)
 
 // HTTPStatusError Custom error types for better handling
 type HTTPStatusError struct {
@@ -252,6 +254,7 @@ func (d *DefaultDownloader) downloadFile(
 			URL:        file.URL,
 		}
 
+		// nolint:lll
 		switch resp.StatusCode {
 		case http.StatusForbidden:
 			logger.Errorf(
@@ -326,7 +329,6 @@ func (d *DefaultDownloader) canSkipDownload(
 	localFileSize int64,
 	localModTime time.Time,
 ) bool {
-
 	summaryFile := filepath.Join(constants.SummaryDir, constants.DefaultSummaryFiles["download"])
 	if !d.ShouldDownload(logger, summaryFile, file) {
 		return true

@@ -354,6 +354,7 @@ func copyFile(logger *multilog.Logger, src, dst string) error {
 
 	return nil
 }
+
 func StringInSlice(str string, slice []string) bool {
 	return NewStringSet(slice).Contains(str)
 }

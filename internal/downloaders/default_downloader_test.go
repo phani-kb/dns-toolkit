@@ -178,7 +178,6 @@ func TestDefaultDownloader_PostDownloadProcess(t *testing.T) {
 }
 
 func TestDefaultDownloader_RetryLogic(t *testing.T) {
-
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
 	defer func() {
@@ -225,7 +224,6 @@ func TestDefaultDownloader_RetryLogic(t *testing.T) {
 }
 
 func TestCanSkipDownload(t *testing.T) {
-
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
 	defer func() {
@@ -292,7 +290,6 @@ func TestCanSkipDownload(t *testing.T) {
 }
 
 func TestCanSkipDownloadWithBadRequest(t *testing.T) {
-
 	logger := setupTestLogger()
 	testDir := setupTestDir(t)
 	defer func() {

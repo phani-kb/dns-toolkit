@@ -410,7 +410,7 @@ var generateCmd = &cobra.Command{
 var generateOutputCmd = &cobra.Command{
 	Use:   "output",
 	Short: "Generate output files with templates prefixed to them",
-	Long:  "Generate output files with static and dynamic templates prefixed to the summary types defined in SummaryTypesWithTemplateMap",
+	Long:  "Generate output files with static and dynamic templates prefixed to the summary types defined in SummaryTypesWithTemplateMap", // nolint:lll
 	Run: func(cmd *cobra.Command, args []string) {
 		if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
 			return

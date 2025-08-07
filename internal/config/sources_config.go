@@ -513,7 +513,7 @@ func matchesFilters(source Source, filters SourceFilters) bool {
 
 	// Check Group filter
 	if filters.Group != "" {
-		//groupMatches := false
+		// groupMatches := false
 		for _, t := range source.Types {
 			for _, lt := range t.GetListTypes() {
 				for _, group := range lt.Groups {
