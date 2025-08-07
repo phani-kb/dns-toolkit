@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"os"
 	"testing"
 
 	"github.com/phani-kb/dns-toolkit/internal/config"
@@ -10,6 +11,21 @@ import (
 
 // Test command argument handling and flag parsing
 func TestCommandArguments(t *testing.T) {
+	configPath := os.Getenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
+	if configPath == "" {
+		t.Skip("DNS_TOOLKIT_TEST_CONFIG_PATH is not set, skipping test")
+	}
+
+	// Set test mode
+	err := os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+	assert.NoError(t, err)
+	defer func() {
+		err := os.Unsetenv("DNS_TOOLKIT_TEST_MODE")
+		if err != nil {
+			t.Logf("Failed to unset DNS_TOOLKIT_TEST_MODE: %v", err)
+		}
+	}()
+
 	oldConfig := AppConfig
 	defer func() { AppConfig = oldConfig }()
 
