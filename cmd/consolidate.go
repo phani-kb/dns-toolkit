@@ -42,10 +42,11 @@ var consolidateAllCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		_, genericSourceTypes, processedFiles := cfg.GetProcessedSummaries(
+		_, genericSourceTypes, processedFiles := cfg.GetProcessedSummariesForConsolidation(
 			Logger,
 			SourcesConfigs,
 			*AppConfig,
+			"general",
 		)
 		var allConsolidatedSummaries []c.ConsolidatedSummary
 		allowlistEntriesByType := make(map[string]u.StringSet)

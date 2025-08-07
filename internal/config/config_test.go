@@ -6,6 +6,8 @@ import (
 	"testing"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
+	"github.com/phani-kb/dns-toolkit/internal/constants"
+	"github.com/phani-kb/multilog"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -315,7 +317,7 @@ func TestSourceGetDownloadFile(t *testing.T) {
 		URL:  "http://example.com/file.txt",
 	}
 
-	logger := createTestLogger(t)
+	logger := CreateTestLogger()
 	downloadDir := "/tmp/downloads"
 
 	downloadFile, err := source.GetDownloadFile(logger, downloadDir)
@@ -478,7 +480,7 @@ func TestSourcesConfigGetSourceByField(t *testing.T) {
 func TestLoadSourcesConfig(t *testing.T) {
 	t.Parallel()
 
-	logger := createTestLogger(t)
+	logger := CreateTestLogger()
 
 	_, err := LoadSourcesConfig(logger, "/nonexistent/file.json")
 	assert.Error(t, err)
@@ -652,4 +654,179 @@ func TestConsolidationTypeFunctions(t *testing.T) {
 	t.Run("IsEnabledSourceForConsolidation - non-existent source", func(t *testing.T) {
 		assert.False(t, IsEnabledSourceForConsolidation("non-existent", sourceConfigs, appConfig, "general"))
 	})
+}
+
+func TestFilterEnabledSummaries(t *testing.T) {
+	logger := multilog.NewLogger()
+	ps := []c.ProcessedSummary{{Name: "srcA"}, {Name: "srcB"}}
+	sourcesConfigs := []SourcesConfig{
+		{
+			Sources: []Source{{Name: "srcA", Disabled: false}, {Name: "srcB", Disabled: true}},
+		},
+	}
+	appConfig := AppConfig{}
+
+	enabled := filterEnabledSummaries(logger, ps, sourcesConfigs, appConfig)
+	if len(enabled) != 1 || enabled[0].Name != "srcA" {
+		t.Errorf("Expected only srcA enabled, got: %v", enabled)
+	}
+}
+
+func TestGetProcessedSummaries(t *testing.T) {
+	logger := multilog.NewLogger()
+	ps := []c.ProcessedSummary{{Name: "src1"}, {Name: "src2"}}
+	sourcesConfigs := []SourcesConfig{
+		{
+			Sources: []Source{{Name: "src1", Disabled: false}, {Name: "src2", Disabled: true}},
+		},
+	}
+	appConfig := AppConfig{}
+
+	enabled := filterEnabledSummaries(logger, ps, sourcesConfigs, appConfig)
+	if len(enabled) != 1 || enabled[0].Name != "src1" {
+		t.Errorf("Expected only src1 enabled, got: %v", enabled)
+	}
+}
+
+// Additional tests for improved coverage of new functions
+func TestGetProcessedSummariesWithFileErrors(t *testing.T) {
+	t.Parallel()
+
+	logger := CreateTestLogger()
+
+	// Test with non-existent file
+	tempDir, err := os.MkdirTemp("", "test_*")
+	assert.NoError(t, err)
+	defer func() {
+		if err := os.RemoveAll(tempDir); err != nil {
+			t.Logf("Failed to remove temp directory: %v", err)
+		}
+	}()
+
+	originalSummaryDir := constants.SummaryDir
+	constants.SummaryDir = tempDir
+	defer func() {
+		constants.SummaryDir = originalSummaryDir
+	}()
+
+	sourceConfig := SourcesConfig{
+		Sources: []Source{
+			{
+				Name:     "test-source",
+				URL:      "http://example.com",
+				Types:    []c.SourceType{{Name: "domain"}},
+				Disabled: false,
+			},
+		},
+	}
+
+	appConfig := AppConfig{
+		DNSToolkit: DNSToolkitConfig{
+			SourceFilters: SourceFilters{},
+		},
+	}
+
+	// Test with missing file
+	summaries, genericTypes, processedFiles := GetProcessedSummaries(
+		logger,
+		[]SourcesConfig{sourceConfig},
+		appConfig,
+	)
+
+	assert.Nil(t, summaries)
+	assert.Nil(t, genericTypes)
+	assert.Nil(t, processedFiles)
+}
+
+func TestFilterEnabledSummariesBasic(t *testing.T) {
+	t.Parallel()
+
+	logger := CreateTestLogger()
+
+	summaries := []c.ProcessedSummary{
+		{Name: "enabled-source"},
+		{Name: "disabled-source"},
+		{Name: "non-existent"},
+	}
+
+	sourceConfig := SourcesConfig{
+		Sources: []Source{
+			{
+				Name:     "enabled-source",
+				URL:      "http://example.com",
+				Types:    []c.SourceType{{Name: "domain"}},
+				Disabled: false,
+			},
+			{
+				Name:     "disabled-source",
+				URL:      "http://example.com",
+				Types:    []c.SourceType{{Name: "domain"}},
+				Disabled: true,
+			},
+		},
+	}
+
+	appConfig := AppConfig{
+		DNSToolkit: DNSToolkitConfig{
+			SourceFilters: SourceFilters{},
+		},
+	}
+
+	enabled := filterEnabledSummaries(
+		logger,
+		summaries,
+		[]SourcesConfig{sourceConfig},
+		appConfig,
+	)
+
+	assert.Len(t, enabled, 1)
+	assert.Equal(t, "enabled-source", enabled[0].Name)
+}
+
+func TestIsEnabledSourceForConsolidationEdgeCases(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name              string
+		sourceName        string
+		consolidationType string
+		expected          bool
+	}{
+		{
+			name:              "empty consolidation type defaults to general",
+			sourceName:        "regular-source",
+			consolidationType: "",
+			expected:          true,
+		},
+	}
+
+	sourceConfig := SourcesConfig{
+		Sources: []Source{
+			{
+				Name:                     "regular-source",
+				URL:                      "http://example.com",
+				Types:                    []c.SourceType{{Name: "domain"}},
+				Disabled:                 false,
+				SkipGeneralConsolidation: false,
+			},
+		},
+	}
+
+	appConfig := AppConfig{
+		DNSToolkit: DNSToolkitConfig{
+			SourceFilters: SourceFilters{},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := IsEnabledSourceForConsolidation(
+				tt.sourceName,
+				[]SourcesConfig{sourceConfig},
+				appConfig,
+				tt.consolidationType,
+			)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
 }

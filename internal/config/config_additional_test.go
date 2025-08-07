@@ -106,7 +106,7 @@ func TestIsEnabledSource(t *testing.T) {
 	}
 }
 
-func TestGetProcessedSummaries(t *testing.T) {
+func TestGetProcessedSummariesForConsolidation(t *testing.T) {
 	t.Parallel()
 
 	logger := createTestLogger(t)
@@ -182,7 +182,12 @@ func TestGetProcessedSummaries(t *testing.T) {
 		},
 	}
 
-	summaries, genericTypes, processedFiles := GetProcessedSummaries(logger, []SourcesConfig{sourceConfig}, appConfig)
+	summaries, genericTypes, processedFiles := GetProcessedSummariesForConsolidation(
+		logger,
+		[]SourcesConfig{sourceConfig},
+		appConfig,
+		"general",
+	)
 
 	assert.Len(t, summaries, 1) // Only enabled source
 	assert.Equal(t, "enabled-source", summaries[0].Name)
@@ -193,7 +198,12 @@ func TestGetProcessedSummaries(t *testing.T) {
 	err = os.Remove(summaryFile)
 	require.NoError(t, err)
 
-	summaries, genericTypes, processedFiles = GetProcessedSummaries(logger, []SourcesConfig{sourceConfig}, appConfig)
+	summaries, genericTypes, processedFiles = GetProcessedSummariesForConsolidation(
+		logger,
+		[]SourcesConfig{sourceConfig},
+		appConfig,
+		"general",
+	)
 	assert.Nil(t, summaries)
 	assert.Nil(t, genericTypes)
 	assert.Nil(t, processedFiles)
@@ -201,7 +211,12 @@ func TestGetProcessedSummaries(t *testing.T) {
 	err = os.WriteFile(summaryFile, []byte("invalid json"), 0644)
 	require.NoError(t, err)
 
-	summaries, genericTypes, processedFiles = GetProcessedSummaries(logger, []SourcesConfig{sourceConfig}, appConfig)
+	summaries, genericTypes, processedFiles = GetProcessedSummariesForConsolidation(
+		logger,
+		[]SourcesConfig{sourceConfig},
+		appConfig,
+		"general",
+	)
 	assert.Nil(t, summaries)
 	assert.Nil(t, genericTypes)
 	assert.Nil(t, processedFiles)
