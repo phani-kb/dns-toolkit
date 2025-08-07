@@ -84,14 +84,22 @@
       "website": "https://www.blocklist.de"
     },
     {
-      "name": "Borestad_AbuseIPDB",
+      "name": "Borestad_AbuseIPDB_S100_3d",
       "categories": "malicious, threat",
+      "frequency": "weekly",
+      "skip_general_consolidation": true,
       "types": [
         {
-          "name": "ipv4_find"
+          "name": "ipv4_find",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
         }
       ],
-      "url": "https://raw.githubusercontent.com/borestad/blocklist-abuseipdb/main/abuseipdb-s100-1d.ipv4",
+      "url": "https://raw.githubusercontent.com/borestad/blocklist-abuseipdb/refs/heads/main/abuseipdb-s100-3d.ipv4",
       "website": "https://github.com/borestad/blocklist-abuseipdb"
     },
     {
@@ -127,7 +135,7 @@
     },
     {
       "name": "DoH_IP_blocklists",
-      "categories": "dns, doh",
+      "categories": "doh",
       "exclude": true,
       "license": "GPL-3.0",
       "skip_general_consolidation": true,
@@ -144,7 +152,7 @@
     },
     {
       "name": "DoH_IP_list",
-      "categories": "dns, doh",
+      "categories": "doh",
       "exclude": true,
       "frequency": "monthly",
       "license": "MIT",
@@ -160,6 +168,7 @@
     {
       "name": "DShield",
       "categories": "malicious, threat",
+      "disabled": true,
       "notes": "100% overlap with Firehol_level2/Firehol_level3",
       "types": [
         {
@@ -217,7 +226,11 @@
     {
       "name": "Firehol_abusers_30d",
       "categories": "malicious, threat",
+      "disabled": true,
       "license": "GPL-2.0",
+      "notes": "False positives are common, use with caution.",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "ipv4"
@@ -255,8 +268,48 @@
       "website": "https://botscout.com"
     },
     {
+      "name": "Firehol_CleanTalk",
+      "categories": "malicious, threat",
+      "license": "GPL-2.0",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        }
+      ],
+      "url": "https://iplists.firehol.org/files/cleantalk.ipset",
+      "website": "https://iplists.firehol.org"
+    },
+    {
+      "name": "Firehol_CleanTalk_Top20",
+      "categories": "malicious, threat",
+      "license": "GPL-2.0",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "mini"
+            }
+          ]
+        }
+      ],
+      "url": "https://iplists.firehol.org/files/cleantalk_top20.ipset",
+      "website": "https://iplists.firehol.org"
+    },
+    {
       "name": "Firehol_GPF_Comics",
       "categories": "malicious, threat",
+      "license": "GPL-2.0",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "ipv4"
@@ -341,6 +394,8 @@
       "name": "GlobalAntiScamOrg-blocklist-ips",
       "categories": "scam",
       "license": "BSD 3-Clause",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "ipv4"
@@ -369,7 +424,7 @@
     },
     {
       "name": "HaGeZi_DoH",
-      "categories": "dns, doh",
+      "categories": "doh",
       "disabled": true,
       "license": "GPL-3.0",
       "notes": ">98% overlap with DoH_IP_blocklists",
@@ -401,7 +456,14 @@
       "categories": "malicious, threat",
       "types": [
         {
-          "name": "ipv4_find"
+          "name": "ipv4_find",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "disabled": true,
+              "notes": ">96% overlap with Firehol_level2/Firehol_level3"
+            }
+          ]
         },
         {
           "name": "ipv6_htaccess"
@@ -413,6 +475,7 @@
     {
       "name": "Public_DNS4",
       "categories": "dns",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "ipv4"
@@ -478,7 +541,14 @@
       "categories": "spam, threat",
       "types": [
         {
-          "name": "cidr_ipv4"
+          "name": "cidr_ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "disabled": true,
+              "notes": ">98% overlap with ET_fwip"
+            }
+          ]
         }
       ],
       "url": "http://www.spamhaus.org/drop/drop.txt",

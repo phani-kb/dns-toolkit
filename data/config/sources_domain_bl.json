@@ -183,7 +183,9 @@
           "name": "domain_adguard",
           "list_types": [
             {
-              "name": "allowlist"
+              "name": "allowlist",
+              "disabled": true,
+              "notes": "Conflicts with other sources"
             }
           ]
         }
@@ -221,28 +223,7 @@
     {
       "name": "Blocklists UT1 Cryptojacking",
       "categories": "cryptocurrency",
-      "files": "cryptojacking/domains",
       "license": "CC BY-SA 4.0",
-      "skip_general_consolidation": true,
-      "types": [
-        {
-          "name": "domain",
-          "list_types": [
-            {
-              "name": "blocklist"
-            }
-          ]
-        }
-      ],
-      "url": "https://dsi.ut-capitole.fr/blacklists/download/cryptojacking.tar.gz",
-      "website": "https://dsi.ut-capitole.fr/blacklists"
-    },
-    {
-      "name": "Blocklists UT1 Malware",
-      "categories": "malware",
-      "files": "phishing/domains",
-      "license": "CC BY-SA 4.0",
-      "notes": ">79% overlap with phishing_army)",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
@@ -255,7 +236,27 @@
           ]
         }
       ],
-      "url": "https://dsi.ut-capitole.fr/blacklists/download/malware.tar.gz",
+      "url": "https://github.com/olbat/ut1-blacklists/raw/refs/heads/master/blacklists/cryptojacking/domains",
+      "website": "https://dsi.ut-capitole.fr/blacklists"
+    },
+    {
+      "name": "Blocklists UT1 Malware",
+      "categories": "malware",
+      "license": "CC BY-SA 4.0",
+      "notes": ">79% overlap with phishing_army",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "blocklist"
+            }
+          ]
+        }
+      ],
+      "url": "https://github.com/olbat/ut1-blacklists/raw/refs/heads/master/blacklists/malware/domains",
       "website": "https://dsi.ut-capitole.fr/blacklists"
     },
     {
@@ -424,8 +425,9 @@
     {
       "name": "Dan Pollock's List",
       "categories": "ads, malware, trackers",
+      "disabled": true,
       "frequency": "weekly",
-      "notes": "Frequent Access forbidden (403) errors",
+      "notes": ">98% overlap with StevenBlack Fake Gambling list",
       "types": [
         {
           "name": "hostname",
@@ -591,6 +593,8 @@
       "categories": "scam",
       "license": "BSD 3-Clause",
       "notes": "To be reviewed",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "domain"
@@ -646,7 +650,7 @@
     },
     {
       "name": "HaGeZi Encrypted DNS Servers",
-      "categories": "dns, doh",
+      "categories": "doh",
       "license": "GPL-3.0",
       "skip_general_consolidation": true,
       "types": [
@@ -664,7 +668,7 @@
       "name": "HaGeZi Gambling Only Domains",
       "categories": "gambling",
       "license": "GPL-3.0",
-      "notes": "Disabled due to large size (202K entries) and gambling-specific focus",
+      "notes": "Skipped due to large size (202K entries) and gambling-specific focus",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
@@ -730,6 +734,7 @@
     {
       "name": "HaGeZi Xiaomi Tracker",
       "categories": "privacy, trackers",
+      "disabled": true,
       "license": "GPL-3.0",
       "notes": ">95% overlap with HaGeZi Pro",
       "types": [
@@ -870,7 +875,7 @@
     },
     {
       "name": "malware-filter_phishing-filter",
-      "categories": "phishing",
+      "categories": "malware, phishing",
       "license": "MIT",
       "types": [
         {
@@ -883,6 +888,7 @@
     {
       "name": "OISD Blocklist Big",
       "categories": "ads, malware, trackers",
+      "disabled": true,
       "license": "GPL-3.0",
       "skip_general_consolidation": false,
       "types": [
@@ -906,6 +912,64 @@
         }
       ],
       "url": "https://big.oisd.nl/",
+      "website": "https://oisd.nl"
+    },
+    {
+      "name": "OISD Blocklist NSFW Small",
+      "categories": "adult",
+      "license": "GPL-3.0",
+      "skip_general_consolidation": false,
+      "skip_groups_consolidation": false,
+      "types": [
+        {
+          "name": "adguard",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        },
+        {
+          "name": "domain_adguard",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        }
+      ],
+      "url": "https://nsfw-small.oisd.nl",
+      "website": "https://oisd.nl"
+    },
+    {
+      "name": "OISD Blocklist Small",
+      "categories": "ads, cryptocurrency, malware, phishing, ransomware, trackers",
+      "license": "GPL-3.0",
+      "types": [
+        {
+          "name": "adguard",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        },
+        {
+          "name": "domain_adguard",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal",
+              "disabled": true,
+              "notes": ">97% overlap with HaGeZi Pro"
+            }
+          ]
+        }
+      ],
+      "url": "https://small.oisd.nl/",
       "website": "https://oisd.nl"
     },
     {
@@ -1457,7 +1521,9 @@
     {
       "name": "Yoyo Adservers-Hosts",
       "categories": "ads",
+      "disabled": true,
       "license": "MIT",
+      "notes": ">98% overlap with StevenBlack Fake Gambling list",
       "types": [
         {
           "name": "hostname"
