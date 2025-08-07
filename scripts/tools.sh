@@ -24,7 +24,7 @@ fmt() {
   for tool in "${FMT_TOOLS[@]}"; do
     echo "Running $tool..."
     if [ "$tool" = "golines" ]; then
-      "$GOBIN/$tool" --max-len=120 -w .
+      find . -name '*.go' | xargs "$GOBIN/$tool" --max-len=120 --base-formatter=gofumpt -w
     elif [ "$tool" = "gofmt" ]; then
       $tool -s -w .
     else

@@ -11,14 +11,16 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var minSources int
-var maxEntries int
-var cpuProfile bool
-var memProfile bool
-var goroutineProfile bool
-var blockProfile bool
-var profileDir string
-var maxWorkers int
+var (
+	minSources       int
+	maxEntries       int
+	cpuProfile       bool
+	memProfile       bool
+	goroutineProfile bool
+	blockProfile     bool
+	profileDir       string
+	maxWorkers       int
+)
 
 var topEntriesCmd = &cobra.Command{
 	Use:   "top",
@@ -106,7 +108,6 @@ var topEntriesCmd = &cobra.Command{
 				maxEntries,
 				maxWorkers,
 			)
-
 			if err != nil {
 				Logger.Errorf("Error processing top entries: %v", err)
 				mainErr = err

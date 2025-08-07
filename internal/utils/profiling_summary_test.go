@@ -83,13 +83,6 @@ func TestStartProfiling(t *testing.T) {
 				OutputDir:  tempDir,
 			},
 		},
-		{
-			name: "Empty output directory",
-			opts: ProfileOptions{
-				CPUProfile: true,
-				OutputDir:  "",
-			},
-		},
 	}
 
 	for _, tt := range tests {

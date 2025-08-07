@@ -18,7 +18,7 @@ import (
 var generateOverlapCmd = &cobra.Command{
 	Use:   "overlap-readme",
 	Short: "Generate detailed overlap analysis markdown file",
-	Long:  "Generate a detailed overlap.md file containing overlap analysis between different sources including overlap percentages, targets, and detailed statistics",
+	Long:  "Generate a detailed overlap.md file containing overlap analysis between different sources including overlap percentages, targets, and detailed statistics", // nolint:lll
 	Run: func(cmd *cobra.Command, args []string) {
 		if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
 			Logger.Debug("Skipping generate overlap-readme command in test mode")
@@ -200,7 +200,8 @@ func generateDetailedOverlapAnalysis() (string, error) {
 	return sb.String(), nil
 }
 
-// parseTargetString parses target strings like "abpvn_hosts, lt: blocklist, type: adguard, count: 1051, overlap: 10, percent: 1.0"
+// parseTargetString parses target strings
+// like "abpvn_hosts, lt: blocklist, type: adguard, count: 1051, overlap: 10, percent: 1.0"
 func parseTargetString(target string) *TargetDetail {
 	parts := strings.Split(target, ", ")
 	if len(parts) < 6 {

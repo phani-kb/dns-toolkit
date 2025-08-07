@@ -220,6 +220,7 @@ var SourceTypeRegexMap = map[string]*regexp.Regexp{
 	),
 	SourceTypeDomainFinder: regexp.MustCompile(`([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}`),
 }
+
 var (
 	GenericSourceTypes = []string{
 		SourceTypeIpv4,

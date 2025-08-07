@@ -83,7 +83,6 @@ func processAllSources(ctx context.Context, logger *multilog.Logger, processedDi
 
 		summary := summary // Create a local copy for goroutine
 		workerPool.Submit(func() {
-
 			// Check for context cancellation
 			select {
 			case <-ctx.Done():

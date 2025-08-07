@@ -28,7 +28,6 @@ func TestGenerateReadmeCmdRun(t *testing.T) {
 }
 
 func TestGenerateOutputBranchReadme(t *testing.T) {
-
 	tempDir, err := os.MkdirTemp("", "readme-test")
 	require.NoError(t, err)
 	defer func() {
@@ -81,7 +80,6 @@ func TestGenerateOutputBranchReadme(t *testing.T) {
 }
 
 func TestCollectWorkflowSummary(t *testing.T) {
-
 	tempDir, err := os.MkdirTemp("", "workflow-summary-test")
 	require.NoError(t, err)
 	defer func() {
@@ -189,7 +187,7 @@ func TestCollectProcessingStats(t *testing.T) {
 	}()
 
 	// Test with missing file
-	var stats = &ProcessingStats{}
+	stats := &ProcessingStats{}
 	err = collectProcessingStats(stats)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "processed summary file not found")
@@ -426,7 +424,6 @@ func TestCollectConsolidateStats(t *testing.T) {
 }
 
 func TestCollectOverlapStats(t *testing.T) {
-
 	tempDir, err := os.MkdirTemp("", "overlap-stats-test")
 	require.NoError(t, err)
 	defer func() {
@@ -515,7 +512,6 @@ func TestGetTopLevelTxtFiles(t *testing.T) {
 }
 
 func TestFormatConsolidateCount(t *testing.T) {
-
 	tests := []struct {
 		name     string
 		expected string
@@ -552,7 +548,6 @@ func TestFormatConsolidateCount(t *testing.T) {
 }
 
 func TestFormatNumber(t *testing.T) {
-
 	tests := []struct {
 		input    int
 		expected string
@@ -642,7 +637,6 @@ func createTestSummaryFiles(t *testing.T, outputSummariesDir string) {
 }
 
 func TestCollectTopStats(t *testing.T) {
-
 	tempDir, err := os.MkdirTemp("", "top-stats-test")
 	require.NoError(t, err)
 	defer func() {

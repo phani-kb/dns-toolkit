@@ -28,7 +28,7 @@ type SourceStats struct {
 var generateStatsCmd = &cobra.Command{
 	Use:   "stats-readme",
 	Short: "Generate and update source statistics in README.md",
-	Long:  "Analyze source configuration files and update the project README.md with comprehensive statistics including source counts, categories, types, and geographic coverage",
+	Long:  "Analyze source configuration files and update the project README.md with comprehensive statistics including source counts, categories, types, and geographic coverage", // nolint:lll
 	Run: func(cmd *cobra.Command, args []string) {
 		// Skip execution in test mode
 		if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {

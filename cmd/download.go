@@ -82,7 +82,6 @@ var downloadCmd = &cobra.Command{
 				totalSources++
 				source := source // local copy for goroutine
 				workerPool.Submit(func() {
-
 					<-ticker.C
 
 					downloadFile, err := source.GetDownloadFile(Logger, constants.DownloadDir)
@@ -184,7 +183,7 @@ var downloadCmd = &cobra.Command{
 
 							if fetchSkipped {
 								summaryFile := filepath.Join(constants.SummaryDir, constants.DefaultSummaryFiles["download"])
-								if prevSummary, err := loadPreviousDownloadSummary(Logger, summaryFile, source.Name); err == nil && prevSummary != nil {
+								if prevSummary, err := loadPreviousDownloadSummary(Logger, summaryFile, source.Name); err == nil && prevSummary != nil { // nolint:lll
 									if prevSummary.CountToConsider != summary.CountToConsider {
 										Logger.Infof("Count to consider changed for %s: %d -> %d, re-processing...",
 											source.Name, prevSummary.CountToConsider, summary.CountToConsider)

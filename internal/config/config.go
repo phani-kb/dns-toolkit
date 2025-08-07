@@ -230,7 +230,38 @@ func GetProcessedSummaries(
 	sourcesConfigs []SourcesConfig,
 	appConfig AppConfig,
 ) ([]c.ProcessedSummary, []string, []c.ProcessedFile) {
-	return GetProcessedSummariesForConsolidation(logger, sourcesConfigs, appConfig, "general")
+	summaryFile := filepath.Join(constants.SummaryDir, constants.DefaultSummaryFiles["processed"])
+	content, err := os.ReadFile(summaryFile)
+	if err != nil {
+		logger.Errorf("Reading file %s: %v", summaryFile, err)
+		return nil, nil, nil
+	}
+
+	var summaries []c.ProcessedSummary
+	if err := json.Unmarshal(content, &summaries); err != nil {
+		logger.Errorf("Unmarshalling JSON: %v", err)
+		return nil, nil, nil
+	}
+	enabledSummaries := filterEnabledSummaries(
+		logger,
+		summaries,
+		sourcesConfigs,
+		appConfig,
+	)
+	sort.Slice(enabledSummaries, func(i, j int) bool {
+		return enabledSummaries[i].Name < enabledSummaries[j].Name
+	})
+
+	genericSourceTypes := extractGenericSourceTypes(enabledSummaries)
+	processedFiles := GetAllProcessedFiles(enabledSummaries)
+	logger.Infof(
+		"Processed summaries count: %d, generic source types count: %d, files count: %d",
+		len(enabledSummaries),
+		len(genericSourceTypes),
+		len(processedFiles),
+	)
+
+	return enabledSummaries, genericSourceTypes, processedFiles
 }
 
 // GetProcessedSummariesForConsolidation reads the processed summaries and filters them based on consolidation type.
@@ -287,6 +318,23 @@ func GetAllProcessedFiles(
 		processedFiles = append(processedFiles, summary.InvalidFiles...)
 	}
 	return processedFiles
+}
+
+func filterEnabledSummaries(
+	logger *multilog.Logger,
+	summaries []c.ProcessedSummary,
+	sourcesConfigs []SourcesConfig,
+	appConfig AppConfig,
+) []c.ProcessedSummary {
+	var enabledSummaries []c.ProcessedSummary
+	for _, summary := range summaries {
+		if IsEnabledSource(summary.Name, sourcesConfigs, appConfig) {
+			enabledSummaries = append(enabledSummaries, summary)
+		} else {
+			logger.Infof("Skipping summary %s: not enabled", summary.Name)
+		}
+	}
+	return enabledSummaries
 }
 
 func filterEnabledSummariesForConsolidation(
