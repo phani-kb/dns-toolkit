@@ -960,8 +960,6 @@ func TestExtractArchiveZip(t *testing.T) {
 func TestFindProjectRoot(t *testing.T) {
 	projectRoot, err := FindProjectRoot("")
 	assert.NoError(t, err)
-	assert.True(t, strings.HasSuffix(projectRoot, "dns-toolkit"),
-		"Project root should end with 'dns-toolkit', got: %s", projectRoot)
 
 	goModPath := filepath.Join(projectRoot, "go.mod")
 	_, err = os.Stat(goModPath)

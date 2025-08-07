@@ -3,10 +3,12 @@ package cmd
 import (
 	"os"
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 	"text/template"
 
+	"github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 
 	"github.com/stretchr/testify/assert"
@@ -227,6 +229,7 @@ func TestCreateOutputFromFile(t *testing.T) {
 		"Test Description",
 		42,
 		outputFile,
+		"Files:\n  - test file 1\n  - test file 2",
 	)
 	assert.NoError(t, err)
 
@@ -274,8 +277,11 @@ func TestProcessRegularFiles(t *testing.T) {
 	fileCount := map[string]int{
 		inputFile: 7,
 	}
+	filesInvolved := map[string][]common.FileInfo{
+		inputFile: {},
+	}
 
-	processRegularFiles(dynTmpl, staticTemplate, "testtype", typeFiles, fileCount)
+	processRegularFiles(dynTmpl, staticTemplate, "testtype", typeFiles, fileCount, filesInvolved)
 
 	outputFile := filepath.Join(tempDir, "input.txt")
 	assert.FileExists(t, outputFile)
@@ -402,16 +408,19 @@ func TestProcessFilesForSummaryType(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotType, gotCount, gotIgnored := processFilesForSummaryType(tt.summaryType, []byte(tt.summaryData))
+			gotType, gotCount, gotFilesInvolved, gotIgnored := processFilesForSummaryType(
+				tt.summaryType,
+				[]byte(tt.summaryData),
+			)
 			assert.Equal(t, tt.wantType, gotType)
 			assert.Equal(t, tt.wantCount, gotCount)
 			assert.Equal(t, tt.wantIgnored, gotIgnored)
+			assert.NotNil(t, gotFilesInvolved)
 		})
 	}
 }
 
 func TestCopySummaryFiles(t *testing.T) {
-
 	tempDir, err := os.MkdirTemp("", "copy-summary-test")
 	require.NoError(t, err)
 	defer func() {
@@ -473,7 +482,6 @@ func TestCopySummaryFiles(t *testing.T) {
 }
 
 func TestArchiveSummaryFiles(t *testing.T) {
-
 	tempDir, err := os.MkdirTemp("", "archive-summary-test")
 	require.NoError(t, err)
 	defer func() {
@@ -523,7 +531,6 @@ func TestArchiveSummaryFiles(t *testing.T) {
 }
 
 func TestDeleteFilesAndFoldersAfterGeneration(t *testing.T) {
-
 	tempDir, err := os.MkdirTemp("", "delete-test")
 	require.NoError(t, err)
 	defer func() {
@@ -577,4 +584,69 @@ func TestDeleteFilesAndFoldersAfterGeneration(t *testing.T) {
 
 	assert.FileExists(t, processedSummaryFile)
 	assert.FileExists(t, testFile)
+}
+
+func TestParseFileInfoFromString(t *testing.T) {
+	cases := []struct {
+		input   string
+		want    common.FileInfo
+		wantErr bool
+	}{
+		{
+			input:   "foo.txt [/path/foo.txt] [42]",
+			want:    common.FileInfo{Name: "foo.txt", Filepath: "/path/foo.txt", Count: 42, MustConsider: false},
+			wantErr: false,
+		},
+		{
+			input:   "bar.txt [/bar.txt] [7] [must consider]",
+			want:    common.FileInfo{Name: "bar.txt", Filepath: "/bar.txt", Count: 7, MustConsider: true},
+			wantErr: false,
+		},
+		{
+			input:   "invalid format",
+			want:    common.FileInfo{},
+			wantErr: true,
+		},
+	}
+	for _, tc := range cases {
+		got, err := parseFileInfoFromString(tc.input)
+		if tc.wantErr && err == nil {
+			t.Errorf("expected error for input %q", tc.input)
+		}
+		if !tc.wantErr && !reflect.DeepEqual(got, tc.want) {
+			t.Errorf("parseFileInfoFromString(%q) = %+v, want %+v", tc.input, got, tc.want)
+		}
+	}
+}
+
+func TestParseFilesFromConsolidatedSummary(t *testing.T) {
+	summary := common.ConsolidatedSummary{
+		Files: []string{
+			"foo.txt [/foo.txt] [10]",
+			"bar.txt [/bar.txt] [5] [must consider]",
+		},
+	}
+	want := []common.FileInfo{
+		{Name: "foo.txt", Filepath: "/foo.txt", Count: 10, MustConsider: false},
+		{Name: "bar.txt", Filepath: "/bar.txt", Count: 5, MustConsider: true},
+	}
+	got := parseFilesFromConsolidatedSummary(summary)
+	if !reflect.DeepEqual(got, want) {
+		t.Errorf("parseFilesFromConsolidatedSummary() = %+v, want %+v", got, want)
+	}
+}
+
+func TestGenerateFilesList(t *testing.T) {
+	files := []common.FileInfo{
+		{Name: "foo.txt", Count: 10, MustConsider: false},
+		{Name: "bar.txt", Count: 5, MustConsider: true},
+	}
+	got := generateFilesList("", "domain", "", files)
+	want := "This domain list was consolidated from 2 source file(s):\n  - foo.txt: 10 entries\n  - bar.txt: 5 entries [must consider]"
+	if got != want {
+		t.Errorf("generateFilesList() = %q, want %q", got, want)
+	}
+	if generateFilesList("", "domain", "", nil) != "" {
+		t.Errorf("generateFilesList() with nil files should return empty string")
+	}
 }

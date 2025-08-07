@@ -3,3 +3,5 @@
 # Last Updated: {{.LastUpdated}}
 # Format: {{.Description}}
 # Count: {{.Count}}
+# Files:
+{{.Files}}

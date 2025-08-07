@@ -17,9 +17,10 @@ mkdir -p coverage
 mkdir -p coverage/archive
 
 echo -e "${GREEN}Running tests with coverage...${NC}"
+PROJECT_ROOT=$(pwd)
 
 export DNS_TOOLKIT_TEST_MODE=true
-export DNS_TOOLKIT_TEST_CONFIG_PATH=$(pwd)/testdata/config.yml
+export DNS_TOOLKIT_TEST_CONFIG_PATH="${PROJECT_ROOT}/testdata/config.yml"
 
 PACKAGES=$(go list ./... | grep -v "/mocks" | grep -v "constants")
 if ! go test -coverprofile=coverage/coverage.out -covermode=atomic $PACKAGES; then

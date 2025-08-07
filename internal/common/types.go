@@ -463,6 +463,7 @@ type TemplateData struct {
 	LastUpdated    string
 	Format         string
 	Description    string
+	Files          string
 	Count          int
 }
 
