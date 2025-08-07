@@ -739,7 +739,7 @@ func TestGetProcessedSummariesWithFileErrors(t *testing.T) {
 }
 
 func TestFilterEnabledSummariesBasic(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 
 	logger := CreateTestLogger()
 
@@ -784,7 +784,7 @@ func TestFilterEnabledSummariesBasic(t *testing.T) {
 }
 
 func TestIsEnabledSourceForConsolidationEdgeCases(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 
 	tests := []struct {
 		name              string
