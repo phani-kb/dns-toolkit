@@ -453,7 +453,7 @@ type FileInfo struct {
 
 // GetString returns a formatted string representation of file info.
 func (fi *FileInfo) GetString() string {
-	return fmt.Sprintf("%s_%s [%s] [%d]%s", fi.Name, fi.SourceType, fi.Filepath, fi.Count,
+	return fmt.Sprintf("%s [%s] [%s] [%d]%s", fi.Name, fi.SourceType, fi.Filepath, fi.Count,
 		func() string {
 			if fi.MustConsider {
 				return " [must consider]"

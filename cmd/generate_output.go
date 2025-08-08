@@ -99,8 +99,8 @@ func loadTemplates() (*template.Template, []byte, error) {
 
 // parseFileInfoFromString parses a FileInfo string back to FileInfo struct
 func parseFileInfoFromString(fileStr string) (common.FileInfo, error) {
-	// Format: "name_sourceType [filepath] [count] [must consider]"
-	re := regexp.MustCompile(`^(.+?)_(.+?) \[(.+?)\] \[(\d+)\]( \[must consider\])?$`)
+	// Format: "name [sourceType] [filepath] [count] [must consider]"
+	re := regexp.MustCompile(`^(.+?) \[(.+?)\] \[(.+?)\] \[(\d+)\]( \[must consider\])?$`)
 	matches := re.FindStringSubmatch(fileStr)
 
 	if len(matches) < 5 {
@@ -164,7 +164,7 @@ func generateFilesList(
 		}
 		lines = append(
 			lines,
-			fmt.Sprintf("#   - %s: %d%s", fileInfo.Name, fileInfo.Count, mustConsiderText),
+			fmt.Sprintf("#   - %s_%s: %d%s", fileInfo.Name, fileInfo.SourceType, fileInfo.Count, mustConsiderText),
 		)
 	}
 
