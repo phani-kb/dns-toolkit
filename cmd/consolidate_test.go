@@ -81,7 +81,7 @@ func TestGetFileStrings(t *testing.T) {
 					Count:      100,
 				},
 			},
-			expected: []string{"test.txt_domain [/path/to/test.txt] [100]"},
+			expected: []string{"test.txt [domain] [/path/to/test.txt] [100]"},
 		},
 		{
 			name: "multiple file infos",
@@ -107,9 +107,9 @@ func TestGetFileStrings(t *testing.T) {
 				},
 			},
 			expected: []string{
-				"file1.txt_domain [/path/to/file1.txt] [50]",
-				"file2.txt_ipv4 [/path/to/file2.txt] [250] [must consider]",
-				"file3.txt_domain [/path/to/file3.txt] [75]",
+				"file1.txt [domain] [/path/to/file1.txt] [50]",
+				"file2.txt [ipv4] [/path/to/file2.txt] [250] [must consider]",
+				"file3.txt [domain] [/path/to/file3.txt] [75]",
 			},
 		},
 		{
@@ -123,7 +123,7 @@ func TestGetFileStrings(t *testing.T) {
 					MustConsider: true,
 				},
 			},
-			expected: []string{"important.txt_ipv4 [/path/to/important.txt] [500] [must consider]"},
+			expected: []string{"important.txt [ipv4] [/path/to/important.txt] [500] [must consider]"},
 		},
 	}
 

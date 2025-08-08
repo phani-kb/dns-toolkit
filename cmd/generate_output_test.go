@@ -593,7 +593,7 @@ func TestParseFileInfoFromString(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			input: "foo.txt_domain [/path/foo.txt] [42]",
+			input: "foo.txt [domain] [/path/foo.txt] [42]",
 			want: common.FileInfo{
 				Name:         "foo.txt",
 				SourceType:   "domain",
@@ -604,7 +604,7 @@ func TestParseFileInfoFromString(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			input: "bar.txt_ipv4 [/bar.txt] [7] [must consider]",
+			input: "bar.txt [ipv4] [/bar.txt] [7] [must consider]",
 			want: common.FileInfo{
 				Name:         "bar.txt",
 				SourceType:   "ipv4",
@@ -634,8 +634,8 @@ func TestParseFileInfoFromString(t *testing.T) {
 func TestParseFilesFromConsolidatedSummary(t *testing.T) {
 	summary := common.ConsolidatedSummary{
 		Files: []string{
-			"foo.txt_domain [/foo.txt] [10]",
-			"bar.txt_ipv4 [/bar.txt] [5] [must consider]",
+			"foo.txt [domain] [/foo.txt] [10]",
+			"bar.txt [ipv4] [/bar.txt] [5] [must consider]",
 		},
 	}
 	want := []common.FileInfo{
@@ -650,11 +650,11 @@ func TestParseFilesFromConsolidatedSummary(t *testing.T) {
 
 func TestGenerateFilesList(t *testing.T) {
 	files := []common.FileInfo{
-		{Name: "foo.txt", SourceType: "domain", Count: 10, MustConsider: false},
-		{Name: "bar.txt", SourceType: "domain", Count: 5, MustConsider: true},
+		{Name: "foo", SourceType: "domain", Count: 10, MustConsider: false},
+		{Name: "bar", SourceType: "ipv4_cidr_expand", Count: 5, MustConsider: true},
 	}
 	got := generateFilesList("", "domain", "", files)
-	want := "# This domain list was consolidated from 2 source file(s):\n#   - foo.txt: 10\n#   - bar.txt: 5 [must consider]"
+	want := "# This domain list was consolidated from 2 source file(s):\n#   - foo_domain: 10\n#   - bar_ipv4_cidr_expand: 5 [must consider]"
 	if got != want {
 		t.Errorf("generateFilesList() = %q, want %q", got, want)
 	}
