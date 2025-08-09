@@ -85,7 +85,7 @@ func printSourceTypeSummary(logger *multilog.Logger, sourcesConfigs []config.Sou
 	if len(mismatches) > 0 {
 		logger.Warnf("MISMATCHES:")
 		for _, mismatch := range mismatches {
-			logger.Warnf(mismatch)
+			logger.Warnf("%s", mismatch)
 		}
 	}
 

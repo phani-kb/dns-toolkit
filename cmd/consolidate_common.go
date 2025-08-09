@@ -185,7 +185,7 @@ func processIdentifierConsolidation(
 	default:
 		logMessage = fmt.Sprintf("Processing %s: %s", config.IdentifierField, config.Identifier)
 	}
-	logger.Infof(logMessage)
+	logger.Infof("%s", logMessage)
 
 	// Filter processed files by identifier
 	identifierFiles := config.GetFilesFunc(config.ProcessedFiles, config.Identifier)

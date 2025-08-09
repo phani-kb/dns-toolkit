@@ -1,6 +1,6 @@
 module github.com/phani-kb/dns-toolkit
 
-go 1.23.6
+go 1.24
 
 require (
 	github.com/PuerkitoBio/goquery v1.10.3
