@@ -31,7 +31,7 @@
             {
               "name": "blocklist",
               "must_consider": true,
-              "groups": "mini"
+              "groups": "lite"
             }
           ]
         }

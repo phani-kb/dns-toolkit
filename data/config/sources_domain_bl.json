@@ -1273,7 +1273,13 @@
       "license": "MIT",
       "types": [
         {
-          "name": "hostname"
+          "name": "hostname",
+          "list_types": [
+              {
+                  "name": "blocklist",
+                  "groups": "normal"
+              }
+          ]
         }
       ],
       "url": "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts",
