@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"text/template"
@@ -156,6 +157,10 @@ func generateFilesList(
 		listType,
 		len(filesInvolved),
 	))
+
+	sort.Slice(filesInvolved, func(i, j int) bool {
+		return strings.ToLower(filesInvolved[i].Name) < strings.ToLower(filesInvolved[j].Name)
+	})
 
 	maxNameLen := 0
 	maxSourceTypeLen := 0
