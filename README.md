@@ -5,7 +5,7 @@
 [![codecov](https://codecov.io/gh/phani-kb/dns-toolkit/branch/main/graph/badge.svg)](https://codecov.io/gh/phani-kb/dns-toolkit)
 [![GoDoc](https://godoc.org/github.com/phani-kb/dns-toolkit?status.svg)](https://godoc.org/github.com/phani-kb/dns-toolkit)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Go Version](https://img.shields.io/badge/Go-1.23-blue.svg)](https://golang.org/doc/go1.23)
+[![Go Version](https://img.shields.io/badge/Go-1.24-blue.svg)](https://golang.org/doc/go1.24)
 [![GitHub commit activity](https://img.shields.io/github/commit-activity/y/phani-kb/dns-toolkit)](https://github.com/phani-kb/dns-toolkit/graphs/commit-activity)
 [![GitHub repo size](https://img.shields.io/github/repo-size/phani-kb/dns-toolkit)](https://github.com/phani-kb/dns-toolkit)
 
@@ -83,8 +83,8 @@ Top domains sourced from the tranco-list.eu list (`domain_top` type) are treated
 
 **Note:** The repo size badge above only reflects the default branch (`main`).
 
-- **Output branch size:** 279.86 MB
-- **Summaries branch size:** 0.89 MB
+- **Output branch size:** 280.37 MB
+- **Summaries branch size:** 0.94 MB
 
 <!-- BRANCH_SIZES_END -->
 
@@ -103,7 +103,7 @@ Top domains sourced from the tranco-list.eu list (`domain_top` type) are treated
 | **Categories** | 22 | ads, adult, annoyance, anonymizer, botnet, cryptocurrency, dns, doh, fake, fakenews, gambling, malicious, malware, others, phishing, privacy, proxy, ransomware, scam, spam, threat, trackers |
 | **Source Types** | 26 | adguard, cidr_ipv4, domain, domain_adguard, domain_comment, domain_csv_http_url_find, domain_custom_csv_blackbook, domain_custom_csv_maltrail, domain_custom_html_ccam, domain_custom_html_puppyscams, domain_http_url, domain_top, domain_url, domain_with_comment_suffix, hostname, ipv4, ipv4_cidr_expand, ipv4_csv_http_url_find, ipv4_custom_html_ccam, ipv4_find, ipv4_http_url, ipv4_range_expand, ipv4_url, ipv6, ipv6_find, ipv6_htaccess |
 | **Geographic Coverage** | 21 countries | CN, CZ, DE, ES, FI, FR, HU, ID, IL, IT, KR, LV, MY, NL, RO, RU, SA, SK, UA, US, VN |
-| **Last Updated** | 2025-08-07 00:05:27 UTC | Statistics generation time |
+| **Last Updated** | 2025-08-08 21:01:50 UTC | Statistics generation time |
 
 <!-- STATS_END -->
 

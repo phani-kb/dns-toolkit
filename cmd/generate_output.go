@@ -157,6 +157,22 @@ func generateFilesList(
 		len(filesInvolved),
 	))
 
+	maxNameLen := 0
+	maxSourceTypeLen := 0
+	maxCountLen := 0
+	for _, fileInfo := range filesInvolved {
+		if len(fileInfo.Name) > maxNameLen {
+			maxNameLen = len(fileInfo.Name)
+		}
+		if len(fileInfo.SourceType) > maxSourceTypeLen {
+			maxSourceTypeLen = len(fileInfo.SourceType)
+		}
+		countLen := len(fmt.Sprintf("%d", fileInfo.Count))
+		if countLen > maxCountLen {
+			maxCountLen = countLen
+		}
+	}
+
 	for _, fileInfo := range filesInvolved {
 		mustConsiderText := ""
 		if fileInfo.MustConsider {
@@ -164,7 +180,13 @@ func generateFilesList(
 		}
 		lines = append(
 			lines,
-			fmt.Sprintf("#   - %s_%s: %d%s", fileInfo.Name, fileInfo.SourceType, fileInfo.Count, mustConsiderText),
+			fmt.Sprintf(
+				"#   - %-*s %-*s: %-*d%s",
+				maxNameLen, fileInfo.Name,
+				maxSourceTypeLen, fileInfo.SourceType,
+				maxCountLen, fileInfo.Count,
+				mustConsiderText,
+			),
 		)
 	}
 

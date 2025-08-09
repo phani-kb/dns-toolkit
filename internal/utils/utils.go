@@ -1128,7 +1128,7 @@ func GetFileLastModifiedTime(logger *multilog.Logger, filePath string) (string, 
 }
 
 func LogMemStats(logger *multilog.Logger, prefix string) {
-	logger.Perff(prefix)
+	logger.Perff("%s", prefix)
 }
 
 // CapPreallocEntries limits the estimated entries to avoid excessive or insufficient allocation.

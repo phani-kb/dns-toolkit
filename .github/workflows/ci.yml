@@ -7,7 +7,7 @@ name: DNS Toolkit Daily Processing
 
 on:
   schedule:
-    - cron: '0 14 * * *'  # Daily at 2 PM UTC
+    - cron: '0 14 * * *' # Daily at 2 PM UTC
   workflow_dispatch:
     inputs:
       mode:
@@ -32,7 +32,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
-  GO_VERSION: "1.23"
+  GO_VERSION: '1.24'
   COVERAGE_THRESHOLD: 80
   GOLANGCI_LINT_VERSION: v2.1.6
 
@@ -74,14 +74,14 @@ jobs:
         run: |
           echo "Running linter..."
           golangci-lint run ./... --timeout=5m
-          
+
           echo "Building application..."
           go build ./...
-          
+
           echo "Running tests with coverage..."
           PACKAGES=$(go list ./... | grep -v "/mocks" | grep -v "constants")
           go test -v -race -coverprofile=coverage.out -covermode=atomic $PACKAGES
-          
+
           # Filter out test helpers from coverage
           if [ -f coverage.out ]; then
             echo "Filtering coverage report..."
@@ -142,7 +142,7 @@ jobs:
             PUBLISH="false"
             MESSAGE="Push to main - Mode: $MODE (use cache, no publish)"
           fi
-          
+
           echo "::notice::$MESSAGE"
           echo "pipeline-mode=$MODE" >> $GITHUB_OUTPUT
           echo "should-publish=$PUBLISH" >> $GITHUB_OUTPUT
@@ -229,7 +229,7 @@ jobs:
           echo "Validating cache availability..."
           echo "Cache key used: data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-v3"
           echo "Cache hit: ${{ steps.cache-restore.outputs.cache-hit }}"
-          
+
           # Check if cache was restored (either exact match or via restore-keys)
           CACHE_RESTORED_FROM="${{ steps.cache-restore.outputs.cache-primary-key }}"
           if [[ -z "$CACHE_RESTORED_FROM" ]]; then
@@ -239,19 +239,19 @@ jobs:
             echo "::error::Cache MISS. '${{ env.PIPELINE_MODE }}' mode requires an existing cache."
             exit 1
           fi
-          
+
           if [[ ! -d "data/download" ]] || [[ -z "$(ls -A data/download 2>/dev/null)" ]]; then
             echo "::error::Cache hit reported, but data/download directory is empty or missing."
             exit 1
           fi
-          
+
           if [[ "${{ env.PIPELINE_MODE }}" == "use-cache" && ! -f "data/download_summary.json" ]]; then
             echo "::error::'use-cache' mode requires 'data/download_summary.json' but it's missing from cache."
             exit 1
           fi
-          
+
           echo "✅ Cache validated successfully."
-          
+
           if [[ "${{ steps.cache-restore.outputs.cache-hit }}" == "true" ]]; then
             echo "Cache: Exact key match"
             echo "Key: ${{ steps.cache-restore.outputs.cache-primary-key }}"
@@ -272,24 +272,24 @@ jobs:
         run: |
           echo "Backing up data files for branch switching..."
           mkdir -p /tmp/data-backup
-          
+
           # Backup download directory and summary file
           if [[ -d "data/download" ]]; then
             cp -r data/download /tmp/data-backup/ 2>/dev/null || true
             echo "Backed up data/download directory"
           fi
-          
+
           if [[ -f "data/download_summary.json" ]]; then
             cp data/download_summary.json /tmp/data-backup/ 2>/dev/null || true
             echo "Backed up data/download_summary.json"
           fi
-          
+
           echo "Data backup completed"
 
       - name: Run DNS Toolkit Pipeline
         run: |
           echo "Running DNS toolkit pipeline in '${{ env.PIPELINE_MODE }}' mode..."
-          
+
           # Step 1: Download (conditional)
           if [[ "${{ env.PIPELINE_MODE }}" == "full-pipeline" || "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]]; then
             echo "Step 1: Downloading fresh data..."
@@ -304,7 +304,7 @@ jobs:
             CACHED_SIZE=$(du -sh data/download 2>/dev/null | cut -f1 || echo "0")
             echo "Using cache: $CACHED_COUNT files ($CACHED_SIZE)"
           fi
-          
+
           # Core Processing Steps
           echo "Step 2: Processing data..."
           ./bin/dns-toolkit process
@@ -317,7 +317,7 @@ jobs:
           ./bin/dns-toolkit generate output-readme
           ./bin/dns-toolkit generate overlap-readme
           ./bin/dns-toolkit generate summaries-readme
-          
+
           echo "✅ Pipeline core steps completed successfully."
 
       - name: Count and validate output files
@@ -327,17 +327,17 @@ jobs:
           SUMMARY_COUNT=$(find data/output/summaries -name "*.json" 2>/dev/null | wc -l)
           DOWNLOAD_COUNT=$(find data/download -type f 2>/dev/null | wc -l)
           DOWNLOAD_SIZE=$(du -sh data/download 2>/dev/null | cut -f1 || echo "0")
-          
+
           echo "output-count=$OUTPUT_COUNT" >> $GITHUB_OUTPUT
           echo "summary-count=$SUMMARY_COUNT" >> $GITHUB_OUTPUT
           echo "download-count=$DOWNLOAD_COUNT" >> $GITHUB_OUTPUT
           echo "download-size=$DOWNLOAD_SIZE" >> $GITHUB_OUTPUT
-          
+
           echo "Files generated:"
           echo "  - Output files: $OUTPUT_COUNT"
           echo "  - Summary files: $SUMMARY_COUNT"
           echo "  - Download files: $DOWNLOAD_COUNT ($DOWNLOAD_SIZE)"
-          
+
           if [[ "$OUTPUT_COUNT" -eq 0 && "$SUMMARY_COUNT" -eq 0 ]]; then
             echo "::error::No output files generated. Pipeline might have failed silently."
             exit 1
@@ -347,33 +347,33 @@ jobs:
         if: env.SHOULD_PUBLISH == 'true'
         run: |
           echo "Publishing results..."
-          
+
           # Create temporary directories for publishing
           mkdir -p /tmp/publish-data/{output,summaries}
-          
+
           # Prepare output and summary files for publishing
           if [[ -d "data/output" ]]; then
             rsync -av --exclude='summaries/' data/output/ /tmp/publish-data/output/ 2>/dev/null || true
           fi
-          
+
           if [[ -d "data/output/summaries" ]]; then
             cp -r data/output/summaries/* /tmp/publish-data/summaries/ 2>/dev/null || true
           fi
-          
+
           # Store original branch and prepare publish script
           echo "ORIGINAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
-          
+
           # Execute publish script using specific variables
           if [[ "${{ steps.count-files.outputs.output-count }}" -gt 0 ]]; then
             echo "Publishing to output branch..."
             /bin/bash .github/scripts/publish-to-branch.sh output /tmp/publish-data/output
           fi
-          
+
           if [[ "${{ steps.count-files.outputs.summary-count }}" -gt 0 ]]; then
             echo "Publishing to summaries branch..."
             /bin/bash .github/scripts/publish-to-branch.sh summaries /tmp/publish-data/summaries --monthly
           fi
-          
+
           echo "✅ Publishing completed."
 
       - name: Restore data files
@@ -432,7 +432,7 @@ jobs:
           echo "- **Job Status**: \`${{ job.status }}\`" >> $GITHUB_STEP_SUMMARY
           echo "- **Completed At**: $(date -u '+%Y-%m-%d %H:%M UTC')" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           # Add cache status details
           if [[ "${{ env.PIPELINE_MODE }}" == "refresh-cache" || "${{ env.PIPELINE_MODE }}" == "full-pipeline" ]]; then
             echo "### Cache Management" >> $GITHUB_STEP_SUMMARY
@@ -440,7 +440,7 @@ jobs:
             echo "- **Cache Save Status**: \`${{ steps.cache-save-attempt.outcome || 'N/A' }}\`" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           # Add file counts
           if [[ "${{ env.PIPELINE_MODE }}" == "use-cache" || "${{ env.PIPELINE_MODE }}" == "full-pipeline" || "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]] && [[ "${{ job.status }}" == "success" ]]; then
             echo "### File Counts" >> $GITHUB_STEP_SUMMARY
@@ -452,5 +452,5 @@ jobs:
             fi
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           echo "See full logs for details."
