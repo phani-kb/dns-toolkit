@@ -4,7 +4,7 @@
       "name": "VXVault_URLList",
       "categories": "malware",
       "disabled": true,
-      "notes": ">97% overlap with Firehol_level3",
+      "notes": ">95% overlap with Firehol_level3",
       "types": [
         {
           "name": "domain_http_url"
