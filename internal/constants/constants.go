@@ -118,6 +118,13 @@ const (
 	CategoryRansomware     = "ransomware"
 	CategoryBotnet         = "botnet"
 	CategoryExploit        = "exploit"
+	CategoryWindows        = "windows"
+	CategoryMac            = "mac"
+	CategoryFinance        = "finance"
+	CategoryBrowser        = "browser"
+	CategoryIssues         = "issues"
+	CategoryURLShorteners  = "url_shorteners"
+	CategoryDiscord        = "discord"
 
 	GroupMini   = "mini"
 	GroupLite   = "lite"
@@ -274,6 +281,13 @@ var (
 		CategoryRansomware:     true,
 		CategoryBotnet:         true,
 		CategoryExploit:        true,
+		CategoryWindows:        true,
+		CategoryMac:            true,
+		CategoryFinance:        true,
+		CategoryBrowser:        true,
+		CategoryIssues:         true,
+		CategoryURLShorteners:  true,
+		CategoryDiscord:        true,
 	}
 
 	ValidGroups = map[string]bool{

@@ -55,7 +55,7 @@
       "disabled": true,
       "frequency": "weekly",
       "license": "CC Attribution 3.0",
-        "notes": ">99% overlap with StevenBlack Fake Gambling list",
+      "notes": ">99% overlap with StevenBlack Fake Gambling list",
       "types": [
         {
           "name": "hostname",
@@ -245,7 +245,7 @@
       "name": "Blocklists UT1 Malware",
       "categories": "malware",
       "license": "CC BY-SA 4.0",
-      "notes": ">79% overlap with phishing_army",
+      "notes": ">80% overlap with phishing_army",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
@@ -429,7 +429,7 @@
       "categories": "ads, malware, trackers",
       "disabled": true,
       "frequency": "weekly",
-      "notes": ">98% overlap with StevenBlack Fake Gambling list",
+      "notes": ">95% overlap with StevenBlack Fake Gambling list",
       "types": [
         {
           "name": "hostname",
@@ -624,7 +624,7 @@
       "categories": "privacy, trackers",
       "disabled": true,
       "license": "GPL-3.0",
-      "notes": ">83% overlap with HaGeZi Pro",
+      "notes": ">80% overlap with HaGeZi Pro",
       "types": [
         {
           "name": "domain"
@@ -798,6 +798,9 @@
       "categories": "ads",
       "countries": "HU",
       "license": "CC BY 4.0",
+      "notes": ">90% overlap with HaGeZi Pro",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "hostname"
@@ -840,7 +843,7 @@
       "categories": "ads",
       "disabled": true,
       "license": "CC BY-SA 4.0",
-      "notes": ">87% overlap with phishing_army",
+      "notes": ">90% overlap with phishing_army",
       "types": [
         {
           "name": "domain"
@@ -966,7 +969,7 @@
               "name": "blocklist",
               "groups": "normal",
               "disabled": true,
-              "notes": ">97% overlap with HaGeZi Pro"
+              "notes": ">95% overlap with HaGeZi Pro"
             }
           ]
         }
@@ -1062,7 +1065,7 @@
       "categories": "annoyance",
       "disabled": true,
       "license": "GPL-3.0",
-      "notes": ">89% overlap with HaGeZi Pro",
+      "notes": ">90% overlap with HaGeZi Pro",
       "types": [
         {
           "name": "domain"
@@ -1232,6 +1235,7 @@
       "name": "Stamparm_Blackbook",
       "categories": "malicious, threat",
       "frequency": "monthly",
+      "notes": ">95% overlap with Blocklists UT1 Malware",
       "types": [
         {
           "name": "domain_custom_csv_blackbook",
@@ -1275,10 +1279,10 @@
         {
           "name": "hostname",
           "list_types": [
-              {
-                  "name": "blocklist",
-                  "groups": "normal"
-              }
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
           ]
         }
       ],
@@ -1531,7 +1535,7 @@
       "categories": "ads",
       "disabled": true,
       "license": "MIT",
-      "notes": ">98% overlap with StevenBlack Fake Gambling list",
+      "notes": ">95% overlap with StevenBlack Fake Gambling list",
       "types": [
         {
           "name": "hostname"
