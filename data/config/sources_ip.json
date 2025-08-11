@@ -55,11 +55,17 @@
     {
       "name": "BlockListDE_Brute",
       "categories": "threat",
-      "disabled": true,
       "notes": "100% overlap with Firehol_level2",
       "types": [
         {
-          "name": "ipv4"
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "mini"
+            }
+          ]
         }
       ],
       "url": "https://lists.blocklist.de/lists/bruteforcelogin.txt",
