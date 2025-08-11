@@ -11,8 +11,6 @@ import (
 )
 
 func TestResolveFilePath(t *testing.T) {
-	t.Parallel()
-
 	absPath := "/absolute/path/to/file.json"
 	result := resolveFilePath(absPath)
 	assert.Equal(t, absPath, result)
@@ -68,8 +66,6 @@ func TestResolveFilePath(t *testing.T) {
 }
 
 func TestMatchesFilters(t *testing.T) {
-	t.Parallel()
-
 	source := Source{
 		Name:      "test-source",
 		URL:       "http://example.com",
