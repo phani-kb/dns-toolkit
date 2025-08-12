@@ -47,6 +47,7 @@ type DNSToolkitConfig struct {
 	SkipUnchangedDownloads    bool                `yaml:"skip_unchanged_downloads"`
 	SkipCertVerification      bool                `yaml:"skip_cert_verification,omitempty"`
 	SkipNameSpecialCharsCheck bool                `yaml:"skip_name_special_chars_check,omitempty"`
+	MinOverlapPercent         float64             `yaml:"min_overlap_percent,omitempty"`
 }
 
 func (dc *DNSToolkitConfig) Validate() error {
@@ -64,6 +65,13 @@ func (dc *DNSToolkitConfig) Validate() error {
 	}
 
 	return nil
+}
+
+func (dc *DNSToolkitConfig) GetMinOverlapPercent() float64 {
+	if dc.MinOverlapPercent != 0 {
+		return dc.MinOverlapPercent
+	}
+	return constants.MinOverlapPercent
 }
 
 // validateSourceFile checks if a source file exists, handling relative paths in test mode
