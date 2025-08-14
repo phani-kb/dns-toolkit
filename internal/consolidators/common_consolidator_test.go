@@ -325,6 +325,23 @@ func TestCommonConsolidatorFilterEntries(t *testing.T) {
 			expectedFilteredLen: 3,
 			expectedIgnoredLen:  2,
 		},
+		{
+			name:       "domain_blocklist_vs_allowlist_must_consider_true",
+			sourceType: constants.SourceTypeDomain,
+			listType:   constants.ListTypeBlocklist,
+			entries: []entryData{
+				{value: "example.com", mustConsider: true}, // Blocklist mustConsider
+				{value: "other.com", mustConsider: false},
+			},
+			filterEntries: []entryData{
+				{value: "example.com", mustConsider: true}, // Allowlist mustConsider
+				{value: "someother.com", mustConsider: false},
+			},
+			expectedFiltered:    []string{"example.com", "other.com"},
+			expectedIgnored:     []string{},
+			expectedFilteredLen: 2,
+			expectedIgnoredLen:  0,
+		},
 	}
 
 	for _, tt := range tests {
