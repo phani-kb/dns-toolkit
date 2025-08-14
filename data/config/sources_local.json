@@ -63,6 +63,22 @@
         }
       ],
       "url": "file://data/custom/blocklist_adg.txt"
+    },
+    {
+      "name": "Local Blocklist (Domain)",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "mini"
+            }
+          ]
+        }
+      ],
+      "url": "file://data/custom/blocklist_domain.txt"
     }
   ]
 }
