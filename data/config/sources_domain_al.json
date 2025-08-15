@@ -152,21 +152,6 @@
       "url": "https://raw.githubusercontent.com/ookangzheng/blahdns/master/hosts/whitelist.txt"
     },
     {
-      "name": "Boutetnico_URL_Shorteners",
-      "categories": "url_shorteners",
-      "types": [
-        {
-          "name": "domain",
-          "list_types": [
-            {
-              "name": "allowlist"
-            }
-          ]
-        }
-      ],
-      "url": "https://raw.githubusercontent.com/boutetnico/url-shorteners/master/list.txt"
-    },
-    {
       "name": "China_CDN_Whitelist",
       "countries": "CN",
       "disabled": true,
@@ -231,6 +216,8 @@
     },
     {
       "name": "Freekers_Whitelist",
+      "disabled": true,
+      "notes": "No update since 2019",
       "types": [
         {
           "name": "domain",
@@ -241,7 +228,8 @@
           ]
         }
       ],
-      "url": "https://raw.githubusercontent.com/freekers/whitelist/master/domains/whitelist.txt"
+      "url": "https://raw.githubusercontent.com/freekers/whitelist/master/domains/whitelist.txt",
+      "website": "https://github.com/Freekers/whitelist/tree/master"
     },
     {
       "name": "Notracking_Hosts_whitelist",
@@ -287,7 +275,8 @@
           ]
         }
       ],
-      "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Whitelists/Whitelist"
+      "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Whitelists/Whitelist",
+      "website": "https://github.com/ShadowWhisperer/BlockLists"
     },
     {
       "name": "T145_allowlist-domains",

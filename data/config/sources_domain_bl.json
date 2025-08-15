@@ -287,6 +287,31 @@
       "website": "https://dsi.ut-capitole.fr/blacklists"
     },
     {
+      "name": "Blocklists UT1 Shortener",
+      "categories": "url_shorteners",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/refs/heads/master/blacklists/shortener/domains",
+      "website": "https://github.com/olbat/ut1-blacklists/"
+    },
+    {
+      "name": "Boutetnico_URL_Shorteners",
+      "categories": "url_shorteners",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/boutetnico/url-shorteners/master/list.txt"
+    },
+    {
       "name": "Cameleon",
       "categories": "ads",
       "disabled": true,
@@ -298,6 +323,19 @@
       ],
       "url": "https://sysctl.org/cameleon/hosts",
       "website": "https://sysctl.org/cameleon"
+    },
+    {
+      "name": "CF Torrent Trackers",
+      "categories": "torrent_trackers",
+      "license": "GPL-3.0",
+      "skip_general_consolidation": true,
+      "types": [
+        {
+          "name": "domain_url"
+        }
+      ],
+      "url": "https://cf.trackerslist.com/all.txt",
+      "website": "https://cf.trackerslist.com/"
     },
     {
       "name": "CJX Annoyance",
@@ -857,6 +895,19 @@
       "website": "https://kadantiscam.netlify.app"
     },
     {
+      "name": "Korlabs_UrlShortener",
+      "categories": "url_shorteners",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/korlabsio/urlshortener/refs/heads/main/names.txt",
+      "website": "https://github.com/korlabsio/urlshortener"
+    },
+    {
       "name": "Malicious URL Blocklist (URLHaus)",
       "categories": "ads",
       "disabled": true,
@@ -1010,6 +1061,19 @@
       ],
       "url": "https://pgl.yoyo.org/adservers/serverlist.php?hostformat=nohtml",
       "website": "https://pgl.yoyo.org/adservers/"
+    },
+    {
+      "name": "pexcn Torrent Trackers",
+      "categories": "torrent_trackers",
+      "license": "GPL-3.0",
+      "skip_general_consolidation": true,
+      "types": [
+        {
+          "name": "domain_url"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/pexcn/daily/gh-pages/trackerlist/trackerlist-best.txt",
+      "website": "https://github.com/pexcn"
     },
     {
       "name": "phishing_army",
@@ -1219,6 +1283,19 @@
       "website": "https://github.com/ShadowWhisperer/BlockLists"
     },
     {
+      "name": "ShadowWhisperer_UrlShortener",
+      "categories": "url_shorteners",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/refs/heads/master/Lists/UrlShortener",
+      "website": "https://github.com/ShadowWhisperer/BlockLists"
+    },
+    {
       "name": "Spam404",
       "categories": "spam",
       "license": "CC-BY-4.0",
@@ -1308,6 +1385,19 @@
       ],
       "url": "https://github.com/T145/black-mirror/releases/download/latest/BLOCK_DOMAIN.txt",
       "website": "https://github.com/T145/black-mirror"
+    },
+    {
+      "name": "Torrent Trackers",
+      "categories": "torrent_trackers",
+      "license": "MIT",
+      "skip_general_consolidation": true,
+      "types": [
+        {
+          "name": "domain"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/im-sm/Pi-hole-Torrent-Blocklist/main/all-torrent-trackers.txt",
+      "website": "https://github.com/sakib-m/Pi-hole-Torrent-Blocklist"
     },
     {
       "name": "Ukrainian Ad Filter",

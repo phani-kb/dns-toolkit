@@ -88,43 +88,44 @@ const (
 	FrequencyWeekly  = "weekly"
 	FrequencyMonthly = "monthly"
 
-	CategoryAdult          = "adult"
-	CategoryMalware        = "malware"
-	CategoryAds            = "ads"
-	CategoryFamily         = "family"
-	CategoryOthers         = "others"
-	CategoryDns            = "dns"
-	CategoryDoh            = "doh"
-	CategorySpam           = "spam"
-	CategoryScam           = "scam"
-	CategoryPhishing       = "phishing"
-	CategoryCryptocurrency = "cryptocurrency"
-	CategoryTrackers       = "trackers"
-	CategorySocial         = "social"
-	CategoryAnnoyance      = "annoyance"
-	CategoryFake           = "fake"
-	CategoryFakeNews       = "fakenews"
-	CategoryGambling       = "gambling"
-	CategoryThreat         = "threat"
-	CategoryPrivacy        = "privacy"
-	CategorySecurity       = "security"
-	CategoryMalicious      = "malicious"
-	CategoryAnonymizer     = "anonymizer"
-	CategoryTopDomains     = "topdomains"
-	CategoryNewDomains     = "newdomains"
-	CategoryMobile         = "mobile"
-	CategoryProxy          = "proxy"
-	CategoryTrojan         = "trojan"
-	CategoryRansomware     = "ransomware"
-	CategoryBotnet         = "botnet"
-	CategoryExploit        = "exploit"
-	CategoryWindows        = "windows"
-	CategoryMac            = "mac"
-	CategoryFinance        = "finance"
-	CategoryBrowser        = "browser"
-	CategoryIssues         = "issues"
-	CategoryURLShorteners  = "url_shorteners"
-	CategoryDiscord        = "discord"
+	CategoryAdult           = "adult"
+	CategoryMalware         = "malware"
+	CategoryAds             = "ads"
+	CategoryFamily          = "family"
+	CategoryOthers          = "others"
+	CategoryDns             = "dns"
+	CategoryDoh             = "doh"
+	CategorySpam            = "spam"
+	CategoryScam            = "scam"
+	CategoryPhishing        = "phishing"
+	CategoryCryptocurrency  = "cryptocurrency"
+	CategoryTrackers        = "trackers"
+	CategorySocial          = "social"
+	CategoryAnnoyance       = "annoyance"
+	CategoryFake            = "fake"
+	CategoryFakeNews        = "fakenews"
+	CategoryGambling        = "gambling"
+	CategoryThreat          = "threat"
+	CategoryPrivacy         = "privacy"
+	CategorySecurity        = "security"
+	CategoryMalicious       = "malicious"
+	CategoryAnonymizer      = "anonymizer"
+	CategoryTopDomains      = "topdomains"
+	CategoryNewDomains      = "newdomains"
+	CategoryMobile          = "mobile"
+	CategoryProxy           = "proxy"
+	CategoryTrojan          = "trojan"
+	CategoryRansomware      = "ransomware"
+	CategoryBotnet          = "botnet"
+	CategoryExploit         = "exploit"
+	CategoryWindows         = "windows"
+	CategoryMac             = "mac"
+	CategoryFinance         = "finance"
+	CategoryBrowser         = "browser"
+	CategoryIssues          = "issues"
+	CategoryURLShorteners   = "url_shorteners"
+	CategoryDiscord         = "discord"
+	CategoryTorrentTrackers = "torrent_trackers"
 
 	GroupMini   = "mini"
 	GroupLite   = "lite"
@@ -251,43 +252,44 @@ var (
 		FrequencyMonthly: true,
 	}
 	ValidCategories = map[string]bool{
-		CategoryAdult:          true,
-		CategoryMalware:        true,
-		CategoryAds:            true,
-		CategoryFamily:         true,
-		CategoryOthers:         true,
-		CategorySocial:         true,
-		CategoryFake:           true,
-		CategoryFakeNews:       true,
-		CategoryGambling:       true,
-		CategoryPhishing:       true,
-		CategoryCryptocurrency: true,
-		CategorySpam:           true,
-		CategoryScam:           true,
-		CategoryDns:            true,
-		CategoryDoh:            true,
-		CategoryTrackers:       true,
-		CategoryAnnoyance:      true,
-		CategoryThreat:         true,
-		CategoryPrivacy:        true,
-		CategorySecurity:       true,
-		CategoryMalicious:      true,
-		CategoryAnonymizer:     true,
-		CategoryTopDomains:     true,
-		CategoryNewDomains:     true,
-		CategoryMobile:         true,
-		CategoryProxy:          true,
-		CategoryTrojan:         true,
-		CategoryRansomware:     true,
-		CategoryBotnet:         true,
-		CategoryExploit:        true,
-		CategoryWindows:        true,
-		CategoryMac:            true,
-		CategoryFinance:        true,
-		CategoryBrowser:        true,
-		CategoryIssues:         true,
-		CategoryURLShorteners:  true,
-		CategoryDiscord:        true,
+		CategoryAdult:           true,
+		CategoryMalware:         true,
+		CategoryAds:             true,
+		CategoryFamily:          true,
+		CategoryOthers:          true,
+		CategorySocial:          true,
+		CategoryFake:            true,
+		CategoryFakeNews:        true,
+		CategoryGambling:        true,
+		CategoryPhishing:        true,
+		CategoryCryptocurrency:  true,
+		CategorySpam:            true,
+		CategoryScam:            true,
+		CategoryDns:             true,
+		CategoryDoh:             true,
+		CategoryTrackers:        true,
+		CategoryAnnoyance:       true,
+		CategoryThreat:          true,
+		CategoryPrivacy:         true,
+		CategorySecurity:        true,
+		CategoryMalicious:       true,
+		CategoryAnonymizer:      true,
+		CategoryTopDomains:      true,
+		CategoryNewDomains:      true,
+		CategoryMobile:          true,
+		CategoryProxy:           true,
+		CategoryTrojan:          true,
+		CategoryRansomware:      true,
+		CategoryBotnet:          true,
+		CategoryExploit:         true,
+		CategoryWindows:         true,
+		CategoryMac:             true,
+		CategoryFinance:         true,
+		CategoryBrowser:         true,
+		CategoryIssues:          true,
+		CategoryURLShorteners:   true,
+		CategoryDiscord:         true,
+		CategoryTorrentTrackers: true,
 	}
 
 	ValidGroups = map[string]bool{
