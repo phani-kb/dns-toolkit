@@ -1,11 +1,12 @@
+# START source domains
 @@||rs6.net^$image,script,third-party
 @@||click.discord.com^$important
 @@||fpt.live.com^$important
 @@||adaway.org^
 @@||adguardteam.github.io^
-@@||big.oisd.nl^
 @@||blocklist.greensnow.co^
 @@||cdn.jsdelivr.net^
+@@||cf.trackerslist.com^
 @@||cinsscore.com^
 @@||cybercrime-tracker.net^
 @@||dsi.ut-capitole.fr^
@@ -19,7 +20,7 @@
 @@||lists.cyberhost.uk^
 @@||malware-filter.gitlab.io^
 @@||myip.ms^
-@@||opendbl.net^
+@@||nsfw-small.oisd.nl^
 @@||openphish.com^
 @@||pgl.yoyo.org^
 @@||public-dns.info^
@@ -30,10 +31,13 @@
 @@||rules.emergingthreats.net^
 @@||sblam.com^
 @@||someonewhocares.org^
+@@||small.oisd.nl^
 @@||tracker.viriback.com^
 @@||tranco-list.eu^
 @@||urlhaus.abuse.ch^
 @@||v.firebog.net^
 @@||view.sentinel.turris.cz^
+@@||web.archive.org^
 @@||www.binarydefense.com^
 @@||www.spamhaus.org^
+# END source domains

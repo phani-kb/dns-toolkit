@@ -30,7 +30,7 @@
           ]
         }
       ],
-      "url": "file://data/custom/allowlist_domain.txt"
+      "url": "file://data/custom/allowlist_domains.txt"
     },
     {
       "name": "Local Allowlist (ipv4)",
@@ -78,7 +78,7 @@
           ]
         }
       ],
-      "url": "file://data/custom/blocklist_domain.txt"
+      "url": "file://data/custom/blocklist_domains.txt"
     }
   ]
 }
