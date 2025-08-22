@@ -348,7 +348,7 @@ func TestSourcesConfigComplexFiltering(t *testing.T) {
 						},
 					},
 				},
-				Categories: []string{"whitelist"},
+				Categories: []string{"allowlist"},
 				Countries:  []string{"US"},
 				Disabled:   false,
 			},
@@ -420,7 +420,7 @@ func TestSourcesConfigComplexFiltering(t *testing.T) {
 			name: "Filter excluding certain categories",
 			filters: SourceFilters{
 				Category: NameFilter{
-					NotContains: []string{"whitelist"},
+					NotContains: []string{"allowlist"},
 				},
 			},
 			expectedCount: 2,

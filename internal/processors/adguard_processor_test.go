@@ -83,9 +83,9 @@ func TestAdGuardBlocklistProcessor_Process(t *testing.T) {
 		},
 		{
 			name:            "complex adguard rules",
-			content:         "||ads.example.com^\n@@||whitelist.example.com^\n! Comment\n# Another comment\n||tracking.example.com^$third-party\n@@||allowed.example.com^$important",
+			content:         "||ads.example.com^\n@@||allowlist.example.com^\n! Comment\n# Another comment\n||tracking.example.com^$third-party\n@@||allowed.example.com^$important",
 			expectedValid:   []string{"||ads.example.com^", "||tracking.example.com^$third-party"},
-			expectedInvalid: []string{"@@||whitelist.example.com^", "@@||allowed.example.com^$important"},
+			expectedInvalid: []string{"@@||allowlist.example.com^", "@@||allowed.example.com^$important"},
 		},
 	}
 
@@ -173,8 +173,8 @@ func TestAdGuardAllowlistProcessor_Process(t *testing.T) {
 		},
 		{
 			name:            "complex adguard allowlist rules",
-			content:         "||ads.example.com^\n@@||whitelist.example.com^\n! Comment\n# Another comment\n||tracking.example.com^$third-party\n@@||allowed.example.com^$important",
-			expectedValid:   []string{"@@||whitelist.example.com^", "@@||allowed.example.com^$important"},
+			content:         "||ads.example.com^\n@@||allowlist.example.com^\n! Comment\n# Another comment\n||tracking.example.com^$third-party\n@@||allowed.example.com^$important",
+			expectedValid:   []string{"@@||allowlist.example.com^", "@@||allowed.example.com^$important"},
 			expectedInvalid: []string{"||ads.example.com^", "||tracking.example.com^$third-party"},
 		},
 	}
@@ -197,7 +197,7 @@ func TestAdGuardProcessors_Integration(t *testing.T) {
 
 	content := `# AdGuard Home blocklist
 ||ads.example.com^
-@@||whitelist.example.com^
+@@||allowlist.example.com^
 ||tracking.site.com^$third-party
 @@||allowed.site.com^$important
 ! This is a comment
@@ -213,13 +213,13 @@ example.domain.com
 		"example.domain.com",
 	}
 	expectedBlocklistInvalid := []string{
-		"@@||whitelist.example.com^",
+		"@@||allowlist.example.com^",
 		"@@||allowed.site.com^$important",
 		"@@exception.domain.com",
 	}
 
 	expectedAllowlistValid := []string{
-		"@@||whitelist.example.com^",
+		"@@||allowlist.example.com^",
 		"@@||allowed.site.com^$important",
 		"@@exception.domain.com",
 	}

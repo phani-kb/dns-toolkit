@@ -94,7 +94,7 @@ func SaveSummaries[T any](
 			logger.Warnf("Failed to create backup directory: %v", err)
 		} else {
 			// Copy the existing file to the backup
-			if err := copyFile(logger, summaryFile, backupFilePath); err != nil {
+			if err := CopyFile(logger, summaryFile, backupFilePath); err != nil {
 				logger.Warnf("Failed to backup summary file: %v", err)
 			} else {
 				logger.Infof("Backed up summary file to: %s", backupFilePath)

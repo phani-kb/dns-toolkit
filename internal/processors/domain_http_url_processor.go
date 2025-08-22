@@ -7,6 +7,7 @@ import (
 
 	"github.com/phani-kb/multilog"
 
+	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/dns-toolkit/internal/utils"
 )
 
@@ -44,8 +45,7 @@ func (p *DomainHttpUrlProcessor) Process(_ *multilog.Logger, content string) ([]
 	var validEntries, invalidEntries []string
 	lines := strings.Split(content, "\n")
 
-	// Updated regex to better handle complex URLs with paths and query parameters
-	urlRegex := regexp.MustCompile(`^(?:https?:\/\/)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(?::\d+)?(?:\/[^\s]*)?$`)
+	urlRegex := regexp.MustCompile(constants.DomainHttpUrlRegex)
 	uniqueDomains := make(map[string]struct{})
 
 	for _, line := range lines {

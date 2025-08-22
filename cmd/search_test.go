@@ -190,7 +190,7 @@ func TestCategorizeFileContent(t *testing.T) {
 		},
 		{
 			name:     "unknown format entries",
-			lines:    []string{"||example.com^", "@@||whitelist.com^", "||ads.com^"},
+			lines:    []string{"||example.com^", "@@||allowlist.com^", "||ads.com^"},
 			expected: constants.SourceTypeUnknown,
 		},
 		{
