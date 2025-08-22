@@ -139,7 +139,7 @@ func RemoveDuplicates(entries []string) []string {
 
 	set := NewStringSet(entries)
 
-	return set.ToSlice()
+	return set.ToSliceSorted()
 }
 
 // SaveFile saves the content from the reader to the specified destination folder and file name.
@@ -298,6 +298,18 @@ func IsIP(line string) bool {
 	return net.ParseIP(line) != nil
 }
 
+// IsIPv4 checks if a string is a valid IPv4 address.
+//
+// Parameters:
+//   - line: The string to check
+//
+// Returns:
+//   - true if the string is a valid IPv4 address, false otherwise
+func IsIPv4(line string) bool {
+	ip := net.ParseIP(line)
+	return ip != nil && ip.To4() != nil
+}
+
 // IsIPv6 checks if a string is a valid IPv6 address.
 //
 // Parameters:
@@ -333,8 +345,8 @@ func GetTimestamp() string {
 	return time.Now().Format(constants.TimestampFormat)
 }
 
-// copyFile copies a file from src to dst
-func copyFile(logger *multilog.Logger, src, dst string) error {
+// CopyFile copies a file from src to dst
+func CopyFile(logger *multilog.Logger, src, dst string) error {
 	sourceFile, err := os.Open(src)
 	if err != nil {
 		return err

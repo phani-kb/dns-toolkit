@@ -1144,3 +1144,25 @@ func TestExpandIpv4Range(t *testing.T) {
 		})
 	}
 }
+
+func TestIsValidIPv4(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected bool
+	}{
+		{"192.168.1.1", true},
+		{"10.0.0.1", true},
+		{"172.16.0.1", true},
+		{"256.1.2.3", false},
+		{"1.2.3.256", false},
+		{"192.168.1", false},
+		{"192.168.1.1.1", false},
+		{"192.168.1.abc", false},
+		{"", false},
+	}
+
+	for _, test := range tests {
+		result := IsIPv4(test.input)
+		assert.Equal(t, test.expected, result, "Input: %s", test.input)
+	}
+}

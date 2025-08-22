@@ -2,15 +2,33 @@ click.redditmail.com
 drive.google.com
 web.whatsapp.com
 teams.microsoft.com
-# START source domains
-adaway.org
+chatgpt.com
+cursor.com
+cursor.sh
+claude.ai
+openai.com
+ai.com
+chatai.com
+gpt.ai
+aichat.com
+chatbot.com
+deepai.net
+deepai.io
+aiaas.com
+conversai.com
+deepchat.com
+smartai.com
+botgpt.com
+aihub.com
+neuralai.com
+aiverse.com
+### START sources
 adguardteam.github.io
 blocklist.greensnow.co
 cdn.jsdelivr.net
 cf.trackerslist.com
 cinsscore.com
 cybercrime-tracker.net
-dsi.ut-capitole.fr
 easylist-downloads.adblockplus.org
 easylist.to
 filters.adtidy.org
@@ -25,7 +43,6 @@ nsfw-small.oisd.nl
 openphish.com
 pgl.yoyo.org
 public-dns.info
-puppyscams.org
 quidsup.net
 raw.githubusercontent.com
 report.cs.rutgers.edu
@@ -40,4 +57,4 @@ view.sentinel.turris.cz
 web.archive.org
 www.binarydefense.com
 www.spamhaus.org
-# END source domains
+### END sources

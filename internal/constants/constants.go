@@ -229,6 +229,10 @@ var SourceTypeRegexMap = map[string]*regexp.Regexp{
 	SourceTypeDomainFinder: regexp.MustCompile(`([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}`),
 }
 
+const (
+	DomainHttpUrlRegex = `^(?:https?:\/\/)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(?::\d+)?(?:\/[^\s]*)?$`
+)
+
 var (
 	GenericSourceTypes = []string{
 		SourceTypeIpv4,
@@ -242,6 +246,20 @@ var (
 		SourceTypeHostname:        SourceTypeDomain,
 		SourceTypeIpv4RangeExpand: SourceTypeIpv4,
 		SourceTypeIpv4CidrExpand:  SourceTypeIpv4,
+	}
+)
+
+var (
+	AllowlistFilesMap = map[string]string{
+		SourceTypeDomain:  "data/allowlist_domains.txt",
+		SourceTypeAdguard: "data/allowlist_adg.txt",
+		SourceTypeIpv4:    "data/allowlist_ipv4.txt",
+	}
+
+	CustomAllowlistFilesMap = map[string]string{
+		SourceTypeDomain:  "data/custom/allowlist_domains.txt",
+		SourceTypeAdguard: "data/custom/allowlist_adg.txt",
+		SourceTypeIpv4:    "data/custom/allowlist_ipv4.txt",
 	}
 )
 

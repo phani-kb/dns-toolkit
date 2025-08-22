@@ -44,7 +44,7 @@ data/archive/
 data/backup/
 data/profiles/
 data/*.json
-data/whitelist_*.txt
+data/allowlist_*.txt
 
 # Test files
 testdata/**/*.json
@@ -52,3 +52,4 @@ testdata/**/*.tgz
 testdata/output/
 # profiling files
 testdata/**/*.prof
+testdata/data/allowlist_*.txt
