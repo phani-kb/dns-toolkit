@@ -3,8 +3,8 @@ package cmd
 import (
 	"bufio"
 	"fmt"
+	"net"
 	"os"
-	"os/exec"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -201,6 +201,7 @@ func loadCustomElements(logger *multilog.Logger, filename string) []string {
 			domains = append(domains, line)
 		}
 	}
+	sort.Strings(domains)
 
 	logger.Debug("Loaded custom domains", "count", len(domains))
 	return domains
@@ -270,12 +271,16 @@ func writeAllowlistWithStructure(
 
 func generateAdGuardRules(logger *multilog.Logger, filename string, customDomains, sourceDomains []string) error {
 	customAdguardRules := loadCustomElements(logger, constants.CustomAllowlistFilesMap[constants.SourceTypeAdguard])
+	rulesSet := utils.NewStringSet(customAdguardRules)
+
 	for _, domain := range customDomains {
 		adgRule := adgFormat(domain)
-		customAdguardRules = append(customAdguardRules, adgRule)
+		if !rulesSet.Contains(adgRule) {
+			customAdguardRules = append(customAdguardRules, adgRule)
+		}
 	}
 
-	return writeAllowlistWithStructure(logger, filename, customAdguardRules, sourceDomains, adgFormat)
+	return writeAllowlistWithStructure(logger, filename, rulesSet.ToSliceSorted(), sourceDomains, adgFormat)
 }
 
 func generateIPv4Addresses(
@@ -311,31 +316,26 @@ func getResolvedIPs(logger *multilog.Logger, domains []string) []string {
 
 		ips := resolveDomainIPv4(logger, domain)
 		resolvedIPs = append(resolvedIPs, ips...)
-		time.Sleep(1 * time.Second)
+		time.Sleep(constants.IPResolveInterval)
 	}
 
 	return resolvedIPs
 }
 
 func resolveDomainIPv4(logger *multilog.Logger, domain string) []string {
-	ips := make([]string, 0)
-
-	cmd := exec.Command("dig", "+short", domain, "A")
-	output, err := cmd.Output()
+	ipStrings := make([]string, 0)
+	ips, err := net.LookupIP(domain)
 	if err != nil {
 		logger.Debug("Failed to resolve domain", "domain", domain, "error", err)
-		return ips
+		return ipStrings
 	}
-
-	scanner := bufio.NewScanner(strings.NewReader(string(output)))
-	for scanner.Scan() {
-		ip := strings.TrimSpace(scanner.Text())
-		if utils.IsIPv4(ip) && ip != "0.0.0.0" {
-			ips = append(ips, ip)
+	for _, ip := range ips {
+		if utils.IsIPv4(ip.String()) && ip.String() != "0.0.0.0" {
+			ipStrings = append(ipStrings, ip.String())
 		}
 	}
 
-	return ips
+	return ipStrings
 }
 
 func init() {
