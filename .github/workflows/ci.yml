@@ -301,16 +301,10 @@ jobs:
             
             # Check if allowlist files were modified
             if ! git diff --quiet -- data/custom/allowlist_*.txt; then
-              echo "Allowlist files were modified, committing changes..."
+              echo "Allowlist files were modified, committing changes locally..."
               git add data/custom/allowlist_*.txt
               git commit -m "Auto-update: Refresh allowlist files (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }})" || true
-              echo "Allowlist changes committed successfully."
-              
-              # Push the changes
-              echo "Pushing allowlist changes to repository..."
-              git push origin main || {
-                echo "Warning: Failed to push allowlist changes, continuing with pipeline..."
-              }
+              echo "Allowlist changes committed locally (not pushed due to branch protection)."
               ALLOWLIST_UPDATED="true"
             else
               echo "No changes to allowlist files detected."
@@ -476,7 +470,7 @@ jobs:
             echo "- **Generated Output Files**: \`${{ steps.count-files.outputs.output-count || 0 }}\`" >> $GITHUB_STEP_SUMMARY
             echo "- **Generated Summary Files**: \`${{ steps.count-files.outputs.summary-count || 0 }}\`" >> $GITHUB_STEP_SUMMARY
             if [[ "${{ steps.pipeline.outputs.allowlist-updated }}" == "true" ]]; then
-              echo "- **Allowlist Files**: Updated and committed to repository" >> $GITHUB_STEP_SUMMARY
+              echo "- **Allowlist Files**: Updated and committed locally (not pushed)" >> $GITHUB_STEP_SUMMARY
             fi
             if [[ -f "data/download/.cache_timestamp" ]]; then
               echo "- **Data Cache Timestamp**: $(cat data/download/.cache_timestamp)" >> $GITHUB_STEP_SUMMARY
