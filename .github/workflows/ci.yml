@@ -289,14 +289,34 @@ jobs:
           echo "Data backup completed"
 
       - name: Run DNS Toolkit Pipeline
+        id: pipeline
         run: |
           echo "Running DNS toolkit pipeline in '${{ env.PIPELINE_MODE }}' mode..."
           # Step 0: Update allowlists
+          ALLOWLIST_UPDATED="false"
           if [[ "${{ env.PIPELINE_MODE }}" == "full-pipeline" || "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]]; then
             echo "Updating allowlists..."
             ./bin/dns-toolkit generate allowlist --overwrite
             echo "Allowlists updated successfully."
+            
+            # Check if allowlist files were modified
+            if ! git diff --quiet -- data/custom/allowlist_*.txt; then
+              echo "Allowlist files were modified, committing changes..."
+              git add data/custom/allowlist_*.txt
+              git commit -m "Auto-update: Refresh allowlist files (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }})" || true
+              echo "Allowlist changes committed successfully."
+              
+              # Push the changes
+              echo "Pushing allowlist changes to repository..."
+              git push origin main || {
+                echo "Warning: Failed to push allowlist changes, continuing with pipeline..."
+              }
+              ALLOWLIST_UPDATED="true"
+            else
+              echo "No changes to allowlist files detected."
+            fi
           fi
+          echo "allowlist-updated=$ALLOWLIST_UPDATED" >> $GITHUB_OUTPUT
 
           # Step 1: Download (conditional)
           if [[ "${{ env.PIPELINE_MODE }}" == "full-pipeline" || "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]]; then
@@ -455,6 +475,9 @@ jobs:
             echo "- **Downloaded Files**: \`${{ steps.count-files.outputs.download-count || 0 }}\` (\`${{ steps.count-files.outputs.download-size || '0' }}\`)" >> $GITHUB_STEP_SUMMARY
             echo "- **Generated Output Files**: \`${{ steps.count-files.outputs.output-count || 0 }}\`" >> $GITHUB_STEP_SUMMARY
             echo "- **Generated Summary Files**: \`${{ steps.count-files.outputs.summary-count || 0 }}\`" >> $GITHUB_STEP_SUMMARY
+            if [[ "${{ steps.pipeline.outputs.allowlist-updated }}" == "true" ]]; then
+              echo "- **Allowlist Files**: Updated and committed to repository" >> $GITHUB_STEP_SUMMARY
+            fi
             if [[ -f "data/download/.cache_timestamp" ]]; then
               echo "- **Data Cache Timestamp**: $(cat data/download/.cache_timestamp)" >> $GITHUB_STEP_SUMMARY
             fi
