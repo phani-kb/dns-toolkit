@@ -132,19 +132,25 @@ func generateOutputBranchReadme() string {
 
 	sb.WriteString("## Quick Start\n\n")
 	sb.WriteString("Add any of these URLs to your DNS filtering solution:\n\n")
-	sb.WriteString("```\n")
 
 	topLevelFiles, err := getTopLevelTxtFiles()
 	if err == nil && len(topLevelFiles) > 0 {
-		sb.WriteString("# Consolidated Blocklists or Allowlists\n")
+		sb.WriteString("<details>\n")
+		sb.WriteString(
+			"<summary><strong>📋 Consolidated Blocklists and Allowlists</strong></summary>\n\n",
+		)
+		sb.WriteString("```\n")
 		for _, filename := range topLevelFiles {
 			sb.WriteString(fmt.Sprintf("%s/%s\n", constants.GitHubRawURL, filename))
 		}
-		sb.WriteString("\n")
+		sb.WriteString("```\n")
+		sb.WriteString("</details>\n\n")
 	}
 
 	if summary.Groups.TotalGroups > 0 {
-		sb.WriteString("# Size-based lists\n")
+		sb.WriteString("<details>\n")
+		sb.WriteString("<summary><strong>📏 Size-based Lists</strong></summary>\n\n")
+		sb.WriteString("```\n")
 		var groups []string
 		for group := range summary.Groups.GroupSummary {
 			groups = append(groups, group)
@@ -160,11 +166,14 @@ func generateOutputBranchReadme() string {
 				}
 			}
 		}
-		sb.WriteString("\n")
+		sb.WriteString("```\n")
+		sb.WriteString("</details>\n\n")
 	}
 
 	if summary.Categories.TotalCategories > 0 {
-		sb.WriteString("# Category-based lists\n")
+		sb.WriteString("<details>\n")
+		sb.WriteString("<summary><strong>🏷️ Category-based Lists</strong></summary>\n\n")
+		sb.WriteString("```\n")
 		var categories []string
 		for category := range summary.Categories.CategorySummary {
 			categories = append(categories, category)
@@ -180,11 +189,16 @@ func generateOutputBranchReadme() string {
 				}
 			}
 		}
-		sb.WriteString("\n")
+		sb.WriteString("```\n")
+		sb.WriteString("</details>\n\n")
 	}
 
 	if summary.Top.TotalFiles > 0 {
-		sb.WriteString("# High-confidence lists (top entries by number of sources)\n")
+		sb.WriteString("<details>\n")
+		sb.WriteString(
+			"<summary><strong>⭐ High-confidence Lists</strong> (top entries by number of sources)</summary>\n\n",
+		)
+		sb.WriteString("```\n")
 		var types []string
 		for sourceType := range summary.Top.FilesByType {
 			types = append(types, sourceType)
@@ -206,9 +220,9 @@ func generateOutputBranchReadme() string {
 				}
 			}
 		}
-		sb.WriteString("\n")
+		sb.WriteString("```\n")
+		sb.WriteString("</details>\n\n")
 	}
-	sb.WriteString("```\n\n")
 
 	// Daily Workflow Summary
 	sb.WriteString("## Daily Workflow Summary\n\n")
