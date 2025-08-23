@@ -1166,3 +1166,14 @@ func TestIsValidIPv4(t *testing.T) {
 		assert.Equal(t, test.expected, result, "Input: %s", test.input)
 	}
 }
+
+func TestResolveDomainsToIPv4(t *testing.T) {
+	logger := multilog.NewLogger()
+	ips, failedDomains := ResolveDomainsToIPv4(logger, []string{"localhost"})
+	if ips == nil {
+		t.Error("Expected non-nil slice")
+	}
+	if len(failedDomains) > 0 {
+		t.Error("Expected non-nil slice")
+	}
+}

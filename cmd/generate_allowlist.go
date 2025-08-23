@@ -3,7 +3,6 @@ package cmd
 import (
 	"bufio"
 	"fmt"
-	"net"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -307,35 +306,16 @@ func generateIPv4Addresses(
 
 func getResolvedIPs(logger *multilog.Logger, domains []string) []string {
 	totalDomains := len(domains)
-	logger.Info("Resolving IPv4 addresses for domains", "count", totalDomains)
+	logger.Infof("Resolving IPv4 addresses for %v domains...", totalDomains)
 
-	resolvedIPs := make([]string, 0)
-	for i, domain := range domains {
-		current := i + 1
-		logger.Info("Resolving domain", "current", current, "total", totalDomains, "domain", domain)
+	resolvedIPs, failedDomains := utils.ResolveDomainsToIPv4(logger, domains)
 
-		ips := resolveDomainIPv4(logger, domain)
-		resolvedIPs = append(resolvedIPs, ips...)
-		time.Sleep(constants.IPResolveInterval)
+	logger.Infof("Resolved IPv4 addresses count: %v", len(resolvedIPs))
+	if len(failedDomains) > 0 {
+		logger.Warnf("Failed to resolve %v domains", len(failedDomains))
 	}
 
 	return resolvedIPs
-}
-
-func resolveDomainIPv4(logger *multilog.Logger, domain string) []string {
-	ipStrings := make([]string, 0)
-	ips, err := net.LookupIP(domain)
-	if err != nil {
-		logger.Debug("Failed to resolve domain", "domain", domain, "error", err)
-		return ipStrings
-	}
-	for _, ip := range ips {
-		if utils.IsIPv4(ip.String()) && ip.String() != "0.0.0.0" {
-			ipStrings = append(ipStrings, ip.String())
-		}
-	}
-
-	return ipStrings
 }
 
 func init() {

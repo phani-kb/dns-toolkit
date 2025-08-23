@@ -18,6 +18,7 @@ import (
 	"regexp"
 	"runtime"
 	"slices"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -1245,4 +1246,41 @@ func GetUserAgent(logger *multilog.Logger, appName string, appVersion string, ap
 
 	logger.Debugf("User agent: %s", userAgent)
 	return userAgent
+}
+
+func ResolveDomainsToIPv4(logger *multilog.Logger, domains []string) ([]string, []string) {
+	var ipAddresses []string
+	var failedDomains []string
+
+	for _, domain := range domains {
+		ips := resolveDomainIPv4(logger, domain)
+		if len(ips) == 0 {
+			failedDomains = append(failedDomains, domain)
+		} else {
+			ipAddresses = append(ipAddresses, ips...)
+		}
+
+		time.Sleep(constants.IPResolveInterval)
+	}
+
+	sort.Strings(ipAddresses)
+	sort.Strings(failedDomains)
+
+	return ipAddresses, failedDomains
+}
+
+func resolveDomainIPv4(logger *multilog.Logger, domain string) []string {
+	ipStrings := make([]string, 0)
+	ips, err := net.LookupIP(domain)
+	if err != nil {
+		logger.Debug("Failed to resolve domain", "domain", domain, "error", err)
+		return ipStrings
+	}
+	for _, ip := range ips {
+		if IsIPv4(ip.String()) && ip.String() != "0.0.0.0" {
+			ipStrings = append(ipStrings, ip.String())
+		}
+	}
+
+	return ipStrings
 }
