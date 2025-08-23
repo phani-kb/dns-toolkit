@@ -82,7 +82,7 @@ func TestGenerateCreditsSection(t *testing.T) {
 		assert.Contains(t, section, "✅ Enabled")
 		assert.Contains(t, section, "ads")
 		assert.Contains(t, section, "Test source")
-		assert.True(t, strings.HasSuffix(section, "<!-- CREDITS_END -->\n"))
+		assert.True(t, strings.HasSuffix(section, "<!-- CREDITS_END -->"))
 	})
 
 	t.Run("Special characters and edge cases", func(t *testing.T) {
