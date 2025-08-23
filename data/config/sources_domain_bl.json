@@ -599,7 +599,7 @@
       "website": "https://github.com/FakesiteListHUN/FakeWebshopListHUN"
     },
     {
-      "name": "Frogeye trackers",
+      "name": "Frogeye-firstparty-trackers",
       "categories": "trackers",
       "license": "CC BY 4.0",
       "types": [
@@ -822,6 +822,21 @@
       "website": "https://github.com/Hestat/minerchk"
     },
     {
+      "name": "hkamran80_smarttv",
+      "categories": "smarttv",
+      "frequency": "weekly",
+      "license": "MIT",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/hkamran80/blocklists/refs/heads/main/smart-tv.txt",
+      "website": "https://github.com/hkamran80/blocklists"
+    },
+    {
       "name": "Hostsfile",
       "categories": "ads",
       "disabled": true,
@@ -1023,7 +1038,7 @@
             {
               "name": "blocklist",
               "groups": "normal",
-              "disabled": true,
+              "disabled": false,
               "notes": ">95% overlap with HaGeZi Pro"
             }
           ]
@@ -1294,6 +1309,51 @@
       ],
       "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/refs/heads/master/Lists/UrlShortener",
       "website": "https://github.com/ShadowWhisperer/BlockLists"
+    },
+    {
+      "name": "Sinfonietta_Adult",
+      "categories": "adult",
+      "frequency": "weekly",
+      "license": "MIT",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "hostname"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/Sinfonietta/hostfiles/refs/heads/master/pornography-hosts",
+      "website": "https://github.com/Sinfonietta/hostfiles"
+    },
+    {
+      "name": "Sinfonietta_Gambling",
+      "categories": "gambling",
+      "frequency": "weekly",
+      "license": "MIT",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "hostname"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/Sinfonietta/hostfiles/refs/heads/master/gambling-hosts",
+      "website": "https://github.com/Sinfonietta/hostfiles"
+    },
+    {
+      "name": "Sinfonietta_Social",
+      "categories": "social",
+      "frequency": "weekly",
+      "license": "MIT",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "hostname"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/Sinfonietta/hostfiles/refs/heads/master/social-hosts",
+      "website": "https://github.com/Sinfonietta/hostfiles"
     },
     {
       "name": "Spam404",

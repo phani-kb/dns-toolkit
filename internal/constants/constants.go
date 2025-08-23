@@ -126,6 +126,7 @@ const (
 	CategoryURLShorteners   = "url_shorteners"
 	CategoryDiscord         = "discord"
 	CategoryTorrentTrackers = "torrent_trackers"
+	CategorySmartTV         = "smarttv"
 
 	GroupMini   = "mini"
 	GroupLite   = "lite"
