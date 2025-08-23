@@ -96,8 +96,11 @@ func TestGetResolvedIPs(t *testing.T) {
 
 func TestResolveDomainIPv4(t *testing.T) {
 	logger, _ := multilog.NewTestLogger(t)
-	ips := resolveDomainIPv4(logger, "localhost")
+	ips, failedDomains := utils.ResolveDomainsToIPv4(logger, []string{"localhost"})
 	if ips == nil {
+		t.Error("Expected non-nil slice")
+	}
+	if len(failedDomains) > 0 {
 		t.Error("Expected non-nil slice")
 	}
 }
