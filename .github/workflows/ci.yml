@@ -294,7 +294,7 @@ jobs:
           # Step 0: Update allowlists
           if [[ "${{ env.PIPELINE_MODE }}" == "full-pipeline" || "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]]; then
             echo "Updating allowlists..."
-            ./bin/dns-toolkit generate allowlists --overwrite
+            ./bin/dns-toolkit generate allowlist --overwrite
             echo "Allowlists updated successfully."
           fi
 
