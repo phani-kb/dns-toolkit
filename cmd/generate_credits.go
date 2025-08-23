@@ -130,7 +130,7 @@ func generateCreditsSection() string {
 			name := source.Name
 			if source.URL != "" {
 				if strings.HasPrefix(source.URL, "file://") {
-					name = fmt.Sprintf("%s", source.Name)
+					name = source.Name
 				} else {
 					name = fmt.Sprintf("[%s](%s)", source.Name, source.URL)
 				}
@@ -159,7 +159,7 @@ func generateCreditsSection() string {
 		sb.WriteString("\n</details>\n\n")
 	}
 
-	sb.WriteString("<!-- CREDITS_END -->\n")
+	sb.WriteString("<!-- CREDITS_END -->")
 
 	return sb.String()
 }

@@ -437,8 +437,6 @@ This project is made possible by the following blocklist and allowlist sources:
 
 <!-- CREDITS_END -->
 
-
-
 **Note:** Detailed information about each source can be found in the configuration files located in `data/config/sources*.json`.
 
 ## Contributing
