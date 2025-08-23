@@ -7,7 +7,9 @@ name: DNS Toolkit Daily Processing
 
 on:
   schedule:
+    # run twice daily
     - cron: '0 14 * * *' # Daily at 2 PM UTC
+    - cron: '0 2 * * *' # Daily at 2 AM UTC
   workflow_dispatch:
     inputs:
       mode:
@@ -289,6 +291,12 @@ jobs:
       - name: Run DNS Toolkit Pipeline
         run: |
           echo "Running DNS toolkit pipeline in '${{ env.PIPELINE_MODE }}' mode..."
+          # Step 0: Update allowlists
+          if [[ "${{ env.PIPELINE_MODE }}" == "full-pipeline" || "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]]; then
+            echo "Updating allowlists..."
+            ./bin/dns-toolkit generate allowlists --overwrite
+            echo "Allowlists updated successfully."
+          fi
 
           # Step 1: Download (conditional)
           if [[ "${{ env.PIPELINE_MODE }}" == "full-pipeline" || "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]]; then

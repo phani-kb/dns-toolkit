@@ -138,7 +138,7 @@
       "website": "https://github.com/AdguardTeam/AdGuardFilters"
     },
     {
-      "name": "Adguard CNAME Mail Trackers",
+      "name": "AdGuard CNAME Mail Trackers",
       "categories": "trackers",
       "license": "MIT",
       "skip_general_consolidation": true,
@@ -152,7 +152,7 @@
       "website": "https://github.com/AdguardTeam/cname-trackers"
     },
     {
-      "name": "Adguard CNAME Trackers",
+      "name": "AdGuard CNAME Trackers",
       "categories": "trackers",
       "license": "MIT",
       "skip_general_consolidation": true,

@@ -2,7 +2,8 @@ name: Delete Old Workflow Runs
 
 on:
   schedule:
-    - cron: '0 10 * * 0'  # Weekly on Sunday at 10AM UTC
+    - cron: '0 10 * * 0' # Weekly on Sunday at 10AM UTC
+    - cron: '0 10 * * 3' # Weekly on Wednesday at 10AM UTC
   workflow_dispatch:
     inputs:
       retain_days:
@@ -20,7 +21,7 @@ jobs:
     permissions:
       actions: write
       contents: read
-    
+
     steps:
       - name: Delete old workflow runs
         uses: Mattraks/delete-workflow-runs@v2

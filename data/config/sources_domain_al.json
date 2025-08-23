@@ -15,7 +15,7 @@
       "url": "https://raw.githubusercontent.com/AdguardTeam/AdGuardSDNSFilter/master/Filters/exclusions.txt"
     },
     {
-      "name": "AdguardTeam_HttpsExclusions_android",
+      "name": "AdGuardTeam_HttpsExclusions_android",
       "categories": "mobile",
       "types": [
         {
@@ -30,7 +30,7 @@
       "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/android.txt"
     },
     {
-      "name": "AdguardTeam_HttpsExclusions_banks",
+      "name": "AdGuardTeam_HttpsExclusions_banks",
       "categories": "finance",
       "types": [
         {
@@ -45,7 +45,7 @@
       "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/banks.txt"
     },
     {
-      "name": "AdguardTeam_HttpsExclusions_firefox",
+      "name": "AdGuardTeam_HttpsExclusions_firefox",
       "categories": "browser",
       "types": [
         {
@@ -60,7 +60,7 @@
       "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/firefox.txt"
     },
     {
-      "name": "AdguardTeam_HttpsExclusions_issues",
+      "name": "AdGuardTeam_HttpsExclusions_issues",
       "categories": "issues",
       "types": [
         {
@@ -75,7 +75,7 @@
       "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/issues.txt"
     },
     {
-      "name": "AdguardTeam_HttpsExclusions_mac",
+      "name": "AdGuardTeam_HttpsExclusions_mac",
       "categories": "mac",
       "types": [
         {
@@ -90,7 +90,7 @@
       "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/mac.txt"
     },
     {
-      "name": "AdguardTeam_HttpsExclusions_sensitive",
+      "name": "AdGuardTeam_HttpsExclusions_sensitive",
       "types": [
         {
           "name": "domain",
@@ -104,7 +104,7 @@
       "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/sensitive.txt"
     },
     {
-      "name": "AdguardTeam_HttpsExclusions_windows",
+      "name": "AdGuardTeam_HttpsExclusions_windows",
       "categories": "windows",
       "types": [
         {
