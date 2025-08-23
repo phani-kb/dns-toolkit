@@ -1,25 +1,11 @@
-ai.com
-aiaas.com
-aichat.com
-aihub.com
-aiverse.com
-botgpt.com
-chatai.com
-chatbot.com
 chatgpt.com
 claude.ai
 click.redditmail.com
-conversai.com
 cursor.com
 cursor.sh
-deepai.io
-deepai.net
-deepchat.com
+deepseek.com
 drive.google.com
-gpt.ai
-neuralai.com
 openai.com
-smartai.com
 teams.microsoft.com
 web.whatsapp.com
 ### START sources
