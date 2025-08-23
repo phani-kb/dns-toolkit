@@ -3,6 +3,7 @@
     {
       "name": "tranco",
       "count_to_consider": 1000,
+      "categories": "topdomains",
       "files": "top-1m.csv",
       "frequency": "monthly",
       "types": [

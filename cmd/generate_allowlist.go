@@ -270,13 +270,13 @@ func writeAllowlistWithStructure(
 
 func generateAdGuardRules(logger *multilog.Logger, filename string, customDomains, sourceDomains []string) error {
 	customAdguardRules := loadCustomElements(logger, constants.CustomAllowlistFilesMap[constants.SourceTypeAdguard])
+	logger.Infof("%v existing custom AdGuard rules", len(customAdguardRules))
+
 	rulesSet := utils.NewStringSet(customAdguardRules)
 
 	for _, domain := range customDomains {
 		adgRule := adgFormat(domain)
-		if !rulesSet.Contains(adgRule) {
-			customAdguardRules = append(customAdguardRules, adgRule)
-		}
+		rulesSet.Add(adgRule)
 	}
 
 	return writeAllowlistWithStructure(logger, filename, rulesSet.ToSliceSorted(), sourceDomains, adgFormat)
@@ -313,6 +313,9 @@ func getResolvedIPs(logger *multilog.Logger, domains []string) []string {
 	logger.Infof("Resolved IPv4 addresses count: %v", len(resolvedIPs))
 	if len(failedDomains) > 0 {
 		logger.Warnf("Failed to resolve %v domains", len(failedDomains))
+		for _, domain := range failedDomains {
+			logger.Warnf("Domain: %s", domain)
+		}
 	}
 
 	return resolvedIPs

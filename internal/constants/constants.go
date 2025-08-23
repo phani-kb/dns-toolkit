@@ -127,6 +127,8 @@ const (
 	CategoryDiscord         = "discord"
 	CategoryTorrentTrackers = "torrent_trackers"
 	CategorySmartTV         = "smarttv"
+	CategoryLocal           = "local"
+	CategoryCustom          = "custom"
 
 	GroupMini   = "mini"
 	GroupLite   = "lite"
@@ -310,6 +312,8 @@ var (
 		CategoryDiscord:         true,
 		CategoryTorrentTrackers: true,
 		CategorySmartTV:         true,
+		CategoryLocal:           true,
+		CategoryCustom:          true,
 	}
 
 	ValidGroups = map[string]bool{
@@ -345,7 +349,7 @@ const (
 	MaxSampleLinesToCategorize    = 100
 	TimestampFormat               = "20060102_150405"
 	BackupFileTimestampFormat     = "20060102_150405"
-	DownloadInterval              = 1800 * time.Millisecond
+	DownloadInterval              = 1500 * time.Millisecond
 	DefaultHashAlgorithm          = "md5"
 	DefaultMaxRetries             = 3
 	DefaultRetryDelayInSeconds    = 10
