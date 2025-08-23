@@ -309,6 +309,7 @@ var (
 		CategoryURLShorteners:   true,
 		CategoryDiscord:         true,
 		CategoryTorrentTrackers: true,
+		CategorySmartTV:         true,
 	}
 
 	ValidGroups = map[string]bool{
