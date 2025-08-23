@@ -143,7 +143,6 @@
     {
       "name": "DoH_IP_blocklists",
       "categories": "doh",
-      "exclude": true,
       "license": "GPL-3.0",
       "notes": ">90% overlap with HaGeZi Encrypted DNS Servers",
       "skip_general_consolidation": true,
@@ -162,7 +161,6 @@
     {
       "name": "DoH_IP_list",
       "categories": "doh",
-      "exclude": true,
       "frequency": "monthly",
       "license": "MIT",
       "skip_general_consolidation": true,

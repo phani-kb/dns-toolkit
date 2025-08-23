@@ -2,6 +2,7 @@ package utils
 
 import (
 	"sync"
+	"sync/atomic"
 
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 )
@@ -37,6 +38,7 @@ func (p *DTEntryPool) Intern(s string) string {
 	p.mu.RUnlock()
 
 	if ok {
+		atomic.AddInt64(&p.stats.hits, 1)
 		return interned
 	}
 
@@ -45,10 +47,12 @@ func (p *DTEntryPool) Intern(s string) string {
 	interned, ok = p.pool[s]
 	if ok {
 		p.mu.Unlock()
+		atomic.AddInt64(&p.stats.hits, 1)
 		return interned
 	}
 	p.pool[s] = s
 	p.mu.Unlock()
+	atomic.AddInt64(&p.stats.misses, 1)
 	return s
 }
 
@@ -73,13 +77,14 @@ func (p *DTEntryPool) Clear() {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 	p.pool = make(map[string]string)
-	p.stats.hits = 0
-	p.stats.misses = 0
+	atomic.StoreInt64(&p.stats.hits, 0)
+	atomic.StoreInt64(&p.stats.misses, 0)
 }
 
 // Stats return the current hit/miss statistics for the pool.
 func (p *DTEntryPool) Stats() PoolStats {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-	return p.stats
+	return PoolStats{
+		hits:   atomic.LoadInt64(&p.stats.hits),
+		misses: atomic.LoadInt64(&p.stats.misses),
+	}
 }
