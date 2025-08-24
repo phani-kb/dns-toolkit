@@ -157,8 +157,9 @@ func generateDetailedOverlapAnalysis() (string, error) {
 		sb.WriteString("\n")
 	}
 
-	// filter overlap summaries by minimum overlap percent
-	overlapSummaries = FilterOverlapSummariesByMinPercent(overlapSummaries, AppConfig.DNSToolkit.GetMinOverlapPercent())
+	// consider targets with overlap count > 0
+	minPercent := AppConfig.DNSToolkit.GetMinOverlapPercent()
+	overlapSummaries = FilterOverlapSummariesByMinPercent(overlapSummaries, minPercent)
 
 	// Detailed analysis per source
 	sb.WriteString("## Detailed Source Analysis\n\n")
@@ -201,7 +202,10 @@ func generateDetailedOverlapAnalysis() (string, error) {
 
 			for _, targetStr := range summary.TargetsList {
 				target := parseTargetString(targetStr)
-				if target != nil && target.OverlapPercent >= AppConfig.DNSToolkit.GetMinOverlapPercent() {
+				if target == nil {
+					continue
+				}
+				if target.OverlapCount > 0 || target.OverlapPercent >= minPercent {
 					sb.WriteString(fmt.Sprintf("| %s | %s | %s | %s | %s | %.1f%% |\n",
 						target.Name,
 						target.ListType,
@@ -319,7 +323,7 @@ func FilterOverlapSummariesByMinPercent(overlapSummaries []c.OverlapSummary, min
 			if td == nil {
 				continue
 			}
-			if td.OverlapPercent >= minPercent {
+			if td.OverlapCount > 0 || td.OverlapPercent >= minPercent {
 				newTargets = append(newTargets, targetStr)
 			}
 		}
