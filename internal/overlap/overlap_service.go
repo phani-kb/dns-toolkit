@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
+	cfg "github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
@@ -346,7 +347,7 @@ func computeCompactSummaryFromPairs(sourceTypeName, sourceName string, pairs []c
 	// same-list only if both ListType and Type match the source.
 	// else, treat it as a cross-list/type conflict.
 	for _, t := range cs.Targets {
-		if t.ListType == cs.ListType && t.Type == cs.Type {
+		if t.ListType == cs.ListType && cfg.GetGenericSourceType(t.Type) == cfg.GetGenericSourceType(cs.Type) {
 			totalOverlapSameList += t.Overlap
 		} else {
 			totalOverlapCrossList += t.Overlap

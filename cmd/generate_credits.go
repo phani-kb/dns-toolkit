@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -106,6 +107,21 @@ func generateCreditsSection() string {
 	}
 	sort.Strings(filenames)
 
+	overlapMap := make(map[string][2]int)
+	overlapFile := filepath.Join(constants.SummaryDir, constants.DefaultSummaryFiles["overlap"])
+	if data, err := os.ReadFile(overlapFile); err == nil {
+		var overlaps []struct {
+			Source    string `json:"source"`
+			Unique    int    `json:"unique"`
+			Conflicts int    `json:"conflicts"`
+		}
+		if err := json.Unmarshal(data, &overlaps); err == nil {
+			for _, o := range overlaps {
+				overlapMap[o.Source] = [2]int{o.Unique, o.Conflicts}
+			}
+		}
+	}
+
 	for _, filename := range filenames {
 		sources := sourcesByFile[filename]
 		if len(sources) == 0 {
@@ -125,10 +141,15 @@ func generateCreditsSection() string {
 			),
 		)
 
-		sb.WriteString(
-			"| Name | Status | Categories | AL/BL | Notes |\n",
-		) // TODO Consolidation: general, groups, categories
-		sb.WriteString("|------|--------|------------|-------|-------|\n")
+		// If overlapMap has entries, replace AL/BL column with Unique/Conflicts column.
+		hasOverlap := len(overlapMap) > 0
+		if hasOverlap {
+			sb.WriteString("| Name | Status | Categories | Unique/Conflicts | Notes |\n")
+			sb.WriteString("|------|--------|------------|------------------|-------|\n")
+		} else {
+			sb.WriteString("| Name | Status | Categories | AL/BL | Notes |\n")
+			sb.WriteString("|------|--------|------------|-------|-------|\n")
+		}
 
 		for _, source := range sources {
 			name := source.Name
@@ -158,8 +179,18 @@ func generateCreditsSection() string {
 			}
 
 			listTypes := getListTypes(source)
-			sb.WriteString(fmt.Sprintf("| %s | %s | %s | %s | %s |\n",
-				name, status, categories, listTypes, notes))
+			if hasOverlap {
+				if vals, ok := overlapMap[source.Name]; ok {
+					sb.WriteString(fmt.Sprintf("| %s | %s | %s | %d/%d | %s |\n",
+						name, status, categories, vals[0], vals[1], notes))
+				} else {
+					sb.WriteString(fmt.Sprintf("| %s | %s | %s | - | %s |\n",
+						name, status, categories, notes))
+				}
+			} else {
+				sb.WriteString(fmt.Sprintf("| %s | %s | %s | %s | %s |\n",
+					name, status, categories, listTypes, notes))
+			}
 		}
 
 		sb.WriteString("\n</details>\n\n")
