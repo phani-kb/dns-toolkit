@@ -1284,3 +1284,31 @@ func resolveDomainIPv4(logger *multilog.Logger, domain string) []string {
 
 	return ipStrings
 }
+
+// ExtractEntriesWithRegex extracts entries from content using a regex pattern.
+// Lines that match the regex are considered valid, others invalid.
+//
+// Parameters:
+//   - content: The content to process
+//   - regex: The regex pattern to match against
+//
+// Returns:
+//   - A slice of valid entries (match the regex)
+//   - A slice of invalid entries (don't match the regex)
+func ExtractEntriesWithRegex(content string, regex *regexp.Regexp) ([]string, []string) {
+	var validEntries, invalidEntries []string
+	lines := strings.Split(content, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if IsComment(line) {
+			continue
+		}
+		matchedString := regex.FindString(line)
+		if matchedString != "" {
+			validEntries = append(validEntries, matchedString)
+		} else {
+			invalidEntries = append(invalidEntries, line)
+		}
+	}
+	return RemoveDuplicates(validEntries), RemoveDuplicates(invalidEntries)
+}

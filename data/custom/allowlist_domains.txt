@@ -1,11 +1,5 @@
-chatgpt.com
-claude.ai
 click.redditmail.com
-cursor.com
-cursor.sh
-deepseek.com
 drive.google.com
-openai.com
 teams.microsoft.com
 web.whatsapp.com
 ### START sources
