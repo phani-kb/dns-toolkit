@@ -384,6 +384,13 @@ jobs:
           fi
 
           # Store original branch and prepare publish script
+          if ! git diff --quiet -- README.md; then
+            echo "Committing generated README changes to avoid dirty working tree"
+            git add README.md || true
+            git commit -m "Auto-update: Generated README (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }}) [skip ci]" || true
+            echo "README committed locally."
+          fi
+
           echo "ORIGINAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
 
           # Execute publish script using specific variables
