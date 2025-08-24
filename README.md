@@ -107,6 +107,18 @@ Top domains sourced from the tranco-list.eu list (`domain_top` type) are treated
 
 **[View Detailed Overlap Analysis →](https://github.com/phani-kb/dns-toolkit/blob/output/overlap.md)** - Comprehensive analysis showing how entries are shared across different DNS sources.
 
+> 🔍 **Overlap report — quick interpretation**
+>
+> **Why it matters:** the overlap report helps you spot redundant or conflicting sources so you can prune, prioritize, or investigate sources quickly.
+>
+> **Quick checklist:**
+>
+> - **Unique Entries = 0** → source is fully covered by same-list sources (low value-add).
+> - **Conflicts > 0** → entries appear in different list types (e.g., blocklist vs allowlist); investigate mismatches.
+> - **Overlap % (table)** → shown relative to the *target*; high values mean the target is largely covered by this source.
+>
+> Run `dns-toolkit overlap` or open `overlap.md` to explore details.
+> 
 **Processing summaries and metadata are archived in the [`summaries`](https://github.com/phani-kb/dns-toolkit/tree/summaries) branch with 1-year retention.**
 
 <!-- BRANCH_SIZES_START -->
