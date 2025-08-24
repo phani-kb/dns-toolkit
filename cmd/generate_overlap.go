@@ -165,7 +165,7 @@ func generateDetailedOverlapAnalysis() (string, error) {
 	sb.WriteString("## Detailed Source Analysis\n\n")
 
 	sort.Slice(overlapSummaries, func(i, j int) bool {
-		return strings.ToLower(overlapSummaries[i].Source) < strings.ToLower(overlapSummaries[j].Source)
+		return u.CaseInsensitiveLess(overlapSummaries[i].Source, overlapSummaries[j].Source)
 	})
 
 	for _, summary := range overlapSummaries {

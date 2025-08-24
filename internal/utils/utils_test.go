@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"runtime"
 	"strings"
@@ -328,6 +329,36 @@ func TestShouldDownloadSource(t *testing.T) {
 	writeSummary(oldTime, "unknown")
 	result = ShouldDownloadSource(logger, tempFile.Name(), "test-source")
 	assert.True(t, result) // Should download with unknown frequency defaulting to daily
+}
+
+func TestCaseInsensitiveLess(t *testing.T) {
+	if !CaseInsensitiveLess("apple", "Banana") {
+		t.Fatalf("expected apple < Banana (case-insensitive)")
+	}
+	if CaseInsensitiveLess("Cherry", "banana") {
+		t.Fatalf("expected Cherry > banana (case-insensitive)")
+	}
+	if CaseInsensitiveLess("same", "same") {
+		t.Fatalf("expected same !< same")
+	}
+}
+
+func TestSortCaseInsensitiveStrings(t *testing.T) {
+	input := []string{"banana", "Apple", "cherry", "apple"}
+	expected := []string{"Apple", "apple", "banana", "cherry"}
+	SortCaseInsensitiveStrings(input)
+	if !reflect.DeepEqual(input, expected) {
+		t.Fatalf("unexpected sort result: got %v want %v", input, expected)
+	}
+}
+
+func TestFormatNameCounts(t *testing.T) {
+	m := map[string]int{"zeta": 2, "Alpha": 5, "beta": 3}
+	got := FormatNameCounts(m)
+	want := []string{"Alpha (5)", "beta (3)", "zeta (2)"}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("FormatNameCounts returned %v, want %v", got, want)
+	}
 }
 
 func TestLogMemStats(t *testing.T) {

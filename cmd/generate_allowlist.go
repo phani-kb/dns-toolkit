@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"sort"
 	"strings"
 	"time"
 
@@ -154,7 +153,7 @@ func extractSourceDomains() []string {
 	for domain := range domains {
 		result = append(result, domain)
 	}
-	sort.Strings(result)
+	utils.SortCaseInsensitiveStrings(result)
 
 	return result
 }
@@ -200,7 +199,7 @@ func loadCustomElements(logger *multilog.Logger, filename string) []string {
 			domains = append(domains, line)
 		}
 	}
-	sort.Strings(domains)
+	utils.SortCaseInsensitiveStrings(domains)
 
 	logger.Debug("Loaded custom domains", "count", len(domains))
 	return domains
@@ -223,7 +222,7 @@ func combineDomains(customDomains, sourceDomains []string) []string {
 	for domain := range allDomainsMap {
 		result = append(result, domain)
 	}
-	sort.Strings(result)
+	utils.SortCaseInsensitiveStrings(result)
 
 	return result
 }

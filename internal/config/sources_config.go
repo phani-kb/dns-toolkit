@@ -331,7 +331,7 @@ func (sc *SourcesConfig) GetEnabledSources(filters SourceFilters) []Source {
 		enabledSources = append(enabledSources, source)
 	}
 	sort.Slice(enabledSources, func(i, j int) bool {
-		return strings.ToLower(enabledSources[i].Name) < strings.ToLower(enabledSources[j].Name)
+		return u.CaseInsensitiveLess(enabledSources[i].Name, enabledSources[j].Name)
 	})
 	return enabledSources
 }
@@ -351,7 +351,7 @@ func (sc *SourcesConfig) GetSourcesForGeneralConsolidation(filters SourceFilters
 		sources = append(sources, source)
 	}
 	sort.Slice(sources, func(i, j int) bool {
-		return strings.ToLower(sources[i].Name) < strings.ToLower(sources[j].Name)
+		return u.CaseInsensitiveLess(sources[i].Name, sources[j].Name)
 	})
 	return sources
 }
@@ -371,7 +371,7 @@ func (sc *SourcesConfig) GetSourcesForGroupsConsolidation(filters SourceFilters)
 		sources = append(sources, source)
 	}
 	sort.Slice(sources, func(i, j int) bool {
-		return strings.ToLower(sources[i].Name) < strings.ToLower(sources[j].Name)
+		return u.CaseInsensitiveLess(sources[i].Name, sources[j].Name)
 	})
 	return sources
 }
@@ -390,7 +390,7 @@ func (sc *SourcesConfig) GetSourcesForCategoriesConsolidation(filters SourceFilt
 		sources = append(sources, source)
 	}
 	sort.Slice(sources, func(i, j int) bool {
-		return strings.ToLower(sources[i].Name) < strings.ToLower(sources[j].Name)
+		return u.CaseInsensitiveLess(sources[i].Name, sources[j].Name)
 	})
 	return sources
 }

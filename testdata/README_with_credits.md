@@ -27,7 +27,7 @@ This is a test README file for testing the generate credits functionality.
 <!-- STATS_END -->
 
 <!-- CREDITS_START -->
-## Source Credits (Old)
+## Credits (Old)
 
 This project is made possible by the following blocklist and allowlist sources:
 

@@ -158,9 +158,10 @@ func generateFilesList(
 		len(filesInvolved),
 	))
 
-	sort.Slice(filesInvolved, func(i, j int) bool {
-		return strings.ToLower(filesInvolved[i].Name) < strings.ToLower(filesInvolved[j].Name)
-	})
+	sort.Slice(
+		filesInvolved,
+		func(i, j int) bool { return u.CaseInsensitiveLess(filesInvolved[i].Name, filesInvolved[j].Name) },
+	)
 
 	maxNameLen := 0
 	maxSourceTypeLen := 0
