@@ -233,14 +233,15 @@
     },
     {
       "name": "Notracking_Hosts_whitelist",
-      "disabled": true,
-      "notes": "Huge list use with caution",
+      "disabled": false,
+      "notes": "Huge list, use with caution",
       "types": [
         {
           "name": "domain",
           "list_types": [
             {
-              "name": "allowlist"
+              "name": "allowlist",
+              "groups": "big"
             }
           ]
         }
@@ -282,7 +283,7 @@
       "name": "T145_allowlist-domains",
       "disabled": true,
       "license": "AGPL-3.0",
-      "notes": "Too many allowlist domains, use with caution.",
+      "notes": "Huge list, use with caution",
       "types": [
         {
           "name": "domain",
@@ -298,14 +299,15 @@
     },
     {
       "name": "TogoFire_AD_Settings_whitelist",
-      "disabled": true,
-      "notes": "Huge list use with caution",
+      "disabled": false,
+      "notes": "Huge list, use with caution",
       "types": [
         {
           "name": "adguard",
           "list_types": [
             {
-              "name": "allowlist"
+              "name": "allowlist",
+              "groups": "big"
             }
           ]
         }

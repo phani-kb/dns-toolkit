@@ -3,7 +3,7 @@
     {
       "name": "VXVault_URLList",
       "categories": "malware",
-      "disabled": true,
+      "disabled": false,
       "notes": ">95% overlap with Firehol_level3",
       "types": [
         {

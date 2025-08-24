@@ -24,12 +24,13 @@ fi
 # gor- overlap README
 # gsr- summaries README
 # gs - stats README
+# gc - credits README
 # cp - copy summaries
 
 if [ "$#" -gt 0 ]; then
     IFS=',' read -ra steps <<< "$1"
 else
-    steps=("ga" "d" "p" "c" "cg" "cc" "t" "o" "op" "gr" "gor" "gsr" "gs" "cp")
+    steps=("ga" "d" "p" "c" "cg" "cc" "t" "o" "op" "gr" "gor" "gsr" "gs" "gc" "cp")
 fi
 
 for step in "${steps[@]}"; do
@@ -86,8 +87,12 @@ for step in "${steps[@]}"; do
             echo "Step 13: Generating stats README..."
             ./bin/dns-toolkit generate stats-readme
             ;;
+        gc)
+            echo "Step 14: Generating credits README..."
+            ./bin/dns-toolkit generate credits
+            ;;
         cp)
-            echo "Step 14: Copy summary files to archive..."
+            echo "Step 15: Copy summary files to archive..."
             cp data/output/summaries/* data/archive/
             ;;
         *)

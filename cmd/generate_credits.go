@@ -8,6 +8,8 @@ import (
 	"strings"
 
 	"github.com/phani-kb/dns-toolkit/internal/config"
+	"github.com/phani-kb/dns-toolkit/internal/constants"
+	"github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
 	"github.com/spf13/cobra"
 )
@@ -123,17 +125,20 @@ func generateCreditsSection() string {
 			),
 		)
 
-		sb.WriteString("| Name | Status | Categories | Notes |\n")
-		sb.WriteString("|------|--------|------------|-------|\n")
+		sb.WriteString(
+			"| Name | Status | Categories | AL/BL | Notes |\n",
+		) // TODO Consolidation: general, groups, categories
+		sb.WriteString("|------|--------|------------|-------|-------|\n")
 
 		for _, source := range sources {
 			name := source.Name
 			if source.URL != "" {
-				if strings.HasPrefix(source.URL, "file://") {
-					name = source.Name
-				} else {
-					name = fmt.Sprintf("[%s](%s)", source.Name, source.URL)
-				}
+				name = source.Name
+				// if strings.HasPrefix(source.URL, "file://") {
+				// 	name = source.Name
+				// } else {
+				// 	name = fmt.Sprintf("[%s](%s)", source.Name, source.URL)
+				// }
 			}
 
 			status := "✅ Enabled"
@@ -152,8 +157,9 @@ func generateCreditsSection() string {
 				notes = strings.ReplaceAll(notes, "\n", " ")
 			}
 
-			sb.WriteString(fmt.Sprintf("| %s | %s | %s | %s |\n",
-				name, status, categories, notes))
+			listTypes := getListTypes(source)
+			sb.WriteString(fmt.Sprintf("| %s | %s | %s | %s | %s |\n",
+				name, status, categories, listTypes, notes))
 		}
 
 		sb.WriteString("\n</details>\n\n")
@@ -162,6 +168,16 @@ func generateCreditsSection() string {
 	sb.WriteString("<!-- CREDITS_END -->")
 
 	return sb.String()
+}
+
+func getListTypes(source config.Source) []string {
+	listTypes := utils.NewStringSet([]string{})
+	for _, t := range source.Types {
+		for _, lt := range t.ListTypes {
+			listTypes.Add(constants.ListTypeMap[lt.Name])
+		}
+	}
+	return listTypes.ToSliceSorted()
 }
 
 func init() {

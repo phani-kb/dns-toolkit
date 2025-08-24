@@ -78,10 +78,11 @@ func TestGenerateCreditsSection(t *testing.T) {
 		assert.Contains(t, section, "## Source Credits")
 		assert.Contains(t, section, "<details>")
 		assert.Contains(t, section, "test-sources.yml")
-		assert.Contains(t, section, "[test-source](https://example.com/list)")
+		assert.Contains(t, section, "test-source")
 		assert.Contains(t, section, "✅ Enabled")
 		assert.Contains(t, section, "ads")
 		assert.Contains(t, section, "Test source")
+		assert.Contains(t, section, "[BL]")
 		assert.True(t, strings.HasSuffix(section, "<!-- CREDITS_END -->"))
 	})
 
@@ -124,6 +125,7 @@ func TestGenerateCreditsSection(t *testing.T) {
 		assert.Contains(t, section, "| - |")
 		assert.Contains(t, section, "Notes with \\| pipes \\|")
 		assert.Contains(t, section, "and newlines")
+		assert.Contains(t, section, "[BL]")
 	})
 
 	t.Run("No sources configured", func(t *testing.T) {
@@ -204,10 +206,11 @@ Installation information here.
 
 		assert.Contains(t, contentStr, "## Source Credits")
 		assert.Contains(t, contentStr, "test-sources.yml")
-		assert.Contains(t, contentStr, "[test-source](https://example.com/list)")
+		assert.Contains(t, contentStr, "test-source")
 
 		assert.Contains(t, contentStr, "# Test Project")
 		assert.Contains(t, contentStr, "## Installation")
+		assert.Contains(t, contentStr, "[BL]")
 	})
 
 	t.Run("Replace existing credits section with testdata file", func(t *testing.T) {
@@ -232,11 +235,38 @@ Installation information here.
 
 		assert.Contains(t, contentStr, "## Source Credits")
 		assert.Contains(t, contentStr, "test-sources.yml")
-		assert.Contains(t, contentStr, "[test-source](https://example.com/list)")
+		assert.Contains(t, contentStr, "test-source")
+		assert.Contains(t, contentStr, "[BL]")
 
 		assert.Contains(t, contentStr, "# DNS Toolkit Test")
 		assert.Contains(t, contentStr, "## Installation")
 		assert.Contains(t, contentStr, "## Source Statistics")
 		assert.Contains(t, contentStr, "## Branch Sizes")
 	})
+}
+
+func TestGetListTypes(t *testing.T) {
+	source := config.Source{
+		Name: "example-source",
+		Types: []common.SourceType{
+			{
+				Name: "domain",
+				ListTypes: []common.ListType{
+					{Name: "blocklist"},
+					{Name: "allowlist"},
+				},
+			},
+			{
+				Name: "ipv4",
+				ListTypes: []common.ListType{
+					{Name: "blocklist"},
+				},
+			},
+		},
+	}
+
+	expected := []string{"AL", "BL"}
+	result := getListTypes(source)
+
+	assert.Equal(t, expected, result, "List types should match expected unique sorted values")
 }
