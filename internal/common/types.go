@@ -409,14 +409,15 @@ type OverlapFileInfo struct {
 
 // OverlapSummary represents a compact summary of overlap information for a source.
 type OverlapSummary struct {
-	Source       string                  `json:"source"`        // Name of the source file
-	ListType     string                  `json:"list_type"`     // Type of list (blocklist or allowlist)
-	Type         string                  `json:"source_type"`   // Source type (domain, ipv4, etc.)
-	TargetsList  []string                `json:"targets"`       // List of targets as strings
-	Targets      []OverlapTargetFileInfo `json:"-"`             // Detailed target information (not serialized)
-	Count        int                     `json:"count"`         // Number of entries in the source
-	Unique       int                     `json:"unique"`        // Number of unique entries
-	TargetsCount int                     `json:"targets_count"` // Number of target files with overlap
+	Source       string                  `json:"source"`              // Name of the source file
+	ListType     string                  `json:"list_type"`           // Type of list (blocklist or allowlist)
+	Type         string                  `json:"source_type"`         // Source type (domain, ipv4, etc.)
+	TargetsList  []string                `json:"targets"`             // List of targets as strings
+	Targets      []OverlapTargetFileInfo `json:"-"`                   // Detailed target information (not serialized)
+	Count        int                     `json:"count"`               // Number of entries in the source
+	Unique       int                     `json:"unique"`              // Number of unique entries
+	Conflicts    int                     `json:"conflicts,omitempty"` // Number of overlaps with different list types
+	TargetsCount int                     `json:"targets_count"`       // Number of target files with overlap
 }
 
 func (os *OverlapSummary) GetName() string {

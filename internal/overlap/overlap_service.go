@@ -297,6 +297,7 @@ func computeCompactSummaryFromPairs(sourceTypeName, sourceName string, pairs []c
 		Targets:     make([]c.OverlapTargetFileInfo, 0),
 	}
 
+	// Use composite key: Name|ListType|Type to distinguish semantically different targets
 	targetMap := make(map[string]c.OverlapTargetFileInfo)
 
 	for _, targetPair := range pairs {
@@ -316,8 +317,9 @@ func computeCompactSummaryFromPairs(sourceTypeName, sourceName string, pairs []c
 			Overlap:  targetPair.Overlap,
 		}
 
-		if existing, exists := targetMap[targetFile.Name]; !exists || ot.Overlap > existing.Overlap {
-			targetMap[targetFile.Name] = ot
+		key := targetFile.Name + "|" + targetFile.ListType + "|" + targetFile.Type
+		if existing, exists := targetMap[key]; !exists || ot.Overlap > existing.Overlap {
+			targetMap[key] = ot
 		}
 	}
 
@@ -339,16 +341,26 @@ func computeCompactSummaryFromPairs(sourceTypeName, sourceName string, pairs []c
 
 	cs.TargetsCount = len(cs.Targets)
 
-	totalOverlapCount := 0
+	totalOverlapSameList := 0
+	totalOverlapCrossList := 0
+	// same-list only if both ListType and Type match the source.
+	// else, treat it as a cross-list/type conflict.
 	for _, t := range cs.Targets {
-		totalOverlapCount += t.Overlap
+		if t.ListType == cs.ListType && t.Type == cs.Type {
+			totalOverlapSameList += t.Overlap
+		} else {
+			totalOverlapCrossList += t.Overlap
+		}
 	}
 
-	uniqueEntries := cs.Count - totalOverlapCount
+	// unique entries are the entries not present in any target (same-list or cross-list).
+	// conflicts can be ignored here
+	uniqueEntries := cs.Count - (totalOverlapSameList + totalOverlapCrossList)
 	if uniqueEntries < 0 {
 		uniqueEntries = 0
 	}
 	cs.Unique = uniqueEntries
+	cs.Conflicts = totalOverlapCrossList
 
 	return cs
 }
