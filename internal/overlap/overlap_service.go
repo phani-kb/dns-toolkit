@@ -80,7 +80,7 @@ func (s *DefaultOverlapService) FindOverlap(
 	for fp := range validFiles {
 		filePaths = append(filePaths, fp)
 	}
-	sort.Strings(filePaths)
+	u.SortCaseInsensitiveStrings(filePaths)
 
 	for i := 0; i < len(filePaths); i++ {
 		for j := i + 1; j < len(filePaths); j++ {

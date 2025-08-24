@@ -12,6 +12,7 @@ import (
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
+	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
 	"gopkg.in/yaml.v2"
 )
@@ -256,9 +257,10 @@ func GetProcessedSummaries(
 		sourcesConfigs,
 		appConfig,
 	)
-	sort.Slice(enabledSummaries, func(i, j int) bool {
-		return enabledSummaries[i].Name < enabledSummaries[j].Name
-	})
+	sort.Slice(
+		enabledSummaries,
+		func(i, j int) bool { return u.CaseInsensitiveLess(enabledSummaries[i].Name, enabledSummaries[j].Name) },
+	)
 
 	genericSourceTypes := extractGenericSourceTypes(enabledSummaries)
 	processedFiles := GetAllProcessedFiles(enabledSummaries)
@@ -300,9 +302,10 @@ func GetProcessedSummariesForConsolidation(
 		appConfig,
 		consolidationType,
 	)
-	sort.Slice(enabledSummaries, func(i, j int) bool {
-		return enabledSummaries[i].Name < enabledSummaries[j].Name
-	})
+	sort.Slice(
+		enabledSummaries,
+		func(i, j int) bool { return u.CaseInsensitiveLess(enabledSummaries[i].Name, enabledSummaries[j].Name) },
+	)
 
 	genericSourceTypes := extractGenericSourceTypes(enabledSummaries)
 	processedFiles := GetAllProcessedFiles(enabledSummaries)
@@ -380,6 +383,6 @@ func extractGenericSourceTypes(summaries []c.ProcessedSummary) []string {
 	for sourceType := range sourceTypeMap {
 		genericSourceTypes = append(genericSourceTypes, sourceType)
 	}
-	sort.Strings(genericSourceTypes)
+	u.SortCaseInsensitiveStrings(genericSourceTypes)
 	return genericSourceTypes
 }

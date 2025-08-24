@@ -686,6 +686,30 @@ func GetMapKeys[K comparable, V any](m map[K]V) []K {
 	return keys
 }
 
+// CaseInsensitiveLess returns true if a < b using case-insensitive comparison.
+func CaseInsensitiveLess(a, b string) bool {
+	return strings.ToLower(a) < strings.ToLower(b)
+}
+
+// SortCaseInsensitiveStrings sorts the provided slice of strings in-place using a case-insensitive order.
+func SortCaseInsensitiveStrings(items []string) {
+	sort.Slice(items, func(i, j int) bool { return CaseInsensitiveLess(items[i], items[j]) })
+}
+
+// FormatNameCounts returns "name (count)" sorted case-insensitively by name.
+func FormatNameCounts(m map[string]int) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	SortCaseInsensitiveStrings(keys)
+	out := make([]string, 0, len(keys))
+	for _, k := range keys {
+		out = append(out, fmt.Sprintf("%s (%d)", k, m[k]))
+	}
+	return out
+}
+
 // ExpandIpv4Range expands a range of IPv4 addresses into individual addresses.
 // The expected format is "startIP-endIP", e.g., "194.180.49.0-194.180.49.255".
 //

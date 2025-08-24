@@ -155,7 +155,7 @@ func generateOutputBranchReadme() string {
 		for group := range summary.Groups.GroupSummary {
 			groups = append(groups, group)
 		}
-		sort.Strings(groups)
+		u.SortCaseInsensitiveStrings(groups)
 
 		for _, group := range groups {
 			if listTypes, exists := summary.Groups.GroupListTypes[group]; exists {
@@ -178,7 +178,7 @@ func generateOutputBranchReadme() string {
 		for category := range summary.Categories.CategorySummary {
 			categories = append(categories, category)
 		}
-		sort.Strings(categories)
+		u.SortCaseInsensitiveStrings(categories)
 
 		for _, category := range categories {
 			if listTypes, exists := summary.Categories.CategoryListTypes[category]; exists {
@@ -203,7 +203,7 @@ func generateOutputBranchReadme() string {
 		for sourceType := range summary.Top.FilesByType {
 			types = append(types, sourceType)
 		}
-		sort.Strings(types)
+		u.SortCaseInsensitiveStrings(types)
 
 		for _, sourceType := range types {
 			if details, exists := summary.Top.FileDetails[sourceType]; exists && len(details) > 0 {
@@ -259,7 +259,7 @@ func generateOutputBranchReadme() string {
 		for sourceType := range summary.Download.SourcesByType {
 			sourceTypes = append(sourceTypes, sourceType)
 		}
-		sort.Strings(sourceTypes)
+		u.SortCaseInsensitiveStrings(sourceTypes)
 
 		for _, sourceType := range sourceTypes {
 			count := summary.Download.SourcesByType[sourceType]
@@ -295,7 +295,7 @@ func generateOutputBranchReadme() string {
 	for t := range allTypes {
 		types = append(types, t)
 	}
-	sort.Strings(types)
+	u.SortCaseInsensitiveStrings(types)
 
 	for _, sourceType := range types {
 		valid := summary.Processing.ValidFilesByType[sourceType]
@@ -334,7 +334,7 @@ func generateOutputBranchReadme() string {
 		for group := range summary.Groups.GroupSummary {
 			groups = append(groups, group)
 		}
-		sort.Strings(groups)
+		u.SortCaseInsensitiveStrings(groups)
 
 		for _, group := range groups {
 			count := summary.Groups.GroupSummary[group]
@@ -354,7 +354,7 @@ func generateOutputBranchReadme() string {
 		for category := range summary.Categories.CategorySummary {
 			categories = append(categories, category)
 		}
-		sort.Strings(categories)
+		u.SortCaseInsensitiveStrings(categories)
 
 		for _, category := range categories {
 			count := summary.Categories.CategorySummary[category]
@@ -401,8 +401,8 @@ func generateOutputBranchReadme() string {
 
 		// Sort entries: by source type, then by list type (allowlist first), then by min sources desc
 		sort.Slice(allEntries, func(i, j int) bool {
-			if allEntries[i].sourceType != allEntries[j].sourceType {
-				return allEntries[i].sourceType < allEntries[j].sourceType
+			if !strings.EqualFold(allEntries[i].sourceType, allEntries[j].sourceType) {
+				return u.CaseInsensitiveLess(allEntries[i].sourceType, allEntries[j].sourceType)
 			}
 			if allEntries[i].detail.ListType != allEntries[j].detail.ListType {
 				return allEntries[i].detail.ListType == "allowlist"
@@ -659,7 +659,9 @@ func collectConsolidatedStatsGeneric(
 
 		// Sort list types for each identifier
 		for identifier := range listTypes {
-			sort.Strings(listTypes[identifier])
+			sort.Slice(listTypes[identifier], func(i, j int) bool {
+				return strings.ToLower(listTypes[identifier][i]) < strings.ToLower(listTypes[identifier][j])
+			})
 		}
 
 		setStats(summary, listTypes, len(identifiersSet), lastUpdateTime)
@@ -733,7 +735,7 @@ func getTopLevelTxtFiles() ([]string, error) {
 		}
 	}
 
-	sort.Strings(txtFiles)
+	u.SortCaseInsensitiveStrings(txtFiles)
 	return txtFiles, nil
 }
 

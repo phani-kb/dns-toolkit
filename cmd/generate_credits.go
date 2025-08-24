@@ -85,7 +85,7 @@ func generateCreditsSection() string {
 	var sb strings.Builder
 
 	sb.WriteString("<!-- CREDITS_START -->\n")
-	sb.WriteString("## Source Credits\n\n")
+	sb.WriteString("## Credits\n\n")
 	sb.WriteString("This project is made possible by the following blocklist and allowlist sources:\n\n")
 	sb.WriteString("Legend: S = Status, C/U/X = Count / Unique / Conflicts\n\n")
 
@@ -106,7 +106,7 @@ func generateCreditsSection() string {
 	for filename := range sourcesByFile {
 		filenames = append(filenames, filename)
 	}
-	sort.Strings(filenames)
+	utils.SortCaseInsensitiveStrings(filenames)
 
 	overlapMap := make(map[string][3]int)
 	overlapFile := filepath.Join(constants.SummaryDir, constants.DefaultSummaryFiles["overlap"])
@@ -131,7 +131,7 @@ func generateCreditsSection() string {
 		}
 
 		sort.Slice(sources, func(i, j int) bool {
-			return sources[i].Name < sources[j].Name
+			return utils.CaseInsensitiveLess(sources[i].Name, sources[j].Name)
 		})
 
 		sb.WriteString("<details>\n")
@@ -183,8 +183,10 @@ func generateCreditsSection() string {
 			listTypes := getListTypes(source)
 			if hasOverlap {
 				if vals, ok := overlapMap[source.Name]; ok {
-					sb.WriteString(fmt.Sprintf("| %s | %s | %s | %d / %d / %d | %s |\n",
-						name, status, categories, vals[0], vals[1], vals[2], notes))
+					sb.WriteString(
+						fmt.Sprintf("| %s | %s | %s | <span style=\"white-space:nowrap\">%d / %d / %d</span> | %s |\n",
+							name, status, categories, vals[0], vals[1], vals[2], notes),
+					)
 				} else {
 					sb.WriteString(fmt.Sprintf("| %s | %s | %s | - | %s |\n",
 						name, status, categories, notes))

@@ -75,7 +75,7 @@ func TestGenerateCreditsSection(t *testing.T) {
 
 		assert.Contains(t, section, "<!-- CREDITS_START -->")
 		assert.Contains(t, section, "<!-- CREDITS_END -->")
-		assert.Contains(t, section, "## Source Credits")
+		assert.Contains(t, section, "## Credits")
 		assert.Contains(t, section, "<details>")
 		assert.Contains(t, section, "test-sources.yml")
 		assert.Contains(t, section, "test-source")
@@ -136,7 +136,7 @@ func TestGenerateCreditsSection(t *testing.T) {
 
 		assert.Contains(t, section, "<!-- CREDITS_START -->")
 		assert.Contains(t, section, "<!-- CREDITS_END -->")
-		assert.Contains(t, section, "## Source Credits")
+		assert.Contains(t, section, "## Credits")
 		assert.NotContains(t, section, "<details>")
 	})
 }
@@ -204,7 +204,7 @@ Installation information here.
 		assert.NotContains(t, contentStr, "Old Credits")
 		assert.NotContains(t, contentStr, "Old content here")
 
-		assert.Contains(t, contentStr, "## Source Credits")
+		assert.Contains(t, contentStr, "## Credits")
 		assert.Contains(t, contentStr, "test-sources.yml")
 		assert.Contains(t, contentStr, "test-source")
 
@@ -229,11 +229,11 @@ Installation information here.
 		require.NoError(t, err)
 		contentStr := string(updatedContent)
 
-		assert.NotContains(t, contentStr, "Source Credits (Old)")
+		assert.NotContains(t, contentStr, "Credits (Old)")
 		assert.NotContains(t, contentStr, "old-sources-1.yml")
 		assert.NotContains(t, contentStr, "old-source-1")
 
-		assert.Contains(t, contentStr, "## Source Credits")
+		assert.Contains(t, contentStr, "## Credits")
 		assert.Contains(t, contentStr, "test-sources.yml")
 		assert.Contains(t, contentStr, "test-source")
 		assert.Contains(t, contentStr, "[BL]")
