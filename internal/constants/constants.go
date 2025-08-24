@@ -167,6 +167,7 @@ const (
 	SourceTypeIpv6Htaccess               = "ipv6_htaccess"
 	SourceTypeTopDomains                 = "domain_top"
 	SourceTypeDomainCustomHtmlPuppyScams = "domain_custom_html_puppyscams"
+	SourceTypeIpv4FromDomain             = "ipv4_from_domain"
 
 	ListTypeBlocklist = "blocklist"
 	ListTypeAllowlist = "allowlist"
@@ -204,6 +205,7 @@ var (
 		SourceTypeIpv6Htaccess:               true,
 		SourceTypeTopDomains:                 true,
 		SourceTypeDomainCustomHtmlPuppyScams: true,
+		SourceTypeIpv4FromDomain:             true,
 	}
 	ValidListTypes = map[string]bool{
 		ListTypeBlocklist: true,

@@ -36,7 +36,7 @@ for step in "${steps[@]}"; do
     case "$step" in
         ga)
             echo "Step 1: Generating allowlist..."
-            ./bin/dns-toolkit generate allowlist
+            ./bin/dns-toolkit generate allowlist --overwrite
             ;;
         d)
             echo "Step 2: Downloading data..."
