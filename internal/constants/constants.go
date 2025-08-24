@@ -367,7 +367,7 @@ const (
 	DefaultBlockProfileRate       = 1000
 	MinFilesForParallelProcessing = 10
 	MaxEntryLength                = 255
-	MinOverlapPercent             = 0.1
+	MinOverlapPercent             = 0.0
 	IPResolveInterval             = 100 * time.Millisecond
 )
 

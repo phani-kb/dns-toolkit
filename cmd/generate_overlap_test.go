@@ -381,8 +381,8 @@ func TestFilterOverlapSummariesByMinPercent(t *testing.T) {
 		AppConfig.DNSToolkit.GetMinOverlapPercent(),
 	)
 
-	require.Len(t, filteredSummaries, 1)
-	require.Len(t, filteredSummaries[0].TargetsList, 1)
+	require.Len(t, filteredSummaries, 2)
+	require.Len(t, filteredSummaries[0].TargetsList, 2)
 	assert.Contains(t, filteredSummaries[0].TargetsList[0], "percent: 15.0")
 	assert.NotContains(t, filteredSummaries[0].TargetsList[0], "percent: 5.0")
 }
