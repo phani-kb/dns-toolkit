@@ -87,6 +87,7 @@ func generateCreditsSection() string {
 	sb.WriteString("<!-- CREDITS_START -->\n")
 	sb.WriteString("## Source Credits\n\n")
 	sb.WriteString("This project is made possible by the following blocklist and allowlist sources:\n\n")
+	sb.WriteString("Legend: S = Status, C/U/X = Count / Unique / Conflicts\n\n")
 
 	sourcesByFile := make(map[string][]config.Source)
 
@@ -145,11 +146,11 @@ func generateCreditsSection() string {
 		// If overlapMap has entries, replace AL/BL column with Count/Unique/Conflicts column.
 		hasOverlap := len(overlapMap) > 0
 		if hasOverlap {
-			sb.WriteString("| Name | Status | Categories | Count/Unique/Conflicts | Notes |\n")
-			sb.WriteString("|------|--------|------------|------------------------|-------|\n")
+			sb.WriteString("| Name | S | Categories | C/U/X | Notes |\n")
+			sb.WriteString("|------|---|------------|-------|-------|\n")
 		} else {
-			sb.WriteString("| Name | Status | Categories | AL/BL | Notes |\n")
-			sb.WriteString("|------|--------|------------|-------|-------|\n")
+			sb.WriteString("| Name | S | Categories | AL/BL | Notes |\n")
+			sb.WriteString("|------|---|------------|-------|-------|\n")
 		}
 
 		for _, source := range sources {
@@ -163,9 +164,9 @@ func generateCreditsSection() string {
 				// }
 			}
 
-			status := "✅ Enabled"
+			status := "✅"
 			if source.Disabled {
-				status = "❌ Disabled"
+				status = "❌"
 			}
 
 			categories := "-"
