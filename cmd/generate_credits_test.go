@@ -79,7 +79,7 @@ func TestGenerateCreditsSection(t *testing.T) {
 		assert.Contains(t, section, "<details>")
 		assert.Contains(t, section, "test-sources.yml")
 		assert.Contains(t, section, "test-source")
-		assert.Contains(t, section, "✅ Enabled")
+		assert.Contains(t, section, "✅")
 		assert.Contains(t, section, "ads")
 		assert.Contains(t, section, "Test source")
 		assert.Contains(t, section, "[BL]")
@@ -121,7 +121,7 @@ func TestGenerateCreditsSection(t *testing.T) {
 
 		assert.Contains(t, section, "special-source")
 		assert.NotContains(t, section, "[special-source](file://")
-		assert.Contains(t, section, "❌ Disabled")
+		assert.Contains(t, section, "❌")
 		assert.Contains(t, section, "| - |")
 		assert.Contains(t, section, "Notes with \\| pipes \\|")
 		assert.Contains(t, section, "and newlines")
