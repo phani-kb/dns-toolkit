@@ -1,6 +1,56 @@
 {
   "sources": [
     {
+      "name": "Local AI Allowlist (Domain)",
+      "categories": "local",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        },
+        {
+          "name": "ipv4_from_domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "file://data/custom/list_ai.txt"
+    },
+    {
+      "name": "Local AI Blocklist (Domain)",
+      "categories": "local",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "blocklist"
+            }
+          ]
+        },
+        {
+          "name": "ipv4_from_domain",
+          "list_types": [
+            {
+              "name": "blocklist"
+            }
+          ]
+        }
+      ],
+      "url": "file://data/custom/list_ai.txt"
+    },
+    {
       "name": "Local Allowlist (AdGuard)",
       "categories": "local",
       "types": [
@@ -67,56 +117,6 @@
         }
       ],
       "url": "file://data/custom/blocklist_adg.txt"
-    },
-    {
-      "name": "Local AI Blocklist (Domain)",
-      "categories": "local",
-      "skip_general_consolidation": true,
-      "skip_groups_consolidation": true,
-      "types": [
-        {
-          "name": "domain",
-          "list_types": [
-            {
-              "name": "blocklist"
-            }
-          ]
-        },
-        {
-          "name": "ipv4_from_domain",
-          "list_types": [
-            {
-              "name": "blocklist"
-            }
-          ]
-        }
-      ],
-      "url": "file://data/custom/list_ai.txt"
-    },
-    {
-      "name": "Local AI Allowlist (Domain)",
-      "categories": "local",
-      "skip_general_consolidation": true,
-      "skip_groups_consolidation": true,
-      "types": [
-        {
-          "name": "domain",
-          "list_types": [
-            {
-              "name": "allowlist"
-            }
-          ]
-        },
-        {
-          "name": "ipv4_from_domain",
-          "list_types": [
-            {
-              "name": "allowlist"
-            }
-          ]
-        }
-      ],
-      "url": "file://data/custom/list_ai.txt"
     },
     {
       "name": "Local Blocklist (Domain)",

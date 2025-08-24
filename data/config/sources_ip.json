@@ -112,7 +112,7 @@
     {
       "name": "BruteforceBlocker",
       "categories": "threat",
-      "disabled": true,
+      "disabled": false,
       "notes": ">95% overlap with EmergingThreats_CompromisedIPs",
       "types": [
         {
@@ -176,7 +176,7 @@
     {
       "name": "DShield",
       "categories": "malicious, threat",
-      "disabled": true,
+      "disabled": false,
       "notes": "100% overlap with Firehol_level2/Firehol_level3",
       "types": [
         {
@@ -443,7 +443,7 @@
     {
       "name": "HaGeZi_DoH",
       "categories": "doh",
-      "disabled": true,
+      "disabled": false,
       "license": "GPL-3.0",
       "notes": ">90% overlap with DoH_IP_blocklists",
       "skip_general_consolidation": true,
@@ -458,7 +458,7 @@
     {
       "name": "HaGeZi_TIF",
       "categories": "malicious, threat",
-      "disabled": true,
+      "disabled": false,
       "license": "GPL-3.0",
       "notes": "No unique contribution",
       "types": [
@@ -578,7 +578,7 @@
       "categories": "others",
       "disabled": true,
       "license": "AGPL-3.0",
-      "notes": "Too many allowlist IPs, use with caution.",
+      "notes": "Huge list, use with caution. More than its blocklist counterpart.",
       "types": [
         {
           "name": "ipv4",
@@ -597,7 +597,7 @@
       "categories": "malicious, malware, threat",
       "disabled": true,
       "license": "AGPL-3.0",
-      "notes": "Too many blocklist IPs, use with caution.",
+      "notes": "Huge list, use with caution.",
       "types": [
         {
           "name": "ipv4",

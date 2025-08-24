@@ -130,7 +130,7 @@ var topEntriesCmd = &cobra.Command{
 
 func init() {
 	topEntriesCmd.Flags().IntVarP(&minSources, "min-sources", "m", 0, "Minimum sources (3-12)")
-	topEntriesCmd.Flags().IntVarP(&maxEntries, "max-entries", "x", 50000, "Max entries (default 50000)")
+	topEntriesCmd.Flags().IntVarP(&maxEntries, "max-entries", "x", int(^uint(0)>>1), "Max entries")
 
 	AddProfilingFlags(topEntriesCmd, &cpuProfile, &memProfile, &goroutineProfile, &blockProfile, &profileDir)
 }
