@@ -243,8 +243,13 @@ func generateOutputBranchReadme() string {
 	sb.WriteString(fmt.Sprintf("| Last Update | %s |\n", summary.Download.LastUpdateTime))
 	sb.WriteString("\n")
 
-	// Sources by Type
+	// Sources by Type (collapsible)
 	if len(summary.Download.SourcesByType) > 0 {
+		sb.WriteString("<details>\n")
+		// nolint:lll
+		sb.WriteString(
+			"<summary><strong>📚 Sources by Type:</strong> Breakdown of source types and their configured counts</summary>\n\n",
+		)
 		sb.WriteString("**Sources by Type:**\n\n")
 		sb.WriteString("| Source Type | Count |\n")
 		sb.WriteString("|-------------|-------|\n")
@@ -261,6 +266,7 @@ func generateOutputBranchReadme() string {
 			sb.WriteString(fmt.Sprintf("| %s | %d |\n", sourceType, count))
 		}
 		sb.WriteString("\n")
+		sb.WriteString("</details>\n\n")
 	}
 
 	// Failed Sources

@@ -78,23 +78,6 @@ flowchart LR
 
 ---
 
-## Source Configuration (Important!)
-
-Sources are configured in `data/config/sources*.json` files. Each source specifies:
-
-- Download URL and frequency
-- Source type (domain, IPv4, IPv6, AdGuard, etc.)
-- Categories (ads, malware, privacy, etc.)
-- License and website information
-
-[View and edit source configuration files in `data/config/`](https://github.com/phani-kb/dns-toolkit/tree/main/data/config)
-
-> **To add, modify, or review sources, always refer to the files in `data/config/`.**
-
-## Special Note on Top Domains (tranco-list.eu)
-
-Top domains sourced from the tranco-list.eu list (`domain_top` type) are treated as an allowlist. You can configure the `count_to_consider` value in the relevant config file (`data/config/sources_domain_top.json`) to increase the number of top domains included in the allowlist. This is useful for fine-tuning the strictness or permissiveness of your DNS filtering setup.
-
 ## Published Outputs
 
 **Ready-to-use blocklist files are published daily to the [`output`](https://github.com/phani-kb/dns-toolkit/tree/output) branch:**
@@ -107,11 +90,9 @@ Top domains sourced from the tranco-list.eu list (`domain_top` type) are treated
 
 **[View Detailed Overlap Analysis →](https://github.com/phani-kb/dns-toolkit/blob/output/overlap.md)** - Comprehensive analysis showing how entries are shared across different DNS sources.
 
-> 🔍 **Overlap report — quick interpretation**
+> 🔍 **Overlap report**
 >
-> **Why it matters:** the overlap report helps you spot redundant or conflicting sources so you can prune, prioritize, or investigate sources quickly.
->
-> **Quick checklist:**
+> **Why it matters:** the overlap report helps you spot redundant or conflicting sources.
 >
 > - **Unique Entries = 0** → source is fully covered by same-list sources (low value-add).
 > - **Conflicts > 0** → entries appear in different list types (e.g., blocklist vs allowlist); investigate mismatches.
@@ -150,73 +131,6 @@ Top domains sourced from the tranco-list.eu list (`domain_top` type) are treated
 
 <!-- STATS_END -->
 
-## Installation
-
-```bash
-git clone https://github.com/phani-kb/dns-toolkit.git
-cd dns-toolkit
-go build -o bin/dns-toolkit main.go
-```
-
-## Quick Start
-
-```bash
-# Download and process all sources
-dns-toolkit download
-dns-toolkit process
-dns-toolkit consolidate
-dns-toolkit generate output
-
-# Search for a domain
-dns-toolkit search example.com
-
-# Analyze overlaps between sources
-dns-toolkit overlap
-
-# Find top entries across sources
-dns-toolkit top
-```
-
-## Key Commands
-
-```text
-DNS Toolkit
-
-Usage:
-  dns-toolkit [command]
-
-Available Commands:
-  archive          Archive DNS toolkit data
-  consolidate      Consolidate processed files
-  download         Download enabled sources
-  generate         Generate different types of outputs
-  help             Help about any command
-  overlap          Find overlap between source files
-  process          Process downloaded files
-  search           Search for a domain or IP in the processed files
-  sts              Prints the source types summary
-  top              Find top entry(s) in each generic source type
-  validate-sources Validate the sources configuration
-  version          Print the version number of DNS Toolkit
-
-Flags:
-  -h, --help   help for dns-toolkit
-
-Use "dns-toolkit [command] --help" for more information about a command.
-```
-
-## Output Structure
-
-```text
-data/output/
-├── *_blocklist.txt            # Blocklists for various source types (adguard, domain, ipv4, ipv6, cidr)
-├── *_allowlist.txt            # Allowlists for various source types (adguard, domain, etc.)
-├── categories/                # Lists by category (ads, malware, privacy, etc.)
-├── groups/                    # Lists by size (mini, lite, normal, big)
-├── top/                       # Top entries based on source frequency
-├── ignored/                   # Entries filtered by allowlists
-└── summaries/                 # Processing metadata and statistics
-```
 <!-- CREDITS_START -->
 ## Source Credits
 
@@ -450,7 +364,90 @@ This project is made possible by the following blocklist and allowlist sources:
 
 <!-- CREDITS_END -->
 
-**Note:** Detailed information about each source can be found in the configuration files located in `data/config/sources*.json`.
+## Source Configuration (Important!)
+
+Sources are configured in `data/config/sources*.json` files. Each source specifies:
+
+- Download URL and frequency
+- Source type (domain, IPv4, IPv6, AdGuard, etc.)
+- Categories (ads, malware, privacy, etc.)
+- License and website information
+
+[View and edit source configuration files in `data/config/`](https://github.com/phani-kb/dns-toolkit/tree/main/data/config)
+
+> **To add, modify, or review sources, always refer to the files in `data/config/`.**
+
+## Special Note on Top Domains (tranco-list.eu)
+
+Top domains sourced from the tranco-list.eu list (`domain_top` type) are treated as an allowlist. You can configure the `count_to_consider` value in the relevant config file (`data/config/sources_domain_top.json`) to increase the number of top domains included in the allowlist. This is useful for fine-tuning the strictness or permissiveness of your DNS filtering setup.
+
+## Installation
+
+```bash
+git clone https://github.com/phani-kb/dns-toolkit.git
+cd dns-toolkit
+go build -o bin/dns-toolkit main.go
+```
+
+## Quick Start
+
+```bash
+# Download and process all sources
+dns-toolkit download
+dns-toolkit process
+dns-toolkit consolidate
+dns-toolkit generate output
+
+# Search for a domain
+dns-toolkit search example.com
+
+# Analyze overlaps between sources
+dns-toolkit overlap
+
+# Find top entries across sources
+dns-toolkit top
+```
+
+## Key Commands
+
+```text
+DNS Toolkit
+
+Usage:
+  dns-toolkit [command]
+
+Available Commands:
+  archive          Archive DNS toolkit data
+  consolidate      Consolidate processed files
+  download         Download enabled sources
+  generate         Generate different types of outputs
+  help             Help about any command
+  overlap          Find overlap between source files
+  process          Process downloaded files
+  search           Search for a domain or IP in the processed files
+  sts              Prints the source types summary
+  top              Find top entry(s) in each generic source type
+  validate-sources Validate the sources configuration
+  version          Print the version number of DNS Toolkit
+
+Flags:
+  -h, --help   help for dns-toolkit
+
+Use "dns-toolkit [command] --help" for more information about a command.
+```
+
+## Output Structure
+
+```text
+data/output/
+├── *_blocklist.txt            # Blocklists for various source types (adguard, domain, ipv4, ipv6, cidr)
+├── *_allowlist.txt            # Allowlists for various source types (adguard, domain, etc.)
+├── categories/                # Lists by category (ads, malware, privacy, etc.)
+├── groups/                    # Lists by size (mini, lite, normal, big)
+├── top/                       # Top entries based on source frequency
+├── ignored/                   # Entries filtered by allowlists
+└── summaries/                 # Processing metadata and statistics
+```
 
 ## Contributing
 
