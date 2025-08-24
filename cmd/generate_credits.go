@@ -107,17 +107,18 @@ func generateCreditsSection() string {
 	}
 	sort.Strings(filenames)
 
-	overlapMap := make(map[string][2]int)
+	overlapMap := make(map[string][3]int)
 	overlapFile := filepath.Join(constants.SummaryDir, constants.DefaultSummaryFiles["overlap"])
 	if data, err := os.ReadFile(overlapFile); err == nil {
 		var overlaps []struct {
 			Source    string `json:"source"`
+			Count     int    `json:"count"`
 			Unique    int    `json:"unique"`
 			Conflicts int    `json:"conflicts"`
 		}
 		if err := json.Unmarshal(data, &overlaps); err == nil {
 			for _, o := range overlaps {
-				overlapMap[o.Source] = [2]int{o.Unique, o.Conflicts}
+				overlapMap[o.Source] = [3]int{o.Count, o.Unique, o.Conflicts}
 			}
 		}
 	}
@@ -141,11 +142,11 @@ func generateCreditsSection() string {
 			),
 		)
 
-		// If overlapMap has entries, replace AL/BL column with Unique/Conflicts column.
+		// If overlapMap has entries, replace AL/BL column with Count/Unique/Conflicts column.
 		hasOverlap := len(overlapMap) > 0
 		if hasOverlap {
-			sb.WriteString("| Name | Status | Categories | Unique/Conflicts | Notes |\n")
-			sb.WriteString("|------|--------|------------|------------------|-------|\n")
+			sb.WriteString("| Name | Status | Categories | Count/Unique/Conflicts | Notes |\n")
+			sb.WriteString("|------|--------|------------|------------------------|-------|\n")
 		} else {
 			sb.WriteString("| Name | Status | Categories | AL/BL | Notes |\n")
 			sb.WriteString("|------|--------|------------|-------|-------|\n")
@@ -181,8 +182,8 @@ func generateCreditsSection() string {
 			listTypes := getListTypes(source)
 			if hasOverlap {
 				if vals, ok := overlapMap[source.Name]; ok {
-					sb.WriteString(fmt.Sprintf("| %s | %s | %s | %d/%d | %s |\n",
-						name, status, categories, vals[0], vals[1], notes))
+					sb.WriteString(fmt.Sprintf("| %s | %s | %s | %d / %d / %d | %s |\n",
+						name, status, categories, vals[0], vals[1], vals[2], notes))
 				} else {
 					sb.WriteString(fmt.Sprintf("| %s | %s | %s | - | %s |\n",
 						name, status, categories, notes))
@@ -193,7 +194,8 @@ func generateCreditsSection() string {
 			}
 		}
 
-		sb.WriteString("\n</details>\n\n")
+		sb.WriteString("\n")
+		sb.WriteString("</details>\n\n")
 	}
 
 	sb.WriteString("<!-- CREDITS_END -->")
