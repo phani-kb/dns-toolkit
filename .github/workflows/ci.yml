@@ -359,18 +359,18 @@ jobs:
             echo "Using cache: $CACHED_COUNT files ($CACHED_SIZE)"
           fi
 
-          # # Core Processing Steps
-          # echo "Step 2: Processing data..."
-          # ./bin/dns-toolkit process
-          # ./bin/dns-toolkit consolidate
-          # ./bin/dns-toolkit consolidate groups
-          # ./bin/dns-toolkit consolidate categories
+          # Core Processing Steps
+          echo "Step 2: Processing data..."
+          ./bin/dns-toolkit process
+          ./bin/dns-toolkit consolidate
+          ./bin/dns-toolkit consolidate groups
+          ./bin/dns-toolkit consolidate categories
           # ./bin/dns-toolkit top
           # ./bin/dns-toolkit overlap
-          # ./bin/dns-toolkit generate output -i
-          # ./bin/dns-toolkit generate output-readme
+          ./bin/dns-toolkit generate output -i
+          ./bin/dns-toolkit generate output-readme
           # ./bin/dns-toolkit generate overlap-readme
-          # ./bin/dns-toolkit generate summaries-readme
+          ./bin/dns-toolkit generate summaries-readme
           ./bin/dns-toolkit generate stats-readme
           ./bin/dns-toolkit generate credits
 

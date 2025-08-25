@@ -34,7 +34,7 @@ echo "Branch Name: ${BRANCH_NAME}"
 echo "Repository: ${GITHUB_REPOSITORY}"
 
 echo "Checking for changes in: ${FILES_PATTERN}"
-if ! git diff --quiet -- ${FILES_PATTERN} 2>/dev/null && ! git diff --cached --quiet -- ${FILES_PATTERN} 2>/dev/null; then
+if ! git diff --quiet -- ${FILES_PATTERN} 2>/dev/null || ! git diff --cached --quiet -- ${FILES_PATTERN} 2>/dev/null; then
     echo "Changes detected"
 else
     UNTRACKED_FILES=$(git ls-files --others --exclude-standard -- ${FILES_PATTERN} 2>/dev/null || true)
