@@ -3,7 +3,6 @@ package cmd
 import (
 	"os"
 	"path/filepath"
-	"sort"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	cfg "github.com/phani-kb/dns-toolkit/internal/config"
@@ -160,7 +159,7 @@ func getUniqueCategories(processedFiles []c.ProcessedFile) []string {
 		categories = append(categories, category)
 	}
 
-	sort.Strings(categories)
+	u.SortCaseInsensitiveStrings(categories)
 
 	return categories
 }

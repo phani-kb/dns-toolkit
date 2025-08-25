@@ -11,8 +11,6 @@ import (
 )
 
 func TestResolveFilePath(t *testing.T) {
-	t.Parallel()
-
 	absPath := "/absolute/path/to/file.json"
 	result := resolveFilePath(absPath)
 	assert.Equal(t, absPath, result)
@@ -68,8 +66,6 @@ func TestResolveFilePath(t *testing.T) {
 }
 
 func TestMatchesFilters(t *testing.T) {
-	t.Parallel()
-
 	source := Source{
 		Name:      "test-source",
 		URL:       "http://example.com",
@@ -352,7 +348,7 @@ func TestSourcesConfigComplexFiltering(t *testing.T) {
 						},
 					},
 				},
-				Categories: []string{"whitelist"},
+				Categories: []string{"allowlist"},
 				Countries:  []string{"US"},
 				Disabled:   false,
 			},
@@ -424,7 +420,7 @@ func TestSourcesConfigComplexFiltering(t *testing.T) {
 			name: "Filter excluding certain categories",
 			filters: SourceFilters{
 				Category: NameFilter{
-					NotContains: []string{"whitelist"},
+					NotContains: []string{"allowlist"},
 				},
 			},
 			expectedCount: 2,

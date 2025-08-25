@@ -1,6 +1,124 @@
 {
   "sources": [
     {
+      "name": "AdGuardSDNSFilter_exclusions",
+      "types": [
+        {
+          "name": "adguard",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/AdguardTeam/AdGuardSDNSFilter/master/Filters/exclusions.txt"
+    },
+    {
+      "name": "AdGuardTeam_HttpsExclusions_android",
+      "categories": "mobile",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/android.txt"
+    },
+    {
+      "name": "AdGuardTeam_HttpsExclusions_banks",
+      "categories": "finance",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/banks.txt"
+    },
+    {
+      "name": "AdGuardTeam_HttpsExclusions_firefox",
+      "categories": "browser",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/firefox.txt"
+    },
+    {
+      "name": "AdGuardTeam_HttpsExclusions_issues",
+      "categories": "issues",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/issues.txt"
+    },
+    {
+      "name": "AdGuardTeam_HttpsExclusions_mac",
+      "categories": "mac",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/mac.txt"
+    },
+    {
+      "name": "AdGuardTeam_HttpsExclusions_sensitive",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/sensitive.txt"
+    },
+    {
+      "name": "AdGuardTeam_HttpsExclusions_windows",
+      "categories": "windows",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/AdguardTeam/HttpsExclusions/master/exclusions/windows.txt"
+    },
+    {
       "name": "anudeepND_Allowlist",
       "disabled": true,
       "license": "MIT",
@@ -20,22 +138,115 @@
       "website": "https://github.com/anudeepND/whitelist"
     },
     {
+      "name": "BlahDNS_whitelist",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/ookangzheng/blahdns/master/hosts/whitelist.txt"
+    },
+    {
+      "name": "China_CDN_Whitelist",
+      "countries": "CN",
+      "disabled": true,
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/mawenjian/china-cdn-domain-whitelist/master/china-cdn-domain-whitelist.txt"
+    },
+    {
+      "name": "DandelionSprout_AdGuardHome_Whitelist",
+      "types": [
+        {
+          "name": "adguard",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/DandelionSprout/AdGuard-Home-Whitelist/master/whitelist.txt"
+    },
+    {
+      "name": "Dogino_Discord_Official",
+      "categories": "discord",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/Dogino/Discord-Phishing-URLs/main/official-domains.txt"
+    },
+    {
       "name": "fabriziosalmi_allowlist",
       "license": "GPL-3.0",
-      "notes": "Needs review, as it contains domains that may not be suitable for an allowlist.",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "domain",
           "list_types": [
             {
               "name": "allowlist",
-              "groups": "lite"
+              "groups": "normal"
             }
           ]
         }
       ],
       "url": "https://raw.githubusercontent.com/fabriziosalmi/blacklists/refs/heads/main/whitelist.txt",
       "website": "https://github.com/fabriziosalmi/blacklists"
+    },
+    {
+      "name": "Freekers_Whitelist",
+      "disabled": true,
+      "notes": "No update since 2019",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/freekers/whitelist/master/domains/whitelist.txt",
+      "website": "https://github.com/Freekers/whitelist/tree/master"
+    },
+    {
+      "name": "Notracking_Hosts_whitelist",
+      "disabled": false,
+      "notes": "Huge list, use with caution",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist",
+              "groups": "big"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/notracking/hosts-blocklists-scripts/master/hostnames.whitelist.txt"
     },
     {
       "name": "ShadowWhisperer_Allowlist",
@@ -54,10 +265,25 @@
       "website": "https://github.com/ShadowWhisperer/BlockLists"
     },
     {
+      "name": "ShadowWhisperer_Whitelist",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Whitelists/Whitelist",
+      "website": "https://github.com/ShadowWhisperer/BlockLists"
+    },
+    {
       "name": "T145_allowlist-domains",
       "disabled": true,
       "license": "AGPL-3.0",
-      "notes": "Too many allowlist domains, use with caution.",
+      "notes": "Huge list, use with caution",
       "types": [
         {
           "name": "domain",
@@ -70,6 +296,23 @@
       ],
       "url": "https://github.com/T145/black-mirror/releases/download/latest/ALLOW_DOMAIN.txt",
       "website": "https://github.com/T145/black-mirror"
+    },
+    {
+      "name": "TogoFire_AD_Settings_whitelist",
+      "disabled": false,
+      "notes": "Huge list, use with caution",
+      "types": [
+        {
+          "name": "adguard",
+          "list_types": [
+            {
+              "name": "allowlist",
+              "groups": "big"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/TogoFire-Home/AD-Settings/main/Filters/whitelist.txt"
     }
   ]
 }

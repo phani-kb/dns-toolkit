@@ -31,7 +31,7 @@
             {
               "name": "blocklist",
               "must_consider": true,
-              "groups": "mini"
+              "groups": "lite"
             }
           ]
         }
@@ -55,11 +55,17 @@
     {
       "name": "BlockListDE_Brute",
       "categories": "threat",
-      "disabled": true,
-      "notes": "100% overlap with Firehol_level2",
+      "notes": ">95% overlap with Firehol_level2",
       "types": [
         {
-          "name": "ipv4"
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "mini"
+            }
+          ]
         }
       ],
       "url": "https://lists.blocklist.de/lists/bruteforcelogin.txt",
@@ -68,6 +74,7 @@
     {
       "name": "BlockListDE_Strong",
       "categories": "malicious, threat",
+      "notes": ">95% overlap with Borestad_AbuseIPDB_S100_3d",
       "types": [
         {
           "name": "ipv4",
@@ -105,8 +112,8 @@
     {
       "name": "BruteforceBlocker",
       "categories": "threat",
-      "disabled": true,
-      "notes": ">98% overlap with EmergingThreats_CompromisedIPs",
+      "disabled": false,
+      "notes": ">95% overlap with EmergingThreats_CompromisedIPs",
       "types": [
         {
           "name": "ipv4_find"
@@ -136,9 +143,10 @@
     {
       "name": "DoH_IP_blocklists",
       "categories": "doh",
-      "exclude": true,
       "license": "GPL-3.0",
+      "notes": ">90% overlap with HaGeZi Encrypted DNS Servers",
       "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "domain_comment"
@@ -153,10 +161,10 @@
     {
       "name": "DoH_IP_list",
       "categories": "doh",
-      "exclude": true,
       "frequency": "monthly",
       "license": "MIT",
       "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "ipv4"
@@ -168,7 +176,7 @@
     {
       "name": "DShield",
       "categories": "malicious, threat",
-      "disabled": true,
+      "disabled": false,
       "notes": "100% overlap with Firehol_level2/Firehol_level3",
       "types": [
         {
@@ -182,6 +190,7 @@
       "name": "EmergingThreats_CompromisedIPs",
       "categories": "malicious, threat",
       "license": "GPL-2.0",
+      "notes": ">95% overlap with Firehol_level3,  and Borestad_AbuseIPDB_S100_3d",
       "types": [
         {
           "name": "ipv4",
@@ -203,7 +212,14 @@
       "license": "GPL-2.0",
       "types": [
         {
-          "name": "cidr_ipv4"
+          "name": "cidr_ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "mini",
+              "must_consider": true
+            }
+          ]
         }
       ],
       "url": "https://rules.emergingthreats.net/fwrules/emerging-Block-IPs.txt",
@@ -215,6 +231,7 @@
       "frequency": "monthly",
       "license": "GPL-3.0",
       "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "ipv4"
@@ -407,6 +424,7 @@
     {
       "name": "Greensnow",
       "categories": "malicious, malware, threat",
+      "notes": ">95% overlap with Firehol_level2",
       "types": [
         {
           "name": "ipv4",
@@ -425,9 +443,9 @@
     {
       "name": "HaGeZi_DoH",
       "categories": "doh",
-      "disabled": true,
+      "disabled": false,
       "license": "GPL-3.0",
-      "notes": ">98% overlap with DoH_IP_blocklists",
+      "notes": ">90% overlap with DoH_IP_blocklists",
       "skip_general_consolidation": true,
       "types": [
         {
@@ -440,7 +458,7 @@
     {
       "name": "HaGeZi_TIF",
       "categories": "malicious, threat",
-      "disabled": true,
+      "disabled": false,
       "license": "GPL-3.0",
       "notes": "No unique contribution",
       "types": [
@@ -461,7 +479,7 @@
             {
               "name": "blocklist",
               "disabled": true,
-              "notes": ">96% overlap with Firehol_level2/Firehol_level3"
+              "notes": ">95% overlap with Firehol_level2/Firehol_level3"
             }
           ]
         },
@@ -476,6 +494,7 @@
       "name": "Public_DNS4",
       "categories": "dns",
       "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "ipv4"
@@ -546,7 +565,7 @@
             {
               "name": "blocklist",
               "disabled": true,
-              "notes": ">98% overlap with ET_fwip"
+              "notes": ">95% overlap with ET_fwip"
             }
           ]
         }
@@ -559,7 +578,7 @@
       "categories": "others",
       "disabled": true,
       "license": "AGPL-3.0",
-      "notes": "Too many allowlist IPs, use with caution.",
+      "notes": "Huge list, use with caution. More than its blocklist counterpart.",
       "types": [
         {
           "name": "ipv4",
@@ -578,7 +597,7 @@
       "categories": "malicious, malware, threat",
       "disabled": true,
       "license": "AGPL-3.0",
-      "notes": "Too many blocklist IPs, use with caution.",
+      "notes": "Huge list, use with caution.",
       "types": [
         {
           "name": "ipv4",

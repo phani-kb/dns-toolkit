@@ -436,7 +436,7 @@ func TestLoadAppConfigEdgeCases(t *testing.T) {
 	validYAML := `
 application:
   name: TestApp
-  version: 0.1.0
+  version: 0.4.0
   description: Test application
 dns_toolkit:
   source_files: []

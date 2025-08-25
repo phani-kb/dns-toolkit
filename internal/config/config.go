@@ -12,6 +12,7 @@ import (
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
+	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
 	"gopkg.in/yaml.v2"
 )
@@ -47,6 +48,7 @@ type DNSToolkitConfig struct {
 	SkipUnchangedDownloads    bool                `yaml:"skip_unchanged_downloads"`
 	SkipCertVerification      bool                `yaml:"skip_cert_verification,omitempty"`
 	SkipNameSpecialCharsCheck bool                `yaml:"skip_name_special_chars_check,omitempty"`
+	MinOverlapPercent         float64             `yaml:"min_overlap_percent,omitempty"`
 }
 
 func (dc *DNSToolkitConfig) Validate() error {
@@ -64,6 +66,13 @@ func (dc *DNSToolkitConfig) Validate() error {
 	}
 
 	return nil
+}
+
+func (dc *DNSToolkitConfig) GetMinOverlapPercent() float64 {
+	if dc.MinOverlapPercent != 0 {
+		return dc.MinOverlapPercent
+	}
+	return constants.MinOverlapPercent
 }
 
 // validateSourceFile checks if a source file exists, handling relative paths in test mode
@@ -248,9 +257,10 @@ func GetProcessedSummaries(
 		sourcesConfigs,
 		appConfig,
 	)
-	sort.Slice(enabledSummaries, func(i, j int) bool {
-		return enabledSummaries[i].Name < enabledSummaries[j].Name
-	})
+	sort.Slice(
+		enabledSummaries,
+		func(i, j int) bool { return u.CaseInsensitiveLess(enabledSummaries[i].Name, enabledSummaries[j].Name) },
+	)
 
 	genericSourceTypes := extractGenericSourceTypes(enabledSummaries)
 	processedFiles := GetAllProcessedFiles(enabledSummaries)
@@ -292,9 +302,10 @@ func GetProcessedSummariesForConsolidation(
 		appConfig,
 		consolidationType,
 	)
-	sort.Slice(enabledSummaries, func(i, j int) bool {
-		return enabledSummaries[i].Name < enabledSummaries[j].Name
-	})
+	sort.Slice(
+		enabledSummaries,
+		func(i, j int) bool { return u.CaseInsensitiveLess(enabledSummaries[i].Name, enabledSummaries[j].Name) },
+	)
 
 	genericSourceTypes := extractGenericSourceTypes(enabledSummaries)
 	processedFiles := GetAllProcessedFiles(enabledSummaries)
@@ -372,6 +383,6 @@ func extractGenericSourceTypes(summaries []c.ProcessedSummary) []string {
 	for sourceType := range sourceTypeMap {
 		genericSourceTypes = append(genericSourceTypes, sourceType)
 	}
-	sort.Strings(genericSourceTypes)
+	u.SortCaseInsensitiveStrings(genericSourceTypes)
 	return genericSourceTypes
 }

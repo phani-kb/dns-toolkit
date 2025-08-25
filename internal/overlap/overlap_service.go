@@ -10,6 +10,7 @@ import (
 	"sync"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
+	cfg "github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
@@ -79,7 +80,7 @@ func (s *DefaultOverlapService) FindOverlap(
 	for fp := range validFiles {
 		filePaths = append(filePaths, fp)
 	}
-	sort.Strings(filePaths)
+	u.SortCaseInsensitiveStrings(filePaths)
 
 	for i := 0; i < len(filePaths); i++ {
 		for j := i + 1; j < len(filePaths); j++ {
@@ -260,96 +261,12 @@ func (s *DefaultOverlapService) WriteCompactOverlapSummaries(
 	for sourceTypeName, sourceNameMap := range sourceTypeMap {
 		// Process each source name within this type
 		for sourceName, pairs := range sourceNameMap {
-			if len(pairs) == 0 {
+			cs := computeCompactSummaryFromPairs(sourceTypeName, sourceName, pairs)
+			if cs == nil {
 				continue
 			}
-
-			// Use the first pair's source info as reference
-			firstPair := pairs[0]
-
-			compactSummary := c.OverlapSummary{
-				Type:        sourceTypeName,
-				Source:      sourceName,
-				ListType:    firstPair.Source.ListType,
-				Count:       firstPair.Source.Count,
-				TargetsList: make([]string, 0),
-				Targets:     make([]c.OverlapTargetFileInfo, 0),
-			}
-
-			// Use a map to deduplicate targets by their name
-			targetMap := make(map[string]c.OverlapTargetFileInfo)
-			totalOverlapCount := 0
-
-			// Find all unique targets that overlap with this source
-			for _, targetPair := range pairs {
-				// Skip pairs that don't have the current source as the source
-				if targetPair.Source.Name != sourceName {
-					continue
-				}
-
-				// Find targets that overlap with this source
-				targetFile := targetPair.Target
-
-				if targetPair.Overlap > 0 {
-					// Track total overlap count for unique calculation
-					totalOverlapCount += targetPair.Overlap
-
-					overlapTargetFile := c.OverlapTargetFileInfo{
-						Name:     targetFile.Name,
-						ListType: targetFile.ListType,
-						Type:     targetFile.Type,
-						Count:    targetFile.Count,
-						Percent:  targetFile.Percent,
-						Overlap:  targetPair.Overlap,
-					}
-
-					// Use the target name as a key to avoid duplicates
-					// If the target is already in the map, keep the one with the higher overlap
-					if existing, exists := targetMap[targetFile.Name]; !exists ||
-						targetPair.Overlap > existing.Overlap {
-						targetMap[targetFile.Name] = overlapTargetFile
-					}
-				}
-			}
-
-			// Convert the map values to a slice
-			for _, target := range targetMap {
-				compactSummary.Targets = append(compactSummary.Targets, target)
-			}
-
-			if len(compactSummary.Targets) == 0 {
-				continue
-			}
-
-			// Sort targets by percent in descending order
-			sort.Slice(compactSummary.Targets, func(i, j int) bool {
-				return u.ParsePercent(
-					compactSummary.Targets[i].Percent,
-				) > u.ParsePercent(
-					compactSummary.Targets[j].Percent,
-				)
-			})
-
-			for _, target := range compactSummary.Targets {
-				compactSummary.TargetsList = append(compactSummary.TargetsList, target.GetString())
-			}
-
-			compactSummary.TargetsCount = len(compactSummary.Targets)
-
-			uniqueEntries := compactSummary.Count - totalOverlapCount
-			if uniqueEntries < 0 {
-				uniqueEntries = 0
-			}
-			compactSummary.Unique = uniqueEntries
-
-			logger.Infof(
-				"Source: %s targets count: %d for %s",
-				compactSummary.Source,
-				compactSummary.TargetsCount,
-				sourceTypeName,
-			)
-
-			compactSummaries = append(compactSummaries, compactSummary)
+			logger.Infof("Source: %s targets count: %d for %s", cs.Source, cs.TargetsCount, sourceTypeName)
+			compactSummaries = append(compactSummaries, *cs)
 		}
 		logger.Infof("Overlap summaries count: %d for %s", len(compactSummaries), sourceTypeName)
 	}
@@ -362,6 +279,91 @@ func (s *DefaultOverlapService) WriteCompactOverlapSummaries(
 
 	logger.Infof("Saved %d overlap summaries to %s", savedCount, summaryFile)
 	return compactSummaries, nil
+}
+
+// computeCompactSummaryFromPairs builds a compact OverlapSummary for a given source from its pairs.
+// It deduplicates targets by name, keeps the highest overlap per target name, and computes Unique
+// as Count - sum(deduplicated overlaps).
+func computeCompactSummaryFromPairs(sourceTypeName, sourceName string, pairs []c.OverlapPair) *c.OverlapSummary {
+	if len(pairs) == 0 {
+		return nil
+	}
+	firstPair := pairs[0]
+	cs := &c.OverlapSummary{
+		Type:        sourceTypeName,
+		Source:      sourceName,
+		ListType:    firstPair.Source.ListType,
+		Count:       firstPair.Source.Count,
+		TargetsList: make([]string, 0),
+		Targets:     make([]c.OverlapTargetFileInfo, 0),
+	}
+
+	// Use composite key: Name|ListType|Type to distinguish semantically different targets
+	targetMap := make(map[string]c.OverlapTargetFileInfo)
+
+	for _, targetPair := range pairs {
+		if targetPair.Source.Name != sourceName {
+			continue
+		}
+		targetFile := targetPair.Target
+		if targetPair.Overlap <= 0 {
+			continue
+		}
+		ot := c.OverlapTargetFileInfo{
+			Name:     targetFile.Name,
+			ListType: targetFile.ListType,
+			Type:     targetFile.Type,
+			Count:    targetFile.Count,
+			Percent:  targetFile.Percent,
+			Overlap:  targetPair.Overlap,
+		}
+
+		key := targetFile.Name + "|" + targetFile.ListType + "|" + targetFile.Type
+		if existing, exists := targetMap[key]; !exists || ot.Overlap > existing.Overlap {
+			targetMap[key] = ot
+		}
+	}
+
+	for _, target := range targetMap {
+		cs.Targets = append(cs.Targets, target)
+	}
+
+	if len(cs.Targets) == 0 {
+		return nil
+	}
+
+	sort.Slice(cs.Targets, func(i, j int) bool {
+		return u.ParsePercent(cs.Targets[i].Percent) > u.ParsePercent(cs.Targets[j].Percent)
+	})
+
+	for _, target := range cs.Targets {
+		cs.TargetsList = append(cs.TargetsList, target.GetString())
+	}
+
+	cs.TargetsCount = len(cs.Targets)
+
+	totalOverlapSameList := 0
+	totalOverlapCrossList := 0
+	// same-list only if both ListType and Type match the source.
+	// else, treat it as a cross-list/type conflict.
+	for _, t := range cs.Targets {
+		if t.ListType == cs.ListType && cfg.GetGenericSourceType(t.Type) == cfg.GetGenericSourceType(cs.Type) {
+			totalOverlapSameList += t.Overlap
+		} else {
+			totalOverlapCrossList += t.Overlap
+		}
+	}
+
+	// unique entries are the entries not present in any target (same-list or cross-list).
+	// conflicts can be ignored here
+	uniqueEntries := cs.Count - (totalOverlapSameList + totalOverlapCrossList)
+	if uniqueEntries < 0 {
+		uniqueEntries = 0
+	}
+	cs.Unique = uniqueEntries
+	cs.Conflicts = totalOverlapCrossList
+
+	return cs
 }
 
 // GetOverlapFilename generates a filename for an overlap file based on source and target file information

@@ -7,6 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"text/template"
@@ -99,24 +100,26 @@ func loadTemplates() (*template.Template, []byte, error) {
 
 // parseFileInfoFromString parses a FileInfo string back to FileInfo struct
 func parseFileInfoFromString(fileStr string) (common.FileInfo, error) {
-	// Format: "name [filepath] [count] [must consider]"
-	re := regexp.MustCompile(`^(.+?) \[(.+?)\] \[(\d+)\]( \[must consider\])?$`)
+	// Format: "name [sourceType] [filepath] [count] [must consider]"
+	re := regexp.MustCompile(`^(.+?) \[(.+?)\] \[(.+?)\] \[(\d+)\]( \[must consider\])?$`)
 	matches := re.FindStringSubmatch(fileStr)
 
-	if len(matches) < 4 {
+	if len(matches) < 5 {
 		return common.FileInfo{}, fmt.Errorf("invalid file info string format: %s", fileStr)
 	}
 
 	name := matches[1]
-	filepath := matches[2]
-	count, err := strconv.Atoi(matches[3])
+	sourceType := matches[2]
+	filepath := matches[3]
+	count, err := strconv.Atoi(matches[4])
 	if err != nil {
-		return common.FileInfo{}, fmt.Errorf("invalid count in file info string: %s", matches[3])
+		return common.FileInfo{}, fmt.Errorf("invalid count in file info string: %s", matches[4])
 	}
-	mustConsider := len(matches) > 4 && matches[4] != ""
+	mustConsider := len(matches) > 5 && matches[5] != ""
 
 	return common.FileInfo{
 		Name:         name,
+		SourceType:   sourceType,
 		Filepath:     filepath,
 		Count:        count,
 		MustConsider: mustConsider,
@@ -155,6 +158,27 @@ func generateFilesList(
 		len(filesInvolved),
 	))
 
+	sort.Slice(
+		filesInvolved,
+		func(i, j int) bool { return u.CaseInsensitiveLess(filesInvolved[i].Name, filesInvolved[j].Name) },
+	)
+
+	maxNameLen := 0
+	maxSourceTypeLen := 0
+	maxCountLen := 0
+	for _, fileInfo := range filesInvolved {
+		if len(fileInfo.Name) > maxNameLen {
+			maxNameLen = len(fileInfo.Name)
+		}
+		if len(fileInfo.SourceType) > maxSourceTypeLen {
+			maxSourceTypeLen = len(fileInfo.SourceType)
+		}
+		countLen := len(fmt.Sprintf("%d", fileInfo.Count))
+		if countLen > maxCountLen {
+			maxCountLen = countLen
+		}
+	}
+
 	for _, fileInfo := range filesInvolved {
 		mustConsiderText := ""
 		if fileInfo.MustConsider {
@@ -162,7 +186,13 @@ func generateFilesList(
 		}
 		lines = append(
 			lines,
-			fmt.Sprintf("#   - %s: %d%s", fileInfo.Name, fileInfo.Count, mustConsiderText),
+			fmt.Sprintf(
+				"#   - %-*s %-*s: %-*d%s",
+				maxNameLen, fileInfo.Name,
+				maxSourceTypeLen, fileInfo.SourceType,
+				maxCountLen, fileInfo.Count,
+				mustConsiderText,
+			),
 		)
 	}
 

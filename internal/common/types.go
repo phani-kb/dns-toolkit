@@ -409,14 +409,15 @@ type OverlapFileInfo struct {
 
 // OverlapSummary represents a compact summary of overlap information for a source.
 type OverlapSummary struct {
-	Source       string                  `json:"source"`        // Name of the source file
-	ListType     string                  `json:"list_type"`     // Type of list (blocklist or allowlist)
-	Type         string                  `json:"source_type"`   // Source type (domain, ipv4, etc.)
-	TargetsList  []string                `json:"targets"`       // List of targets as strings
-	Targets      []OverlapTargetFileInfo `json:"-"`             // Detailed target information (not serialized)
-	Count        int                     `json:"count"`         // Number of entries in the source
-	Unique       int                     `json:"unique"`        // Number of unique entries
-	TargetsCount int                     `json:"targets_count"` // Number of target files with overlap
+	Source       string                  `json:"source"`              // Name of the source file
+	ListType     string                  `json:"list_type"`           // Type of list (blocklist or allowlist)
+	Type         string                  `json:"source_type"`         // Source type (domain, ipv4, etc.)
+	TargetsList  []string                `json:"targets"`             // List of targets as strings
+	Targets      []OverlapTargetFileInfo `json:"-"`                   // Detailed target information (not serialized)
+	Count        int                     `json:"count"`               // Number of entries in the source
+	Unique       int                     `json:"unique"`              // Number of unique entries
+	Conflicts    int                     `json:"conflicts,omitempty"` // Number of overlaps with different list types
+	TargetsCount int                     `json:"targets_count"`       // Number of target files with overlap
 }
 
 func (os *OverlapSummary) GetName() string {
@@ -445,6 +446,7 @@ func (ot *OverlapTargetFileInfo) GetString() string {
 // FileInfo contains basic information about a file.
 type FileInfo struct {
 	Name         string `json:"name"`                    // Name of the file source
+	SourceType   string `json:"source_type"`             // Type of the source
 	Filepath     string `json:"filepath"`                // Path to the file
 	MustConsider bool   `json:"must_consider,omitempty"` // Whether the file must be considered
 	Count        int    `json:"count"`                   // Number of entries
@@ -452,7 +454,7 @@ type FileInfo struct {
 
 // GetString returns a formatted string representation of file info.
 func (fi *FileInfo) GetString() string {
-	return fmt.Sprintf("%s [%s] [%d]%s", fi.Name, fi.Filepath, fi.Count,
+	return fmt.Sprintf("%s [%s] [%s] [%d]%s", fi.Name, fi.SourceType, fi.Filepath, fi.Count,
 		func() string {
 			if fi.MustConsider {
 				return " [must consider]"

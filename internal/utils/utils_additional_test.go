@@ -31,17 +31,17 @@ func TestCopyFile(t *testing.T) {
 	err = os.WriteFile(srcFile, []byte(testContent), 0644)
 	require.NoError(t, err)
 
-	err = copyFile(logger, srcFile, dstFile)
+	err = CopyFile(logger, srcFile, dstFile)
 	assert.NoError(t, err)
 
 	copiedContent, err := os.ReadFile(dstFile)
 	require.NoError(t, err)
 	assert.Equal(t, testContent, string(copiedContent))
 
-	err = copyFile(logger, "/non/existent/file.txt", dstFile)
+	err = CopyFile(logger, "/non/existent/file.txt", dstFile)
 	assert.Error(t, err)
 
-	err = copyFile(logger, srcFile, "/non/existent/dir/file.txt")
+	err = CopyFile(logger, srcFile, "/non/existent/dir/file.txt")
 	assert.Error(t, err)
 }
 

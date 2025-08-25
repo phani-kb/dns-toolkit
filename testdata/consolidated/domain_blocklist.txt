@@ -1,0 +1,10 @@
+test.com
+example.com
+bad-domain.com
+malicious-site.org
+spam-domain.net
+phishing-site.com
+adware-site.net
+tracking-domain.org
+suspicious-site.com
+blocked-domain.net

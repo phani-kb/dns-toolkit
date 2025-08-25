@@ -343,3 +343,46 @@ func createTestOverlapSummary(t *testing.T, summaryDir string) {
 	summaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles["overlap"])
 	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
 }
+
+func TestFilterOverlapSummariesByMinPercent(t *testing.T) {
+	overlapSummaries := []c.OverlapSummary{
+		{
+			Type:         "domain",
+			Source:       "source_a",
+			ListType:     "blocklist",
+			Count:        1000,
+			Unique:       800,
+			TargetsCount: 2,
+			TargetsList: []string{
+				"source_b, lt: blocklist, type: domain, count: 1500, overlap: 150, percent: 15.0",
+				"source_c, lt: allowlist, type: domain, count: 500, overlap: 50, percent: 5.0",
+			},
+		},
+		{
+			Type:         "domain",
+			Source:       "source_d",
+			ListType:     "blocklist",
+			Count:        500,
+			Unique:       400,
+			TargetsCount: 1,
+			TargetsList: []string{
+				"source_e, lt: blocklist, type: domain, count: 700, overlap: 20, percent: 2.0",
+			},
+		},
+	}
+
+	minPercent := 10.0
+	origMin := AppConfig.DNSToolkit.MinOverlapPercent
+	AppConfig.DNSToolkit.MinOverlapPercent = minPercent
+	defer func() { AppConfig.DNSToolkit.MinOverlapPercent = origMin }()
+
+	filteredSummaries := FilterOverlapSummariesByMinPercent(
+		overlapSummaries,
+		AppConfig.DNSToolkit.GetMinOverlapPercent(),
+	)
+
+	require.Len(t, filteredSummaries, 2)
+	require.Len(t, filteredSummaries[0].TargetsList, 2)
+	assert.Contains(t, filteredSummaries[0].TargetsList[0], "percent: 15.0")
+	assert.NotContains(t, filteredSummaries[0].TargetsList[0], "percent: 5.0")
+}

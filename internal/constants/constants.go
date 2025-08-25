@@ -88,36 +88,49 @@ const (
 	FrequencyWeekly  = "weekly"
 	FrequencyMonthly = "monthly"
 
-	CategoryAdult          = "adult"
-	CategoryMalware        = "malware"
-	CategoryAds            = "ads"
-	CategoryFamily         = "family"
-	CategoryOthers         = "others"
-	CategoryDns            = "dns"
-	CategoryDoh            = "doh"
-	CategorySpam           = "spam"
-	CategoryScam           = "scam"
-	CategoryPhishing       = "phishing"
-	CategoryCryptocurrency = "cryptocurrency"
-	CategoryTrackers       = "trackers"
-	CategorySocial         = "social"
-	CategoryAnnoyance      = "annoyance"
-	CategoryFake           = "fake"
-	CategoryFakeNews       = "fakenews"
-	CategoryGambling       = "gambling"
-	CategoryThreat         = "threat"
-	CategoryPrivacy        = "privacy"
-	CategorySecurity       = "security"
-	CategoryMalicious      = "malicious"
-	CategoryAnonymizer     = "anonymizer"
-	CategoryTopDomains     = "topdomains"
-	CategoryNewDomains     = "newdomains"
-	CategoryMobile         = "mobile"
-	CategoryProxy          = "proxy"
-	CategoryTrojan         = "trojan"
-	CategoryRansomware     = "ransomware"
-	CategoryBotnet         = "botnet"
-	CategoryExploit        = "exploit"
+	CategoryAdult           = "adult"
+	CategoryMalware         = "malware"
+	CategoryAds             = "ads"
+	CategoryFamily          = "family"
+	CategoryOthers          = "others"
+	CategoryDns             = "dns"
+	CategoryDoh             = "doh"
+	CategorySpam            = "spam"
+	CategoryScam            = "scam"
+	CategoryPhishing        = "phishing"
+	CategoryCryptocurrency  = "cryptocurrency"
+	CategoryTrackers        = "trackers"
+	CategorySocial          = "social"
+	CategoryAnnoyance       = "annoyance"
+	CategoryFake            = "fake"
+	CategoryFakeNews        = "fakenews"
+	CategoryGambling        = "gambling"
+	CategoryThreat          = "threat"
+	CategoryPrivacy         = "privacy"
+	CategorySecurity        = "security"
+	CategoryMalicious       = "malicious"
+	CategoryAnonymizer      = "anonymizer"
+	CategoryTopDomains      = "topdomains"
+	CategoryNewDomains      = "newdomains"
+	CategoryMobile          = "mobile"
+	CategoryProxy           = "proxy"
+	CategoryTrojan          = "trojan"
+	CategoryRansomware      = "ransomware"
+	CategoryBotnet          = "botnet"
+	CategoryExploit         = "exploit"
+	CategoryWindows         = "windows"
+	CategoryMac             = "mac"
+	CategoryFinance         = "finance"
+	CategoryBrowser         = "browser"
+	CategoryIssues          = "issues"
+	CategoryURLShorteners   = "url_shorteners"
+	CategoryDiscord         = "discord"
+	CategoryTorrentTrackers = "torrent_trackers"
+	CategorySmartTV         = "smarttv"
+	CategoryLocal           = "local"
+	CategoryCustom          = "custom"
+	CategoryDating          = "dating"
+	CategoryKademlia        = "kad"
 
 	GroupMini   = "mini"
 	GroupLite   = "lite"
@@ -156,6 +169,7 @@ const (
 	SourceTypeIpv6Htaccess               = "ipv6_htaccess"
 	SourceTypeTopDomains                 = "domain_top"
 	SourceTypeDomainCustomHtmlPuppyScams = "domain_custom_html_puppyscams"
+	SourceTypeIpv4FromDomain             = "ipv4_from_domain"
 
 	ListTypeBlocklist = "blocklist"
 	ListTypeAllowlist = "allowlist"
@@ -193,6 +207,7 @@ var (
 		SourceTypeIpv6Htaccess:               true,
 		SourceTypeTopDomains:                 true,
 		SourceTypeDomainCustomHtmlPuppyScams: true,
+		SourceTypeIpv4FromDomain:             true,
 	}
 	ValidListTypes = map[string]bool{
 		ListTypeBlocklist: true,
@@ -221,6 +236,10 @@ var SourceTypeRegexMap = map[string]*regexp.Regexp{
 	SourceTypeDomainFinder: regexp.MustCompile(`([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}`),
 }
 
+const (
+	DomainHttpUrlRegex = `^(?:https?:\/\/)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(?::\d+)?(?:\/[^\s]*)?$`
+)
+
 var (
 	GenericSourceTypes = []string{
 		SourceTypeIpv4,
@@ -238,42 +257,69 @@ var (
 )
 
 var (
+	AllowlistFilesMap = map[string]string{
+		SourceTypeDomain:  "data/allowlist_domains.txt",
+		SourceTypeAdguard: "data/allowlist_adg.txt",
+		SourceTypeIpv4:    "data/allowlist_ipv4.txt",
+	}
+
+	CustomAllowlistFilesMap = map[string]string{
+		SourceTypeDomain:  "data/custom/allowlist_domains.txt",
+		SourceTypeAdguard: "data/custom/allowlist_adg.txt",
+		SourceTypeIpv4:    "data/custom/allowlist_ipv4.txt",
+	}
+)
+
+var (
 	ValidFrequencies = map[string]bool{
 		FrequencyDaily:   true,
 		FrequencyWeekly:  true,
 		FrequencyMonthly: true,
 	}
 	ValidCategories = map[string]bool{
-		CategoryAdult:          true,
-		CategoryMalware:        true,
-		CategoryAds:            true,
-		CategoryFamily:         true,
-		CategoryOthers:         true,
-		CategorySocial:         true,
-		CategoryFake:           true,
-		CategoryFakeNews:       true,
-		CategoryGambling:       true,
-		CategoryPhishing:       true,
-		CategoryCryptocurrency: true,
-		CategorySpam:           true,
-		CategoryScam:           true,
-		CategoryDns:            true,
-		CategoryDoh:            true,
-		CategoryTrackers:       true,
-		CategoryAnnoyance:      true,
-		CategoryThreat:         true,
-		CategoryPrivacy:        true,
-		CategorySecurity:       true,
-		CategoryMalicious:      true,
-		CategoryAnonymizer:     true,
-		CategoryTopDomains:     true,
-		CategoryNewDomains:     true,
-		CategoryMobile:         true,
-		CategoryProxy:          true,
-		CategoryTrojan:         true,
-		CategoryRansomware:     true,
-		CategoryBotnet:         true,
-		CategoryExploit:        true,
+		CategoryAdult:           true,
+		CategoryMalware:         true,
+		CategoryAds:             true,
+		CategoryFamily:          true,
+		CategoryOthers:          true,
+		CategorySocial:          true,
+		CategoryFake:            true,
+		CategoryFakeNews:        true,
+		CategoryGambling:        true,
+		CategoryPhishing:        true,
+		CategoryCryptocurrency:  true,
+		CategorySpam:            true,
+		CategoryScam:            true,
+		CategoryDns:             true,
+		CategoryDoh:             true,
+		CategoryTrackers:        true,
+		CategoryAnnoyance:       true,
+		CategoryThreat:          true,
+		CategoryPrivacy:         true,
+		CategorySecurity:        true,
+		CategoryMalicious:       true,
+		CategoryAnonymizer:      true,
+		CategoryTopDomains:      true,
+		CategoryNewDomains:      true,
+		CategoryMobile:          true,
+		CategoryProxy:           true,
+		CategoryTrojan:          true,
+		CategoryRansomware:      true,
+		CategoryBotnet:          true,
+		CategoryExploit:         true,
+		CategoryWindows:         true,
+		CategoryMac:             true,
+		CategoryFinance:         true,
+		CategoryBrowser:         true,
+		CategoryIssues:          true,
+		CategoryURLShorteners:   true,
+		CategoryDiscord:         true,
+		CategoryTorrentTrackers: true,
+		CategorySmartTV:         true,
+		CategoryLocal:           true,
+		CategoryCustom:          true,
+		CategoryDating:          true,
+		CategoryKademlia:        true,
 	}
 
 	ValidGroups = map[string]bool{
@@ -309,7 +355,7 @@ const (
 	MaxSampleLinesToCategorize    = 100
 	TimestampFormat               = "20060102_150405"
 	BackupFileTimestampFormat     = "20060102_150405"
-	DownloadInterval              = 1800 * time.Millisecond
+	DownloadInterval              = 1000 * time.Millisecond
 	DefaultHashAlgorithm          = "md5"
 	DefaultMaxRetries             = 3
 	DefaultRetryDelayInSeconds    = 10
@@ -321,6 +367,8 @@ const (
 	DefaultBlockProfileRate       = 1000
 	MinFilesForParallelProcessing = 10
 	MaxEntryLength                = 255
+	MinOverlapPercent             = 0.0
+	IPResolveInterval             = 100 * time.Millisecond
 )
 
 var DefaultMinSourcesRange = []int{3, 4, 5, 6, 7, 8, 9, 10, 11, 12}

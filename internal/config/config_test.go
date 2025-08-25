@@ -550,8 +550,6 @@ func TestLoadSourcesConfig(t *testing.T) {
 }
 
 func TestSourceUnmarshalJSON(t *testing.T) {
-	t.Parallel()
-
 	jsonData := `{
 		"name": "test-source",
 		"url": "http://example.com",
@@ -690,8 +688,6 @@ func TestGetProcessedSummaries(t *testing.T) {
 
 // Additional tests for improved coverage of new functions
 func TestGetProcessedSummariesWithFileErrors(t *testing.T) {
-	t.Parallel()
-
 	logger := CreateTestLogger()
 
 	// Test with non-existent file
@@ -739,7 +735,7 @@ func TestGetProcessedSummariesWithFileErrors(t *testing.T) {
 }
 
 func TestFilterEnabledSummariesBasic(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 
 	logger := CreateTestLogger()
 
@@ -784,7 +780,7 @@ func TestFilterEnabledSummariesBasic(t *testing.T) {
 }
 
 func TestIsEnabledSourceForConsolidationEdgeCases(t *testing.T) {
-	t.Parallel()
+	// t.Parallel()
 
 	tests := []struct {
 		name              string

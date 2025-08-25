@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"runtime/debug"
+	"sort"
 	"sync"
 	"time"
 	"unicode"
@@ -316,6 +317,15 @@ func (s *DefaultTopEntriesService) GetTopNEntries(
 			result[i] = ecp
 		}
 	}
+
+	// Sort by count and then entry name
+	// Sorting by just name may lead to incorrect results with max entries
+	sort.SliceStable(result, func(i, j int) bool {
+		if result[i].Count == result[j].Count {
+			return result[i].Entry < result[j].Entry
+		}
+		return result[i].Count > result[j].Count
+	})
 	return result
 }
 

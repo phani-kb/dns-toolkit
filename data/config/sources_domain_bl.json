@@ -3,9 +3,9 @@
     {
       "name": "1Hosts (Lite)",
       "categories": "ads, trackers",
-      "disabled": true,
+      "disabled": false,
       "license": "MPLv2",
-      "notes": "Covered by other sources",
+      "notes": "100% covered by other sources",
       "types": [
         {
           "name": "domain",
@@ -41,7 +41,9 @@
           "name": "domain_adguard",
           "list_types": [
             {
-              "name": "allowlist"
+              "name": "allowlist",
+              "disabled": true,
+              "notes": "Conflicts with other sources"
             }
           ]
         }
@@ -52,10 +54,10 @@
     {
       "name": "Adaway",
       "categories": "ads",
-      "disabled": true,
+      "disabled": false,
       "frequency": "weekly",
       "license": "CC Attribution 3.0",
-        "notes": ">99% overlap with StevenBlack Fake Gambling list",
+      "notes": ">99% overlap with StevenBlack Fake Gambling list",
       "types": [
         {
           "name": "hostname",
@@ -91,7 +93,9 @@
           "name": "domain_adguard",
           "list_types": [
             {
-              "name": "allowlist"
+              "name": "allowlist",
+              "disabled": true,
+              "notes": "Conflicts with other sources"
             }
           ]
         }
@@ -132,6 +136,34 @@
       ],
       "url": "https://filters.adtidy.org/extension/firefox/filters/2.txt",
       "website": "https://github.com/AdguardTeam/AdGuardFilters"
+    },
+    {
+      "name": "AdGuard CNAME Mail Trackers",
+      "categories": "trackers",
+      "license": "MIT",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_mail_trackers_justdomains.txt",
+      "website": "https://github.com/AdguardTeam/cname-trackers"
+    },
+    {
+      "name": "AdGuard CNAME Trackers",
+      "categories": "trackers",
+      "license": "MIT",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/AdguardTeam/cname-trackers/master/data/combined_disguised_trackers_justdomains.txt",
+      "website": "https://github.com/AdguardTeam/cname-trackers"
     },
     {
       "name": "AdGuard DNS filter",
@@ -245,7 +277,7 @@
       "name": "Blocklists UT1 Malware",
       "categories": "malware",
       "license": "CC BY-SA 4.0",
-      "notes": ">79% overlap with phishing_army",
+      "notes": ">80% overlap with phishing_army",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
@@ -264,10 +296,10 @@
     {
       "name": "Blocklists UT1 Publicite",
       "categories": "ads",
-      "disabled": true,
+      "disabled": false,
       "files": "publicite/domains",
       "license": "CC BY-SA 4.0",
-      "notes": "Covered by other sources",
+      "notes": "100% covered by other sources",
       "types": [
         {
           "name": "domain",
@@ -283,6 +315,31 @@
       "website": "https://dsi.ut-capitole.fr/blacklists"
     },
     {
+      "name": "Blocklists UT1 Shortener",
+      "categories": "url_shorteners",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/olbat/ut1-blacklists/refs/heads/master/blacklists/shortener/domains",
+      "website": "https://github.com/olbat/ut1-blacklists/"
+    },
+    {
+      "name": "Boutetnico_URL_Shorteners",
+      "categories": "url_shorteners",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/boutetnico/url-shorteners/master/list.txt"
+    },
+    {
       "name": "Cameleon",
       "categories": "ads",
       "disabled": true,
@@ -294,6 +351,19 @@
       ],
       "url": "https://sysctl.org/cameleon/hosts",
       "website": "https://sysctl.org/cameleon"
+    },
+    {
+      "name": "CF Torrent Trackers",
+      "categories": "torrent_trackers",
+      "license": "GPL-3.0",
+      "skip_general_consolidation": true,
+      "types": [
+        {
+          "name": "domain_url"
+        }
+      ],
+      "url": "https://cf.trackerslist.com/all.txt",
+      "website": "https://cf.trackerslist.com/"
     },
     {
       "name": "CJX Annoyance",
@@ -427,9 +497,9 @@
     {
       "name": "Dan Pollock's List",
       "categories": "ads, malware, trackers",
-      "disabled": true,
+      "disabled": false,
       "frequency": "weekly",
-      "notes": ">98% overlap with StevenBlack Fake Gambling list",
+      "notes": ">95% overlap with StevenBlack Fake Gambling list",
       "types": [
         {
           "name": "hostname",
@@ -504,9 +574,9 @@
     {
       "name": "EasyList",
       "categories": "ads",
-      "disabled": true,
+      "disabled": false,
       "license": "CC BY-SA 3.0, GPL-3.0",
-      "notes": "Covered by other sources",
+      "notes": "100% covered by other sources",
       "types": [
         {
           "name": "adguard"
@@ -520,7 +590,7 @@
       "categories": "malicious, threat",
       "disabled": true,
       "license": "GPL-3.0",
-      "notes": "Huge list",
+      "notes": "Huge list, >3 million entries",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
@@ -557,7 +627,7 @@
       "website": "https://github.com/FakesiteListHUN/FakeWebshopListHUN"
     },
     {
-      "name": "Frogeye trackers",
+      "name": "Frogeye-firstparty-trackers",
       "categories": "trackers",
       "license": "CC BY 4.0",
       "types": [
@@ -594,7 +664,6 @@
       "name": "GlobalAntiScamOrg-blocklist-domains",
       "categories": "scam",
       "license": "BSD 3-Clause",
-      "notes": "To be reviewed",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
@@ -608,7 +677,7 @@
     {
       "name": "HaGeZi Amazon Tracker",
       "categories": "privacy, trackers",
-      "disabled": true,
+      "disabled": false,
       "license": "GPL-3.0",
       "notes": ">98% overlap with HaGeZi Pro",
       "types": [
@@ -622,9 +691,9 @@
     {
       "name": "HaGeZi Apple Tracker",
       "categories": "privacy, trackers",
-      "disabled": true,
+      "disabled": false,
       "license": "GPL-3.0",
-      "notes": ">83% overlap with HaGeZi Pro",
+      "notes": ">80% overlap with HaGeZi Pro",
       "types": [
         {
           "name": "domain"
@@ -636,9 +705,9 @@
     {
       "name": "HaGeZi DNS TIF Mini",
       "categories": "malicious, threat",
-      "disabled": true,
+      "disabled": false,
       "license": "GPL-3.0",
-      "notes": "Covered by other sources",
+      "notes": "100% covered by other sources",
       "types": [
         {
           "name": "adguard"
@@ -670,7 +739,7 @@
       "name": "HaGeZi Gambling Only Domains",
       "categories": "gambling",
       "license": "GPL-3.0",
-      "notes": "Skipped due to large size (202K entries) and gambling-specific focus",
+      "notes": "Huge list and gambling-specific focus",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
@@ -684,7 +753,7 @@
     {
       "name": "HaGeZi Microsoft Tracker",
       "categories": "privacy, trackers",
-      "disabled": true,
+      "disabled": false,
       "license": "GPL-3.0",
       "notes": ">75% overlap with HaGeZi Pro",
       "types": [
@@ -736,7 +805,7 @@
     {
       "name": "HaGeZi Xiaomi Tracker",
       "categories": "privacy, trackers",
-      "disabled": true,
+      "disabled": false,
       "license": "GPL-3.0",
       "notes": ">95% overlap with HaGeZi Pro",
       "types": [
@@ -746,23 +815,6 @@
       ],
       "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/native.xiaomi.txt",
       "website": "https://github.com/hagezi/dns-blocklists"
-    },
-    {
-      "name": "HaGeZi's Pro Blocklist",
-      "categories": "ads",
-      "disabled": true,
-      "license": "GPL-3.0",
-      "notes": "100% overlap with HaGeZi Pro",
-      "types": [
-        {
-          "name": "adguard"
-        },
-        {
-          "name": "domain_adguard"
-        }
-      ],
-      "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_48.txt",
-      "website": "https://github.com/AdguardTeam/HostlistsRegistry"
     },
     {
       "name": "Hestat_Minerchk",
@@ -778,6 +830,21 @@
       ],
       "url": "https://raw.githubusercontent.com/Hestat/minerchk/master/hostslist.txt",
       "website": "https://github.com/Hestat/minerchk"
+    },
+    {
+      "name": "hkamran80_smarttv",
+      "categories": "smarttv",
+      "frequency": "weekly",
+      "license": "MIT",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/hkamran80/blocklists/refs/heads/main/smart-tv.txt",
+      "website": "https://github.com/hkamran80/blocklists"
     },
     {
       "name": "Hostsfile",
@@ -798,6 +865,9 @@
       "categories": "ads",
       "countries": "HU",
       "license": "CC BY 4.0",
+      "notes": ">90% overlap with HaGeZi Pro",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "hostname"
@@ -837,10 +907,12 @@
     },
     {
       "name": "kadantiscam",
-      "categories": "ads",
-      "disabled": true,
+      "categories": "kad",
+      "disabled": false,
       "license": "CC BY-SA 4.0",
-      "notes": ">87% overlap with phishing_army",
+      "notes": "peer-to-peer network protocol",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "domain"
@@ -850,10 +922,23 @@
       "website": "https://kadantiscam.netlify.app"
     },
     {
+      "name": "Korlabs_UrlShortener",
+      "categories": "url_shorteners",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/korlabsio/urlshortener/refs/heads/main/names.txt",
+      "website": "https://github.com/korlabsio/urlshortener"
+    },
+    {
       "name": "Malicious URL Blocklist (URLHaus)",
       "categories": "ads",
-      "disabled": true,
-      "notes": "Covered by other sources",
+      "disabled": false,
+      "notes": "100% covered by other sources",
       "types": [
         {
           "name": "adguard"
@@ -889,17 +974,18 @@
     },
     {
       "name": "OISD Blocklist Big",
-      "categories": "ads, malware, trackers",
-      "disabled": true,
+      "categories": "ads, cryptocurrency, malware, phishing, ransomware, trackers",
+      "disabled": false,
       "license": "GPL-3.0",
-      "skip_general_consolidation": false,
+      "notes": "Huge list",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "adguard",
           "list_types": [
             {
-              "name": "blocklist",
-              "groups": "normal"
+              "name": "blocklist"
             }
           ]
         },
@@ -907,8 +993,7 @@
           "name": "domain_adguard",
           "list_types": [
             {
-              "name": "blocklist",
-              "groups": "normal"
+              "name": "blocklist"
             }
           ]
         }
@@ -965,8 +1050,8 @@
             {
               "name": "blocklist",
               "groups": "normal",
-              "disabled": true,
-              "notes": ">97% overlap with HaGeZi Pro"
+              "disabled": false,
+              "notes": ">95% overlap with HaGeZi Pro"
             }
           ]
         }
@@ -987,9 +1072,9 @@
     {
       "name": "Peter Lowe's Blocklist",
       "categories": "ads",
-      "disabled": true,
+      "disabled": false,
       "license": "MCRAE GENERAL PUBLIC LICENSE (version 4.r53)",
-      "notes": "Covered by other sources",
+      "notes": "100% covered by other sources",
       "types": [
         {
           "name": "domain",
@@ -1005,18 +1090,31 @@
       "website": "https://pgl.yoyo.org/adservers/"
     },
     {
+      "name": "pexcn Torrent Trackers",
+      "categories": "torrent_trackers",
+      "license": "GPL-3.0",
+      "skip_general_consolidation": true,
+      "types": [
+        {
+          "name": "domain_url"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/pexcn/daily/gh-pages/trackerlist/trackerlist-best.txt",
+      "website": "https://github.com/pexcn"
+    },
+    {
       "name": "phishing_army",
       "categories": "phishing",
-      "disabled": true,
+      "disabled": false,
       "license": "CC BY-NC 4.0",
-      "notes": "Covered by other sources",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "domain",
           "list_types": [
             {
               "name": "blocklist",
-              "groups": "lite"
+              "groups": "normal"
             }
           ]
         }
@@ -1060,12 +1158,18 @@
     {
       "name": "quidsup_notrack-annoyance",
       "categories": "annoyance",
-      "disabled": true,
+      "disabled": false,
       "license": "GPL-3.0",
-      "notes": ">89% overlap with HaGeZi Pro",
+      "notes": ">90% overlap with HaGeZi Pro",
       "types": [
         {
-          "name": "domain"
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "lite"
+            }
+          ]
         }
       ],
       "url": "https://quidsup.net/notrack/blocklist.php?download=annoyancedomains",
@@ -1077,7 +1181,13 @@
       "license": "GPL-3.0",
       "types": [
         {
-          "name": "domain"
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "mini"
+            }
+          ]
         }
       ],
       "url": "https://quidsup.net/notrack/blocklist.php?download=malwaredomains",
@@ -1087,6 +1197,8 @@
       "name": "quidsup_notrack-tracker",
       "categories": "trackers",
       "license": "GPL-3.0",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "domain"
@@ -1127,9 +1239,11 @@
     {
       "name": "RPiList_specials-malware",
       "categories": "malware",
-      "disabled": true,
+      "disabled": false,
       "license": "CC BY-NC 4.0",
       "notes": "Huge list",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "adguard"
@@ -1153,7 +1267,7 @@
     },
     {
       "name": "ShadowWhisperer's Dating List",
-      "categories": "ads",
+      "categories": "dating",
       "types": [
         {
           "name": "adguard"
@@ -1162,7 +1276,7 @@
           "name": "domain_adguard"
         }
       ],
-      "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_57.txt"
+      "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/refs/heads/master/Lists/Dating"
     },
     {
       "name": "ShadowWhisperer_BlockLists Ads",
@@ -1178,7 +1292,7 @@
     {
       "name": "ShadowWhisperer_BlockLists Adult",
       "categories": "adult",
-      "notes": "Disabled due to large size and adult content focus",
+      "notes": "Huge list and adult-specific focus",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
@@ -1212,6 +1326,64 @@
       "website": "https://github.com/ShadowWhisperer/BlockLists"
     },
     {
+      "name": "ShadowWhisperer_UrlShortener",
+      "categories": "url_shorteners",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/refs/heads/master/Lists/UrlShortener",
+      "website": "https://github.com/ShadowWhisperer/BlockLists"
+    },
+    {
+      "name": "Sinfonietta_Adult",
+      "categories": "adult",
+      "frequency": "weekly",
+      "license": "MIT",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "hostname"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/Sinfonietta/hostfiles/refs/heads/master/pornography-hosts",
+      "website": "https://github.com/Sinfonietta/hostfiles"
+    },
+    {
+      "name": "Sinfonietta_Gambling",
+      "categories": "gambling",
+      "frequency": "weekly",
+      "license": "MIT",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "hostname"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/Sinfonietta/hostfiles/refs/heads/master/gambling-hosts",
+      "website": "https://github.com/Sinfonietta/hostfiles"
+    },
+    {
+      "name": "Sinfonietta_Social",
+      "categories": "social",
+      "frequency": "weekly",
+      "license": "MIT",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "hostname"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/Sinfonietta/hostfiles/refs/heads/master/social-hosts",
+      "website": "https://github.com/Sinfonietta/hostfiles"
+    },
+    {
       "name": "Spam404",
       "categories": "spam",
       "license": "CC-BY-4.0",
@@ -1232,6 +1404,7 @@
       "name": "Stamparm_Blackbook",
       "categories": "malicious, threat",
       "frequency": "monthly",
+      "notes": ">95% overlap with Blocklists UT1 Malware",
       "types": [
         {
           "name": "domain_custom_csv_blackbook",
@@ -1273,7 +1446,13 @@
       "license": "MIT",
       "types": [
         {
-          "name": "hostname"
+          "name": "hostname",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
         }
       ],
       "url": "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts",
@@ -1284,16 +1463,35 @@
       "categories": "malicious, threat",
       "disabled": true,
       "license": "AGPL-3.0",
-      "notes": "Huge list",
+      "notes": "Huge list, >8 million entries",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "big"
+            }
+          ]
+        }
+      ],
+      "url": "https://github.com/T145/black-mirror/releases/download/latest/BLOCK_DOMAIN.txt",
+      "website": "https://github.com/T145/black-mirror"
+    },
+    {
+      "name": "Torrent Trackers",
+      "categories": "torrent_trackers",
+      "license": "MIT",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "domain"
         }
       ],
-      "url": "https://github.com/T145/black-mirror/releases/download/latest/BLOCK_DOMAIN.txt",
-      "website": "https://github.com/T145/black-mirror"
+      "url": "https://raw.githubusercontent.com/im-sm/Pi-hole-Torrent-Blocklist/main/all-torrent-trackers.txt",
+      "website": "https://github.com/sakib-m/Pi-hole-Torrent-Blocklist"
     },
     {
       "name": "Ukrainian Ad Filter",
@@ -1523,9 +1721,9 @@
     {
       "name": "Yoyo Adservers-Hosts",
       "categories": "ads",
-      "disabled": true,
+      "disabled": false,
       "license": "MIT",
-      "notes": ">98% overlap with StevenBlack Fake Gambling list",
+      "notes": ">95% overlap with StevenBlack Fake Gambling list",
       "types": [
         {
           "name": "hostname"

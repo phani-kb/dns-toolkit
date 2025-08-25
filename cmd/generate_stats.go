@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
 
+	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/spf13/cobra"
 )
 
@@ -123,17 +123,17 @@ func collectSourceStats() *SourceStats {
 	for category := range categoriesMap {
 		stats.Categories = append(stats.Categories, category)
 	}
-	sort.Strings(stats.Categories)
+	u.SortCaseInsensitiveStrings(stats.Categories)
 
 	for sourceType := range sourceTypesMap {
 		stats.SourceTypes = append(stats.SourceTypes, sourceType)
 	}
-	sort.Strings(stats.SourceTypes)
+	u.SortCaseInsensitiveStrings(stats.SourceTypes)
 
 	for country := range countriesMap {
 		stats.Countries = append(stats.Countries, country)
 	}
-	sort.Strings(stats.Countries)
+	u.SortCaseInsensitiveStrings(stats.Countries)
 
 	return stats
 }
