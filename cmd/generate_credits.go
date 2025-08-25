@@ -146,11 +146,11 @@ func generateCreditsSection() string {
 		// If overlapMap has entries, replace AL/BL column with Count/Unique/Conflicts column.
 		hasOverlap := len(overlapMap) > 0
 		if hasOverlap {
-			sb.WriteString("| Name | S | Categories |       C/U/X       | Notes |\n")
-			sb.WriteString("|------|---|------------|-------------------|-------|\n")
+			sb.WriteString("| Name | S | Categories |         C/U/X        | Notes |\n")
+			sb.WriteString("|------|---|------------|----------------------|-------|\n")
 		} else {
-			sb.WriteString("| Name | S | Categories |       AL/BL       | Notes |\n")
-			sb.WriteString("|------|---|------------|-------------------|-------|\n")
+			sb.WriteString("| Name | S | Categories |         AL/BL        | Notes |\n")
+			sb.WriteString("|------|---|------------|----------------------|-------|\n")
 		}
 
 		for _, source := range sources {

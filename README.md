@@ -88,14 +88,14 @@ flowchart LR
 
 **Usage:** Add `https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/[filename]` to your DNS filtering tool.
 
-**[View Detailed Overlap Analysis →](https://github.com/phani-kb/dns-toolkit/blob/output/overlap.md)** - Comprehensive analysis showing how entries are shared across different DNS sources.
+**[View Detailed Overlap Analysis](https://github.com/phani-kb/dns-toolkit/blob/output/overlap.md)** Comprehensive analysis showing how entries are shared across different DNS sources.
 
 > 🔍 **Overlap Analysis**
 >
 > **Why it matters:** the overlap analysis helps to identify redundant or conflicting sources.
 >
 > - **Unique Entries = 0** → source is fully covered by same-list sources (low value-add).
-> - **Conflicts > 0** → entries appear in different list types (e.g., blocklist vs allowlist); investigate mismatches.
+> - **Conflicts > 0** → entries appear in different list types (e.g., blocklist vs. allowlist); investigate mismatches.
 > - **Overlap % (table)** → shown relative to the *target*; high values mean the target is largely covered by this source.
 >
 > Run `dns-toolkit overlap` or open `overlap.md` to explore details.
@@ -127,7 +127,7 @@ flowchart LR
 | **Categories** | 37 | ads, adult, annoyance, anonymizer, botnet, browser, cryptocurrency, dating, discord, dns, doh, fake, fakenews, finance, gambling, issues, kad, local, mac, malicious, malware, mobile, others, phishing, privacy, proxy, ransomware, scam, smarttv, social, spam, threat, topdomains, torrent_trackers, trackers, url_shorteners, windows |
 | **Source Types** | 27 | adguard, cidr_ipv4, domain, domain_adguard, domain_comment, domain_csv_http_url_find, domain_custom_csv_blackbook, domain_custom_csv_maltrail, domain_custom_html_ccam, domain_custom_html_puppyscams, domain_http_url, domain_top, domain_url, domain_with_comment_suffix, hostname, ipv4, ipv4_cidr_expand, ipv4_csv_http_url_find, ipv4_custom_html_ccam, ipv4_find, ipv4_from_domain, ipv4_http_url, ipv4_range_expand, ipv4_url, ipv6, ipv6_find, ipv6_htaccess |
 | **Geographic Coverage** | 21 countries | CN, CZ, DE, ES, FI, FR, HU, ID, IL, IT, KR, LV, MY, NL, RO, RU, SA, SK, UA, US, VN |
-| **Last Updated** | 2025-08-24 20:30:45 UTC | Statistics generation time |
+| **Last Updated** | 2025-08-24 20:46:20 UTC | Statistics generation time |
 
 <!-- STATS_END -->
 
@@ -141,8 +141,8 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 <details>
 <summary><strong>📄 sources_domain_al.json</strong> (20 sources)</summary>
 
-| Name | S | Categories |       C/U/X       | Notes |
-|------|---|------------|-------------------|-------|
+| Name | S | Categories |         C/U/X        | Notes |
+|------|---|------------|----------------------|-------|
 | AdGuardSDNSFilter_exclusions | ✅ | others | - | - |
 | AdGuardTeam_HttpsExclusions_android | ✅ | mobile | 97 / 68 / 9 | - |
 | AdGuardTeam_HttpsExclusions_banks | ✅ | finance | 3971 / 3922 / 14 | - |
@@ -169,8 +169,8 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 <details>
 <summary><strong>📄 sources_domain_bl.json</strong> (99 sources)</summary>
 
-| Name | S | Categories |       C/U/X       | Notes |
-|------|---|------------|-------------------|-------|
+| Name | S | Categories |         C/U/X        | Notes |
+|------|---|------------|----------------------|-------|
 | 1Hosts (Lite) | ✅ | ads, trackers | 128566 / 0 / 516 | 100% covered by other sources |
 | abpvn_hosts | ✅ | ads | 1071 / 954 / 0 | - |
 | Adaway | ✅ | ads | 6540 / 0 / 271 | >99% overlap with StevenBlack Fake Gambling list |
@@ -276,8 +276,8 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 <details>
 <summary><strong>📄 sources_domain_new.json</strong> (1 sources)</summary>
 
-| Name | S | Categories |       C/U/X       | Notes |
-|------|---|------------|-------------------|-------|
+| Name | S | Categories |         C/U/X        | Notes |
+|------|---|------------|----------------------|-------|
 | nrd-14day-mini | ❌ | others | - | Huge list with low unique contribution |
 
 </details>
@@ -285,8 +285,8 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 <details>
 <summary><strong>📄 sources_domain_top.json</strong> (1 sources)</summary>
 
-| Name | S | Categories |       C/U/X       | Notes |
-|------|---|------------|-------------------|-------|
+| Name | S | Categories |         C/U/X        | Notes |
+|------|---|------------|----------------------|-------|
 | tranco | ✅ | topdomains | 1000 / 0 / 1151 | - |
 
 </details>
@@ -294,8 +294,8 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 <details>
 <summary><strong>📄 sources_ip.json</strong> (41 sources)</summary>
 
-| Name | S | Categories |       C/U/X       | Notes |
-|------|---|------------|-------------------|-------|
+| Name | S | Categories |         C/U/X        | Notes |
+|------|---|------------|----------------------|-------|
 | AlienVault_Reputation | ❌ | malicious, threat | - | Not available anymore. The service has been discontinued. |
 | BinaryDefense_Banlist | ✅ | malicious, threat | 3023 / 0 / 0 | This is for public use only. |
 | Blackhole_Today | ❌ | malicious, threat | - | Download fails frequently due to network instability or potential blocking. |
@@ -343,8 +343,8 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 <details>
 <summary><strong>📄 sources_local.json</strong> (7 sources)</summary>
 
-| Name | S | Categories |       C/U/X       | Notes |
-|------|---|------------|-------------------|-------|
+| Name | S | Categories |         C/U/X        | Notes |
+|------|---|------------|----------------------|-------|
 | Local AI Allowlist (Domain) | ✅ | local | 50 / 0 / 51 | - |
 | Local AI Blocklist (Domain) | ✅ | local | 50 / 0 / 51 | - |
 | Local Allowlist (AdGuard) | ✅ | local | - | - |
@@ -358,8 +358,8 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 <details>
 <summary><strong>📄 sources_mis.json</strong> (1 sources)</summary>
 
-| Name | S | Categories |       C/U/X       | Notes |
-|------|---|------------|-------------------|-------|
+| Name | S | Categories |         C/U/X        | Notes |
+|------|---|------------|----------------------|-------|
 | VXVault_URLList | ✅ | malware | 38 / 0 / 0 | >95% overlap with Firehol_level3 |
 
 </details>
@@ -456,12 +456,12 @@ data/output/
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes with tests
-4. **Validate commit messages** before pushing. All commit message must reference a GitHub issue.
+4. **Validate commit messages** before pushing. Commit messages must reference a GitHub issue.
 5. Submit a pull request
 
 ## Issues
 
-If you encounter a bug, have a feature request, or want to suggest an improvement, please open an issue in the [GitHub Issues](https://github.com/phani-kb/dns-toolkit/issues) page.
+If you encounter a bug, have a feature request, or want to suggest an improvement, please open an issue on the [GitHub Issues](https://github.com/phani-kb/dns-toolkit/issues) page.
 
 ## License
 
