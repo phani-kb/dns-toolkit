@@ -97,7 +97,7 @@ func generateDetailedOverlapAnalysis() (string, error) {
 		fmt.Sprintf("**Last Updated:** %s\n\n", time.Now().Format("2006-01-02 15:04:05 UTC")),
 	)
 
-	sb.WriteString("## How to read this report\n\n")
+	sb.WriteString("## How to read this analysis\n\n")
 	// nolint:lll
 	sb.WriteString(
 		"- Unique Entries (same list type): number of entries found only in this source when compared with other sources of the same list type (blocklist vs blocklist, allowlist vs allowlist). If this is `0` the source is fully covered by other sources of the same list type.\n",
