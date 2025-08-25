@@ -37,6 +37,7 @@ env:
   GO_VERSION: '1.24'
   COVERAGE_THRESHOLD: 80
   GOLANGCI_LINT_VERSION: v2.1.6
+  PUSH_TOKEN: ${{ secrets.PUSH_TOKEN }}
 
 jobs:
   test-and-build:
@@ -87,7 +88,8 @@ jobs:
           # Filter out test helpers from coverage
           if [ -f coverage.out ]; then
             echo "Filtering coverage report..."
-            grep -v "test_helpers.go" coverage.out > filtered_coverage.out
+            grep -v "test_helpers.go" coverage.out > tmp_filtered_coverage.out
+            grep -v "testing_helpers.go" tmp_filtered_coverage.out > filtered_coverage.out
             mv filtered_coverage.out coverage.out
           fi
 
@@ -158,6 +160,7 @@ jobs:
     permissions:
       contents: write
       actions: read
+      pull-requests: write
 
     env:
       PIPELINE_MODE: ${{ needs.test-and-build.outputs.pipeline-mode }}
@@ -183,6 +186,19 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
           cache: true
+
+      - name: Install GitHub CLI
+        run: |
+          if ! command -v gh &> /dev/null; then
+            echo "Installing GitHub CLI..."
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt update
+            sudo apt install gh -y
+            echo "GitHub CLI installed successfully"
+          else
+            echo "GitHub CLI already installed"
+          fi
 
       - name: Build DNS toolkit and prepare data directories
         run: |
@@ -292,26 +308,42 @@ jobs:
         id: pipeline
         run: |
           echo "Running DNS toolkit pipeline in '${{ env.PIPELINE_MODE }}' mode..."
+
           # Step 0: Update allowlists
           ALLOWLIST_UPDATED="false"
           if [[ "${{ env.PIPELINE_MODE }}" == "full-pipeline" || "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]]; then
             echo "Updating allowlists..."
             ./bin/dns-toolkit generate allowlist --overwrite
             echo "Allowlists updated successfully."
-            
+
             # Check if allowlist files were modified
             if ! git diff --quiet -- data/custom/allowlist_*.txt; then
-              echo "Allowlist files were modified, committing changes locally..."
-              git add data/custom/allowlist_*.txt
-              git commit -m "Auto-update: Refresh allowlist files (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }})" || true
-              echo "Allowlist changes committed locally."
-              ALLOWLIST_UPDATED="true"
+              echo "Allowlist files were modified..."
+            
+              if [[ -f ".github/scripts/push-to-main.sh" ]]; then
+                echo "Pushing allowlist changes to main branch..."
+                export PUSH_TOKEN="${{ secrets.PUSH_TOKEN }}"
+                export GITHUB_REPOSITORY="${{ github.repository }}"
+                export GITHUB_RUN_NUMBER="${{ github.run_number }}"
+
+                ./.github/scripts/push-to-main.sh "data/custom/allowlist_*.txt" "Auto-update: Refresh allowlist files" "update-main" || {
+                  echo "Push to main failed"
+                }
+                
+                ALLOWLIST_UPDATED="true"
+              else
+                echo "Skipping allowlist push"
+                git add data/custom/allowlist_*.txt
+                git commit -m "Auto-update: Refresh allowlist files (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }})" || true
+                echo "Allowlist changes committed locally."
+                ALLOWLIST_UPDATED="true"
+              fi
             else
-              echo "No changes to allowlist files detected."
+              echo "No changes detected in allowlist files"
             fi
           fi
-          echo "allowlist-updated=$ALLOWLIST_UPDATED" >> $GITHUB_OUTPUT
 
+          echo "allowlist-updated=$ALLOWLIST_UPDATED" >> $GITHUB_OUTPUT
           # Step 1: Download (conditional)
           if [[ "${{ env.PIPELINE_MODE }}" == "full-pipeline" || "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]]; then
             echo "Step 1: Downloading fresh data..."
@@ -339,6 +371,7 @@ jobs:
           ./bin/dns-toolkit generate output-readme
           ./bin/dns-toolkit generate overlap-readme
           ./bin/dns-toolkit generate summaries-readme
+          ./bin/dns-toolkit generate stats-readme
           ./bin/dns-toolkit generate credits
 
           echo "✅ Pipeline core steps completed successfully."
@@ -366,6 +399,33 @@ jobs:
             exit 1
           fi
 
+      - name: Commit README changes to main
+        if: env.SHOULD_PUBLISH == 'true'
+        run: |
+          # Check if README.md has been modified
+          if ! git diff --quiet -- README.md; then
+            echo "README.md has been modified, pushing to main branch..."
+
+            if [[ -f ".github/scripts/push-to-main.sh" ]]; then
+              export PUSH_TOKEN="${{ secrets.PUSH_TOKEN }}"
+              export GITHUB_REPOSITORY="${{ github.repository }}"
+              export GITHUB_RUN_NUMBER="${{ github.run_number }}"
+
+              ./.github/scripts/push-to-main.sh "README.md" "Auto-update: Generated README (mode: ${{ env.PIPELINE_MODE }})" "update-readme" || {
+                echo "Note: No README changes to push or push failed"
+              }
+
+              echo "README changes pushed to main branch via PR"
+            else
+              echo "Skipping README push"
+              git add README.md || true
+              git commit -m "Auto-update: Generated README (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }}) [skip ci]" || true
+              echo "README committed locally."
+            fi
+          else
+            echo "No changes to README.md detected"
+          fi
+
       - name: Publish results
         if: env.SHOULD_PUBLISH == 'true'
         run: |
@@ -383,17 +443,8 @@ jobs:
             cp -r data/output/summaries/* /tmp/publish-data/summaries/ 2>/dev/null || true
           fi
 
-          # Store original branch and prepare publish script
-          if ! git diff --quiet -- README.md; then
-            echo "Committing generated README changes to avoid dirty working tree"
-            git add README.md || true
-            git commit -m "Auto-update: Generated README (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }}) [skip ci]" || true
-            echo "README committed locally."
-          fi
-
           echo "ORIGINAL_BRANCH=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_ENV
 
-          # Execute publish script using specific variables
           if [[ "${{ steps.count-files.outputs.output-count }}" -gt 0 ]]; then
             echo "Publishing to output branch..."
             /bin/bash .github/scripts/publish-to-branch.sh output /tmp/publish-data/output
