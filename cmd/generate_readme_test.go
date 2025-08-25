@@ -764,3 +764,45 @@ func TestCollectTopStats(t *testing.T) {
 		})
 	}
 }
+
+func TestWriteSplitLists_BothTypes(t *testing.T) {
+	var sb strings.Builder
+
+	items := []string{"mini", "lite"}
+	listTypes := map[string][]string{
+		"mini": {"domain_blocklist", "domain_allowlist"},
+		"lite": {"domain_blocklist"},
+	}
+
+	writeSplitLists(&sb, "groups", items, listTypes)
+	out := sb.String()
+
+	if !strings.Contains(out, "🛑 Blocklists") {
+		t.Fatalf("expected blocklists heading in output, got: %s", out)
+	}
+	if !strings.Contains(out, "✅ Allowlists") {
+		t.Fatalf("expected allowlists heading in output, got: %s", out)
+	}
+	if !strings.Contains(out, "```") {
+		t.Fatalf("expected code fence in output, got: %s", out)
+	}
+}
+
+func TestWriteSplitLists_OnlyAllow(t *testing.T) {
+	var sb strings.Builder
+
+	items := []string{"alpha"}
+	listTypes := map[string][]string{
+		"alpha": {"domain_allowlist"},
+	}
+
+	writeSplitLists(&sb, "categories", items, listTypes)
+	out := sb.String()
+
+	if strings.Contains(out, "🛑 Blocklists") {
+		t.Fatalf("did not expect blocklists heading in output, got: %s", out)
+	}
+	if !strings.Contains(out, "✅ Allowlists") {
+		t.Fatalf("expected allowlists heading in output, got: %s", out)
+	}
+}

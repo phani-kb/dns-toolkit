@@ -135,61 +135,68 @@ func generateOutputBranchReadme() string {
 
 	topLevelFiles, err := getTopLevelTxtFiles()
 	if err == nil && len(topLevelFiles) > 0 {
+		var blocklistFiles, allowlistFiles []string
+		for _, filename := range topLevelFiles {
+			if strings.Contains(strings.ToLower(filename), "allowlist") {
+				allowlistFiles = append(allowlistFiles, filename)
+			} else {
+				blocklistFiles = append(blocklistFiles, filename)
+			}
+		}
+		u.SortCaseInsensitiveStrings(blocklistFiles)
+		u.SortCaseInsensitiveStrings(allowlistFiles)
+
 		sb.WriteString("<details>\n")
 		sb.WriteString(
 			"<summary><strong>📋 Consolidated Blocklists and Allowlists</strong></summary>\n\n",
 		)
-		sb.WriteString("```\n")
-		for _, filename := range topLevelFiles {
-			sb.WriteString(fmt.Sprintf("%s/%s\n", constants.GitHubRawURL, filename))
+
+		if len(blocklistFiles) > 0 {
+			sb.WriteString("<strong>🛑 Blocklists</strong>\n\n")
+			sb.WriteString("```\n")
+			for _, filename := range blocklistFiles {
+				sb.WriteString(fmt.Sprintf("%s/%s\n", constants.GitHubRawURL, filename))
+			}
+			sb.WriteString("```\n\n")
 		}
-		sb.WriteString("```\n")
+
+		if len(allowlistFiles) > 0 {
+			sb.WriteString("<strong>✅ Allowlists</strong>\n\n")
+			sb.WriteString("```\n")
+			for _, filename := range allowlistFiles {
+				sb.WriteString(fmt.Sprintf("%s/%s\n", constants.GitHubRawURL, filename))
+			}
+			sb.WriteString("```\n\n")
+		}
+
 		sb.WriteString("</details>\n\n")
 	}
 
 	if summary.Groups.TotalGroups > 0 {
 		sb.WriteString("<details>\n")
 		sb.WriteString("<summary><strong>📏 Size-based Lists</strong></summary>\n\n")
-		sb.WriteString("```\n")
+
 		var groups []string
 		for group := range summary.Groups.GroupSummary {
 			groups = append(groups, group)
 		}
-		u.SortCaseInsensitiveStrings(groups)
 
-		for _, group := range groups {
-			if listTypes, exists := summary.Groups.GroupListTypes[group]; exists {
-				for _, typeListCombination := range listTypes {
-					sb.WriteString(
-						fmt.Sprintf("%s/groups/%s_%s.txt\n", constants.GitHubRawURL, group, typeListCombination),
-					)
-				}
-			}
-		}
-		sb.WriteString("```\n")
+		writeSplitLists(&sb, "groups", groups, summary.Groups.GroupListTypes)
+
 		sb.WriteString("</details>\n\n")
 	}
 
 	if summary.Categories.TotalCategories > 0 {
 		sb.WriteString("<details>\n")
 		sb.WriteString("<summary><strong>🏷️ Category-based Lists</strong></summary>\n\n")
-		sb.WriteString("```\n")
+
 		var categories []string
 		for category := range summary.Categories.CategorySummary {
 			categories = append(categories, category)
 		}
-		u.SortCaseInsensitiveStrings(categories)
 
-		for _, category := range categories {
-			if listTypes, exists := summary.Categories.CategoryListTypes[category]; exists {
-				for _, typeListCombination := range listTypes {
-					sb.WriteString(
-						fmt.Sprintf("%s/categories/%s_%s.txt\n", constants.GitHubRawURL, category, typeListCombination),
-					)
-				}
-			}
-		}
-		sb.WriteString("```\n")
+		writeSplitLists(&sb, "categories", categories, summary.Categories.CategoryListTypes)
+
 		sb.WriteString("</details>\n\n")
 	}
 
@@ -198,29 +205,53 @@ func generateOutputBranchReadme() string {
 		sb.WriteString(
 			"<summary><strong>⭐ High-confidence Lists</strong> (top entries by number of sources)</summary>\n\n",
 		)
-		sb.WriteString("```\n")
+
 		var types []string
 		for sourceType := range summary.Top.FilesByType {
 			types = append(types, sourceType)
 		}
 		u.SortCaseInsensitiveStrings(types)
 
+		var blockEntries, allowEntries []string
 		for _, sourceType := range types {
 			if details, exists := summary.Top.FileDetails[sourceType]; exists && len(details) > 0 {
 				for _, detail := range details {
-					sb.WriteString(
-						fmt.Sprintf(
-							"%s/top/top_%s_%s_min%d.txt\n",
-							constants.GitHubRawURL,
-							sourceType,
-							detail.ListType,
-							detail.MinSources,
-						),
+					url := fmt.Sprintf(
+						"%s/top/top_%s_%s_min%d.txt",
+						constants.GitHubRawURL,
+						sourceType,
+						detail.ListType,
+						detail.MinSources,
 					)
+					if strings.Contains(strings.ToLower(detail.ListType), "allowlist") {
+						allowEntries = append(allowEntries, url)
+					} else {
+						blockEntries = append(blockEntries, url)
+					}
 				}
 			}
 		}
-		sb.WriteString("```\n")
+
+		if len(blockEntries) > 0 {
+			u.SortCaseInsensitiveStrings(blockEntries)
+			sb.WriteString("<strong>🛑 Blocklists</strong>\n\n")
+			sb.WriteString("```\n")
+			for _, line := range blockEntries {
+				sb.WriteString(line + "\n")
+			}
+			sb.WriteString("```\n\n")
+		}
+
+		if len(allowEntries) > 0 {
+			u.SortCaseInsensitiveStrings(allowEntries)
+			sb.WriteString("<strong>✅ Allowlists</strong>\n\n")
+			sb.WriteString("```\n")
+			for _, line := range allowEntries {
+				sb.WriteString(line + "\n")
+			}
+			sb.WriteString("```\n\n")
+		}
+
 		sb.WriteString("</details>\n\n")
 	}
 
@@ -472,6 +503,53 @@ func collectWorkflowSummary() *WorkflowSummary {
 	}
 
 	return summary
+}
+
+// writeSplitLists writes nested blocklists/allowlists details
+func writeSplitLists(sb *strings.Builder, basePath string, items []string, listTypesMap map[string][]string) {
+	if len(items) == 0 {
+		return
+	}
+
+	u.SortCaseInsensitiveStrings(items)
+
+	var anyBlock, anyAllow bool
+	var blockEntries, allowEntries []string
+
+	for _, item := range items {
+		if listTypes, exists := listTypesMap[item]; exists {
+			for _, typeListCombination := range listTypes {
+				url := fmt.Sprintf("%s/%s/%s_%s.txt", constants.GitHubRawURL, basePath, item, typeListCombination)
+				if strings.Contains(strings.ToLower(typeListCombination), "allowlist") {
+					anyAllow = true
+					allowEntries = append(allowEntries, url)
+				} else {
+					anyBlock = true
+					blockEntries = append(blockEntries, url)
+				}
+			}
+		}
+	}
+
+	if anyBlock {
+		u.SortCaseInsensitiveStrings(blockEntries)
+		sb.WriteString("<strong>🛑 Blocklists</strong>\n\n")
+		sb.WriteString("```\n")
+		for _, line := range blockEntries {
+			sb.WriteString(line + "\n")
+		}
+		sb.WriteString("```\n\n")
+	}
+
+	if anyAllow {
+		u.SortCaseInsensitiveStrings(allowEntries)
+		sb.WriteString("<strong>✅ Allowlists</strong>\n\n")
+		sb.WriteString("```\n")
+		for _, line := range allowEntries {
+			sb.WriteString(line + "\n")
+		}
+		sb.WriteString("```\n\n")
+	}
 }
 
 func collectDownloadStats(stats *DownloadStats) error {
