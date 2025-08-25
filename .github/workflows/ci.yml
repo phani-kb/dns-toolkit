@@ -187,17 +187,13 @@ jobs:
           go-version: ${{ env.GO_VERSION }}
           cache: true
 
-      - name: Install GitHub CLI
+      - name: Check GitHub CLI
         run: |
           if ! command -v gh &> /dev/null; then
-            echo "Installing GitHub CLI..."
-            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg
-            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
-            sudo apt update
-            sudo apt install gh -y
-            echo "GitHub CLI installed successfully"
+            echo "GitHub CLI NOT pre-installed"
+            exit 1
           else
-            echo "GitHub CLI already installed"
+            gh --version
           fi
 
       - name: Build DNS toolkit and prepare data directories
@@ -349,7 +345,7 @@ jobs:
 
           echo "allowlist-updated=$ALLOWLIST_UPDATED" >> $GITHUB_OUTPUT
           # Step 1: Download (conditional)
-          if [[ "${{ env.PIPELINE_MODE }}" == "full-pipeline" || "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]]; then
+          if [[ "${{ env.PIPELINE_MODE }}" == "full-pipeline" ]]; then # || "${{ env.PIPELINE_MODE }}" == "refresh-cache"
             echo "Step 1: Downloading fresh data..."
             ./bin/dns-toolkit download
             echo "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" > data/download/.cache_timestamp
@@ -363,18 +359,18 @@ jobs:
             echo "Using cache: $CACHED_COUNT files ($CACHED_SIZE)"
           fi
 
-          # Core Processing Steps
-          echo "Step 2: Processing data..."
-          ./bin/dns-toolkit process
-          ./bin/dns-toolkit consolidate
-          ./bin/dns-toolkit consolidate groups
-          ./bin/dns-toolkit consolidate categories
-          ./bin/dns-toolkit top
-          ./bin/dns-toolkit overlap
-          ./bin/dns-toolkit generate output -i
-          ./bin/dns-toolkit generate output-readme
-          ./bin/dns-toolkit generate overlap-readme
-          ./bin/dns-toolkit generate summaries-readme
+          # # Core Processing Steps
+          # echo "Step 2: Processing data..."
+          # ./bin/dns-toolkit process
+          # ./bin/dns-toolkit consolidate
+          # ./bin/dns-toolkit consolidate groups
+          # ./bin/dns-toolkit consolidate categories
+          # ./bin/dns-toolkit top
+          # ./bin/dns-toolkit overlap
+          # ./bin/dns-toolkit generate output -i
+          # ./bin/dns-toolkit generate output-readme
+          # ./bin/dns-toolkit generate overlap-readme
+          # ./bin/dns-toolkit generate summaries-readme
           ./bin/dns-toolkit generate stats-readme
           ./bin/dns-toolkit generate credits
 
