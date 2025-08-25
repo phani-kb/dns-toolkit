@@ -319,24 +319,21 @@ jobs:
             # Check if allowlist files were modified
             if ! git diff --quiet -- data/custom/allowlist_*.txt; then
               echo "Allowlist files were modified..."
-            
+              
+              git add data/custom/allowlist_*.txt
+              git commit -m "Auto-update: Refresh allowlist files (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }})" || true
+              echo "Allowlist changes committed locally."
+              ALLOWLIST_UPDATED="true"
+              
               if [[ -f ".github/scripts/push-to-main.sh" ]]; then
-                echo "Pushing allowlist changes to main branch..."
+                echo "Attempting to push allowlist changes to separate branch..."
                 export PUSH_TOKEN="${{ secrets.PUSH_TOKEN }}"
                 export GITHUB_REPOSITORY="${{ github.repository }}"
                 export GITHUB_RUN_NUMBER="${{ github.run_number }}"
 
-                ./.github/scripts/push-to-main.sh "data/custom/allowlist_*.txt" "Auto-update: Refresh allowlist files" "update-main" || {
-                  echo "Push to main failed"
+                ./.github/scripts/push-to-main.sh "data/custom/allowlist_*.txt" "Auto-update: Refresh allowlist files" "update-allowlist" || {
+                  echo "Push to separate branch failed, but changes are committed locally"
                 }
-                
-                ALLOWLIST_UPDATED="true"
-              else
-                echo "Skipping allowlist push"
-                git add data/custom/allowlist_*.txt
-                git commit -m "Auto-update: Refresh allowlist files (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }})" || true
-                echo "Allowlist changes committed locally."
-                ALLOWLIST_UPDATED="true"
               fi
             else
               echo "No changes detected in allowlist files"
@@ -399,37 +396,79 @@ jobs:
             exit 1
           fi
 
-      - name: Commit README changes to main
+      - name: Commit all pending changes before publishing
         if: env.SHOULD_PUBLISH == 'true'
         run: |
-          # Check if README.md has been modified
-          if ! git diff --quiet -- README.md; then
-            echo "README.md has been modified, pushing to main branch..."
+          echo "Checking for any uncommitted changes before publishing..."
 
-            if [[ -f ".github/scripts/push-to-main.sh" ]]; then
-              export PUSH_TOKEN="${{ secrets.PUSH_TOKEN }}"
-              export GITHUB_REPOSITORY="${{ github.repository }}"
-              export GITHUB_RUN_NUMBER="${{ github.run_number }}"
+          # Check for any uncommitted changes
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "Found uncommitted changes:"
+            git status --porcelain
+            
+            # Handle README.md changes
+            if ! git diff --quiet -- README.md; then
+              echo "README.md has been modified, handling README changes..."
 
-              ./.github/scripts/push-to-main.sh "README.md" "Auto-update: Generated README (mode: ${{ env.PIPELINE_MODE }})" "update-readme" || {
-                echo "Note: No README changes to push or push failed"
-              }
+              if [[ -f ".github/scripts/push-to-main.sh" ]]; then
+                export PUSH_TOKEN="${{ secrets.PUSH_TOKEN }}"
+                export GITHUB_REPOSITORY="${{ github.repository }}"
+                export GITHUB_RUN_NUMBER="${{ github.run_number }}"
 
-              echo "README changes pushed to main branch via PR"
-            else
-              echo "Skipping README push"
-              git add README.md || true
-              git commit -m "Auto-update: Generated README (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }}) [skip ci]" || true
-              echo "README committed locally."
+                ./.github/scripts/push-to-main.sh "README.md" "Auto-update: Generated README (mode: ${{ env.PIPELINE_MODE }})" "update-readme" || {
+                  echo "README push failed, committing locally instead"
+                  git add README.md || true
+                  git commit -m "Auto-update: Generated README (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }}) [skip ci]" || true
+                }
+                echo "README changes pushed"
+              else
+                echo "Committing README changes locally"
+                git add README.md || true
+                git commit -m "Auto-update: Generated README (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }}) [skip ci]" || true
+              fi
+            fi
+            
+            if [[ -n "$(git status --porcelain)" ]]; then
+              echo "Committing remaining uncommitted changes..."
+              git add -A
+              git commit -m "Auto-commit: Pending changes before publishing (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }}) [skip ci]" || true
+              echo "All changes committed locally"
             fi
           else
-            echo "No changes to README.md detected"
+            echo "No uncommitted changes detected"
+          fi
+
+          CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          if [[ "$CURRENT_BRANCH" != "main" ]]; then
+            echo "Not on main branch (currently on $CURRENT_BRANCH), switching to main"
+            git checkout main || {
+              echo "Failed to checkout main branch"
+              exit 1
+            }
           fi
 
       - name: Publish results
         if: env.SHOULD_PUBLISH == 'true'
         run: |
           echo "Publishing results..."
+
+          CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          if [[ "$CURRENT_BRANCH" != "main" ]]; then
+            echo "Warning: Not on main branch (currently on $CURRENT_BRANCH), switching to main"
+            git checkout main || {
+              echo "Error: Failed to checkout main branch before publishing"
+              exit 1
+            }
+          fi
+
+          if [[ -n "$(git status --porcelain)" ]]; then
+            echo "Error: Working directory is not clean before publishing"
+            git status --porcelain
+            echo "Previous step failed to clean working directory"
+            exit 1
+          fi
+
+          echo "Working directory is clean, proceeding with publishing..."
 
           # Create temporary directories for publishing
           mkdir -p /tmp/publish-data/{output,summaries}
@@ -529,7 +568,7 @@ jobs:
             echo "- **Generated Output Files**: \`${{ steps.count-files.outputs.output-count || 0 }}\`" >> $GITHUB_STEP_SUMMARY
             echo "- **Generated Summary Files**: \`${{ steps.count-files.outputs.summary-count || 0 }}\`" >> $GITHUB_STEP_SUMMARY
             if [[ "${{ steps.pipeline.outputs.allowlist-updated }}" == "true" ]]; then
-              echo "- **Allowlist Files**: Updated and committed locally (not pushed)" >> $GITHUB_STEP_SUMMARY
+              echo "- **Allowlist Files**: Updated and committed locally" >> $GITHUB_STEP_SUMMARY
             fi
             if [[ -f "data/download/.cache_timestamp" ]]; then
               echo "- **Data Cache Timestamp**: $(cat data/download/.cache_timestamp)" >> $GITHUB_STEP_SUMMARY
