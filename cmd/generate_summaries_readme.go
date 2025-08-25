@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 	"time"
 
@@ -18,7 +17,7 @@ import (
 var generateSummariesReadmeCmd = &cobra.Command{
 	Use:   "summaries-readme",
 	Short: "Generate README.md for summaries with summary information",
-	Long:  "Generate a README.md for the summaries directory containing information about the last generated summary files.",
+	Long:  "Generate a README.md for the summaries directory containing information about the last generated summary files.", // nolint:lll
 	Run: func(cmd *cobra.Command, args []string) {
 		if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
 			Logger.Debug("Skipping generate summaries readme command in test mode")
@@ -107,7 +106,7 @@ func generateSummariesReadme() string {
 	for summaryType := range info.SummaryTypes {
 		types = append(types, summaryType)
 	}
-	sort.Strings(types)
+	u.SortCaseInsensitiveStrings(types)
 
 	for _, summaryType := range types {
 		typeInfo := info.SummaryTypes[summaryType]
@@ -217,12 +216,7 @@ func getDetailedStatsForSummaryType(filename string) string {
 
 		if len(typeCount) > 0 {
 			result.WriteString("**Types:** ")
-			var types []string
-			for t, count := range typeCount {
-				types = append(types, fmt.Sprintf("%s (%d)", t, count))
-			}
-			sort.Strings(types)
-			result.WriteString(strings.Join(types, ", "))
+			result.WriteString(strings.Join(u.FormatNameCounts(typeCount), ", "))
 			result.WriteString("  \n")
 		}
 
@@ -253,12 +247,7 @@ func getDetailedStatsForSummaryType(filename string) string {
 
 		if len(typeCount) > 0 {
 			result.WriteString("**Types:** ")
-			var types []string
-			for t, count := range typeCount {
-				types = append(types, fmt.Sprintf("%s (%d)", t, count))
-			}
-			sort.Strings(types)
-			result.WriteString(strings.Join(types, ", "))
+			result.WriteString(strings.Join(u.FormatNameCounts(typeCount), ", "))
 			result.WriteString("  \n")
 		}
 
@@ -286,12 +275,7 @@ func getDetailedStatsForSummaryType(filename string) string {
 
 		if len(typeCount) > 0 {
 			result.WriteString("**Types:** ")
-			var types []string
-			for t, count := range typeCount {
-				types = append(types, fmt.Sprintf("%s (%d)", t, count))
-			}
-			sort.Strings(types)
-			result.WriteString(strings.Join(types, ", "))
+			result.WriteString(strings.Join(u.FormatNameCounts(typeCount), ", "))
 			result.WriteString("  \n")
 		}
 
@@ -302,72 +286,14 @@ func getDetailedStatsForSummaryType(filename string) string {
 		if err := json.Unmarshal(content, &categoriesSummaries); err != nil {
 			return ""
 		}
-
-		totalFiles := 0
-		totalEntries := 0
-		categoryCount := make(map[string]int)
-
-		for _, summary := range categoriesSummaries {
-			totalFiles += summary.FilesCount
-			totalEntries += summary.Count
-			if summary.Category != "" {
-				categoryCount[summary.Category]++
-			}
-		}
-
-		var result strings.Builder
-		result.WriteString(fmt.Sprintf("**Categories:** %d processed  \n", len(categoryCount)))
-		result.WriteString(fmt.Sprintf("**Files:** %d consolidated  \n", totalFiles))
-		result.WriteString(fmt.Sprintf("**Entries:** %s total  \n", formatNumber(totalEntries)))
-
-		if len(categoryCount) > 0 {
-			result.WriteString("**Categories:** ")
-			var categories []string
-			for c, count := range categoryCount {
-				categories = append(categories, fmt.Sprintf("%s (%d)", c, count))
-			}
-			sort.Strings(categories)
-			result.WriteString(strings.Join(categories, ", "))
-			result.WriteString("  \n")
-		}
-
-		return result.String()
+		return summarizeConsolidatedSummaries(categoriesSummaries, "category")
 
 	case "consolidated_groups_summary.json":
 		var groupsSummaries []c.ConsolidatedSummary
 		if err := json.Unmarshal(content, &groupsSummaries); err != nil {
 			return ""
 		}
-
-		totalFiles := 0
-		totalEntries := 0
-		groupCount := make(map[string]int)
-
-		for _, summary := range groupsSummaries {
-			totalFiles += summary.FilesCount
-			totalEntries += summary.Count
-			if summary.Group != "" {
-				groupCount[summary.Group]++
-			}
-		}
-
-		var result strings.Builder
-		result.WriteString(fmt.Sprintf("**Groups:** %d processed  \n", len(groupCount)))
-		result.WriteString(fmt.Sprintf("**Files:** %d consolidated  \n", totalFiles))
-		result.WriteString(fmt.Sprintf("**Entries:** %s total  \n", formatNumber(totalEntries)))
-
-		if len(groupCount) > 0 {
-			result.WriteString("**Groups:** ")
-			var groups []string
-			for g, count := range groupCount {
-				groups = append(groups, fmt.Sprintf("%s (%d)", g, count))
-			}
-			sort.Strings(groups)
-			result.WriteString(strings.Join(groups, ", "))
-			result.WriteString("  \n")
-		}
-
-		return result.String()
+		return summarizeConsolidatedSummaries(groupsSummaries, "group")
 
 	case "top_summary.json":
 		var topSummaries []c.TopSummary
@@ -394,7 +320,7 @@ func getDetailedStatsForSummaryType(filename string) string {
 			for t := range typeMinSources {
 				types = append(types, t)
 			}
-			sort.Strings(types)
+			u.SortCaseInsensitiveStrings(types)
 
 			var details []string
 			for _, t := range types {
@@ -437,12 +363,7 @@ func getDetailedStatsForSummaryType(filename string) string {
 
 		if len(typeCount) > 0 {
 			result.WriteString("**Types:** ")
-			var types []string
-			for t, count := range typeCount {
-				types = append(types, fmt.Sprintf("%s (%d)", t, count))
-			}
-			sort.Strings(types)
-			result.WriteString(strings.Join(types, ", "))
+			result.WriteString(strings.Join(u.FormatNameCounts(typeCount), ", "))
 			result.WriteString("  \n")
 		}
 
@@ -520,6 +441,49 @@ func collectOverallStatsFromFile(filePath, filename string, stats *OverallSummar
 			stats.TotalOverlapAnalyzed = len(overlapSummaries)
 		}
 	}
+}
+
+// summarizeConsolidatedSummaries creates a small summary string for consolidated summaries
+func summarizeConsolidatedSummaries(summaries []c.ConsolidatedSummary, field string) string {
+	totalFiles := 0
+	totalEntries := 0
+	countMap := make(map[string]int)
+
+	for _, summary := range summaries {
+		totalFiles += summary.FilesCount
+		totalEntries += summary.Count
+		switch field {
+		case "category":
+			if summary.Category != "" {
+				countMap[summary.Category]++
+			}
+		case "group":
+			if summary.Group != "" {
+				countMap[summary.Group]++
+			}
+		}
+	}
+
+	var result strings.Builder
+	if field == "category" {
+		result.WriteString(fmt.Sprintf("**Categories:** %d processed  \n", len(countMap)))
+	} else {
+		result.WriteString(fmt.Sprintf("**Groups:** %d processed  \n", len(countMap)))
+	}
+	result.WriteString(fmt.Sprintf("**Files:** %d consolidated  \n", totalFiles))
+	result.WriteString(fmt.Sprintf("**Entries:** %s total  \n", formatNumber(totalEntries)))
+
+	if len(countMap) > 0 {
+		if field == "category" {
+			result.WriteString("**Categories:** ")
+		} else {
+			result.WriteString("**Groups:** ")
+		}
+		result.WriteString(strings.Join(u.FormatNameCounts(countMap), ", "))
+		result.WriteString("  \n")
+	}
+
+	return result.String()
 }
 
 func init() {

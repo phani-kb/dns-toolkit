@@ -2,9 +2,11 @@ package cmd
 
 import (
 	"bufio"
+	"fmt"
 	"net"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 
@@ -21,15 +23,22 @@ var (
 	performDNSLookup   bool
 	performCNAMELookup bool
 	searchAguard       bool
+	bulkDomainLookup   bool
 )
 
 var searchCmd = &cobra.Command{
 	Use:   "search [domain or IP]",
 	Short: "Search for a domain or IP in the processed files",
-	Long:  `Search for a given domain among the valid processed domain files and report the sources in which it was found. Also looks for its IP address among the valid IPv4 processed files.`,
+	Long:  `Search for a given domain among the valid processed domain files and report the sources in which it was found. Also looks for its IP address among the valid IPv4 processed files.`, // nolint:lll
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		query := strings.ToLower(args[0])
+
+		if bulkDomainLookup {
+			handleBulkDomainLookup(query)
+			return
+		}
+
 		Logger.Infof("Searching for: %s", query)
 
 		isIP := net.ParseIP(query) != nil
@@ -74,6 +83,69 @@ func collectQueryData(query string, isIP bool) (u.StringSet, []string) {
 	}
 
 	return ipAddresses, cnames
+}
+
+// handleBulkDomainLookup processes comma-separated domains and returns sorted IPs
+func handleBulkDomainLookup(input string) {
+	domains := strings.Split(input, ",")
+	if len(domains) == 0 {
+		Logger.Errorf("No domains provided")
+		return
+	}
+
+	for i, domain := range domains {
+		domains[i] = strings.TrimSpace(strings.ToLower(domain))
+	}
+
+	Logger.Infof("Domain lookup for %d domains", len(domains))
+
+	allIPs := u.NewStringSet(nil)
+	domainToIPs := make(map[string][]string)
+
+	for _, domain := range domains {
+		if domain == "" {
+			continue
+		}
+
+		Logger.Infof("Resolving domain: %s", domain)
+		domainIPs := u.NewStringSet(nil)
+
+		resolveDomainToIPs(domain, domainIPs, net.LookupIP)
+
+		ipList := domainIPs.ToSlice()
+		if len(ipList) > 0 {
+			domainToIPs[domain] = ipList
+			for _, ip := range ipList {
+				allIPs.Add(ip)
+			}
+		} else {
+			Logger.Warnf("No valid IPs found for domain: %s", domain)
+		}
+	}
+
+	sortedIPs := allIPs.ToSlice()
+	sort.Strings(sortedIPs)
+
+	displayBulkLookupResults(domainToIPs, sortedIPs)
+}
+
+// displayBulkLookupResults shows the results of bulk domain lookup
+func displayBulkLookupResults(domainToIPs map[string][]string, sortedIPs []string) {
+	Logger.Infof("=== Bulk Domain Lookup Results ===")
+
+	Logger.Infof("\nPer-domain IP resolution:")
+	for domain, ips := range domainToIPs {
+		Logger.Infof("Domain: %s", domain)
+		for _, ip := range ips {
+			Logger.Infof("  - %s", ip)
+		}
+	}
+
+	Logger.Infof("\nAll unique IPs (sorted):")
+	Logger.Infof("Total unique IPs: %d", len(sortedIPs))
+	for _, ip := range sortedIPs {
+		fmt.Printf("%s\n", ip)
+	}
 }
 
 // resolveDomainToIPs resolves a domain name to its IP addresses
@@ -138,8 +210,8 @@ func searchInAllFiles(
 
 // searchInFileType searches for the query in files of a specific type
 func searchInFileType(query string, isIP bool, ipAddresses u.StringSet, cnames []string,
-	fileType string, mu *sync.Mutex, domainResults, ipResults, cnameResults map[string][]string) {
-
+	fileType string, mu *sync.Mutex, domainResults, ipResults, cnameResults map[string][]string,
+) {
 	// Search for domain if a query is not an IP
 	if !isIP {
 		results := searchInFiles(query, constants.SourceTypeDomain, fileType, exactMatch)
@@ -174,8 +246,8 @@ func mergeSearchResults(target, source map[string][]string) {
 
 // displaySearchResults shows the search results in a formatted way
 func displaySearchResults(query string, isIP bool, domainResults, ipResults, cnameResults map[string][]string,
-	ipAddresses u.StringSet, cnames []string) {
-
+	ipAddresses u.StringSet, cnames []string,
+) {
 	// Display domain results
 	if !isIP {
 		displayDomainResults(query, domainResults)
@@ -399,8 +471,8 @@ func entryContains(query, filePath string, exactMatch bool) (bool, error) {
 	return false, nil
 }
 
+// nolint:lll
 func init() {
-
 	searchCmd.Flags().BoolVarP(&exactMatch, "exact", "e", false, "Perform exact match instead of substring match")
 	searchCmd.Flags().BoolVarP(&searchProcessed, "processed", "p", true, "Search in processed files")
 	searchCmd.Flags().BoolVarP(&searchConsolidated, "consolidated", "c", true, "Search in consolidated files")
@@ -410,4 +482,6 @@ func init() {
 		BoolVarP(&performCNAMELookup, "cname", "n", true, "Perform CNAME lookup for domain names and search for CNAME records")
 	searchCmd.Flags().
 		BoolVarP(&searchAguard, "adguard", "g", false, "Search in AdGuard files")
+	searchCmd.Flags().
+		BoolVarP(&bulkDomainLookup, "bulk", "b", false, "Perform bulk domain lookup on comma-separated domains and return sorted IPs")
 }

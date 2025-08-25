@@ -25,7 +25,6 @@ func createTempFileWithContentGroups(t *testing.T, content string) string {
 }
 
 func TestConsolidateGroupsCommand(t *testing.T) {
-
 	assert.NotNil(t, consolidateGroupsCmd)
 	assert.Equal(t, "groups", consolidateGroupsCmd.Use)
 	assert.Contains(t, consolidateGroupsCmd.Short, "sized consolidated lists")
@@ -33,7 +32,6 @@ func TestConsolidateGroupsCommand(t *testing.T) {
 }
 
 func TestConsolidateByGroup(t *testing.T) {
-
 	logger := multilog.NewLogger()
 
 	tests := []struct {

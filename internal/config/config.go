@@ -12,6 +12,7 @@ import (
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
+	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
 	"gopkg.in/yaml.v2"
 )
@@ -47,6 +48,7 @@ type DNSToolkitConfig struct {
 	SkipUnchangedDownloads    bool                `yaml:"skip_unchanged_downloads"`
 	SkipCertVerification      bool                `yaml:"skip_cert_verification,omitempty"`
 	SkipNameSpecialCharsCheck bool                `yaml:"skip_name_special_chars_check,omitempty"`
+	MinOverlapPercent         float64             `yaml:"min_overlap_percent,omitempty"`
 }
 
 func (dc *DNSToolkitConfig) Validate() error {
@@ -64,6 +66,13 @@ func (dc *DNSToolkitConfig) Validate() error {
 	}
 
 	return nil
+}
+
+func (dc *DNSToolkitConfig) GetMinOverlapPercent() float64 {
+	if dc.MinOverlapPercent != 0 {
+		return dc.MinOverlapPercent
+	}
+	return constants.MinOverlapPercent
 }
 
 // validateSourceFile checks if a source file exists, handling relative paths in test mode
@@ -230,7 +239,39 @@ func GetProcessedSummaries(
 	sourcesConfigs []SourcesConfig,
 	appConfig AppConfig,
 ) ([]c.ProcessedSummary, []string, []c.ProcessedFile) {
-	return GetProcessedSummariesForConsolidation(logger, sourcesConfigs, appConfig, "general")
+	summaryFile := filepath.Join(constants.SummaryDir, constants.DefaultSummaryFiles["processed"])
+	content, err := os.ReadFile(summaryFile)
+	if err != nil {
+		logger.Errorf("Reading file %s: %v", summaryFile, err)
+		return nil, nil, nil
+	}
+
+	var summaries []c.ProcessedSummary
+	if err := json.Unmarshal(content, &summaries); err != nil {
+		logger.Errorf("Unmarshalling JSON: %v", err)
+		return nil, nil, nil
+	}
+	enabledSummaries := filterEnabledSummaries(
+		logger,
+		summaries,
+		sourcesConfigs,
+		appConfig,
+	)
+	sort.Slice(
+		enabledSummaries,
+		func(i, j int) bool { return u.CaseInsensitiveLess(enabledSummaries[i].Name, enabledSummaries[j].Name) },
+	)
+
+	genericSourceTypes := extractGenericSourceTypes(enabledSummaries)
+	processedFiles := GetAllProcessedFiles(enabledSummaries)
+	logger.Infof(
+		"Processed summaries count: %d, generic source types count: %d, files count: %d",
+		len(enabledSummaries),
+		len(genericSourceTypes),
+		len(processedFiles),
+	)
+
+	return enabledSummaries, genericSourceTypes, processedFiles
 }
 
 // GetProcessedSummariesForConsolidation reads the processed summaries and filters them based on consolidation type.
@@ -261,9 +302,10 @@ func GetProcessedSummariesForConsolidation(
 		appConfig,
 		consolidationType,
 	)
-	sort.Slice(enabledSummaries, func(i, j int) bool {
-		return enabledSummaries[i].Name < enabledSummaries[j].Name
-	})
+	sort.Slice(
+		enabledSummaries,
+		func(i, j int) bool { return u.CaseInsensitiveLess(enabledSummaries[i].Name, enabledSummaries[j].Name) },
+	)
 
 	genericSourceTypes := extractGenericSourceTypes(enabledSummaries)
 	processedFiles := GetAllProcessedFiles(enabledSummaries)
@@ -287,6 +329,23 @@ func GetAllProcessedFiles(
 		processedFiles = append(processedFiles, summary.InvalidFiles...)
 	}
 	return processedFiles
+}
+
+func filterEnabledSummaries(
+	logger *multilog.Logger,
+	summaries []c.ProcessedSummary,
+	sourcesConfigs []SourcesConfig,
+	appConfig AppConfig,
+) []c.ProcessedSummary {
+	var enabledSummaries []c.ProcessedSummary
+	for _, summary := range summaries {
+		if IsEnabledSource(summary.Name, sourcesConfigs, appConfig) {
+			enabledSummaries = append(enabledSummaries, summary)
+		} else {
+			logger.Infof("Skipping summary %s: not enabled", summary.Name)
+		}
+	}
+	return enabledSummaries
 }
 
 func filterEnabledSummariesForConsolidation(
@@ -324,6 +383,6 @@ func extractGenericSourceTypes(summaries []c.ProcessedSummary) []string {
 	for sourceType := range sourceTypeMap {
 		genericSourceTypes = append(genericSourceTypes, sourceType)
 	}
-	sort.Strings(genericSourceTypes)
+	u.SortCaseInsensitiveStrings(genericSourceTypes)
 	return genericSourceTypes
 }

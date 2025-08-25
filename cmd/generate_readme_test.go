@@ -28,7 +28,6 @@ func TestGenerateReadmeCmdRun(t *testing.T) {
 }
 
 func TestGenerateOutputBranchReadme(t *testing.T) {
-
 	tempDir, err := os.MkdirTemp("", "readme-test")
 	require.NoError(t, err)
 	defer func() {
@@ -81,7 +80,6 @@ func TestGenerateOutputBranchReadme(t *testing.T) {
 }
 
 func TestCollectWorkflowSummary(t *testing.T) {
-
 	tempDir, err := os.MkdirTemp("", "workflow-summary-test")
 	require.NoError(t, err)
 	defer func() {
@@ -189,7 +187,7 @@ func TestCollectProcessingStats(t *testing.T) {
 	}()
 
 	// Test with missing file
-	var stats = &ProcessingStats{}
+	stats := &ProcessingStats{}
 	err = collectProcessingStats(stats)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "processed summary file not found")
@@ -287,10 +285,10 @@ func TestCollectGroupsStats(t *testing.T) {
 	assert.Equal(t, "2023-01-01T13:00:00Z", stats.LastUpdateTime)
 	assert.Equal(t, 150, stats.GroupSummary["mini"])
 	assert.Equal(t, 200, stats.GroupSummary["lite"])
-	assert.Contains(t, stats.GroupListTypes["mini"], "blocklist")
-	assert.Contains(t, stats.GroupListTypes["mini"], "allowlist")
-	assert.Contains(t, stats.GroupListTypes["lite"], "blocklist")
-	assert.NotContains(t, stats.GroupListTypes["lite"], "allowlist")
+	assert.Contains(t, stats.GroupListTypes["mini"], "domain_blocklist")
+	assert.Contains(t, stats.GroupListTypes["mini"], "domain_allowlist")
+	assert.Contains(t, stats.GroupListTypes["lite"], "domain_blocklist")
+	assert.NotContains(t, stats.GroupListTypes["lite"], "domain_allowlist")
 }
 
 func TestCollectCategoriesStats(t *testing.T) {
@@ -353,10 +351,11 @@ func TestCollectCategoriesStats(t *testing.T) {
 	assert.Equal(t, "2023-01-01T14:00:00Z", stats.LastUpdateTime)
 	assert.Equal(t, 450, stats.CategorySummary["malware"])
 	assert.Equal(t, 75, stats.CategorySummary["ads"])
-	assert.Contains(t, stats.CategoryListTypes["malware"], "blocklist")
-	assert.NotContains(t, stats.CategoryListTypes["malware"], "allowlist")
-	assert.Contains(t, stats.CategoryListTypes["ads"], "allowlist")
-	assert.NotContains(t, stats.CategoryListTypes["ads"], "blocklist")
+	assert.Contains(t, stats.CategoryListTypes["malware"], "domain_blocklist")
+	assert.Contains(t, stats.CategoryListTypes["malware"], "ipv4_blocklist")
+	assert.NotContains(t, stats.CategoryListTypes["malware"], "domain_allowlist")
+	assert.Contains(t, stats.CategoryListTypes["ads"], "domain_allowlist")
+	assert.NotContains(t, stats.CategoryListTypes["ads"], "domain_blocklist")
 }
 
 func TestCollectConsolidateStats(t *testing.T) {
@@ -425,7 +424,6 @@ func TestCollectConsolidateStats(t *testing.T) {
 }
 
 func TestCollectOverlapStats(t *testing.T) {
-
 	tempDir, err := os.MkdirTemp("", "overlap-stats-test")
 	require.NoError(t, err)
 	defer func() {
@@ -514,7 +512,6 @@ func TestGetTopLevelTxtFiles(t *testing.T) {
 }
 
 func TestFormatConsolidateCount(t *testing.T) {
-
 	tests := []struct {
 		name     string
 		expected string
@@ -551,7 +548,6 @@ func TestFormatConsolidateCount(t *testing.T) {
 }
 
 func TestFormatNumber(t *testing.T) {
-
 	tests := []struct {
 		input    int
 		expected string
@@ -641,7 +637,6 @@ func createTestSummaryFiles(t *testing.T, outputSummariesDir string) {
 }
 
 func TestCollectTopStats(t *testing.T) {
-
 	tempDir, err := os.MkdirTemp("", "top-stats-test")
 	require.NoError(t, err)
 	defer func() {
@@ -767,5 +762,47 @@ func TestCollectTopStats(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestWriteSplitLists_BothTypes(t *testing.T) {
+	var sb strings.Builder
+
+	items := []string{"mini", "lite"}
+	listTypes := map[string][]string{
+		"mini": {"domain_blocklist", "domain_allowlist"},
+		"lite": {"domain_blocklist"},
+	}
+
+	writeSplitLists(&sb, "groups", items, listTypes)
+	out := sb.String()
+
+	if !strings.Contains(out, "🛑 Blocklists") {
+		t.Fatalf("expected blocklists heading in output, got: %s", out)
+	}
+	if !strings.Contains(out, "✅ Allowlists") {
+		t.Fatalf("expected allowlists heading in output, got: %s", out)
+	}
+	if !strings.Contains(out, "```") {
+		t.Fatalf("expected code fence in output, got: %s", out)
+	}
+}
+
+func TestWriteSplitLists_OnlyAllow(t *testing.T) {
+	var sb strings.Builder
+
+	items := []string{"alpha"}
+	listTypes := map[string][]string{
+		"alpha": {"domain_allowlist"},
+	}
+
+	writeSplitLists(&sb, "categories", items, listTypes)
+	out := sb.String()
+
+	if strings.Contains(out, "🛑 Blocklists") {
+		t.Fatalf("did not expect blocklists heading in output, got: %s", out)
+	}
+	if !strings.Contains(out, "✅ Allowlists") {
+		t.Fatalf("expected allowlists heading in output, got: %s", out)
 	}
 }

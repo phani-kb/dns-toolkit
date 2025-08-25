@@ -1,13 +1,17 @@
 click.redditmail.com
 drive.google.com
-# START source domains
+teams.microsoft.com
+web.whatsapp.com
+### START sources
 adaway.org
 adguardteam.github.io
 big.oisd.nl
 blocklist.greensnow.co
 cdn.jsdelivr.net
+cf.trackerslist.com
 cinsscore.com
 cybercrime-tracker.net
+danger.rulez.sk
 dsi.ut-capitole.fr
 easylist-downloads.adblockplus.org
 easylist.to
@@ -19,23 +23,27 @@ lists.blocklist.de
 lists.cyberhost.uk
 malware-filter.gitlab.io
 myip.ms
+nsfw-small.oisd.nl
+o0.pages.dev
 opendbl.net
 openphish.com
 pgl.yoyo.org
+phishing.army
 public-dns.info
-puppyscams.org
 quidsup.net
 raw.githubusercontent.com
 report.cs.rutgers.edu
 rules.emergingthreats.net
 sblam.com
+small.oisd.nl
 someonewhocares.org
 tracker.viriback.com
 tranco-list.eu
 urlhaus.abuse.ch
 v.firebog.net
 view.sentinel.turris.cz
+vxvault.net
 web.archive.org
 www.binarydefense.com
 www.spamhaus.org
-# END source domains
+### END sources

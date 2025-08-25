@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"slices"
 	"strings"
 	"sync"
@@ -83,7 +82,6 @@ func processAllSources(ctx context.Context, logger *multilog.Logger, processedDi
 
 		summary := summary // Create a local copy for goroutine
 		workerPool.Submit(func() {
-
 			// Check for context cancellation
 			select {
 			case <-ctx.Done():
@@ -306,7 +304,7 @@ func extractEntriesByType(
 	var validEntries, invalidEntries []string
 
 	if regex, exists := constants.SourceTypeRegexMap[sourceType]; exists {
-		vEntries, iEntries := extractEntriesWithRegex(content, regex)
+		vEntries, iEntries := u.ExtractEntriesWithRegex(content, regex)
 		validEntries = append(validEntries, vEntries...)
 		invalidEntries = append(invalidEntries, iEntries...)
 	} else if processor, exists := r.Processors.GetProcessor(sourceType, listType); exists {
@@ -361,34 +359,6 @@ func createSummary(
 		InvalidFiles:           invalidFiles,
 		LastProcessedTimestamp: u.GetTimestamp(),
 	}
-}
-
-// extractEntriesWithRegex extracts entries from content using a regex pattern.
-// Lines that match the regex are considered valid, others invalid.
-//
-// Parameters:
-//   - content: The content to process
-//   - regex: The regex pattern to match against
-//
-// Returns:
-//   - A slice of valid entries (match the regex)
-//   - A slice of invalid entries (don't match the regex)
-func extractEntriesWithRegex(content string, regex *regexp.Regexp) ([]string, []string) {
-	var validEntries, invalidEntries []string
-	lines := strings.Split(content, "\n")
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if u.IsComment(line) {
-			continue
-		}
-		matchedString := regex.FindString(line)
-		if matchedString != "" {
-			validEntries = append(validEntries, matchedString)
-		} else {
-			invalidEntries = append(invalidEntries, line)
-		}
-	}
-	return u.RemoveDuplicates(validEntries), u.RemoveDuplicates(invalidEntries)
 }
 
 // saveEntries saves valid and invalid entries to separate files.

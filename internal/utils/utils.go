@@ -18,6 +18,7 @@ import (
 	"regexp"
 	"runtime"
 	"slices"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -139,7 +140,7 @@ func RemoveDuplicates(entries []string) []string {
 
 	set := NewStringSet(entries)
 
-	return set.ToSlice()
+	return set.ToSliceSorted()
 }
 
 // SaveFile saves the content from the reader to the specified destination folder and file name.
@@ -298,6 +299,18 @@ func IsIP(line string) bool {
 	return net.ParseIP(line) != nil
 }
 
+// IsIPv4 checks if a string is a valid IPv4 address.
+//
+// Parameters:
+//   - line: The string to check
+//
+// Returns:
+//   - true if the string is a valid IPv4 address, false otherwise
+func IsIPv4(line string) bool {
+	ip := net.ParseIP(line)
+	return ip != nil && ip.To4() != nil
+}
+
 // IsIPv6 checks if a string is a valid IPv6 address.
 //
 // Parameters:
@@ -333,8 +346,8 @@ func GetTimestamp() string {
 	return time.Now().Format(constants.TimestampFormat)
 }
 
-// copyFile copies a file from src to dst
-func copyFile(logger *multilog.Logger, src, dst string) error {
+// CopyFile copies a file from src to dst
+func CopyFile(logger *multilog.Logger, src, dst string) error {
 	sourceFile, err := os.Open(src)
 	if err != nil {
 		return err
@@ -354,6 +367,7 @@ func copyFile(logger *multilog.Logger, src, dst string) error {
 
 	return nil
 }
+
 func StringInSlice(str string, slice []string) bool {
 	return NewStringSet(slice).Contains(str)
 }
@@ -670,6 +684,30 @@ func GetMapKeys[K comparable, V any](m map[K]V) []K {
 		keys = append(keys, k)
 	}
 	return keys
+}
+
+// CaseInsensitiveLess returns true if a < b using case-insensitive comparison.
+func CaseInsensitiveLess(a, b string) bool {
+	return strings.ToLower(a) < strings.ToLower(b)
+}
+
+// SortCaseInsensitiveStrings sorts the provided slice of strings in-place using a case-insensitive order.
+func SortCaseInsensitiveStrings(items []string) {
+	sort.Slice(items, func(i, j int) bool { return CaseInsensitiveLess(items[i], items[j]) })
+}
+
+// FormatNameCounts returns "name (count)" sorted case-insensitively by name.
+func FormatNameCounts(m map[string]int) []string {
+	keys := make([]string, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	SortCaseInsensitiveStrings(keys)
+	out := make([]string, 0, len(keys))
+	for _, k := range keys {
+		out = append(out, fmt.Sprintf("%s (%d)", k, m[k]))
+	}
+	return out
 }
 
 // ExpandIpv4Range expands a range of IPv4 addresses into individual addresses.
@@ -1009,7 +1047,8 @@ func extractZipFile(logger *multilog.Logger, f *zip.File, destFolder string) err
 	return err
 }
 
-func CopySourceToTarget(logger *multilog.Logger, target c.DownloadTarget) error {
+// copySourceToTargetInternal is the internal implementation for copying files
+func copySourceToTargetInternal(logger *multilog.Logger, target c.DownloadTarget, forceOverwrite bool) error {
 	sourceFilepath := filepath.Join(target.SourceFolder, target.SourceFile)
 	if _, err := os.Stat(sourceFilepath); os.IsNotExist(err) {
 		return fmt.Errorf("source file not found: %s", sourceFilepath)
@@ -1020,9 +1059,13 @@ func CopySourceToTarget(logger *multilog.Logger, target c.DownloadTarget) error 
 		}
 	}
 	targetFilepath := filepath.Join(target.TargetFolder, target.TargetFile)
-	if _, err := os.Stat(targetFilepath); err == nil {
-		logger.Debugf("Target file already exists: %s", targetFilepath)
-		return nil
+
+	// Check if target exists and we shouldn't overwrite
+	if !forceOverwrite {
+		if _, err := os.Stat(targetFilepath); err == nil {
+			logger.Debugf("Target file already exists: %s", targetFilepath)
+			return nil
+		}
 	}
 
 	// copy a source file to a target file
@@ -1036,12 +1079,24 @@ func CopySourceToTarget(logger *multilog.Logger, target c.DownloadTarget) error 
 	if err != nil {
 		return err
 	}
+	defer CloseFile(logger, targetFile)
 
 	if _, err := io.Copy(targetFile, sourceFile); err != nil {
 		return err
 	}
 
+	if forceOverwrite {
+		logger.Debugf("Force copied %s to %s", sourceFilepath, targetFilepath)
+	}
 	return nil
+}
+
+func CopySourceToTarget(logger *multilog.Logger, target c.DownloadTarget) error {
+	return copySourceToTargetInternal(logger, target, false)
+}
+
+func ForceCopySourceToTarget(logger *multilog.Logger, target c.DownloadTarget) error {
+	return copySourceToTargetInternal(logger, target, true)
 }
 
 func CloseBody(logger *multilog.Logger, body io.Closer) {
@@ -1110,7 +1165,7 @@ func GetFileLastModifiedTime(logger *multilog.Logger, filePath string) (string, 
 }
 
 func LogMemStats(logger *multilog.Logger, prefix string) {
-	logger.Perff(prefix)
+	logger.Perff("%s", prefix)
 }
 
 // CapPreallocEntries limits the estimated entries to avoid excessive or insufficient allocation.
@@ -1215,4 +1270,69 @@ func GetUserAgent(logger *multilog.Logger, appName string, appVersion string, ap
 
 	logger.Debugf("User agent: %s", userAgent)
 	return userAgent
+}
+
+func ResolveDomainsToIPv4(logger *multilog.Logger, domains []string) ([]string, []string) {
+	var ipAddresses []string
+	var failedDomains []string
+
+	for _, domain := range domains {
+		ips := resolveDomainIPv4(logger, domain)
+		if len(ips) == 0 {
+			failedDomains = append(failedDomains, domain)
+		} else {
+			ipAddresses = append(ipAddresses, ips...)
+		}
+
+		time.Sleep(constants.IPResolveInterval)
+	}
+
+	sort.Strings(ipAddresses)
+	sort.Strings(failedDomains)
+
+	return ipAddresses, failedDomains
+}
+
+func resolveDomainIPv4(logger *multilog.Logger, domain string) []string {
+	ipStrings := make([]string, 0)
+	ips, err := net.LookupIP(domain)
+	if err != nil {
+		logger.Debug("Failed to resolve domain", "domain", domain, "error", err)
+		return ipStrings
+	}
+	for _, ip := range ips {
+		if IsIPv4(ip.String()) && ip.String() != "0.0.0.0" {
+			ipStrings = append(ipStrings, ip.String())
+		}
+	}
+
+	return ipStrings
+}
+
+// ExtractEntriesWithRegex extracts entries from content using a regex pattern.
+// Lines that match the regex are considered valid, others invalid.
+//
+// Parameters:
+//   - content: The content to process
+//   - regex: The regex pattern to match against
+//
+// Returns:
+//   - A slice of valid entries (match the regex)
+//   - A slice of invalid entries (don't match the regex)
+func ExtractEntriesWithRegex(content string, regex *regexp.Regexp) ([]string, []string) {
+	var validEntries, invalidEntries []string
+	lines := strings.Split(content, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if IsComment(line) {
+			continue
+		}
+		matchedString := regex.FindString(line)
+		if matchedString != "" {
+			validEntries = append(validEntries, matchedString)
+		} else {
+			invalidEntries = append(invalidEntries, line)
+		}
+	}
+	return RemoveDuplicates(validEntries), RemoveDuplicates(invalidEntries)
 }

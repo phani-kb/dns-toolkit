@@ -40,3 +40,13 @@ func TestGetConfigPath(t *testing.T) {
 	err = os.Unsetenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
 	assert.NoError(t, err)
 }
+
+func TestMinOverlapPercent(t *testing.T) {
+	assert.Equal(t, 0.0, AppConfig.DNSToolkit.GetMinOverlapPercent())
+
+	AppConfig.DNSToolkit.MinOverlapPercent = 0.2
+	assert.Equal(t, 0.2, AppConfig.DNSToolkit.GetMinOverlapPercent())
+
+	AppConfig.DNSToolkit.MinOverlapPercent = 0
+	assert.Equal(t, 0.0, AppConfig.DNSToolkit.GetMinOverlapPercent())
+}

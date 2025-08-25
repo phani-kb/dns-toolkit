@@ -3,8 +3,8 @@
     {
       "name": "VXVault_URLList",
       "categories": "malware",
-      "disabled": true,
-      "notes": ">97% overlap with Firehol_level3",
+      "disabled": false,
+      "notes": ">95% overlap with Firehol_level3",
       "types": [
         {
           "name": "domain_http_url"

@@ -18,7 +18,7 @@ import (
 var generateReadmeCmd = &cobra.Command{
 	Use:   "output-readme",
 	Short: "Generate README.md for output branch with daily workflow summary",
-	Long:  "Generate a README.md for the output branch containing tabular summaries of daily workflow runs including download, processing, consolidation, and analysis statistics",
+	Long:  "Generate a README.md for the output branch containing tabular summaries of daily workflow runs including download, processing, consolidation, and analysis statistics", // nolint:lll
 	Run: func(cmd *cobra.Command, args []string) {
 		if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
 			Logger.Debug("Skipping generate readme command in test mode")
@@ -132,81 +132,128 @@ func generateOutputBranchReadme() string {
 
 	sb.WriteString("## Quick Start\n\n")
 	sb.WriteString("Add any of these URLs to your DNS filtering solution:\n\n")
-	sb.WriteString("```\n")
 
 	topLevelFiles, err := getTopLevelTxtFiles()
 	if err == nil && len(topLevelFiles) > 0 {
-		sb.WriteString("# Blocklists or Allowlists\n")
+		var blocklistFiles, allowlistFiles []string
 		for _, filename := range topLevelFiles {
-			sb.WriteString(fmt.Sprintf("%s/%s\n", constants.GitHubRawURL, filename))
+			if strings.Contains(strings.ToLower(filename), "allowlist") {
+				allowlistFiles = append(allowlistFiles, filename)
+			} else {
+				blocklistFiles = append(blocklistFiles, filename)
+			}
 		}
-		sb.WriteString("\n")
+		u.SortCaseInsensitiveStrings(blocklistFiles)
+		u.SortCaseInsensitiveStrings(allowlistFiles)
+
+		sb.WriteString("<details>\n")
+		sb.WriteString(
+			"<summary><strong>📋 Consolidated Blocklists and Allowlists</strong></summary>\n\n",
+		)
+
+		if len(blocklistFiles) > 0 {
+			sb.WriteString("<strong>🛑 Blocklists</strong>\n\n")
+			sb.WriteString("```\n")
+			for _, filename := range blocklistFiles {
+				sb.WriteString(fmt.Sprintf("%s/%s\n", constants.GitHubRawURL, filename))
+			}
+			sb.WriteString("```\n\n")
+		}
+
+		if len(allowlistFiles) > 0 {
+			sb.WriteString("<strong>✅ Allowlists</strong>\n\n")
+			sb.WriteString("```\n")
+			for _, filename := range allowlistFiles {
+				sb.WriteString(fmt.Sprintf("%s/%s\n", constants.GitHubRawURL, filename))
+			}
+			sb.WriteString("```\n\n")
+		}
+
+		sb.WriteString("</details>\n\n")
 	}
 
 	if summary.Groups.TotalGroups > 0 {
-		sb.WriteString("# Size-based lists\n")
+		sb.WriteString("<details>\n")
+		sb.WriteString("<summary><strong>📏 Size-based Lists</strong></summary>\n\n")
+
 		var groups []string
 		for group := range summary.Groups.GroupSummary {
 			groups = append(groups, group)
 		}
-		sort.Strings(groups)
 
-		for _, group := range groups {
-			if listTypes, exists := summary.Groups.GroupListTypes[group]; exists {
-				for _, listType := range listTypes {
-					sb.WriteString(fmt.Sprintf("%s/groups/%s_domain_%s.txt\n", constants.GitHubRawURL, group, listType))
-				}
-			}
-		}
-		sb.WriteString("\n")
+		writeSplitLists(&sb, "groups", groups, summary.Groups.GroupListTypes)
+
+		sb.WriteString("</details>\n\n")
 	}
 
 	if summary.Categories.TotalCategories > 0 {
-		sb.WriteString("# Category-based lists\n")
+		sb.WriteString("<details>\n")
+		sb.WriteString("<summary><strong>🏷️ Category-based Lists</strong></summary>\n\n")
+
 		var categories []string
 		for category := range summary.Categories.CategorySummary {
 			categories = append(categories, category)
 		}
-		sort.Strings(categories)
 
-		for _, category := range categories {
-			if listTypes, exists := summary.Categories.CategoryListTypes[category]; exists {
-				for _, listType := range listTypes {
-					sb.WriteString(
-						fmt.Sprintf("%s/categories/%s_domain_%s.txt\n", constants.GitHubRawURL, category, listType),
-					)
-				}
-			}
-		}
-		sb.WriteString("\n")
+		writeSplitLists(&sb, "categories", categories, summary.Categories.CategoryListTypes)
+
+		sb.WriteString("</details>\n\n")
 	}
 
 	if summary.Top.TotalFiles > 0 {
-		sb.WriteString("# High-confidence lists (top entries)\n")
+		sb.WriteString("<details>\n")
+		sb.WriteString(
+			"<summary><strong>⭐ High-confidence Lists</strong> (top entries by number of sources)</summary>\n\n",
+		)
+
 		var types []string
 		for sourceType := range summary.Top.FilesByType {
 			types = append(types, sourceType)
 		}
-		sort.Strings(types)
+		u.SortCaseInsensitiveStrings(types)
 
+		var blockEntries, allowEntries []string
 		for _, sourceType := range types {
 			if details, exists := summary.Top.FileDetails[sourceType]; exists && len(details) > 0 {
 				for _, detail := range details {
-					sb.WriteString(
-						fmt.Sprintf(
-							"%s/top/top_%s_%s_min%d.txt\n",
-							constants.GitHubRawURL,
-							sourceType,
-							detail.ListType,
-							detail.MinSources,
-						),
+					url := fmt.Sprintf(
+						"%s/top/top_%s_%s_min%d.txt",
+						constants.GitHubRawURL,
+						sourceType,
+						detail.ListType,
+						detail.MinSources,
 					)
+					if strings.Contains(strings.ToLower(detail.ListType), "allowlist") {
+						allowEntries = append(allowEntries, url)
+					} else {
+						blockEntries = append(blockEntries, url)
+					}
 				}
 			}
 		}
-		sb.WriteString("\n")
+
+		if len(blockEntries) > 0 {
+			u.SortCaseInsensitiveStrings(blockEntries)
+			sb.WriteString("<strong>🛑 Blocklists</strong>\n\n")
+			sb.WriteString("```\n")
+			for _, line := range blockEntries {
+				sb.WriteString(line + "\n")
+			}
+			sb.WriteString("```\n\n")
+		}
+
+		if len(allowEntries) > 0 {
+			u.SortCaseInsensitiveStrings(allowEntries)
+			sb.WriteString("<strong>✅ Allowlists</strong>\n\n")
+			sb.WriteString("```\n")
+			for _, line := range allowEntries {
+				sb.WriteString(line + "\n")
+			}
+			sb.WriteString("```\n\n")
+		}
+
+		sb.WriteString("</details>\n\n")
 	}
-	sb.WriteString("```\n\n")
 
 	// Daily Workflow Summary
 	sb.WriteString("## Daily Workflow Summary\n\n")
@@ -227,8 +274,13 @@ func generateOutputBranchReadme() string {
 	sb.WriteString(fmt.Sprintf("| Last Update | %s |\n", summary.Download.LastUpdateTime))
 	sb.WriteString("\n")
 
-	// Sources by Type
+	// Sources by Type (collapsible)
 	if len(summary.Download.SourcesByType) > 0 {
+		sb.WriteString("<details>\n")
+		// nolint:lll
+		sb.WriteString(
+			"<summary><strong>📚 Sources by Type:</strong> Breakdown of source types and their configured counts</summary>\n\n",
+		)
 		sb.WriteString("**Sources by Type:**\n\n")
 		sb.WriteString("| Source Type | Count |\n")
 		sb.WriteString("|-------------|-------|\n")
@@ -238,13 +290,14 @@ func generateOutputBranchReadme() string {
 		for sourceType := range summary.Download.SourcesByType {
 			sourceTypes = append(sourceTypes, sourceType)
 		}
-		sort.Strings(sourceTypes)
+		u.SortCaseInsensitiveStrings(sourceTypes)
 
 		for _, sourceType := range sourceTypes {
 			count := summary.Download.SourcesByType[sourceType]
 			sb.WriteString(fmt.Sprintf("| %s | %d |\n", sourceType, count))
 		}
 		sb.WriteString("\n")
+		sb.WriteString("</details>\n\n")
 	}
 
 	// Failed Sources
@@ -273,7 +326,7 @@ func generateOutputBranchReadme() string {
 	for t := range allTypes {
 		types = append(types, t)
 	}
-	sort.Strings(types)
+	u.SortCaseInsensitiveStrings(types)
 
 	for _, sourceType := range types {
 		valid := summary.Processing.ValidFilesByType[sourceType]
@@ -312,7 +365,7 @@ func generateOutputBranchReadme() string {
 		for group := range summary.Groups.GroupSummary {
 			groups = append(groups, group)
 		}
-		sort.Strings(groups)
+		u.SortCaseInsensitiveStrings(groups)
 
 		for _, group := range groups {
 			count := summary.Groups.GroupSummary[group]
@@ -332,7 +385,7 @@ func generateOutputBranchReadme() string {
 		for category := range summary.Categories.CategorySummary {
 			categories = append(categories, category)
 		}
-		sort.Strings(categories)
+		u.SortCaseInsensitiveStrings(categories)
 
 		for _, category := range categories {
 			count := summary.Categories.CategorySummary[category]
@@ -379,8 +432,8 @@ func generateOutputBranchReadme() string {
 
 		// Sort entries: by source type, then by list type (allowlist first), then by min sources desc
 		sort.Slice(allEntries, func(i, j int) bool {
-			if allEntries[i].sourceType != allEntries[j].sourceType {
-				return allEntries[i].sourceType < allEntries[j].sourceType
+			if !strings.EqualFold(allEntries[i].sourceType, allEntries[j].sourceType) {
+				return u.CaseInsensitiveLess(allEntries[i].sourceType, allEntries[j].sourceType)
 			}
 			if allEntries[i].detail.ListType != allEntries[j].detail.ListType {
 				return allEntries[i].detail.ListType == "allowlist"
@@ -450,6 +503,53 @@ func collectWorkflowSummary() *WorkflowSummary {
 	}
 
 	return summary
+}
+
+// writeSplitLists writes nested blocklists/allowlists details
+func writeSplitLists(sb *strings.Builder, basePath string, items []string, listTypesMap map[string][]string) {
+	if len(items) == 0 {
+		return
+	}
+
+	u.SortCaseInsensitiveStrings(items)
+
+	var anyBlock, anyAllow bool
+	var blockEntries, allowEntries []string
+
+	for _, item := range items {
+		if listTypes, exists := listTypesMap[item]; exists {
+			for _, typeListCombination := range listTypes {
+				url := fmt.Sprintf("%s/%s/%s_%s.txt", constants.GitHubRawURL, basePath, item, typeListCombination)
+				if strings.Contains(strings.ToLower(typeListCombination), "allowlist") {
+					anyAllow = true
+					allowEntries = append(allowEntries, url)
+				} else {
+					anyBlock = true
+					blockEntries = append(blockEntries, url)
+				}
+			}
+		}
+	}
+
+	if anyBlock {
+		u.SortCaseInsensitiveStrings(blockEntries)
+		sb.WriteString("<strong>🛑 Blocklists</strong>\n\n")
+		sb.WriteString("```\n")
+		for _, line := range blockEntries {
+			sb.WriteString(line + "\n")
+		}
+		sb.WriteString("```\n\n")
+	}
+
+	if anyAllow {
+		u.SortCaseInsensitiveStrings(allowEntries)
+		sb.WriteString("<strong>✅ Allowlists</strong>\n\n")
+		sb.WriteString("```\n")
+		for _, line := range allowEntries {
+			sb.WriteString(line + "\n")
+		}
+		sb.WriteString("```\n\n")
+	}
 }
 
 func collectDownloadStats(stats *DownloadStats) error {
@@ -621,22 +721,25 @@ func collectConsolidatedStatsGeneric(
 				}
 
 				// Add list type if not already present
+				typeListCombination := fmt.Sprintf("%s_%s", consolidatedSummary.Type, consolidatedSummary.ListType)
 				listTypeExists := false
 				for _, existingType := range listTypes[identifier] {
-					if existingType == consolidatedSummary.ListType {
+					if existingType == typeListCombination {
 						listTypeExists = true
 						break
 					}
 				}
 				if !listTypeExists {
-					listTypes[identifier] = append(listTypes[identifier], consolidatedSummary.ListType)
+					listTypes[identifier] = append(listTypes[identifier], typeListCombination)
 				}
 			}
 		}
 
 		// Sort list types for each identifier
 		for identifier := range listTypes {
-			sort.Strings(listTypes[identifier])
+			sort.Slice(listTypes[identifier], func(i, j int) bool {
+				return strings.ToLower(listTypes[identifier][i]) < strings.ToLower(listTypes[identifier][j])
+			})
 		}
 
 		setStats(summary, listTypes, len(identifiersSet), lastUpdateTime)
@@ -710,7 +813,7 @@ func getTopLevelTxtFiles() ([]string, error) {
 		}
 	}
 
-	sort.Strings(txtFiles)
+	u.SortCaseInsensitiveStrings(txtFiles)
 	return txtFiles, nil
 }
 

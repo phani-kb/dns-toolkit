@@ -161,7 +161,7 @@ func consolidateGeneric(
 // ProcessingConfig holds configuration for processing consolidation
 type ProcessingConfig struct {
 	GetFilesFunc       func([]c.ProcessedFile, string) []c.ProcessedFile
-	ConsolidateFunc    func(*multilog.Logger, string, string, string, u.StringSet, []c.ProcessedFile) (u.StringSet, c.ConsolidatedSummary)
+	ConsolidateFunc    func(*multilog.Logger, string, string, string, u.StringSet, []c.ProcessedFile) (u.StringSet, c.ConsolidatedSummary) // nolint:lll
 	Identifier         string
 	IdentifierField    string
 	ProcessedFiles     []c.ProcessedFile
@@ -185,7 +185,7 @@ func processIdentifierConsolidation(
 	default:
 		logMessage = fmt.Sprintf("Processing %s: %s", config.IdentifierField, config.Identifier)
 	}
-	logger.Infof(logMessage)
+	logger.Infof("%s", logMessage)
 
 	// Filter processed files by identifier
 	identifierFiles := config.GetFilesFunc(config.ProcessedFiles, config.Identifier)

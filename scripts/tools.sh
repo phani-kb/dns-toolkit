@@ -24,7 +24,7 @@ fmt() {
   for tool in "${FMT_TOOLS[@]}"; do
     echo "Running $tool..."
     if [ "$tool" = "golines" ]; then
-      "$GOBIN/$tool" --max-len=120 -w .
+      find . -name '*.go' | xargs "$GOBIN/$tool" --max-len=120 --base-formatter=gofumpt -w
     elif [ "$tool" = "gofmt" ]; then
       $tool -s -w .
     else
@@ -115,70 +115,7 @@ print_source_urls() {
   print_allowlist_urls
 }
 
-generate_wl() {
-  echo "Generating whitelist files..."
-  
-  # File paths
-  domains_file="data/whitelist_domains.txt"
-  ipv4_file="data/whitelist_ipv4.txt"
-  adguard_file="data/whitelist_adguard.txt"
-  temp_file="data/whitelist_ipv4_temp.txt"
-  
-  # Step 1: Generate domains
-  echo "Step 1/3: Extracting domains from source URLs..."
-  find data/config -name "sources_*.json" -type f ! -name "*schema*" ! -name "*local.json" | \
-    xargs jq -r '.sources[] | select(.url != null and (.disabled != true)) | .url' | \
-    sed 's|^https\?://||' | \
-    sed 's|/.*$||' | \
-    sed 's|:.*$||' | \
-    sort -u > "$domains_file"
-  
-  echo "Domains written to: $domains_file"
-  echo "Total domains: $(wc -l < "$domains_file")"
-  
-  # Step 2: Generate AdGuard format
-  echo "Step 2/3: Generating AdGuard format whitelist..."
-  > "$adguard_file"
-  
-  while IFS= read -r domain; do
-    if [[ -n "$domain" && "$domain" != "file" ]]; then
-      echo "@@||${domain}^" >> "$adguard_file"
-    fi
-  done < "$domains_file"
-  
-  echo "AdGuard format written to: $adguard_file"
-  echo "Total AdGuard rules: $(wc -l < "$adguard_file")"
-    
-  # Step 3: Generate IPv4 addresses
-  echo "Step 3/3: Resolving IPv4 addresses for domains..."
-  > "$ipv4_file"
-  > "$temp_file"
-  
-  total_domains=$(wc -l < "$domains_file")
-  echo "Resolving IPv4 addresses for $total_domains domains..."
-  
-  current=0
-  while IFS= read -r domain; do
-    if [[ -n "$domain" && "$domain" != "file" ]]; then
-      current=$((current + 1))
-      echo "[$current/$total_domains] Resolving: $domain"
-      
-      dig_output=$(dig +noall +answer "$domain" A 2>/dev/null)
-      
-      if [[ -n "$dig_output" ]]; then
-        echo "$dig_output" | awk '$4 == "A" {print $5}' | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' >> "$temp_file"        
-        dig +short "$domain" A 2>/dev/null | grep -E '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$' >> "$temp_file"
-      fi
-      sleep 1.0
-    fi
-  done < "$domains_file"
-  
-  sort -u "$temp_file" > "$ipv4_file"
-  rm -f "$temp_file"
-  
-  echo "IPv4 addresses written to: $ipv4_file"
-  echo "Total unique IPv4 addresses: $(wc -l < "$ipv4_file")" 
-}
+
 
 print_blocklist_urls() {
   find data/config -name "sources_*.json" -type f ! -name "*schema*" | \
@@ -226,11 +163,9 @@ print-duplicate-source-names)
 print-source-urls)
   print_source_urls
   ;;
-generate-wl)
-  generate_wl
-  ;;
+
 *)
-  echo "Usage: $0 {fmt|install-tools|clean-tools|sort-config-sources|print-source-types-names|print-source-types-counts|print-source-names|print-duplicate-source-names|print-source-urls|generate-wl}"
+  echo "Usage: $0 {fmt|install-tools|clean-tools|sort-config-sources|print-source-types-names|print-source-types-counts|print-source-names|print-duplicate-source-names|print-source-urls}"
   exit 1
   ;;
 esac

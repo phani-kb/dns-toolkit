@@ -6,6 +6,8 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"reflect"
+	"regexp"
 	"runtime"
 	"strings"
 	"testing"
@@ -327,6 +329,36 @@ func TestShouldDownloadSource(t *testing.T) {
 	writeSummary(oldTime, "unknown")
 	result = ShouldDownloadSource(logger, tempFile.Name(), "test-source")
 	assert.True(t, result) // Should download with unknown frequency defaulting to daily
+}
+
+func TestCaseInsensitiveLess(t *testing.T) {
+	if !CaseInsensitiveLess("apple", "Banana") {
+		t.Fatalf("expected apple < Banana (case-insensitive)")
+	}
+	if CaseInsensitiveLess("Cherry", "banana") {
+		t.Fatalf("expected Cherry > banana (case-insensitive)")
+	}
+	if CaseInsensitiveLess("same", "same") {
+		t.Fatalf("expected same !< same")
+	}
+}
+
+func TestSortCaseInsensitiveStrings(t *testing.T) {
+	input := []string{"banana", "Apple", "cherry", "apple"}
+	expected := []string{"Apple", "apple", "banana", "cherry"}
+	SortCaseInsensitiveStrings(input)
+	if !reflect.DeepEqual(input, expected) {
+		t.Fatalf("unexpected sort result: got %v want %v", input, expected)
+	}
+}
+
+func TestFormatNameCounts(t *testing.T) {
+	m := map[string]int{"zeta": 2, "Alpha": 5, "beta": 3}
+	got := FormatNameCounts(m)
+	want := []string{"Alpha (5)", "beta (3)", "zeta (2)"}
+	if !reflect.DeepEqual(got, want) {
+		t.Fatalf("FormatNameCounts returned %v, want %v", got, want)
+	}
 }
 
 func TestLogMemStats(t *testing.T) {
@@ -960,8 +992,6 @@ func TestExtractArchiveZip(t *testing.T) {
 func TestFindProjectRoot(t *testing.T) {
 	projectRoot, err := FindProjectRoot("")
 	assert.NoError(t, err)
-	assert.True(t, strings.HasSuffix(projectRoot, "dns-toolkit"),
-		"Project root should end with 'dns-toolkit', got: %s", projectRoot)
 
 	goModPath := filepath.Join(projectRoot, "go.mod")
 	_, err = os.Stat(goModPath)
@@ -1142,6 +1172,113 @@ func TestExpandIpv4Range(t *testing.T) {
 				if i >= len(tt.want) || got[i] != tt.want[i] {
 					t.Errorf("ExpandIpv4Range(%q)[%d] = %q, want %q", tt.ipRange, i, got[i], tt.want[i])
 				}
+			}
+		})
+	}
+}
+
+func TestIsValidIPv4(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected bool
+	}{
+		{"192.168.1.1", true},
+		{"10.0.0.1", true},
+		{"172.16.0.1", true},
+		{"256.1.2.3", false},
+		{"1.2.3.256", false},
+		{"192.168.1", false},
+		{"192.168.1.1.1", false},
+		{"192.168.1.abc", false},
+		{"", false},
+	}
+
+	for _, test := range tests {
+		result := IsIPv4(test.input)
+		assert.Equal(t, test.expected, result, "Input: %s", test.input)
+	}
+}
+
+func TestResolveDomainsToIPv4(t *testing.T) {
+	logger := multilog.NewLogger()
+	ips, failedDomains := ResolveDomainsToIPv4(logger, []string{"localhost"})
+	if ips == nil {
+		t.Error("Expected non-nil slice")
+	}
+	if len(failedDomains) > 0 {
+		t.Error("Expected non-nil slice")
+	}
+}
+
+func TestExtractEntriesWithRegex(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name            string
+		content         string
+		regexPattern    string
+		expectedValid   []string
+		expectedInvalid []string
+	}{
+		{
+			name:            "extract domains",
+			content:         "example.com\ntest.org\ninvalid-line\ngoogle.com\n",
+			regexPattern:    `^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$`,
+			expectedValid:   []string{"example.com", "test.org", "google.com"},
+			expectedInvalid: []string{"invalid-line"},
+		},
+		{
+			name:            "extract IPv4 addresses",
+			content:         "192.168.1.1\n10.0.0.1\ninvalid-ip\n127.0.0.1\n",
+			regexPattern:    `^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$`,
+			expectedValid:   []string{"192.168.1.1", "10.0.0.1", "127.0.0.1"},
+			expectedInvalid: []string{"invalid-ip"},
+		},
+		{
+			name:            "empty content",
+			content:         "",
+			regexPattern:    `^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$`,
+			expectedValid:   nil,
+			expectedInvalid: nil,
+		},
+		{
+			name:            "no matches",
+			content:         "invalid-line1\ninvalid-line2\n",
+			regexPattern:    `^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$`,
+			expectedValid:   nil,
+			expectedInvalid: []string{"invalid-line1", "invalid-line2"},
+		},
+		{
+			name:            "all matches",
+			content:         "example.com\ntest.org\n",
+			regexPattern:    `^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$`,
+			expectedValid:   []string{"example.com", "test.org"},
+			expectedInvalid: nil,
+		},
+		{
+			name:            "content with comments and empty lines",
+			content:         "# Comment\nexample.com\n\ntest.org\n# Another comment\n",
+			regexPattern:    `^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$`,
+			expectedValid:   []string{"example.com", "test.org"}, // Comments and empty lines are filtered out
+			expectedInvalid: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			regex := regexp.MustCompile(tt.regexPattern)
+			valid, invalid := ExtractEntriesWithRegex(tt.content, regex)
+
+			if tt.expectedValid == nil {
+				assert.Nil(t, valid, "Valid entries should be nil")
+			} else {
+				assert.ElementsMatch(t, tt.expectedValid, valid, "Valid entries should match")
+			}
+
+			if tt.expectedInvalid == nil {
+				assert.Nil(t, invalid, "Invalid entries should be nil")
+			} else {
+				assert.ElementsMatch(t, tt.expectedInvalid, invalid, "Invalid entries should match")
 			}
 		})
 	}

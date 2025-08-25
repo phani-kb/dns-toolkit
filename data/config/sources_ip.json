@@ -31,7 +31,7 @@
             {
               "name": "blocklist",
               "must_consider": true,
-              "groups": "mini"
+              "groups": "lite"
             }
           ]
         }
@@ -55,11 +55,17 @@
     {
       "name": "BlockListDE_Brute",
       "categories": "threat",
-      "disabled": true,
-      "notes": "100% overlap with Firehol_level2",
+      "notes": ">95% overlap with Firehol_level2",
       "types": [
         {
-          "name": "ipv4"
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "mini"
+            }
+          ]
         }
       ],
       "url": "https://lists.blocklist.de/lists/bruteforcelogin.txt",
@@ -68,6 +74,7 @@
     {
       "name": "BlockListDE_Strong",
       "categories": "malicious, threat",
+      "notes": ">95% overlap with Borestad_AbuseIPDB_S100_3d",
       "types": [
         {
           "name": "ipv4",
@@ -84,21 +91,29 @@
       "website": "https://www.blocklist.de"
     },
     {
-      "name": "Borestad_AbuseIPDB",
+      "name": "Borestad_AbuseIPDB_S100_3d",
       "categories": "malicious, threat",
+      "frequency": "weekly",
+      "skip_general_consolidation": true,
       "types": [
         {
-          "name": "ipv4_find"
+          "name": "ipv4_find",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
         }
       ],
-      "url": "https://raw.githubusercontent.com/borestad/blocklist-abuseipdb/main/abuseipdb-s100-1d.ipv4",
+      "url": "https://raw.githubusercontent.com/borestad/blocklist-abuseipdb/refs/heads/main/abuseipdb-s100-3d.ipv4",
       "website": "https://github.com/borestad/blocklist-abuseipdb"
     },
     {
       "name": "BruteforceBlocker",
       "categories": "threat",
-      "disabled": true,
-      "notes": ">98% overlap with EmergingThreats_CompromisedIPs",
+      "disabled": false,
+      "notes": ">95% overlap with EmergingThreats_CompromisedIPs",
       "types": [
         {
           "name": "ipv4_find"
@@ -127,10 +142,11 @@
     },
     {
       "name": "DoH_IP_blocklists",
-      "categories": "dns, doh",
-      "exclude": true,
+      "categories": "doh",
       "license": "GPL-3.0",
+      "notes": ">90% overlap with HaGeZi Encrypted DNS Servers",
       "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "domain_comment"
@@ -144,11 +160,11 @@
     },
     {
       "name": "DoH_IP_list",
-      "categories": "dns, doh",
-      "exclude": true,
+      "categories": "doh",
       "frequency": "monthly",
       "license": "MIT",
       "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "ipv4"
@@ -160,6 +176,7 @@
     {
       "name": "DShield",
       "categories": "malicious, threat",
+      "disabled": false,
       "notes": "100% overlap with Firehol_level2/Firehol_level3",
       "types": [
         {
@@ -173,6 +190,7 @@
       "name": "EmergingThreats_CompromisedIPs",
       "categories": "malicious, threat",
       "license": "GPL-2.0",
+      "notes": ">95% overlap with Firehol_level3,  and Borestad_AbuseIPDB_S100_3d",
       "types": [
         {
           "name": "ipv4",
@@ -194,7 +212,14 @@
       "license": "GPL-2.0",
       "types": [
         {
-          "name": "cidr_ipv4"
+          "name": "cidr_ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "mini",
+              "must_consider": true
+            }
+          ]
         }
       ],
       "url": "https://rules.emergingthreats.net/fwrules/emerging-Block-IPs.txt",
@@ -206,6 +231,7 @@
       "frequency": "monthly",
       "license": "GPL-3.0",
       "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "ipv4"
@@ -217,7 +243,11 @@
     {
       "name": "Firehol_abusers_30d",
       "categories": "malicious, threat",
+      "disabled": true,
       "license": "GPL-2.0",
+      "notes": "False positives are common, use with caution.",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "ipv4"
@@ -255,8 +285,48 @@
       "website": "https://botscout.com"
     },
     {
+      "name": "Firehol_CleanTalk",
+      "categories": "malicious, threat",
+      "license": "GPL-2.0",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        }
+      ],
+      "url": "https://iplists.firehol.org/files/cleantalk.ipset",
+      "website": "https://iplists.firehol.org"
+    },
+    {
+      "name": "Firehol_CleanTalk_Top20",
+      "categories": "malicious, threat",
+      "license": "GPL-2.0",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "mini"
+            }
+          ]
+        }
+      ],
+      "url": "https://iplists.firehol.org/files/cleantalk_top20.ipset",
+      "website": "https://iplists.firehol.org"
+    },
+    {
       "name": "Firehol_GPF_Comics",
       "categories": "malicious, threat",
+      "license": "GPL-2.0",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "ipv4"
@@ -341,6 +411,8 @@
       "name": "GlobalAntiScamOrg-blocklist-ips",
       "categories": "scam",
       "license": "BSD 3-Clause",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "ipv4"
@@ -352,6 +424,7 @@
     {
       "name": "Greensnow",
       "categories": "malicious, malware, threat",
+      "notes": ">95% overlap with Firehol_level2",
       "types": [
         {
           "name": "ipv4",
@@ -369,10 +442,10 @@
     },
     {
       "name": "HaGeZi_DoH",
-      "categories": "dns, doh",
-      "disabled": true,
+      "categories": "doh",
+      "disabled": false,
       "license": "GPL-3.0",
-      "notes": ">98% overlap with DoH_IP_blocklists",
+      "notes": ">90% overlap with DoH_IP_blocklists",
       "skip_general_consolidation": true,
       "types": [
         {
@@ -385,7 +458,7 @@
     {
       "name": "HaGeZi_TIF",
       "categories": "malicious, threat",
-      "disabled": true,
+      "disabled": false,
       "license": "GPL-3.0",
       "notes": "No unique contribution",
       "types": [
@@ -401,7 +474,14 @@
       "categories": "malicious, threat",
       "types": [
         {
-          "name": "ipv4_find"
+          "name": "ipv4_find",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "disabled": true,
+              "notes": ">95% overlap with Firehol_level2/Firehol_level3"
+            }
+          ]
         },
         {
           "name": "ipv6_htaccess"
@@ -413,6 +493,8 @@
     {
       "name": "Public_DNS4",
       "categories": "dns",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "ipv4"
@@ -478,7 +560,14 @@
       "categories": "spam, threat",
       "types": [
         {
-          "name": "cidr_ipv4"
+          "name": "cidr_ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "disabled": true,
+              "notes": ">95% overlap with ET_fwip"
+            }
+          ]
         }
       ],
       "url": "http://www.spamhaus.org/drop/drop.txt",
@@ -489,7 +578,7 @@
       "categories": "others",
       "disabled": true,
       "license": "AGPL-3.0",
-      "notes": "Too many allowlist IPs, use with caution.",
+      "notes": "Huge list, use with caution. More than its blocklist counterpart.",
       "types": [
         {
           "name": "ipv4",
@@ -508,7 +597,7 @@
       "categories": "malicious, malware, threat",
       "disabled": true,
       "license": "AGPL-3.0",
-      "notes": "Too many blocklist IPs, use with caution.",
+      "notes": "Huge list, use with caution.",
       "types": [
         {
           "name": "ipv4",

@@ -11,6 +11,7 @@ if [ ! -f "bin/dns-toolkit" ]; then
 fi
 
 # Run each step using short forms:
+# ga - generate allowlist
 # d  - download
 # p  - process
 # c  - consolidate
@@ -19,69 +20,79 @@ fi
 # t  - top
 # o  - overlap
 # op - output
-# r  - output README
-# or - overlap README
-# sr - summaries README
+# gr - output README
+# gor- overlap README
+# gsr- summaries README
+# gs - stats README
+# gc - credits README
 # cp - copy summaries
 
 if [ "$#" -gt 0 ]; then
     IFS=',' read -ra steps <<< "$1"
 else
-    steps=("d" "p" "c" "cg" "cc" "t" "o" "op" "gr" "gor" "gsr" "gs" "cp")
+    steps=("ga" "d" "p" "c" "cg" "cc" "t" "o" "op" "gr" "gor" "gsr" "gs" "gc" "cp")
 fi
 
 for step in "${steps[@]}"; do
     case "$step" in
+        ga)
+            echo "Step 1: Generating allowlist..."
+            ./bin/dns-toolkit generate allowlist --overwrite
+            ;;
         d)
-            echo "Step 1: Downloading data..."
+            echo "Step 2: Downloading data..."
             ./bin/dns-toolkit download
             ;;
         p)
-            echo "Step 2: Processing data..."
+            echo "Step 3: Processing data..."
             ./bin/dns-toolkit process
             ;;
         c)
-            echo "Step 3: Consolidating data..."
+            echo "Step 4: Consolidating data..."
             ./bin/dns-toolkit consolidate
             ;;
         cg)
-            echo "Step 4: Grouping consolidated data..."
+            echo "Step 5: Grouping consolidated data..."
             ./bin/dns-toolkit consolidate groups
             ;;
         cc)
-            echo "Step 5: Categorizing data..."
+            echo "Step 6: Categorizing data..."
             ./bin/dns-toolkit consolidate categories
             ;;
         t)
-            echo "Step 6: Generating top entries..."
+            echo "Step 7: Generating top entries..."
             ./bin/dns-toolkit top
             ;;
         o)
-            echo "Step 7: Finding overlaps..."
+            echo "Step 8: Finding overlaps..."
             ./bin/dns-toolkit overlap #--cpu-profile --mem-profile
             ;;
         op)
-            echo "Step 8: Generating output files..."
+            echo "Step 9: Generating output files..."
             ./bin/dns-toolkit generate output -i
             ;;
         gr)
-            echo "Step 9: Generating output README..."
+            echo "Step 10: Generating output README..."
             ./bin/dns-toolkit generate output-readme
             ;;
         gor)
-            echo "Step 10: Generating overlap README..."
+            echo "Step 11: Generating overlap README..."
             ./bin/dns-toolkit generate overlap-readme
             ;;
         gsr)
-            echo "Step 11: Generating summaries README..."
+            echo "Step 12: Generating summaries README..."
             ./bin/dns-toolkit generate summaries-readme
             ;;
         gs)
-            echo "Step 12: Generating stats README..."
+            echo "Step 13: Generating stats README..."
             ./bin/dns-toolkit generate stats-readme
             ;;
+        gc)
+            echo "Step 14: Generating credits README..."
+            ./bin/dns-toolkit generate credits
+            ;;
         cp)
-            echo "Step 13: Copy summary files to archive..."
+            echo "Step 15: Copy summary files to archive..."
             cp data/output/summaries/* data/archive/
             ;;
         *)

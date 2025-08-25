@@ -18,7 +18,7 @@ import (
 var generateOverlapCmd = &cobra.Command{
 	Use:   "overlap-readme",
 	Short: "Generate detailed overlap analysis markdown file",
-	Long:  "Generate a detailed overlap.md file containing overlap analysis between different sources including overlap percentages, targets, and detailed statistics",
+	Long:  "Generate a detailed overlap.md file containing overlap analysis between different sources including overlap percentages, targets, and detailed statistics", // nolint:lll
 	Run: func(cmd *cobra.Command, args []string) {
 		if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
 			Logger.Debug("Skipping generate overlap-readme command in test mode")
@@ -97,6 +97,26 @@ func generateDetailedOverlapAnalysis() (string, error) {
 		fmt.Sprintf("**Last Updated:** %s\n\n", time.Now().Format("2006-01-02 15:04:05 UTC")),
 	)
 
+	sb.WriteString("## How to read this analysis\n\n")
+	// nolint:lll
+	sb.WriteString(
+		"- Unique Entries (same list type): number of entries found only in this source when compared with other sources of the same list type (blocklist vs blocklist, allowlist vs allowlist). If this is `0` the source is fully covered by other sources of the same list type.\n",
+	)
+	// nolint:lll
+	sb.WriteString(
+		"- Conflicts (cross-list overlaps): entries from this source that also appear in sources of a different list type (for example an entry present in a blocklist and an allowlist). Conflicts may indicate data mismatches.\n",
+	)
+	// nolint:lll
+	sb.WriteString(
+		"- Overlap % (in the table): shown relative to the target source (overlap_count / target_total_count). High values mean the target is largely covered by this source.\n",
+	)
+	sb.WriteString(
+		"- High overlap with low Unique: the source is mostly redundant and can be deprioritized or disabled.\n",
+	)
+	sb.WriteString(
+		"- Low overlap with high Unique: the source contributes unique entries and may be valuable to keep.\n\n",
+	)
+
 	// Summary overview
 	sb.WriteString("## Overview\n\n")
 	sb.WriteString("| Metric | Value |\n")
@@ -137,24 +157,40 @@ func generateDetailedOverlapAnalysis() (string, error) {
 		sb.WriteString("\n")
 	}
 
+	// consider targets with overlap count > 0
+	minPercent := AppConfig.DNSToolkit.GetMinOverlapPercent()
+	overlapSummaries = FilterOverlapSummariesByMinPercent(overlapSummaries, minPercent)
+
 	// Detailed analysis per source
 	sb.WriteString("## Detailed Source Analysis\n\n")
 
 	sort.Slice(overlapSummaries, func(i, j int) bool {
-		return strings.ToLower(overlapSummaries[i].Source) < strings.ToLower(overlapSummaries[j].Source)
+		return u.CaseInsensitiveLess(overlapSummaries[i].Source, overlapSummaries[j].Source)
 	})
 
 	for _, summary := range overlapSummaries {
 		sb.WriteString(fmt.Sprintf("### %s\n\n", summary.Source))
 
-		// Source details - flattened format
-		sb.WriteString(fmt.Sprintf("**List Type:** %s | ", summary.ListType))
-		sb.WriteString(fmt.Sprintf("**Source Type:** %s | ", summary.Type))
-		sb.WriteString(fmt.Sprintf("**Total Entries:** %s | ", formatNumber(summary.Count)))
-		sb.WriteString(fmt.Sprintf("**Unique Entries:** %s | ", formatNumber(summary.Unique)))
-		sb.WriteString(fmt.Sprintf("**Target Sources:** %d\n\n", summary.TargetsCount))
+		concise := fmt.Sprintf(
+			"List Type: %s | Source Type: %s | Total: %s | Targets: %d | Unique: %s | Conflicts: %s",
+			summary.ListType,
+			summary.Type,
+			formatNumber(summary.Count),
+			summary.TargetsCount,
+			formatNumber(summary.Unique),
+			formatNumber(summary.Conflicts),
+		)
+		sb.WriteString("<details>\n")
+		sb.WriteString(fmt.Sprintf("<summary>%s</summary>\n\n", concise))
 
-		// Targets analysis
+		// sb.WriteString(fmt.Sprintf("**List Type:** %s  \n", summary.ListType))
+		// sb.WriteString(fmt.Sprintf("**Source Type:** %s  \n", summary.Type))
+		// sb.WriteString(fmt.Sprintf("**Total Entries:** %s  \n", formatNumber(summary.Count)))
+		// sb.WriteString(fmt.Sprintf("**Unique Entries (same list type):** %s  \n", formatNumber(summary.Unique)))
+		// sb.WriteString(fmt.Sprintf("**Conflicts (cross-list overlaps):** %s  \n", formatNumber(summary.Conflicts)))
+		// sb.WriteString(fmt.Sprintf("**Target Sources:** %d\n\n", summary.TargetsCount))
+
+		// Targets analysis (table)
 		if len(summary.TargetsList) > 0 {
 			sb.WriteString("**Overlap with Other Sources:**\n\n")
 			sb.WriteString(
@@ -166,7 +202,10 @@ func generateDetailedOverlapAnalysis() (string, error) {
 
 			for _, targetStr := range summary.TargetsList {
 				target := parseTargetString(targetStr)
-				if target != nil {
+				if target == nil {
+					continue
+				}
+				if target.OverlapCount > 0 || target.OverlapPercent >= minPercent {
 					sb.WriteString(fmt.Sprintf("| %s | %s | %s | %s | %s | %.1f%% |\n",
 						target.Name,
 						target.ListType,
@@ -181,6 +220,8 @@ func generateDetailedOverlapAnalysis() (string, error) {
 			sb.WriteString("*No overlaps found with other sources.*\n\n")
 		}
 
+		sb.WriteString("</details>\n\n")
+
 		sb.WriteString("---\n\n")
 	}
 
@@ -189,18 +230,22 @@ func generateDetailedOverlapAnalysis() (string, error) {
 		"This overlap analysis is automatically generated by the [DNS Toolkit](%s) ",
 		constants.GitHubRepoURL,
 	))
-	sb.WriteString("to help understand relationships between different DNS sources. ")
+	sb.WriteString("to help understand relationships between different DNS sources.\n\n")
 	sb.WriteString(
-		"High overlap percentages may indicate redundant sources, while low overlap percentages suggest unique content.\n\n",
+		"**Note:** Per-source percentages are computed as (overlap_count / source_total_count) × 100. ",
 	)
 	sb.WriteString(
-		"**Note:** Overlap percentages are calculated as: (overlap_count / source_total_count) × 100\n\n",
+		"In `Overlap with Other Sources` table the displayed Overlap % is computed relative to the target ",
+	)
+	sb.WriteString(
+		"(overlap_count / target_total_count) × 100.\n\n",
 	)
 
 	return sb.String(), nil
 }
 
-// parseTargetString parses target strings like "abpvn_hosts, lt: blocklist, type: adguard, count: 1051, overlap: 10, percent: 1.0"
+// parseTargetString parses target strings
+// like "abpvn_hosts, lt: blocklist, type: adguard, count: 1051, overlap: 10, percent: 1.0"
 func parseTargetString(target string) *TargetDetail {
 	parts := strings.Split(target, ", ")
 	if len(parts) < 6 {
@@ -257,4 +302,40 @@ func parseFloatFromString(s string) (float64, error) {
 
 func init() {
 	generateCmd.AddCommand(generateOverlapCmd)
+}
+
+// FilterOverlapSummariesByMinPercent filters overlap summaries by minimum overlap percent.
+func FilterOverlapSummariesByMinPercent(overlapSummaries []c.OverlapSummary, minPercent float64) []c.OverlapSummary {
+	if minPercent <= 0 {
+		return overlapSummaries
+	}
+
+	filteredSummaries := make([]c.OverlapSummary, 0, len(overlapSummaries))
+	for _, s := range overlapSummaries {
+		if s.TargetsCount == 0 || len(s.TargetsList) == 0 {
+			filteredSummaries = append(filteredSummaries, s)
+			continue
+		}
+
+		newTargets := make([]string, 0, len(s.TargetsList))
+		for _, targetStr := range s.TargetsList {
+			td := parseTargetString(targetStr)
+			if td == nil {
+				continue
+			}
+			if td.OverlapCount > 0 || td.OverlapPercent >= minPercent {
+				newTargets = append(newTargets, targetStr)
+			}
+		}
+
+		if len(newTargets) == 0 {
+			continue
+		}
+
+		s.TargetsList = newTargets
+		s.TargetsCount = len(newTargets)
+		filteredSummaries = append(filteredSummaries, s)
+	}
+
+	return filteredSummaries
 }

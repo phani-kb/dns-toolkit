@@ -9,9 +9,11 @@ import (
 	"github.com/phani-kb/multilog"
 )
 
-var Logger *multilog.Logger
-var AppConfig *config.AppConfig
-var SourcesConfigs []config.SourcesConfig
+var (
+	Logger         *multilog.Logger
+	AppConfig      *config.AppConfig
+	SourcesConfigs []config.SourcesConfig
+)
 
 // GetConfigPath returns the path to the configuration file.
 func GetConfigPath() (string, error) {

@@ -3,6 +3,7 @@ package cmd
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
@@ -14,10 +15,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var ignoreAllowlist bool
-var includeInvalid bool
-var calculateChecksum bool
-var skipConsolidatedSummary bool
+var (
+	ignoreAllowlist         bool
+	includeInvalid          bool
+	calculateChecksum       bool
+	skipConsolidatedSummary bool
+)
 
 var consolidateCmd = &cobra.Command{
 	Use:   "consolidate",
@@ -40,13 +43,14 @@ var consolidateAllCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		_, genericSourceTypes, processedFiles := cfg.GetProcessedSummaries(
+		_, genericSourceTypes, processedFiles := cfg.GetProcessedSummariesForConsolidation(
 			Logger,
 			SourcesConfigs,
 			*AppConfig,
+			"general",
 		)
 		var allConsolidatedSummaries []c.ConsolidatedSummary
-		var allowlistEntriesByType = make(map[string]u.StringSet)
+		allowlistEntriesByType := make(map[string]u.StringSet)
 		var mu sync.Mutex
 
 		// First phase: Process all allowlists synchronously
@@ -144,18 +148,24 @@ func processAllowlists(
 ) {
 	Logger.Infof("Processing allowlists...")
 	for _, genericSourceType := range genericSourceTypes {
+		// Get local blocklist entries for this source type to use as filter
+		localBlocklistEntries := getLocalBlocklistEntries(genericSourceType, processedFiles)
+
 		entries, allowlistSummary := consolidateFilesBasedOnSTLT(
 			Logger,
 			genericSourceType,
 			constants.ListTypeAllowlist,
 			true,
-			u.NewStringSet([]string{}),
+			localBlocklistEntries, // Use local blocklist as filter
 			processedFiles,
 		)
 		allowlistEntriesByType[genericSourceType] = entries
 		appendSummary(allConsolidatedSummaries, allowlistSummary, IsConsolidatedSummaryValid)
 
 		Logger.Debugf("Valid Allowlisted entry(s) count for %s: %d", genericSourceType, len(entries))
+		if len(localBlocklistEntries) > 0 {
+			Logger.Debugf("Local blocklist entries filtered for %s: %d", genericSourceType, len(localBlocklistEntries))
+		}
 
 		if includeInvalid {
 			_, invalidAllowlistSummary := consolidateFilesBasedOnSTLT(
@@ -163,7 +173,7 @@ func processAllowlists(
 				genericSourceType,
 				constants.ListTypeAllowlist,
 				false,
-				u.NewStringSet([]string{}),
+				localBlocklistEntries,
 				processedFiles,
 			)
 			appendSummary(
@@ -174,6 +184,37 @@ func processAllowlists(
 		}
 	}
 	Logger.Debugf("Finished processing allowlists")
+}
+
+func getLocalBlocklistEntries(genericSourceType string, processedFiles []c.ProcessedFile) u.StringSet {
+	localBlocklistFiles := make([]c.ProcessedFile, 0)
+	for _, file := range processedFiles {
+		if file.GenericSourceType == genericSourceType &&
+			file.ListType == constants.ListTypeBlocklist &&
+			file.Valid &&
+			strings.HasPrefix(file.Name, "Local") {
+			localBlocklistFiles = append(localBlocklistFiles, file)
+		}
+	}
+
+	if len(localBlocklistFiles) == 0 {
+		return u.NewStringSet([]string{})
+	}
+
+	Logger.Debugf("Found %d local blocklist files for %s", len(localBlocklistFiles), genericSourceType)
+
+	consolidator, exists := con.Consolidators.GetConsolidator(genericSourceType, constants.ListTypeBlocklist)
+	if !exists {
+		Logger.Warnf("No consolidator found for generic source type: %s, list type: %s",
+			genericSourceType, constants.ListTypeBlocklist)
+		return u.NewStringSet([]string{})
+	}
+
+	// Consolidate local blocklist entries
+	consolidatedEntries, _ := consolidator.Consolidate(Logger, localBlocklistFiles)
+	Logger.Debugf("Consolidated %d local blocklist entries for %s", len(consolidatedEntries), genericSourceType)
+
+	return consolidatedEntries
 }
 
 func consolidateFilesBasedOnSTLT(
@@ -289,6 +330,7 @@ func init() {
 		BoolVar(&calculateChecksum, "calculate-checksum", false, "Calculate checksum on the consolidated files")
 	consolidateCategoriesCmd.PersistentFlags().
 		BoolVar(&skipConsolidatedSummary, "skip-consolidated-summary", false, "Skip creating the consolidated summary file")
+	// nolint:lll
 	consolidateGroupsCmd.PersistentFlags().
 		BoolVar(&skipConsolidatedSummary, "skip-consolidated-summary", false, "Skip creating the regular consolidated summary file")
 	consolidateCmd.AddCommand(consolidateAllCmd)
