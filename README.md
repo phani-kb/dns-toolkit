@@ -127,7 +127,7 @@ flowchart LR
 | **Categories** | 37 | ads, adult, annoyance, anonymizer, botnet, browser, cryptocurrency, dating, discord, dns, doh, fake, fakenews, finance, gambling, issues, kad, local, mac, malicious, malware, mobile, others, phishing, privacy, proxy, ransomware, scam, smarttv, social, spam, threat, topdomains, torrent_trackers, trackers, url_shorteners, windows |
 | **Source Types** | 27 | adguard, cidr_ipv4, domain, domain_adguard, domain_comment, domain_csv_http_url_find, domain_custom_csv_blackbook, domain_custom_csv_maltrail, domain_custom_html_ccam, domain_custom_html_puppyscams, domain_http_url, domain_top, domain_url, domain_with_comment_suffix, hostname, ipv4, ipv4_cidr_expand, ipv4_csv_http_url_find, ipv4_custom_html_ccam, ipv4_find, ipv4_from_domain, ipv4_http_url, ipv4_range_expand, ipv4_url, ipv6, ipv6_find, ipv6_htaccess |
 | **Geographic Coverage** | 21 countries | CN, CZ, DE, ES, FI, FR, HU, ID, IL, IT, KR, LV, MY, NL, RO, RU, SA, SK, UA, US, VN |
-| **Last Updated** | 2025-08-24 19:04:18 UTC | Statistics generation time |
+| **Last Updated** | 2025-08-24 19:39:11 UTC | Statistics generation time |
 
 <!-- STATS_END -->
 
@@ -304,7 +304,7 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | Borestad_AbuseIPDB_S100_3d | ✅ | malicious, threat | <span style="white-space:nowrap">80682 / 0 / 0</span> | - |
 | BruteforceBlocker | ✅ | threat | <span style="white-space:nowrap">433 / 0 / 0</span> | >95% overlap with EmergingThreats_CompromisedIPs |
 | CINSScore_BadGuys_Army | ✅ | malicious, threat | <span style="white-space:nowrap">15000 / 0 / 0</span> | - |
-| DoH_IP_blocklists | ✅ | doh | <span style="white-space:nowrap">2576 / 676 / 10</span> | >90% overlap with HaGeZi Encrypted DNS Servers |
+| DoH_IP_blocklists | ✅ | doh | <span style="white-space:nowrap">2576 / 678 / 9</span> | >90% overlap with HaGeZi Encrypted DNS Servers |
 | DoH_IP_list | ✅ | doh | <span style="white-space:nowrap">731 / 0 / 0</span> | - |
 | DShield | ✅ | malicious, threat | <span style="white-space:nowrap">5120 / 0 / 0</span> | 100% overlap with Firehol_level2/Firehol_level3 |
 | EmergingThreats_CompromisedIPs | ✅ | malicious, threat | <span style="white-space:nowrap">428 / 0 / 0</span> | >95% overlap with Firehol_level3,  and Borestad_AbuseIPDB_S100_3d |
@@ -319,7 +319,7 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | Firehol_level1 | ✅ | malicious, threat | <span style="white-space:nowrap">4529 / 3055 / 0</span> | - |
 | Firehol_level2 | ✅ | malicious, threat | <span style="white-space:nowrap">14853 / 0 / 0</span> | - |
 | Firehol_level3 | ✅ | malicious, threat | <span style="white-space:nowrap">12187 / 0 / 3</span> | - |
-| Firehol_SocksProxy_7d | ✅ | anonymizer, privacy, proxy | <span style="white-space:nowrap">2547 / 2279 / 0</span> | - |
+| Firehol_SocksProxy_7d | ✅ | anonymizer, privacy, proxy | <span style="white-space:nowrap">110 / 0 / 0</span> | - |
 | Firehol_SSLProxies_1d | ✅ | anonymizer, privacy, proxy | <span style="white-space:nowrap">299 / 225 / 0</span> | - |
 | GlobalAntiScamOrg-blocklist-ips | ✅ | scam | - | - |
 | Greensnow | ✅ | malicious, malware, threat | <span style="white-space:nowrap">5491 / 0 / 0</span> | >95% overlap with Firehol_level2 |
@@ -345,11 +345,11 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 
 | Name | S | Categories | C/U/X | Notes |
 |------|---|------------|-------|-------|
-| Local AI Allowlist (Domain) | ✅ | local | <span style="white-space:nowrap">49 / 0 / 51</span> | - |
-| Local AI Blocklist (Domain) | ✅ | local | <span style="white-space:nowrap">49 / 0 / 51</span> | - |
+| Local AI Allowlist (Domain) | ✅ | local | <span style="white-space:nowrap">50 / 0 / 51</span> | - |
+| Local AI Blocklist (Domain) | ✅ | local | <span style="white-space:nowrap">50 / 0 / 51</span> | - |
 | Local Allowlist (AdGuard) | ✅ | local | - | - |
 | Local Allowlist (Domain) | ✅ | local | <span style="white-space:nowrap">47 / 6 / 8</span> | - |
-| Local Allowlist (ipv4) | ✅ | local | <span style="white-space:nowrap">74 / 53 / 19</span> | - |
+| Local Allowlist (ipv4) | ✅ | local | <span style="white-space:nowrap">76 / 57 / 18</span> | - |
 | Local Blocklist (AdGuard) | ✅ | local | <span style="white-space:nowrap">7 / 0 / 0</span> | - |
 | Local Blocklist (Domain) | ✅ | local | <span style="white-space:nowrap">1 / 0 / 1</span> | - |
 
