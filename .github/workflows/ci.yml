@@ -317,12 +317,12 @@ jobs:
               echo "Allowlist files were modified..."
               ALLOWLIST_UPDATED="true"
               
-              if [[ -f ".github/scripts/commit-and-auto-merge.sh" ]]; then
+              if [[ -f ".github/scripts/auto-merge.sh" ]]; then
                 export PUSH_TOKEN="${{ secrets.PUSH_TOKEN }}"
                 export GITHUB_REPOSITORY="${{ github.repository }}"
                 export GITHUB_RUN_NUMBER="${{ github.run_number }}"
 
-                ./.github/scripts/commit-and-auto-merge.sh "data/custom/allowlist_*.txt" \
+                ./.github/scripts/auto-merge.sh "data/custom/allowlist_*.txt" \
                   "Auto-update: Refresh allowlist files (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }})" \
                   "update-allowlist" "Auto-update: Refresh allowlist files"
               else
@@ -405,12 +405,12 @@ jobs:
             if ! git diff --quiet -- README.md; then
               echo "README.md has been modified, handling README changes..."
 
-              if [[ -f ".github/scripts/commit-and-auto-merge.sh" ]]; then
+              if [[ -f ".github/scripts/auto-merge.sh" ]]; then
                 export PUSH_TOKEN="${{ secrets.PUSH_TOKEN }}"
                 export GITHUB_REPOSITORY="${{ github.repository }}"
                 export GITHUB_RUN_NUMBER="${{ github.run_number }}"
 
-                ./.github/scripts/commit-and-auto-merge.sh "README.md" \
+                ./.github/scripts/auto-merge.sh "README.md" \
                   "Auto-update: Generated README (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }}) [skip ci]" \
                   "update-readme" "Auto-update: Generated README (mode: ${{ env.PIPELINE_MODE }})"
               else

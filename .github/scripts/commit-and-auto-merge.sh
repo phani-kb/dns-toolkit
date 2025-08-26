@@ -54,17 +54,65 @@ if ./.github/scripts/push-to-main.sh "$FILES_PATTERN" "$DESCRIPTION" "$BRANCH_NA
         PR_NUMBER=$(gh pr list --head "$BRANCH_NAME" --base main --json number --jq '.[0].number' 2>/dev/null || echo "")
         
         if [[ -n "$PR_NUMBER" ]]; then
-            echo "Found PR #$PR_NUMBER, attempting auto-merge..."
+            echo "Found PR #$PR_NUMBER, checking merge readiness..."
             
+            # First try auto-merge (will queue for when checks pass)
             if gh pr merge "$PR_NUMBER" --auto --squash --delete-branch; then
-                echo "✅ PR #$PR_NUMBER auto-merged successfully"
+                echo "✅ PR #$PR_NUMBER auto-merge enabled (will merge when checks pass)"
             else
-                echo "⚠️ Auto-merge failed, attempting direct merge..."
+                echo "⚠️ Auto-merge failed, checking if we can merge immediately..."
                 
-                if gh pr merge "$PR_NUMBER" --squash --delete-branch; then
-                    echo "✅ PR #$PR_NUMBER merged directly and branch deleted"
+                # Check if PR is ready to merge (all checks passed)
+                PR_STATUS=$(gh pr view "$PR_NUMBER" --json mergeable,statusCheckRollupState --jq '.mergeable + ":" + .statusCheckRollupState' 2>/dev/null || echo "unknown:unknown")
+                MERGEABLE=$(echo "$PR_STATUS" | cut -d: -f1)
+                CHECK_STATE=$(echo "$PR_STATUS" | cut -d: -f2)
+                
+                echo "PR Status: mergeable=$MERGEABLE, checks=$CHECK_STATE"
+                
+                if [[ "$MERGEABLE" == "MERGEABLE" && "$CHECK_STATE" == "SUCCESS" ]]; then
+                    echo "✅ All checks passed, attempting direct merge..."
+                    if gh pr merge "$PR_NUMBER" --squash --delete-branch; then
+                        echo "✅ PR #$PR_NUMBER merged directly and branch deleted"
+                    else
+                        echo "⚠️ Direct merge failed despite checks passing"
+                    fi
+                elif [[ "$CHECK_STATE" == "PENDING" || "$CHECK_STATE" == "EXPECTED" ]]; then
+                    echo "⏳ Status checks are still running, waiting briefly..."
+                    
+                    for i in {1..8}; do
+                        sleep 15
+                        NEW_STATUS=$(gh pr view "$PR_NUMBER" --json mergeable,statusCheckRollupState --jq '.mergeable + ":" + .statusCheckRollupState' 2>/dev/null || echo "unknown:unknown")
+                        NEW_MERGEABLE=$(echo "$NEW_STATUS" | cut -d: -f1)
+                        NEW_CHECK_STATE=$(echo "$NEW_STATUS" | cut -d: -f2)
+                        
+                        echo "  Check $i/8: mergeable=$NEW_MERGEABLE, checks=$NEW_CHECK_STATE"
+                        
+                        if [[ "$NEW_MERGEABLE" == "MERGEABLE" && "$NEW_CHECK_STATE" == "SUCCESS" ]]; then
+                            echo "✅ All checks passed after waiting, attempting merge..."
+                            if gh pr merge "$PR_NUMBER" --squash --delete-branch; then
+                                echo "✅ PR #$PR_NUMBER merged successfully after waiting"
+                                break
+                            else
+                                echo "⚠️ Merge failed despite checks passing"
+                                break
+                            fi
+                        elif [[ "$NEW_CHECK_STATE" == "FAILURE" ]]; then
+                            echo "❌ Status checks failed during wait"
+                            break
+                        fi
+                    done
+                    
+                    # If we get here and haven't merged, provide final status
+                    if [[ "$NEW_CHECK_STATE" == "PENDING" || "$NEW_CHECK_STATE" == "EXPECTED" ]]; then
+                        echo "⏳ Checks still running after 2 minutes, PR will auto-merge when ready"
+                        echo "   Monitor at: https://github.com/$GITHUB_REPOSITORY/pull/$PR_NUMBER"
+                    fi
+                elif [[ "$CHECK_STATE" == "FAILURE" ]]; then
+                    echo "❌ Status checks failed, PR needs manual review"
+                    echo "   Check failures at: https://github.com/$GITHUB_REPOSITORY/pull/$PR_NUMBER"
                 else
-                    echo "⚠️ Direct merge also failed, PR #$PR_NUMBER needs manual review"
+                    echo "⚠️ PR #$PR_NUMBER needs manual review (status: $PR_STATUS)"
+                    echo "   Manual merge may be required due to branch protection rules"
                 fi
             fi
         else
