@@ -59,7 +59,13 @@ if ./.github/scripts/push-to-main.sh "$FILES_PATTERN" "$DESCRIPTION" "$BRANCH_NA
             if gh pr merge "$PR_NUMBER" --auto --squash --delete-branch; then
                 echo "✅ PR #$PR_NUMBER auto-merged successfully"
             else
-                echo "⚠️ Auto-merge failed, PR #$PR_NUMBER needs manual review"
+                echo "⚠️ Auto-merge failed, attempting direct merge..."
+                
+                if gh pr merge "$PR_NUMBER" --squash --delete-branch; then
+                    echo "✅ PR #$PR_NUMBER merged directly and branch deleted"
+                else
+                    echo "⚠️ Direct merge also failed, PR #$PR_NUMBER needs manual review"
+                fi
             fi
         else
             echo "⚠️ Could not find PR number for auto-merge"

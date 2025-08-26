@@ -58,39 +58,23 @@ echo "Fetching latest from origin..."
 git fetch origin
 
 if git ls-remote --heads origin "${BRANCH_NAME}" | grep -q "${BRANCH_NAME}"; then
-    echo "Branch '${BRANCH_NAME}' exists remotely, checking out..."
+    echo "Branch '${BRANCH_NAME}' exists remotely, force-resetting to avoid conflicts..."
     
     if [[ "${CURRENT_BRANCH}" == "${BRANCH_NAME}" ]]; then
-        echo "Already on branch ${BRANCH_NAME}"
-        git pull origin "${BRANCH_NAME}" --rebase || {
-            echo "Pull failed, attempting to resolve..."
-            git rebase --abort 2>/dev/null || true
-            git pull origin "${BRANCH_NAME}" --no-rebase
-        }
-    else
-        git stash push -m "Temporary stash for branch switch" || true
-        
-        git checkout "${BRANCH_NAME}" 2>/dev/null || {
-            echo "Local branch doesn't exist, creating from remote..."
-            git checkout -b "${BRANCH_NAME}" "origin/${BRANCH_NAME}"
-        }
-        
-        git pull origin "${BRANCH_NAME}" --rebase || {
-            echo "Pull failed, attempting to resolve..."
-            git rebase --abort 2>/dev/null || true
-            git pull origin "${BRANCH_NAME}" --no-rebase
-        }
-        
-        git stash pop 2>/dev/null || true
+        echo "Already on branch ${BRANCH_NAME}, switching to main first"
+        git checkout main
     fi
+    
+    git branch -D "${BRANCH_NAME}" 2>/dev/null || true    
+    git checkout -b "${BRANCH_NAME}" origin/main
+    
+    echo "Created fresh branch '${BRANCH_NAME}' from main to avoid conflicts"
 else
     echo "Branch '${BRANCH_NAME}' doesn't exist, creating new branch..."
     
     if [[ "${CURRENT_BRANCH}" != "${BRANCH_NAME}" ]]; then
         git stash push -m "Temporary stash for branch creation" || true
-        
-        git checkout -b "${BRANCH_NAME}" origin/main
-        
+        git checkout -b "${BRANCH_NAME}" origin/main        
         git stash pop 2>/dev/null || true
     fi
 fi
@@ -111,10 +95,13 @@ git commit -m "${FULL_COMMIT_MESSAGE}" || {
 }
 
 echo "Pushing branch '${BRANCH_NAME}' to origin..."
-git push origin "${BRANCH_NAME}" || {
-    echo "Push failed, attempting with force-with-lease..."
-    git push origin "${BRANCH_NAME}" --force-with-lease
-}
+if git ls-remote --heads origin "${BRANCH_NAME}" | grep -q "${BRANCH_NAME}"; then
+    echo "Branch exists remotely, force-pushing to overwrite..."
+    git push origin "${BRANCH_NAME}" --force
+else
+    echo "New branch, pushing normally..."
+    git push origin "${BRANCH_NAME}"
+fi
 
 echo "Changes pushed to branch '${BRANCH_NAME}'"
 
@@ -125,38 +112,39 @@ if command -v gh &> /dev/null; then
     
     EXISTING_PR=$(gh pr list --head "${BRANCH_NAME}" --base main --json number --jq '.[0].number' 2>/dev/null || echo "")
     
-    if [[ -z "${EXISTING_PR}" ]]; then
-        echo "Creating new PR to main branch..."
-        
-        PR_BODY="## Automated Update
+    if [[ -n "${EXISTING_PR}" ]]; then
+        echo "Found existing PR #${EXISTING_PR}, closing it to create a fresh one..."
+        gh pr close "${EXISTING_PR}" --delete-branch || {
+            echo "Failed to close existing PR #${EXISTING_PR}"
+            exit 1
+        }
+        echo "Existing PR closed, creating new one..."
+    fi
+    
+    echo "Creating new PR to main branch..."
 
-**Branch**: \`${BRANCH_NAME}\`
-**CI Run**: #${GITHUB_RUN_NUMBER}
-**Files Changed**: \`${FILES_PATTERN}\`
+    PR_BODY="### Automated Update
+
+Branch: \`${BRANCH_NAME}\`
+CI Run: #${GITHUB_RUN_NUMBER}
+Files Changed: \`${FILES_PATTERN}\`
 
 ### Changes
 ${COMMIT_MESSAGE}
 
 ---
-*This PR was automatically created by the CI pipeline.*"
-        
-        gh pr create \
-            --title "${FULL_COMMIT_MESSAGE}" \
-            --body "${PR_BODY}" \
-            --head "${BRANCH_NAME}" \
-            --base main \
-            --repo "${GITHUB_REPOSITORY}" || {
+This PR was automatically created by the CI pipeline."
+    
+    gh pr create \
+        --title "${FULL_COMMIT_MESSAGE}" \
+        --body "${PR_BODY}" \
+        --head "${BRANCH_NAME}" \
+        --base main \
+        --repo "${GITHUB_REPOSITORY}" || {
             echo "Warning: Failed to create PR. Please create it manually."
         }
         
-        echo "PR created successfully"
-    else
-        echo "PR #${EXISTING_PR} already exists and was updated with new commit"
-
-        gh pr comment "${EXISTING_PR}" \
-            --body "Updated with new changes from CI run #${GITHUB_RUN_NUMBER}" \
-            --repo "${GITHUB_REPOSITORY}" 2>/dev/null || true
-    fi
+    echo "PR created successfully"
 else
     echo ""
     echo "⚠️  GitHub CLI not available. Please create PR manually:"
