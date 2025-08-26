@@ -28,6 +28,9 @@ func TestComputeCompactSummaryFromPairs_DedupeOverlapCounts(t *testing.T) {
 
 	cs := computeCompactSummaryFromPairs("domain", "sourceA", pairs)
 	assert.NotNil(t, cs)
+	if cs == nil {
+		t.FailNow()
+	}
 	assert.Equal(t, 2, cs.TargetsCount)
 	// For targetX, the highest overlap=10, so total overlap = 10 + 5 = 15
 	assert.Equal(t, 15, func() int { return cs.Count - cs.Unique }())
@@ -53,6 +56,9 @@ func TestComputeCompactSummaryFromPairs_ListTypeDiffers(t *testing.T) {
 
 	cs := computeCompactSummaryFromPairs("domain", "sourceA", pairs)
 	assert.NotNil(t, cs)
+	if cs == nil {
+		t.FailNow()
+	}
 	assert.Equal(t, 2, cs.TargetsCount)
 	// total overlap = 10 + 3 = 13
 	assert.Equal(t, 13, func() int { return cs.Count - cs.Unique }())
@@ -76,6 +82,9 @@ func TestComputeCompactSummaryFromPairs_TypeDiffers(t *testing.T) {
 
 	cs := computeCompactSummaryFromPairs("domain", "sourceA", pairs)
 	assert.NotNil(t, cs)
+	if cs == nil {
+		t.FailNow()
+	}
 	assert.Equal(t, 2, cs.TargetsCount)
 	// total overlap = 10 + 4 = 14
 	assert.Equal(t, 14, func() int { return cs.Count - cs.Unique }())

@@ -53,7 +53,12 @@ func TestLoadCustomElements(t *testing.T) {
 func TestWriteAllowlistWithStructure(t *testing.T) {
 	logger, _ := multilog.NewTestLogger(t)
 	file := "test_allowlist.txt"
-	defer os.Remove(file)
+	defer func(name string) {
+		err := os.Remove(name)
+		if err != nil {
+			logger.Errorf("Failed to remove file %s: %v\n", name, err)
+		}
+	}(file)
 	err := writeAllowlistWithStructure(
 		logger,
 		file,
@@ -69,7 +74,12 @@ func TestWriteAllowlistWithStructure(t *testing.T) {
 func TestGenerateAdGuardRules(t *testing.T) {
 	logger, _ := multilog.NewTestLogger(t)
 	file := "test_adguard.txt"
-	defer os.Remove(file)
+	defer func(name string) {
+		err := os.Remove(name)
+		if err != nil {
+			logger.Errorf("Failed to remove file %s: %v\n", name, err)
+		}
+	}(file)
 	err := generateAdGuardRules(logger, file, []string{"a.com"}, []string{"b.com"})
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)

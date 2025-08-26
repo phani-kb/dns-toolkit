@@ -11,6 +11,8 @@ import (
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/config"
+	"github.com/phani-kb/dns-toolkit/internal/utils"
+	"github.com/phani-kb/multilog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -468,7 +470,8 @@ func TestDomainTopDownloader_PostDownloadProcess_LargeFile(t *testing.T) {
 		_, err := fmt.Fprintf(file, "%d,domain%d.com\n", i, i)
 		require.NoError(t, err)
 	}
-	file.Close()
+	logger, _ = multilog.NewTestLogger(t)
+	defer utils.CloseFile(logger, file)
 
 	downloader := NewDomainTopDownloaderWithRetries(1)
 	err = downloader.PostDownloadProcess(logger, testFile, 100)

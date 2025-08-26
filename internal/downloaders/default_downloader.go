@@ -222,7 +222,7 @@ func (d *DefaultDownloader) downloadFile(
 		}
 
 		// Check response status
-		if resp.StatusCode == http.StatusTooManyRequests && attempt < d.maxRetries {
+		if resp != nil && resp.StatusCode == http.StatusTooManyRequests && attempt < d.maxRetries {
 			u.CloseBody(logger, resp.Body)
 
 			// For 429, use exponential backoff with jitter
@@ -350,7 +350,7 @@ func (d *DefaultDownloader) canSkipDownload(
 		}()
 	}
 
-	if err != nil || resp.StatusCode != http.StatusOK {
+	if err != nil || resp != nil && resp.StatusCode != http.StatusOK {
 		return false
 	}
 

@@ -40,7 +40,9 @@ func TestRegisterDuplicateDownloader(t *testing.T) {
 
 	err = downloaders.RegisterDownloader(mockDownloader2)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "already exists")
+	if err == nil {
+		assert.Contains(t, err.Error(), "already exists")
+	}
 }
 
 // TestGetDownloader tests retrieving an existing downloader

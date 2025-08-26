@@ -70,7 +70,7 @@ func TestGenerateDetailedOverlapAnalysis(t *testing.T) {
 	assert.Contains(t, overlapMd, "**Last Updated:**")
 	assert.Contains(t, overlapMd, "## About")
 
-	emptyOverlapSummaries := []c.OverlapSummary{}
+	var emptyOverlapSummaries []c.OverlapSummary
 	content, err := json.Marshal(emptyOverlapSummaries)
 	require.NoError(t, err)
 	summaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles["overlap"])

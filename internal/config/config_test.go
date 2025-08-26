@@ -378,7 +378,9 @@ func TestValidateAppConfig(t *testing.T) {
 
 	err := ValidateAppConfig(validConfig)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "application validation error")
+	if assert.Error(t, err) {
+		assert.Contains(t, err.Error(), "application validation error")
+	}
 
 	// Invalid config
 	invalidConfig := AppConfig{
@@ -389,7 +391,9 @@ func TestValidateAppConfig(t *testing.T) {
 
 	err = ValidateAppConfig(invalidConfig)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "application validation error")
+	if assert.Error(t, err) {
+		assert.Contains(t, err.Error(), "application validation error")
+	}
 }
 
 func TestSourcesConfigIsEnabled(t *testing.T) {

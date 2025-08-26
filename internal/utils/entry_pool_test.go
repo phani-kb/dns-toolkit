@@ -69,8 +69,8 @@ func TestDTEntryPool_InternMany(t *testing.T) {
 
 	pool := NewDTEntryPool()
 
-	strings := []string{"example.com", "google.com", "example.com", "github.com"}
-	interned := pool.InternMany(strings)
+	strs := []string{"example.com", "google.com", "example.com", "github.com"}
+	interned := pool.InternMany(strs)
 
 	assert.Len(t, interned, 4)
 	assert.Equal(t, "example.com", interned[0])
@@ -174,8 +174,8 @@ func TestDTEntryPool_WithConstants(t *testing.T) {
 	interned := pool.Intern(normalStr)
 	assert.Equal(t, normalStr, interned)
 
-	strings := []string{"google.com", "github.com", "stackoverflow.com"}
-	for _, s := range strings {
+	strs := []string{"google.com", "github.com", "stackoverflow.com"}
+	for _, s := range strs {
 		interned := pool.Intern(s)
 		assert.Equal(t, s, interned)
 	}

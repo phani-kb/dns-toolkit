@@ -148,7 +148,7 @@ var downloadCmd = &cobra.Command{
 
 						if err != nil {
 
-							switch e := err.(type) {
+							switch e := err.(type) { // wrapped errors handling
 							case *d.HTTPStatusError:
 								Logger.Errorf("Downloading source %s error: HTTP status %d for %s", source.Name, e.StatusCode, e.URL)
 								summary.Error = e.Error()

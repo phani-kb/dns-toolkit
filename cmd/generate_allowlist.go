@@ -186,7 +186,7 @@ func loadCustomElements(logger *multilog.Logger, filename string) []string {
 	defer utils.CloseFile(logger, file)
 
 	scanner := bufio.NewScanner(file)
-	inSourceDomains := false
+	// inSourceDomains := false
 
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
@@ -195,7 +195,7 @@ func loadCustomElements(logger *multilog.Logger, filename string) []string {
 			break
 		}
 
-		if !utils.IsComment(line) && !inSourceDomains {
+		if !utils.IsComment(line) {
 			domains = append(domains, line)
 		}
 	}

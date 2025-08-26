@@ -33,7 +33,7 @@ func (m *mockConsolidatorCommon) Consolidate(_ *multilog.Logger, _ []c.Processed
 
 func (m *mockConsolidatorCommon) FilterEntries(
 	_ *multilog.Logger,
-	entries, filterEntries u.StringSet,
+	entries, _ u.StringSet,
 ) (u.StringSet, u.StringSet) {
 	if m.filteredEntries != nil && m.ignoredEntries != nil {
 		return m.filteredEntries, m.ignoredEntries
@@ -376,8 +376,8 @@ func TestProcessIdentifierConsolidation(t *testing.T) {
 	mockGetCategoryFilesFunc := func(files []c.ProcessedFile, category string) []c.ProcessedFile {
 		var result []c.ProcessedFile
 		for _, file := range files {
-			for _, c := range file.Categories {
-				if c == category {
+			for _, cat := range file.Categories {
+				if cat == category {
 					result = append(result, file)
 					break
 				}
@@ -623,7 +623,7 @@ func TestProcessingConfig(t *testing.T) {
 		return u.NewStringSet([]string{}), c.ConsolidatedSummary{}
 	}
 
-	config := ProcessingConfig{
+	cfg := ProcessingConfig{
 		GetFilesFunc:       mockGetFilesFunc,
 		ConsolidateFunc:    mockConsolidateFunc,
 		ProcessedFiles:     []c.ProcessedFile{},
@@ -632,12 +632,12 @@ func TestProcessingConfig(t *testing.T) {
 		IdentifierField:    "Group",
 	}
 
-	assert.NotNil(t, config.GetFilesFunc, "GetFilesFunc should not be nil")
-	assert.NotNil(t, config.ConsolidateFunc, "ConsolidateFunc should not be nil")
-	assert.NotNil(t, config.ProcessedFiles, "ProcessedFiles should not be nil")
-	assert.NotEmpty(t, config.GenericSourceTypes, "GenericSourceTypes should not be empty")
-	assert.NotEmpty(t, config.Identifier, "Identifier should not be empty")
-	assert.NotEmpty(t, config.IdentifierField, "IdentifierField should not be empty")
+	assert.NotNil(t, cfg.GetFilesFunc, "GetFilesFunc should not be nil")
+	assert.NotNil(t, cfg.ConsolidateFunc, "ConsolidateFunc should not be nil")
+	assert.NotNil(t, cfg.ProcessedFiles, "ProcessedFiles should not be nil")
+	assert.NotEmpty(t, cfg.GenericSourceTypes, "GenericSourceTypes should not be empty")
+	assert.NotEmpty(t, cfg.Identifier, "Identifier should not be empty")
+	assert.NotEmpty(t, cfg.IdentifierField, "IdentifierField should not be empty")
 }
 
 func TestConsolidateGeneric_FileSaveError(t *testing.T) {
@@ -927,7 +927,7 @@ func TestProcessIdentifierConsolidation_EdgeCases(t *testing.T) {
 	logger := multilog.NewLogger()
 
 	t.Run("nil get files function", func(t *testing.T) {
-		config := ProcessingConfig{
+		cfg := ProcessingConfig{
 			GetFilesFunc:       nil, // Nil function
 			ConsolidateFunc:    nil,
 			ProcessedFiles:     []c.ProcessedFile{},
@@ -939,7 +939,7 @@ func TestProcessIdentifierConsolidation_EdgeCases(t *testing.T) {
 		// This should panic because the function expects valid function pointers
 		// This test demonstrates that the function requires proper validation
 		assert.Panics(t, func() {
-			processIdentifierConsolidation(logger, config)
+			processIdentifierConsolidation(logger, cfg)
 		}, "Should panic with nil function")
 	})
 
@@ -952,7 +952,7 @@ func TestProcessIdentifierConsolidation_EdgeCases(t *testing.T) {
 			return u.NewStringSet([]string{}), c.ConsolidatedSummary{}
 		}
 
-		config := ProcessingConfig{
+		cfg := ProcessingConfig{
 			GetFilesFunc:       mockGetFilesFunc,
 			ConsolidateFunc:    mockConsolidateFunc,
 			ProcessedFiles:     []c.ProcessedFile{},
@@ -961,7 +961,7 @@ func TestProcessIdentifierConsolidation_EdgeCases(t *testing.T) {
 			IdentifierField:    "Group",
 		}
 
-		result := processIdentifierConsolidation(logger, config)
+		result := processIdentifierConsolidation(logger, cfg)
 
 		summaries := result["test"]
 		assert.Equal(t, 0, len(summaries), "Should handle empty source types")
@@ -981,7 +981,7 @@ func TestProcessIdentifierConsolidation_EdgeCases(t *testing.T) {
 			}
 		}
 
-		config := ProcessingConfig{
+		cfg := ProcessingConfig{
 			GetFilesFunc:    mockGetFilesFunc,
 			ConsolidateFunc: mockConsolidateFunc,
 			ProcessedFiles: []c.ProcessedFile{
@@ -998,7 +998,7 @@ func TestProcessIdentifierConsolidation_EdgeCases(t *testing.T) {
 			IdentifierField:    "UnknownField", // Unknown field
 		}
 
-		result := processIdentifierConsolidation(logger, config)
+		result := processIdentifierConsolidation(logger, cfg)
 
 		summaries := result["test"]
 		assert.Equal(t, 1, len(summaries), "Should process with unknown field")
