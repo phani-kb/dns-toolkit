@@ -1,8 +1,8 @@
 #!/bin/bash
-set -e
+
+set -euo pipefail
 
 # Usage: ./push-to-main.sh <files-pattern> <commit-message> [branch-name]
-#
 
 if [[ $# -lt 2 ]]; then
     echo "Usage: $0 <files-pattern> <commit-message> [branch-name]"
