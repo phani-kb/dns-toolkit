@@ -317,26 +317,21 @@ jobs:
               echo "Allowlist files were modified..."
               ALLOWLIST_UPDATED="true"
               
+              # Always commit locally first to ensure clean working directory
               git add data/custom/allowlist_*.txt
               git commit -m "Auto-update: Refresh allowlist files (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }})" || true
               echo "Allowlist changes committed locally."
               
-              if [[ -f ".github/scripts/push-to-main.sh" ]]; then
-                echo "Attempting to push allowlist changes to separate branch for PR..."
-                export PUSH_TOKEN="${{ secrets.PUSH_TOKEN }}"
-                export GITHUB_REPOSITORY="${{ github.repository }}"
-                export GITHUB_RUN_NUMBER="${{ github.run_number }}"
-
-                # Reset to get the changes back for pushing
-                git reset --soft HEAD~1
+              if [[ -n "${{ secrets.PUSH_TOKEN }}" ]]; then                
+                git remote set-url origin "https://x-access-token:${{ secrets.PUSH_TOKEN }}@github.com/${{ github.repository }}.git"
                 
-                if ./.github/scripts/push-to-main.sh "data/custom/allowlist_*.txt" "Auto-update: Refresh allowlist files" "update-allowlist"; then
-                  echo "Allowlist changes pushed to separate branch successfully"
+                if git push origin main; then
+                  echo "Allowlist changes pushed to main branch successfully"
                 else
-                  echo "Push to separate branch failed, committing locally instead"
-                  git add data/custom/allowlist_*.txt
-                  git commit -m "Auto-update: Refresh allowlist files (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }})" || true
+                  echo "Failed to push to main branch, but changes are committed locally"
                 fi
+              else
+                echo "No PUSH_TOKEN available, changes only committed locally"
               fi
             else
               echo "No changes detected in allowlist files"
@@ -417,22 +412,16 @@ jobs:
               git commit -m "Auto-update: Generated README (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }}) [skip ci]" || true
               echo "README changes committed locally."
 
-              if [[ -f ".github/scripts/push-to-main.sh" ]]; then
-                echo "Attempting to push README changes to separate branch for PR..."
-                export PUSH_TOKEN="${{ secrets.PUSH_TOKEN }}"
-                export GITHUB_REPOSITORY="${{ github.repository }}"
-                export GITHUB_RUN_NUMBER="${{ github.run_number }}"
-
-                # Reset to get the changes back for pushing  
-                git reset --soft HEAD~1
-
-                if ./.github/scripts/push-to-main.sh "README.md" "Auto-update: Generated README (mode: ${{ env.PIPELINE_MODE }})" "update-readme"; then
-                  echo "README changes pushed to separate branch successfully"
+              if [[ -n "${{ secrets.PUSH_TOKEN }}" ]]; then                
+                git remote set-url origin "https://x-access-token:${{ secrets.PUSH_TOKEN }}@github.com/${{ github.repository }}.git"
+                
+                if git push origin main; then
+                  echo "README changes pushed to main branch successfully"
                 else
-                  echo "README push failed, committing locally instead"
-                  git add README.md || true
-                  git commit -m "Auto-update: Generated README (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }}) [skip ci]" || true
+                  echo "Failed to push to main branch, but changes are committed locally"
                 fi
+              else
+                echo "No PUSH_TOKEN available, changes only committed locally"
               fi
             fi
             
