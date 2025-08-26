@@ -28,6 +28,8 @@ if [[ -z "${GITHUB_REPOSITORY:-}" ]]; then
     echo "GITHUB_REPOSITORY not set, skipping auto-merge" >&2 && exit 1
 fi
 
+timestamp=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+
 git config user.name "GitHub Actions Bot"
 git config user.email "actions@github.com"
 
