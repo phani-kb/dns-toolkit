@@ -102,10 +102,19 @@ else
   
   if [[ ${#files_array[@]} -gt 0 ]]; then
     echo "Found ${#files_array[@]} files matching pattern: $FILES_PATTERN"
+    echo "Files to add: ${files_array[*]}"
+    echo "Git status before adding:"
+    git status --porcelain -- "${files_array[@]}"
+    echo "Working directory changes for these files:"
+    git diff -- "${files_array[@]}" | head -20
     git add "${files_array[@]}" || {
       echo "Failed to add matched files"
       exit 1
     }
+    echo "Git status after adding:"
+    git status --porcelain -- "${files_array[@]}"
+    echo "Staged changes for these files:"
+    git diff --cached -- "${files_array[@]}" | head -20
   else
     echo "No files found matching pattern: $FILES_PATTERN"
     if [[ -f "$FILES_PATTERN" ]]; then
@@ -117,6 +126,12 @@ else
     fi
   fi
 fi
+
+echo "Checking for staged changes..."
+echo "Git diff --cached status:"
+git diff --cached --name-status
+echo "Git status --porcelain:"
+git status --porcelain
 
 if git diff --cached --quiet; then
   echo "No staged changes for pattern '$FILES_PATTERN'. Nothing to do."
