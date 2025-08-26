@@ -131,6 +131,7 @@ const (
 	CategoryCustom          = "custom"
 	CategoryDating          = "dating"
 	CategoryKademlia        = "kad"
+	CategoryAI              = "ai"
 
 	GroupMini   = "mini"
 	GroupLite   = "lite"
@@ -320,6 +321,7 @@ var (
 		CategoryCustom:          true,
 		CategoryDating:          true,
 		CategoryKademlia:        true,
+		CategoryAI:              true,
 	}
 
 	ValidGroups = map[string]bool{

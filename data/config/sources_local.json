@@ -2,7 +2,7 @@
   "sources": [
     {
       "name": "Local AI Allowlist (Domain)",
-      "categories": "local",
+      "categories": "ai, local",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
@@ -27,7 +27,7 @@
     },
     {
       "name": "Local AI Blocklist (Domain)",
-      "categories": "local",
+      "categories": "ai, local",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
