@@ -317,21 +317,18 @@ jobs:
               echo "Allowlist files were modified..."
               ALLOWLIST_UPDATED="true"
               
-              # Always commit locally first to ensure clean working directory
-              git add data/custom/allowlist_*.txt
-              git commit -m "Auto-update: Refresh allowlist files (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }})" || true
-              echo "Allowlist changes committed locally."
-              
-              if [[ -n "${{ secrets.PUSH_TOKEN }}" ]]; then                
-                git remote set-url origin "https://x-access-token:${{ secrets.PUSH_TOKEN }}@github.com/${{ github.repository }}.git"
-                
-                if git push origin main; then
-                  echo "Allowlist changes pushed to main branch successfully"
-                else
-                  echo "Failed to push to main branch, but changes are committed locally"
-                fi
+              if [[ -f ".github/scripts/commit-and-auto-merge.sh" ]]; then
+                export PUSH_TOKEN="${{ secrets.PUSH_TOKEN }}"
+                export GITHUB_REPOSITORY="${{ github.repository }}"
+                export GITHUB_RUN_NUMBER="${{ github.run_number }}"
+
+                ./.github/scripts/commit-and-auto-merge.sh "data/custom/allowlist_*.txt" \
+                  "Auto-update: Refresh allowlist files (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }})" \
+                  "update-allowlist" "Auto-update: Refresh allowlist files"
               else
-                echo "No PUSH_TOKEN available, changes only committed locally"
+                echo "Script not found, committing locally only"
+                git add data/custom/allowlist_*.txt
+                git commit -m "Auto-update: Refresh allowlist files (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }})" || true
               fi
             else
               echo "No changes detected in allowlist files"
@@ -408,20 +405,18 @@ jobs:
             if ! git diff --quiet -- README.md; then
               echo "README.md has been modified, handling README changes..."
 
-              git add README.md || true
-              git commit -m "Auto-update: Generated README (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }}) [skip ci]" || true
-              echo "README changes committed locally."
+              if [[ -f ".github/scripts/commit-and-auto-merge.sh" ]]; then
+                export PUSH_TOKEN="${{ secrets.PUSH_TOKEN }}"
+                export GITHUB_REPOSITORY="${{ github.repository }}"
+                export GITHUB_RUN_NUMBER="${{ github.run_number }}"
 
-              if [[ -n "${{ secrets.PUSH_TOKEN }}" ]]; then                
-                git remote set-url origin "https://x-access-token:${{ secrets.PUSH_TOKEN }}@github.com/${{ github.repository }}.git"
-                
-                if git push origin main; then
-                  echo "README changes pushed to main branch successfully"
-                else
-                  echo "Failed to push to main branch, but changes are committed locally"
-                fi
+                ./.github/scripts/commit-and-auto-merge.sh "README.md" \
+                  "Auto-update: Generated README (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }}) [skip ci]" \
+                  "update-readme" "Auto-update: Generated README (mode: ${{ env.PIPELINE_MODE }})"
               else
-                echo "No PUSH_TOKEN available, changes only committed locally"
+                echo "Script not found, committing locally only"
+                git add README.md || true
+                git commit -m "Auto-update: Generated README (CI run ${{ github.run_number }}, mode: ${{ env.PIPELINE_MODE }}) [skip ci]" || true
               fi
             fi
             
