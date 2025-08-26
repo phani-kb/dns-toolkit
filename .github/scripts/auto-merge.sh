@@ -67,6 +67,23 @@ trap cleanup EXIT
 
 if [[ "$ORIG_BRANCH" != "$BRANCH_NAME" ]]; then
   if ! git diff --quiet || ! git diff --cached --quiet || [[ -n "$(git ls-files --others --exclude-standard)" ]]; then
+    TEMP_COPY_DIR="/tmp/ci-orig-files-$$"
+    mkdir -p "$TEMP_COPY_DIR"
+    shopt -s nullglob
+    temp_files=($FILES_PATTERN)
+    shopt -u nullglob
+    if [[ ${#temp_files[@]} -gt 0 ]]; then
+      echo "Saving ${#temp_files[@]} files to temporary dir before branch switch: ${temp_files[*]}"
+      for f in "${temp_files[@]}"; do
+        if [[ -f "$f" ]]; then
+          mkdir -p "$TEMP_COPY_DIR/$(dirname "$f")"
+          cp -- "$f" "$TEMP_COPY_DIR/$f" || true
+        fi
+      done
+    else
+      echo "No matching files to save before stash for pattern: $FILES_PATTERN"
+    fi
+
     ORIG_STASH_REF="stash@{0}"
     echo "Stashing changes on '$ORIG_BRANCH' before switching..."
     git stash push -u -m "auto-stash: $ORIG_BRANCH -> $BRANCH_NAME @ $timestamp"
@@ -83,6 +100,16 @@ if [[ "$ORIG_BRANCH" != "$BRANCH_NAME" ]]; then
     DEFAULT_BASE="$(gh repo view "$GITHUB_REPOSITORY" --json defaultBranchRef -q '.defaultBranchRef.name' 2>/dev/null || echo main)"
     git fetch origin "$DEFAULT_BASE:$DEFAULT_BASE" >/dev/null 2>&1 || true
     git checkout -b "$BRANCH_NAME" "$DEFAULT_BASE"
+  fi
+  if [[ -n "${TEMP_COPY_DIR:-}" ]] && [[ -d "$TEMP_COPY_DIR" ]]; then
+    echo "Restoring files from temporary copy directory onto '$BRANCH_NAME'..."
+    find "$TEMP_COPY_DIR" -type f | while read -r src; do
+      dest="${src#$TEMP_COPY_DIR/}"
+      mkdir -p "$(dirname "$dest")"
+      cp -- "$src" "$dest" || true
+      echo "  restored $dest"
+    done
+    rm -rf "$TEMP_COPY_DIR" || true
   fi
 else
   if ! git diff --quiet || ! git diff --cached --quiet || [[ -n "$(git ls-files --others --exclude-standard)" ]]; then
