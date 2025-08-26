@@ -110,7 +110,7 @@ func parseFileInfoFromString(fileStr string) (common.FileInfo, error) {
 
 	name := matches[1]
 	sourceType := matches[2]
-	filepath := matches[3]
+	fp := matches[3]
 	count, err := strconv.Atoi(matches[4])
 	if err != nil {
 		return common.FileInfo{}, fmt.Errorf("invalid count in file info string: %s", matches[4])
@@ -120,7 +120,7 @@ func parseFileInfoFromString(fileStr string) (common.FileInfo, error) {
 	return common.FileInfo{
 		Name:         name,
 		SourceType:   sourceType,
-		Filepath:     filepath,
+		Filepath:     fp,
 		Count:        count,
 		MustConsider: mustConsider,
 	}, nil

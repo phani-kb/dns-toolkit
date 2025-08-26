@@ -485,12 +485,13 @@ func TestReadEntriesFromFileWithPool(t *testing.T) {
 	err = tempFile.Close()
 	require.NoError(t, err)
 
-	entries, duplicates, err := ReadEntriesFromFileWithPool(logger, tempFile.Name(), nil)
+	pool := NewDTEntryPool()
+	entries, duplicates, err := ReadEntriesFromFileWithPool(logger, tempFile.Name(), pool)
 	assert.NoError(t, err)
 	assert.Len(t, entries, 2)
 	assert.Equal(t, 1, duplicates)
 
-	pool := NewDTEntryPool()
+	pool = NewDTEntryPool()
 	entries2, duplicates2, err := ReadEntriesFromFileWithPool(logger, tempFile.Name(), pool)
 	assert.NoError(t, err)
 	assert.Len(t, entries2, len(entries))

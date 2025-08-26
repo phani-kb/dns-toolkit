@@ -129,8 +129,9 @@ func TestCollectDownloadStats(t *testing.T) {
 	stats := &DownloadStats{}
 	err = collectDownloadStats(stats)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "download summary file not found")
-
+	if err != nil {
+		assert.Contains(t, err.Error(), "download summary file not found")
+	}
 	downloadSummaries := []c.DownloadSummary{
 		{
 			Name:                  "test-source-1",
@@ -190,7 +191,9 @@ func TestCollectProcessingStats(t *testing.T) {
 	stats := &ProcessingStats{}
 	err = collectProcessingStats(stats)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "processed summary file not found")
+	if err != nil {
+		assert.Contains(t, err.Error(), "processed summary file not found")
+	}
 
 	// Create test processing summary
 	processedSummaries := []c.ProcessedSummary{
@@ -380,7 +383,9 @@ func TestCollectConsolidateStats(t *testing.T) {
 	stats := &ConsolidateStats{}
 	err = collectConsolidateStats(stats)
 	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "consolidated summary file not found")
+	if err != nil {
+		assert.Contains(t, err.Error(), "consolidated summary file not found")
+	}
 
 	// Create test consolidated summary
 	consolidatedSummaries := []c.ConsolidatedSummary{
