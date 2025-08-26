@@ -96,7 +96,26 @@ fi
 if [[ "$FILES_PATTERN" == "." || "$FILES_PATTERN" == "./" ]]; then
   git add -A
 else
-  git add -A -- ":(${FILES_PATTERN})" || git add -A "$FILES_PATTERN" || true
+  shopt -s nullglob  # to handle no matches gracefully
+  files_array=($FILES_PATTERN)
+  shopt -u nullglob
+  
+  if [[ ${#files_array[@]} -gt 0 ]]; then
+    echo "Found ${#files_array[@]} files matching pattern: $FILES_PATTERN"
+    git add "${files_array[@]}" || {
+      echo "Failed to add matched files"
+      exit 1
+    }
+  else
+    echo "No files found matching pattern: $FILES_PATTERN"
+    if [[ -f "$FILES_PATTERN" ]]; then
+      git add "$FILES_PATTERN"
+      echo "Added literal file: $FILES_PATTERN"
+    else
+      echo "No files to add for pattern: $FILES_PATTERN"
+      exit 0
+    fi
+  fi
 fi
 
 if git diff --cached --quiet; then
