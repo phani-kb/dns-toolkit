@@ -48,7 +48,6 @@ data/backup/
 data/profiles/
 data/*.json
 data/allowlist_*.txt
-data/conflicts.md
 
 # Test files
 testdata/**/*.json
