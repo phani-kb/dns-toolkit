@@ -20,6 +20,7 @@ var (
 	includeInvalid          bool
 	calculateChecksum       bool
 	skipConsolidatedSummary bool
+	generateConflictsReport bool
 )
 
 var consolidateCmd = &cobra.Command{
@@ -135,6 +136,15 @@ var consolidateAllCmd = &cobra.Command{
 		} else {
 			if summariesCount > 0 {
 				Logger.Infof("Saved consolidated summaries to %s", summaryFile)
+			}
+
+			if generateConflictsReport {
+				reportPath, err := GenerateConflictReport(Logger, processedFiles)
+				if err != nil {
+					Logger.Errorf("Error generating conflicts report: %v", err)
+				} else if reportPath != "" {
+					Logger.Infof("Generated conflicts report: %s", reportPath)
+				}
 			}
 		}
 	},
@@ -328,6 +338,9 @@ func init() {
 		BoolVar(&includeInvalid, "include-invalid", false, "Include invalid entry(s) during consolidation")
 	consolidateCmd.PersistentFlags().
 		BoolVar(&calculateChecksum, "calculate-checksum", false, "Calculate checksum on the consolidated files")
+	// nolint:lll
+	consolidateCmd.PersistentFlags().
+		BoolVar(&generateConflictsReport, "gen-conflicts", false, "Generate a conflict report, allowlist vs. blocklist")
 	consolidateCategoriesCmd.PersistentFlags().
 		BoolVar(&skipConsolidatedSummary, "skip-consolidated-summary", false, "Skip creating the consolidated summary file")
 	// nolint:lll

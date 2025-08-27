@@ -48,6 +48,7 @@ data/backup/
 data/profiles/
 data/*.json
 data/allowlist_*.txt
+data/conflicts.md
 
 # Test files
 testdata/**/*.json
@@ -56,3 +57,5 @@ testdata/output/
 # profiling files
 testdata/**/*.prof
 testdata/data/allowlist_*.txt
+testdata/*.md
+testdata/*.txt
