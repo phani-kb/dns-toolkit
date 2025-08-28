@@ -1,11 +1,11 @@
 package cmd
 
 import (
+	"encoding/json"
 	"os"
 	"path/filepath"
 	"testing"
 
-	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
@@ -20,10 +20,13 @@ func setupTestEnvironment(t *testing.T) (func(), string) {
 
 	testDataDir := filepath.Join(projectRoot, "testdata")
 	oldOutputDir := constants.OutputDir
-	constants.OutputDir = filepath.Join(testDataDir, constants.OutputDir)
+	oldSummaryDir := constants.SummaryDir
+	constants.OutputDir = filepath.Join(testDataDir, "output")
+	constants.SummaryDir = filepath.Join(testDataDir, "data")
 
 	return func() {
 		constants.OutputDir = oldOutputDir
+		constants.SummaryDir = oldSummaryDir
 	}, testDataDir
 }
 
@@ -43,18 +46,12 @@ func TestGenerateConflictReport_NoConflicts(t *testing.T) {
 		t.Fatalf("failed to write allowlist: %v", err)
 	}
 
-	processed := []c.ProcessedFile{
-		{Name: "bl-src", ListType: constants.ListTypeBlocklist, Filepath: bl, Valid: true},
-		{Name: "al-src", ListType: constants.ListTypeAllowlist, Filepath: al, Valid: true},
-	}
-
-	path, err := GenerateConflictReport(logger, processed)
+	path, err := GenerateConflictReport(logger, "non_existent_summary.json")
 	assert.NoError(t, err)
 	assert.Equal(t, "", path, "expected no report path when no conflicts")
 }
 
 func TestGenerateConflictReport_WithConflicts(t *testing.T) {
-	t.Parallel()
 	logger, _ := multilog.NewTestLogger(t)
 
 	cleanup, testDataDir := setupTestEnvironment(t)
@@ -70,12 +67,43 @@ func TestGenerateConflictReport_WithConflicts(t *testing.T) {
 		t.Fatalf("failed to write allowlist: %v", err)
 	}
 
-	processed := []c.ProcessedFile{
-		{Name: "bl-src-1", ListType: constants.ListTypeBlocklist, Filepath: bl, Valid: true},
-		{Name: "al-src-1", ListType: constants.ListTypeAllowlist, Filepath: al, Valid: true},
+	// processed := []c.ProcessedFile{
+	// 	{Name: "bl-src-1", ListType: constants.ListTypeBlocklist, Filepath: bl, Valid: true},
+	// 	{Name: "al-src-1", ListType: constants.ListTypeAllowlist, Filepath: al, Valid: true},
+	// }
+
+	dataDir := filepath.Join(testDataDir, "data")
+	if err := os.MkdirAll(dataDir, 0o755); err != nil {
+		t.Fatalf("failed to create data dir: %v", err)
 	}
 
-	path, err := GenerateConflictReport(logger, processed)
+	overrides := []struct {
+		Entry      string   `json:"entry"`
+		Decision   string   `json:"decision"`
+		BlockSrcs  []string `json:"block_sources"`
+		AllowSrcs  []string `json:"allow_sources"`
+		BlockCount int      `json:"block_count"`
+		AllowCount int      `json:"allow_count"`
+	}{
+		{
+			Entry:      "common.example.com",
+			Decision:   "conflict",
+			BlockSrcs:  []string{"bl-src-1"},
+			AllowSrcs:  []string{"al-src-1"},
+			BlockCount: 1,
+			AllowCount: 1,
+		},
+	}
+	confPath := filepath.Join(dataDir, constants.SummaryTypesOutputSummaryFileMap[constants.SummaryTypeOverrides])
+	bb, err := json.MarshalIndent(overrides, "", "  ")
+	if err != nil {
+		t.Fatalf("failed to marshal overrides json: %v", err)
+	}
+	if err := os.WriteFile(confPath, bb, 0o644); err != nil {
+		t.Fatalf("failed to write overrides json: %v", err)
+	}
+
+	path, err := GenerateConflictReport(logger, confPath)
 	assert.NoError(t, err)
 	if assert.NotEmpty(t, path) {
 		_, err := os.Stat(path)

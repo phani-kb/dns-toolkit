@@ -98,7 +98,7 @@ flowchart LR
 | **Categories** | 39 | ads, adult, ai, annoyance, anonymizer, botnet, browser, cryptocurrency, dating, discord, dns, doh, fake, fakenews, finance, gambling, issues, kad, local, mac, malicious, malware, mobile, others, phishing, privacy, proxy, ransomware, scam, smarttv, social, spam, spyware, threat, topdomains, torrent_trackers, trackers, url_shorteners, windows |
 | **Source Types** | 27 | adguard, cidr_ipv4, domain, domain_adguard, domain_comment, domain_csv_http_url_find, domain_custom_csv_blackbook, domain_custom_csv_maltrail, domain_custom_html_ccam, domain_custom_html_puppyscams, domain_http_url, domain_top, domain_url, domain_with_comment_suffix, hostname, ipv4, ipv4_cidr_expand, ipv4_csv_http_url_find, ipv4_custom_html_ccam, ipv4_find, ipv4_from_domain, ipv4_http_url, ipv4_range_expand, ipv4_url, ipv6, ipv6_find, ipv6_htaccess |
 | **Geographic Coverage** | 21 countries | CN, CZ, DE, ES, FI, FR, HU, ID, IL, IT, KR, LV, MY, NL, RO, RU, SA, SK, UA, US, VN |
-| **Last Updated** | 2025-08-27 20:27:37 UTC | Statistics generation time |
+| **Last Updated** | 2025-08-28 01:23:00 UTC | Statistics generation time |
 
 <!-- STATS_END -->
 
@@ -177,7 +177,7 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | GlobalAntiScamOrg-blocklist-domains | ✅ | scam | 11065 / 7358 / 2 | - |
 | HaGeZi Amazon Tracker | ✅ | privacy, trackers | 615 / 0 / 34 | >98% overlap with HaGeZi Pro |
 | HaGeZi Apple Tracker | ✅ | privacy, trackers | 290 / 0 / 7 | >80% overlap with HaGeZi Pro |
-| HaGeZi DNS TIF Mini | ✅ | malicious, threat | 120519 / 1270 / 1 | 100% covered by other sources |
+| HaGeZi DNS TIF Mini | ✅ | malicious, threat | 120519 / 1262 / 1 | 100% covered by other sources |
 | HaGeZi Encrypted DNS Servers | ✅ | doh | 1438 / 260 / 9 | - |
 | HaGeZi Gambling Only Domains | ✅ | gambling | 185977 / 179602 / 5 | Huge list and gambling-specific focus |
 | HaGeZi Microsoft Tracker | ✅ | privacy, trackers | 971 / 0 / 12 | >75% overlap with HaGeZi Pro |
@@ -194,7 +194,7 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | kadantiscam | ✅ | kad | 230104 / 0 / 2 | peer-to-peer network protocol |
 | Korlabs_UrlShortener | ✅ | url_shorteners | 237 / 0 / 17 | - |
 | Malicious URL Blocklist (URLHaus) | ✅ | ads | 2147 / 0 / 0 | 100% covered by other sources |
-| Maltrail_StaticTrails | ✅ | malware, threat | 203918 / 172277 / 5 | - |
+| Maltrail_StaticTrails | ✅ | malware, threat | 203921 / 172280 / 5 | - |
 | malware-filter_phishing-filter | ✅ | malware, phishing | 25711 / 0 / 0 | - |
 | OISD Blocklist Big | ✅ | ads, cryptocurrency, malware, phishing, ransomware, trackers | 201817 / 0 / 77 | Huge list |
 | OISD Blocklist NSFW Small | ✅ | adult | 19923 / 0 / 14 | - |
@@ -225,14 +225,14 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | StevenBlack_Adhoc_list | ❌ | ads, malware, trackers | - | 100% overlap with StevenBlack Fake Gambling list |
 | StevenBlack_Fake_Gambling_Porn | ✅ | ads, adult, fake, fakenews, gambling | 317834 / 0 / 236 | - |
 | T145_black-mirror | ❌ | malicious, threat | - | Huge list, >8 million entries |
-| Torrent Trackers | ✅ | torrent_trackers | 485 / 459 / 0 | - |
+| Torrent Trackers | ✅ | torrent_trackers | 487 / 461 / 0 | - |
 | Ukrainian Ad Filter | ✅ | ads | 1449 / 1246 / 0 | - |
 | Ukrainian Annoyance Filter | ✅ | annoyance | - | - |
 | Ukrainian Privacy Filter | ✅ | privacy, trackers | 345 / 48 / 1 | - |
 | Ukrainian Security Filter | ✅ | malicious, threat | 1736 / 1165 / 0 | - |
 | UncheckyAds | ❌ | ads, privacy, trackers | - | No update since 2021 |
 | URLHaus (Abuse.ch) | ✅ | malware | - | - |
-| USOM-Blocklists-domains | ✅ | malicious, threat | 404591 / 350568 / 18 | Huge list |
+| USOM-Blocklists-domains | ✅ | malicious, threat | 404591 / 350550 / 18 | Huge list |
 | Viriback_Dump | ✅ | malware | 4594 / 0 / 0 | - |
 | WaLLy3K | ✅ | ads | 350 / 0 / 12 | - |
 | Warui_Adhosts | ✅ | ads | 75775 / 0 / 246 | Huge list |
@@ -276,7 +276,7 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | Borestad_AbuseIPDB_S100_3d | ✅ | malicious, threat | 80682 / 0 / 0 | - |
 | BruteforceBlocker | ✅ | threat | 404 / 0 / 0 | >95% overlap with EmergingThreats_CompromisedIPs |
 | CINSScore_BadGuys_Army | ✅ | malicious, threat | 15000 / 0 / 0 | - |
-| DoH_IP_blocklists | ✅ | doh | 2565 / 660 / 10 | >90% overlap with HaGeZi Encrypted DNS Servers |
+| DoH_IP_blocklists | ✅ | doh | 2565 / 662 / 9 | >90% overlap with HaGeZi Encrypted DNS Servers |
 | DoH_IP_list | ✅ | doh | 731 / 0 / 0 | - |
 | DShield | ✅ | malicious, threat | 5120 / 0 / 0 | 100% overlap with Firehol_level2/Firehol_level3 |
 | EmergingThreats_CompromisedIPs | ✅ | malicious, threat | 409 / 0 / 0 | >95% overlap with Firehol_level3,  and Borestad_AbuseIPDB_S100_3d |
@@ -290,7 +290,7 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | Firehol_GPF_Comics | ✅ | malicious, threat | 2434 / 1084 / 0 | - |
 | Firehol_level1 | ✅ | malicious, threat | 4523 / 3051 / 0 | - |
 | Firehol_level2 | ✅ | malicious, threat | 14252 / 0 / 0 | - |
-| Firehol_level3 | ✅ | malicious, threat | 20222 / 0 / 3 | - |
+| Firehol_level3 | ✅ | malicious, threat | 12463 / 0 / 3 | - |
 | Firehol_SocksProxy_7d | ✅ | anonymizer, privacy, proxy | 2547 / 2298 / 0 | - |
 | Firehol_SSLProxies_1d | ✅ | anonymizer, privacy, proxy | 299 / 223 / 0 | - |
 | GlobalAntiScamOrg-blocklist-ips | ✅ | scam | - | - |
@@ -317,11 +317,11 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 
 | Name | S | Categories |         C / U / X        | Notes |
 |------|---|------------|--------------------------|-------|
-| Local AI Allowlist (Domain) | ✅ | ai, local | 49 / 0 / 51 | - |
-| Local AI Blocklist (Domain) | ✅ | ai, local | 49 / 0 / 51 | - |
+| Local AI Allowlist (Domain) | ✅ | ai, local | 50 / 0 / 51 | - |
+| Local AI Blocklist (Domain) | ✅ | ai, local | 50 / 0 / 51 | - |
 | Local Allowlist (AdGuard) | ✅ | local | - | - |
 | Local Allowlist (Domain) | ✅ | local | 48 / 18 / 8 | - |
-| Local Allowlist (ipv4) | ✅ | local | 76 / 55 / 19 | - |
+| Local Allowlist (ipv4) | ✅ | local | 78 / 59 / 18 | - |
 | Local Blocklist (AdGuard) | ✅ | local | 7 / 0 / 0 | - |
 | Local Blocklist (Domain) | ✅ | local | 1 / 0 / 0 | - |
 

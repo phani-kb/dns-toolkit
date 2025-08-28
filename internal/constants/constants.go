@@ -548,3 +548,8 @@ var SummaryTypesToDeleteAfterOutputGenerationMap = map[string]bool{
 	SummaryTypeTop:                    true,
 	SummaryTypeArchive:                false,
 }
+
+var OverrideThresholds = map[string]int{
+	"allowlist": 3,
+	"blocklist": 2,
+}

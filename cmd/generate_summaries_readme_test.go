@@ -124,11 +124,11 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 	}()
 
 	tests := []struct {
+		createFile   func(string) error
 		name         string
 		filename     string
-		createFile   func(string) error
-		expectStats  bool
 		expectedText []string
+		expectStats  bool
 	}{
 		{
 			name:     "non-existent file",
@@ -432,10 +432,10 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 	}()
 
 	tests := []struct {
-		name            string
-		filename        string
 		createFile      func(string) error
 		expectedUpdates func(*OverallSummaryStats) bool
+		name            string
+		filename        string
 		expectNoChange  bool
 	}{
 		{
