@@ -554,17 +554,17 @@ func TestFormatConsolidateCount(t *testing.T) {
 
 func TestFormatNumber(t *testing.T) {
 	tests := []struct {
-		input    int
 		expected string
+		input    int
 	}{
-		{0, "0"},
-		{999, "999"},
-		{1000, "1.0K"},
-		{1500, "1.5K"},
-		{999999, "1000.0K"},
-		{1000000, "1.0M"},
-		{2500000, "2.5M"},
-		{1234567, "1.2M"},
+		{"0", 0},
+		{"999", 999},
+		{"1.0K", 1000},
+		{"1.5K", 1500},
+		{"1000.0K", 999999},
+		{"1.0M", 1000000},
+		{"2.5M", 2500000},
+		{"1.2M", 1234567},
 	}
 
 	for _, tt := range tests {

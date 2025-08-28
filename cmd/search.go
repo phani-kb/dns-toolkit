@@ -13,6 +13,7 @@ import (
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
+	"github.com/phani-kb/multilog"
 	"github.com/spf13/cobra"
 )
 
@@ -24,6 +25,7 @@ var (
 	performCNAMELookup bool
 	searchAguard       bool
 	bulkDomainLookup   bool
+	searchOutput       bool
 )
 
 var searchCmd = &cobra.Command{
@@ -204,6 +206,16 @@ func searchInAllFiles(
 		}()
 	}
 
+	// Search in output files
+	if searchOutput {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			searchInFileType(query, isIP, ipAddresses, cnames, constants.SearchOutputFile,
+				&mu, domainResults, ipResults, cnameResults)
+		}()
+	}
+
 	wg.Wait()
 	return domainResults, ipResults, cnameResults
 }
@@ -377,6 +389,12 @@ func searchInFiles(query string, sourceType string, searchFileType string, exact
 		} else {
 			Logger.Errorf("Error getting consolidated files: %v", err)
 		}
+	case constants.SearchOutputFile:
+		if files, err := getOutputFiles(Logger); err == nil {
+			allFiles = append(allFiles, files...)
+		} else {
+			Logger.Errorf("Error getting output files: %v", err)
+		}
 	}
 
 	// Use a StringSet to track found files more efficiently
@@ -438,6 +456,10 @@ func getConsolidatedFiles(sourceType string, summaryFile string) ([]string, erro
 	)
 }
 
+func getOutputFiles(logger *multilog.Logger) ([]string, error) {
+	return u.GetFilesInDir(logger, constants.OutputDir, []string{"*.txt"})
+}
+
 // entryContains checks if the file contains the query string
 func entryContains(query, filePath string, exactMatch bool) (bool, error) {
 	file, err := os.Open(filePath)
@@ -476,6 +498,7 @@ func init() {
 	searchCmd.Flags().BoolVarP(&exactMatch, "exact", "e", false, "Perform exact match instead of substring match")
 	searchCmd.Flags().BoolVarP(&searchProcessed, "processed", "p", true, "Search in processed files")
 	searchCmd.Flags().BoolVarP(&searchConsolidated, "consolidated", "c", true, "Search in consolidated files")
+	searchCmd.Flags().BoolVarP(&searchOutput, "output", "o", true, "Search in output files")
 	searchCmd.Flags().
 		BoolVarP(&performDNSLookup, "dns", "d", false, "Perform DNS lookup for domain names to find associated IPs")
 	searchCmd.Flags().

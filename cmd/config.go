@@ -18,7 +18,8 @@ var (
 // GetConfigPath returns the path to the configuration file.
 func GetConfigPath() (string, error) {
 	configPath := filepath.Join("configs", "config.yml")
-	inTestMode := os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true"
+	const testModeTrue = "true"
+	inTestMode := os.Getenv("DNS_TOOLKIT_TEST_MODE") == testModeTrue
 	if inTestMode {
 		configPath = os.Getenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
 		if configPath == "" {

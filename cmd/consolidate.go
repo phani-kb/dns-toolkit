@@ -20,6 +20,8 @@ var (
 	includeInvalid          bool
 	calculateChecksum       bool
 	skipConsolidatedSummary bool
+	generateConflictsReport bool
+	emitResolvedLists       bool
 )
 
 var consolidateCmd = &cobra.Command{
@@ -61,6 +63,31 @@ var consolidateAllCmd = &cobra.Command{
 				allowlistEntriesByType,
 				&allConsolidatedSummaries,
 			)
+		}
+
+		allowByType, _, _, _, _, _ := BuildResolutionSets(Logger, processedFiles)
+		if len(allowByType) > 0 {
+			for gst, aset := range allowByType {
+				Logger.Infof("Processing allowlist entries for %s", gst)
+				if existing, ok := allowlistEntriesByType[gst]; ok && existing != nil {
+					Logger.Infof(
+						"Merging %d resolved allowlist entries into existing %d entries for %s",
+						aset.Size(),
+						existing.Size(),
+						gst,
+					)
+					existing.AddAll(aset.ToSlice(), false)
+					allowlistEntriesByType[gst] = existing
+				} else {
+					Logger.Infof("Assigning new allowlist entries for %s", gst)
+					Logger.Infof(
+						"No existing allowlist entries for %s; using %d resolved allowlist entries",
+						gst,
+						aset.Size(),
+					)
+					allowlistEntriesByType[gst] = aset
+				}
+			}
 		}
 
 		// Second phase: Process all blocklists in parallel, now that we have all allowlist entries
@@ -135,6 +162,13 @@ var consolidateAllCmd = &cobra.Command{
 		} else {
 			if summariesCount > 0 {
 				Logger.Infof("Saved consolidated summaries to %s", summaryFile)
+			}
+
+			if generateConflictsReport {
+				manager := NewConsolidationManager(Logger)
+				if err := manager.GenerateConflictReport(processedFiles); err != nil {
+					Logger.Errorf("Failed to generate conflicts report: %v", err)
+				}
 			}
 		}
 	},
@@ -313,14 +347,6 @@ func IsConsolidatedSummaryValid(summary c.ConsolidatedSummary) bool {
 	return summary.Count > 0
 }
 
-func getFileStrings(fileInfos []c.FileInfo) []string {
-	fileStrings := make([]string, 0)
-	for _, fileInfo := range fileInfos {
-		fileStrings = append(fileStrings, fileInfo.GetString())
-	}
-	return fileStrings
-}
-
 func init() {
 	consolidateCmd.PersistentFlags().
 		BoolVar(&ignoreAllowlist, "ignore-allowlist", false, "Ignore allowlist during consolidation where applicable")
@@ -328,6 +354,11 @@ func init() {
 		BoolVar(&includeInvalid, "include-invalid", false, "Include invalid entry(s) during consolidation")
 	consolidateCmd.PersistentFlags().
 		BoolVar(&calculateChecksum, "calculate-checksum", false, "Calculate checksum on the consolidated files")
+	// nolint:lll
+	consolidateCmd.PersistentFlags().
+		BoolVar(&generateConflictsReport, "gen-conflicts", false, "Generate a conflict report, allowlist vs. blocklist")
+	consolidateCmd.PersistentFlags().
+		BoolVar(&emitResolvedLists, "emit-resolved-lists", false, "Emit allowlist and blocklist when resolving conflicts")
 	consolidateCategoriesCmd.PersistentFlags().
 		BoolVar(&skipConsolidatedSummary, "skip-consolidated-summary", false, "Skip creating the consolidated summary file")
 	// nolint:lll

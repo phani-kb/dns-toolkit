@@ -43,12 +43,30 @@ type DNSToolkitConfig struct {
 	Folders                   FoldersConfig       `yaml:"folders"`
 	SourceFilters             SourceFilters       `yaml:"source_filters"`
 	FilesChecksum             FilesChecksumConfig `yaml:"files_checksum"`
+	Override                  OverrideConfig      `yaml:"override,omitempty"`
 	MaxWorkers                int                 `yaml:"max_workers"`
 	MaxRetries                int                 `yaml:"max_retries"`
 	SkipUnchangedDownloads    bool                `yaml:"skip_unchanged_downloads"`
 	SkipCertVerification      bool                `yaml:"skip_cert_verification,omitempty"`
 	SkipNameSpecialCharsCheck bool                `yaml:"skip_name_special_chars_check,omitempty"`
 	MinOverlapPercent         float64             `yaml:"min_overlap_percent,omitempty"`
+}
+
+type OverrideConfig struct {
+	ConsolidatedFiles []FPath           `yaml:"consolidated_files"`
+	Thresholds        []ThresholdConfig `yaml:"thresholds"`
+	Enabled           bool              `yaml:"enabled"`
+}
+
+type ThresholdConfig struct {
+	Name       string `yaml:"name"`
+	MinSources int    `yaml:"min_sources,omitempty"`
+	MaxSources int    `yaml:"max_sources,omitempty"`
+}
+
+type FPath struct {
+	Name string `yaml:"name"`
+	Path string `yaml:"path"`
 }
 
 func (dc *DNSToolkitConfig) Validate() error {

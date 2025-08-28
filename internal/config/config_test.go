@@ -739,8 +739,6 @@ func TestGetProcessedSummariesWithFileErrors(t *testing.T) {
 }
 
 func TestFilterEnabledSummariesBasic(t *testing.T) {
-	// t.Parallel()
-
 	logger := CreateTestLogger()
 
 	summaries := []c.ProcessedSummary{
@@ -784,8 +782,6 @@ func TestFilterEnabledSummariesBasic(t *testing.T) {
 }
 
 func TestIsEnabledSourceForConsolidationEdgeCases(t *testing.T) {
-	// t.Parallel()
-
 	tests := []struct {
 		name              string
 		sourceName        string
@@ -827,6 +823,46 @@ func TestIsEnabledSourceForConsolidationEdgeCases(t *testing.T) {
 				tt.consolidationType,
 			)
 			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestGetMinOverlapPercent(t *testing.T) {
+	tests := []struct {
+		name              string
+		minOverlapPercent float64
+		expectedResult    float64
+	}{
+		{
+			name:              "uses configured value when set",
+			minOverlapPercent: 25.5,
+			expectedResult:    25.5,
+		},
+		{
+			name:              "uses default when zero",
+			minOverlapPercent: 0,
+			expectedResult:    constants.MinOverlapPercent,
+		},
+		{
+			name:              "uses configured negative value",
+			minOverlapPercent: -10.0,
+			expectedResult:    -10.0,
+		},
+		{
+			name:              "uses configured 100 percent",
+			minOverlapPercent: 100.0,
+			expectedResult:    100.0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			config := &DNSToolkitConfig{
+				MinOverlapPercent: tt.minOverlapPercent,
+			}
+
+			result := config.GetMinOverlapPercent()
+			assert.Equal(t, tt.expectedResult, result)
 		})
 	}
 }

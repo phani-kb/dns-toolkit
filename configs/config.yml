@@ -37,6 +37,18 @@ dns_toolkit:
     - 'myip.ms'
     - 'vxvault.net'
   min_overlap_percent: 0.1
+  override:
+    enabled: true
+    thresholds:
+      - name: allowlist
+        min_sources: 3
+      - name: blocklist
+        min_sources: 2
+    consolidated_files:
+      - name: allowlist
+        path: data/consolidated_allowlist.txt
+      - name: blocklist
+        path: data/consolidated_blocklist.txt
   max_workers: 1
   max_retries: 3
   source_filters:

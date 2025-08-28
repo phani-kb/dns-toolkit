@@ -385,8 +385,8 @@ func TestGetLocalBlocklistEntries(t *testing.T) {
 		name              string
 		genericSourceType string
 		processedFiles    []c.ProcessedFile
-		expectedCount     int
 		expectedEntries   []string
+		expectedCount     int
 	}{
 		{
 			name:              "local blocklist found",
