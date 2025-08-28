@@ -311,7 +311,7 @@ jobs:
           # Core Processing Steps
           echo "Step 2: Processing data..."
           ./bin/dns-toolkit process
-          ./bin/dns-toolkit consolidate
+          ./bin/dns-toolkit consolidate --gen-conflicts
           ./bin/dns-toolkit consolidate groups
           ./bin/dns-toolkit consolidate categories
           ./bin/dns-toolkit top
