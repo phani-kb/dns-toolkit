@@ -1,7 +1,7 @@
 name: DNS Toolkit Daily Processing
 
 # - Scheduled runs: full-pipeline mode with publishing
-# - Push to main: use-cache mode without publishing (avoids cache conflicts)
+# - Push to release/1.0.0: use-cache mode without publishing (avoids cache conflicts)
 # - Manual dispatch: user-selected mode with conditional publishing (refresh-cache and use-cache don't publish)
 # - Pull Request: test-only mode
 
@@ -22,9 +22,9 @@ on:
           - 'use-cache'
           - 'refresh-cache'
   push:
-    branches: [main]
+    branches: [release/1.0.0]
   pull_request:
-    branches: [main]
+    branches: [release/1.0.0]
 
 permissions:
   contents: read
@@ -140,10 +140,10 @@ jobs:
             MODE="full-pipeline"
             PUBLISH="true"
             MESSAGE="Scheduled event - Mode: $MODE"
-          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+          elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/release/1.0.0" ]]; then
             MODE="use-cache"
             PUBLISH="false"
-            MESSAGE="Push to main - Mode: $MODE (use cache, no publish)"
+            MESSAGE="Push to release/1.0.0 - Mode: $MODE (use cache, no publish)"
           fi
 
           echo "::notice::$MESSAGE"
