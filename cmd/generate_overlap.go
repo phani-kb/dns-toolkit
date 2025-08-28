@@ -17,7 +17,7 @@ import (
 
 var generateOverlapCmd = &cobra.Command{
 	Use:   "overlap-readme",
-	Short: "Generate detailed overlap analysis markdown file",
+	Short: "Generate detailed overlap analysis file",
 	Long:  "Generate a detailed overlap.md file containing overlap analysis between different sources including overlap percentages, targets, and detailed statistics", // nolint:lll
 	Run: func(cmd *cobra.Command, args []string) {
 		if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {

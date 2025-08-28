@@ -59,7 +59,7 @@ flowchart LR
 
 **[View Detailed Overlap Analysis](https://github.com/phani-kb/dns-toolkit/blob/output/overlap.md)** Comprehensive analysis showing how entries are shared across different DNS sources.
 
-**[Conflicts Report (allowlist vs blocklist)](https://github.com/phani-kb/dns-toolkit/blob/output/conflicts.md)** A daily-generated markdown report listing entries found in both allowlists and blocklists, including the source(s) where they were found.
+**[Conflicts Report (allowlist vs blocklist)](https://github.com/phani-kb/dns-toolkit/blob/output/conflicts.md)** A daily-generated report listing entries found in both allowlists and blocklists, including the source(s) where they were found.
 
 > 🔍 **Overlap Analysis**
 >
