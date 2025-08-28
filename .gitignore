@@ -55,4 +55,6 @@ testdata/**/*.tgz
 testdata/output/
 # profiling files
 testdata/**/*.prof
-testdata/data/allowlist_*.txt
+testdata/data/
+testdata/*.md
+testdata/*.txt

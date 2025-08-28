@@ -1284,3 +1284,262 @@ func TestExtractEntriesWithRegex(t *testing.T) {
 		})
 	}
 }
+
+func TestForceCopySourceToTarget(t *testing.T) {
+	logger := createTestLogger(t)
+	tmpDir := t.TempDir()
+
+	sourceFolder := filepath.Join(tmpDir, "source")
+	err := os.MkdirAll(sourceFolder, 0o755)
+	require.NoError(t, err)
+
+	sourceFile := "test.txt"
+	sourceContent := "test content for force copy"
+	err = os.WriteFile(filepath.Join(sourceFolder, sourceFile), []byte(sourceContent), 0o644)
+	require.NoError(t, err)
+
+	targetFolder := filepath.Join(tmpDir, "target")
+	err = os.MkdirAll(targetFolder, 0o755)
+	require.NoError(t, err)
+
+	target := c.DownloadTarget{
+		SourceFolder: sourceFolder,
+		SourceFile:   sourceFile,
+		TargetFolder: targetFolder,
+		TargetFile:   "copied.txt",
+	}
+
+	err = ForceCopySourceToTarget(logger, target)
+	assert.NoError(t, err)
+
+	targetContent, err := os.ReadFile(filepath.Join(targetFolder, "copied.txt"))
+	assert.NoError(t, err)
+	assert.Equal(t, sourceContent, string(targetContent))
+
+	target.SourceFile = "nonexistent.txt"
+	err = ForceCopySourceToTarget(logger, target)
+	assert.Error(t, err)
+}
+
+func TestGetTestDataDir(t *testing.T) {
+	logger := createTestLogger(t)
+
+	result := getTestDataDir(logger)
+
+	assert.Contains(t, result, "testdata")
+	assert.NotEmpty(t, result)
+
+	_, err := os.Stat(result)
+	if os.IsNotExist(err) {
+		err = os.MkdirAll(result, 0755)
+		assert.NoError(t, err)
+
+		defer func() {
+			_ = os.RemoveAll(result)
+		}()
+	}
+}
+
+func TestExpandIpv4Cidr(t *testing.T) {
+	logger := createTestLogger(t)
+
+	tests := []struct {
+		name        string
+		cidr        string
+		expected    []string
+		expectError bool
+	}{
+		{
+			name:     "small /30 CIDR",
+			cidr:     "192.168.1.0/30",
+			expected: []string{"192.168.1.0", "192.168.1.1", "192.168.1.2", "192.168.1.3"},
+		},
+		{
+			name:     "single IP /32",
+			cidr:     "10.0.0.1/32",
+			expected: []string{"10.0.0.1"},
+		},
+		{
+			name: "/29 CIDR (8 IPs)",
+			cidr: "172.16.0.0/29",
+			expected: []string{
+				"172.16.0.0",
+				"172.16.0.1",
+				"172.16.0.2",
+				"172.16.0.3",
+				"172.16.0.4",
+				"172.16.0.5",
+				"172.16.0.6",
+				"172.16.0.7",
+			},
+		},
+		{
+			name:        "invalid CIDR format",
+			cidr:        "invalid-cidr",
+			expectError: true,
+		},
+		{
+			name:        "IPv6 CIDR",
+			cidr:        "2001:db8::/32",
+			expectError: true,
+		},
+		{
+			name:        "too large CIDR (/7)",
+			cidr:        "10.0.0.0/7",
+			expectError: true,
+		},
+		{
+			name:        "non-IPv4 format",
+			cidr:        "256.256.256.256/24",
+			expectError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result, err := ExpandIpv4Cidr(logger, tt.cidr)
+
+			if tt.expectError {
+				assert.Error(t, err)
+				assert.Nil(t, result)
+			} else {
+				assert.NoError(t, err)
+				assert.Equal(t, tt.expected, result)
+			}
+		})
+	}
+}
+
+func TestStringSetSize(t *testing.T) {
+	tests := []struct {
+		name     string
+		entries  []string
+		expected int
+	}{
+		{
+			name:     "empty set",
+			entries:  []string{},
+			expected: 0,
+		},
+		{
+			name:     "single entry",
+			entries:  []string{"test.com"},
+			expected: 1,
+		},
+		{
+			name:     "multiple entries",
+			entries:  []string{"test1.com", "test2.com", "test3.com"},
+			expected: 3,
+		},
+		{
+			name:     "with duplicates",
+			entries:  []string{"test.com", "test.com", "other.com"},
+			expected: 2, // duplicates should be removed
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			set := NewStringSet(tt.entries)
+			size := set.Size()
+			assert.Equal(t, tt.expected, size)
+		})
+	}
+}
+
+func TestGetFilesInDir(t *testing.T) {
+	logger := createTestLogger(t)
+	tempDir := t.TempDir()
+
+	subDir := filepath.Join(tempDir, "subdir")
+	err := os.MkdirAll(subDir, 0755)
+	require.NoError(t, err)
+
+	testFiles := map[string]string{
+		"file2.log":         "content2",
+		"subdir/nested.txt": "nested content",
+	}
+
+	for relPath, content := range testFiles {
+		fullPath := filepath.Join(tempDir, relPath)
+		err := os.WriteFile(fullPath, []byte(content), 0644)
+		require.NoError(t, err)
+	}
+
+	tests := []struct {
+		name          string
+		patterns      []string
+		expectedCount int
+		shouldContain []string
+		shouldExclude []string
+	}{
+		{
+			name:          "no patterns - all files",
+			patterns:      nil,
+			expectedCount: 2,
+			shouldContain: []string{"file2.log", "nested.txt"},
+		},
+		{
+			name:          "txt pattern only",
+			patterns:      []string{"*.txt"},
+			expectedCount: 1,
+			shouldContain: []string{"nested.txt"},
+			shouldExclude: []string{"file2.log"},
+		},
+		{
+			name:          "log pattern only",
+			patterns:      []string{"*.log"},
+			expectedCount: 1,
+			shouldContain: []string{"file2.log"},
+			shouldExclude: []string{"nested.txt"},
+		},
+		{
+			name:          "multiple patterns",
+			patterns:      []string{"*.txt", "*.log"},
+			expectedCount: 2,
+			shouldContain: []string{"file2.log", "nested.txt"},
+			shouldExclude: []string{},
+		},
+		{
+			name:          "no matches pattern",
+			patterns:      []string{"*.xyz"},
+			expectedCount: 0,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			files, err := GetFilesInDir(logger, tempDir, tt.patterns)
+			assert.NoError(t, err)
+			assert.Len(t, files, tt.expectedCount)
+
+			for _, expected := range tt.shouldContain {
+				found := false
+				for _, file := range files {
+					if strings.Contains(file, expected) {
+						found = true
+						break
+					}
+				}
+				assert.True(t, found, "Expected file %s not found in results", expected)
+			}
+
+			for _, excluded := range tt.shouldExclude {
+				found := false
+				for _, file := range files {
+					if strings.Contains(file, excluded) {
+						found = true
+						break
+					}
+				}
+				assert.False(t, found, "Excluded file %s found in results", excluded)
+			}
+		})
+	}
+
+	t.Run("non-existent directory", func(t *testing.T) {
+		files, err := GetFilesInDir(logger, "/non/existent/path", nil)
+		assert.Error(t, err)
+		assert.Nil(t, files)
+	})
+}

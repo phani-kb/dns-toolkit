@@ -43,6 +43,7 @@
 @@||v.firebog.net^
 @@||view.sentinel.turris.cz^
 @@||vxvault.net^
+@@||warui.intaa.net^
 @@||web.archive.org^
 @@||www.binarydefense.com^
 @@||www.spamhaus.org^

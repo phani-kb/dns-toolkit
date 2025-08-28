@@ -292,15 +292,15 @@ func TestFormatNumberInOverlap(t *testing.T) {
 	t.Parallel()
 
 	tests := []struct {
-		input    int
 		expected string
+		input    int
 	}{
-		{0, "0"},
-		{500, "500"},
-		{1000, "1.0K"},
-		{1500, "1.5K"},
-		{1000000, "1.0M"},
-		{2500000, "2.5M"},
+		{"0", 0},
+		{"500", 500},
+		{"1.0K", 1000},
+		{"1.5K", 1500},
+		{"1.0M", 1000000},
+		{"2.5M", 2500000},
 	}
 
 	for _, tt := range tests {

@@ -69,6 +69,10 @@ func NewStringSetWithCapacity(capacity int) StringSet {
 	return make(StringSet, capacity)
 }
 
+func (s StringSet) Size() int {
+	return len(s)
+}
+
 func (s StringSet) Contains(str string) bool {
 	_, found := s[str]
 	return found
@@ -1335,4 +1339,38 @@ func ExtractEntriesWithRegex(content string, regex *regexp.Regexp) ([]string, []
 		}
 	}
 	return RemoveDuplicates(validEntries), RemoveDuplicates(invalidEntries)
+}
+
+func GetFilesInDir(logger *multilog.Logger, dir string, patterns []string) ([]string, error) {
+	var files []string
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			logger.Errorf("Error accessing file %s: %v", path, err)
+			return err
+		}
+		if info.IsDir() {
+			return nil
+		}
+		if len(patterns) > 0 {
+			baseName := filepath.Base(path)
+			for _, pattern := range patterns {
+				matched, err := filepath.Match(pattern, baseName)
+				if err != nil {
+					logger.Errorf("Pattern match error for %s: %v", pattern, err)
+					continue
+				}
+				if matched {
+					files = append(files, path)
+					break
+				}
+			}
+		} else {
+			files = append(files, path)
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
+	}
+	return files, nil
 }

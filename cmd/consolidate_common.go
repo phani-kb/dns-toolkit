@@ -12,6 +12,15 @@ import (
 	"github.com/phani-kb/multilog"
 )
 
+// getFileStrings converts FileInfo slice to string slice
+func getFileStrings(fileInfos []c.FileInfo) []string {
+	fileStrings := make([]string, 0, len(fileInfos))
+	for _, fileInfo := range fileInfos {
+		fileStrings = append(fileStrings, fileInfo.GetString())
+	}
+	return fileStrings
+}
+
 // ConsolidationParams holds parameters for consolidation functions
 type ConsolidationParams struct {
 	GenericSourceType string

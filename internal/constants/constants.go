@@ -26,6 +26,7 @@ const (
 	SummaryTypeArchive                = "archive"
 	SummaryTypeUnknown                = "unknown"
 	SummaryTypeOutput                 = "output"
+	SummaryTypeOverrides              = "overrides"
 )
 
 // Default directories for various operations
@@ -81,6 +82,7 @@ var DefaultSummaryFiles = map[string]string{
 	"overlap":                 "overlap_summary.json",
 	"top":                     "top_summary.json",
 	"archive":                 "archive_summary.json",
+	"overrides":               "consolidated_overrides_summary.json",
 }
 
 const (
@@ -132,11 +134,15 @@ const (
 	CategoryDating          = "dating"
 	CategoryKademlia        = "kad"
 	CategoryAI              = "ai"
+	CategorySpyware         = "spyware"
 
 	GroupMini   = "mini"
 	GroupLite   = "lite"
 	GroupNormal = "normal"
 	GroupBig    = "big"
+
+	ForcedBlock = "forced_block"
+	ForcedAllow = "forced_allow"
 )
 
 const (
@@ -269,6 +275,21 @@ var (
 		SourceTypeAdguard: "data/custom/allowlist_adg.txt",
 		SourceTypeIpv4:    "data/custom/allowlist_ipv4.txt",
 	}
+
+	CustomOverrideFilesMap = map[string]map[string]string{
+		SourceTypeDomain: {
+			ForcedAllow: "data/custom/domain_forced_allow.txt",
+			ForcedBlock: "data/custom/domain_forced_block.txt",
+		},
+		SourceTypeAdguard: {
+			ForcedAllow: "data/custom/adguard_forced_allow.txt",
+			ForcedBlock: "data/custom/adguard_forced_block.txt",
+		},
+		SourceTypeIpv4: {
+			ForcedAllow: "data/custom/ipv4_forced_allow.txt",
+			ForcedBlock: "data/custom/ipv4_forced_block.txt",
+		},
+	}
 )
 
 var (
@@ -322,6 +343,7 @@ var (
 		CategoryDating:          true,
 		CategoryKademlia:        true,
 		CategoryAI:              true,
+		CategorySpyware:         true,
 	}
 
 	ValidGroups = map[string]bool{
@@ -351,6 +373,7 @@ var ArchiveExtensions = []string{".zip", ".tar.gz"}
 const (
 	SearchProcessedFile    = "processed"
 	SearchConsolidatedFile = "consolidated"
+	SearchOutputFile       = "output"
 )
 
 const (
@@ -492,6 +515,7 @@ var SummaryTypesOutputSummaryFileMap = map[string]string{
 	SummaryTypeOverlap:                DefaultSummaryFiles[SummaryTypeOverlap],
 	SummaryTypeTop:                    DefaultSummaryFiles[SummaryTypeTop],
 	SummaryTypeArchive:                DefaultSummaryFiles[SummaryTypeArchive],
+	SummaryTypeOverrides:              DefaultSummaryFiles[SummaryTypeOverrides],
 }
 
 // SummaryTypesOutputSummaryFileToSkipMap maps summary types to their output file names that should be skipped
@@ -523,4 +547,9 @@ var SummaryTypesToDeleteAfterOutputGenerationMap = map[string]bool{
 	SummaryTypeOverlap:                true,
 	SummaryTypeTop:                    true,
 	SummaryTypeArchive:                false,
+}
+
+var OverrideThresholds = map[string]int{
+	"allowlist": 3,
+	"blocklist": 2,
 }
