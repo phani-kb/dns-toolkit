@@ -100,7 +100,7 @@ func generateDetailedOverlapAnalysis() (string, error) {
 	sb.WriteString("## How to read this analysis\n\n")
 	// nolint:lll
 	sb.WriteString(
-		"- Unique Entries (same list type): number of entries found only in this source when compared with other sources of the same list type (blocklist vs blocklist, allowlist vs allowlist). If this is `0` the source is fully covered by other sources of the same list type.\n",
+		"- Unique Entries (same list type): number of entries found only in this source when compared with other sources of the same list type (blocklist vs. blocklist, allowlist vs. allowlist). If this is `0` the source is fully covered by other sources of the same list type.\n",
 	)
 	// nolint:lll
 	sb.WriteString(
