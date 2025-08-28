@@ -12,7 +12,7 @@ Usage: $0 [OPTIONS]
 Options:
   -h, --help      Show this help message
   -r, --range     Check commits in specific range (e.g., HEAD~5..HEAD)
-  -b, --branch    Check commits between current branch and specified branch (default: main)
+  -b, --branch    Check commits between current branch and specified branch (default: release/1.0.0)
   -n, --number    Check last N commits (default: 10)
   --fix          Show fix instructions for invalid commits
 
@@ -62,7 +62,7 @@ EOF
 }
 
 RANGE=""
-BRANCH="main"
+BRANCH="release/1.0.0"
 NUMBER=10
 SHOW_FIX=false
 
