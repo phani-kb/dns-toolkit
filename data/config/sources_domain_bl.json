@@ -188,13 +188,33 @@
           "list_types": [
             {
               "name": "allowlist",
-              "groups": "lite"
+              "disabled": true,
+              "notes": "Conflicts with other sources"
             }
           ]
         }
       ],
       "url": "https://adguardteam.github.io/HostlistsRegistry/assets/filter_1.txt",
       "website": "https://adguardteam.github.io/HostlistsRegistry"
+    },
+    {
+      "name": "AdGuard Spyware Filter - Mobile",
+      "categories": "ads, mobile, spyware",
+      "license": "GPL-3.0",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "adguard",
+          "list_types": [
+            {
+              "name": "blocklist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/master/SpywareFilter/sections/mobile.txt",
+      "website": "https://github.com/AdguardTeam/AdguardFilters"
     },
     {
       "name": "AntiAdBlockFilters",
@@ -386,7 +406,9 @@
           "name": "domain_adguard",
           "list_types": [
             {
-              "name": "allowlist"
+              "name": "allowlist",
+              "disabled": true,
+              "notes": "Conflicts with other sources"
             }
           ]
         }
@@ -563,7 +585,9 @@
           "name": "domain_adguard",
           "list_types": [
             {
-              "name": "allowlist"
+              "name": "allowlist",
+              "disabled": true,
+              "notes": "Conflicts with other sources"
             }
           ]
         }
@@ -1635,6 +1659,25 @@
       "website": "https://v.firebog.net"
     },
     {
+      "name": "Warui_Adhosts",
+      "categories": "ads",
+      "notes": "Huge list",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "hostname",
+          "list_types": [
+            {
+              "name": "blocklist"
+            }
+          ]
+        }
+      ],
+      "url": "https://warui.intaa.net/adhosts/hosts.txt",
+      "website": "https://warui.intaa.net/adhosts/"
+    },
+    {
       "name": "WindowsSpyBlocker_Hosts_spy",
       "categories": "privacy, trackers",
       "disabled": true,
@@ -1697,7 +1740,9 @@
           "name": "domain_adguard",
           "list_types": [
             {
-              "name": "allowlist"
+              "name": "allowlist",
+              "disabled": true,
+              "notes": "Conflicts with other sources"
             }
           ]
         }

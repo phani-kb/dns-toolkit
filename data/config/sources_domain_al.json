@@ -139,6 +139,8 @@
     },
     {
       "name": "BlahDNS_whitelist",
+      "disabled": true,
+      "notes": "Too many conflicts with other sources",
       "types": [
         {
           "name": "domain",
@@ -149,7 +151,8 @@
           ]
         }
       ],
-      "url": "https://raw.githubusercontent.com/ookangzheng/blahdns/master/hosts/whitelist.txt"
+      "url": "https://raw.githubusercontent.com/zoonderkins/blahdns/refs/heads/master/hosts/whitelist.txt",
+      "website": "https://github.com/zoonderkins/blahdns"
     },
     {
       "name": "China_CDN_Whitelist",
@@ -233,8 +236,8 @@
     },
     {
       "name": "Notracking_Hosts_whitelist",
-      "disabled": false,
-      "notes": "Huge list, use with caution",
+      "disabled": true,
+      "notes": "Archived by the owner on Aug 8, 2023",
       "types": [
         {
           "name": "domain",
@@ -256,27 +259,13 @@
           "list_types": [
             {
               "name": "allowlist",
-              "groups": "normal"
+              "groups": "normal",
+              "notes": "Conflicts with other sources, use with caution"
             }
           ]
         }
       ],
       "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/refs/heads/master/Whitelists/Whitelist",
-      "website": "https://github.com/ShadowWhisperer/BlockLists"
-    },
-    {
-      "name": "ShadowWhisperer_Whitelist",
-      "types": [
-        {
-          "name": "domain",
-          "list_types": [
-            {
-              "name": "allowlist"
-            }
-          ]
-        }
-      ],
-      "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/master/Whitelists/Whitelist",
       "website": "https://github.com/ShadowWhisperer/BlockLists"
     },
     {
