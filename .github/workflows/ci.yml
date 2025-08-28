@@ -214,6 +214,10 @@ jobs:
               ;;
           esac
 
+      - name: Generate date for cache key
+        id: date
+        run: echo "date=$(date -u '+%Y-%m-%d')" >> $GITHUB_OUTPUT
+
       - name: Restore data cache
         uses: actions/cache/restore@v4
         id: cache-restore
@@ -221,10 +225,9 @@ jobs:
           path: |
             data/download
             data/download_summary.json
-          key: data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-v3
+          key: data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-v3
           restore-keys: |
-            data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-
-            data-download-${{ runner.os }}-
+            data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-
 
       - name: Validate cache (for use-cache & refresh-cache modes)
         if: env.PIPELINE_MODE == 'use-cache' || env.PIPELINE_MODE == 'refresh-cache'
@@ -243,14 +246,16 @@ jobs:
             exit 1
           fi
 
-          if [[ ! -d "data/download" ]] || [[ -z "$(ls -A data/download 2>/dev/null)" ]]; then
-            echo "::error::Cache hit reported, but data/download directory is empty or missing."
-            exit 1
-          fi
+          if [[ "${{ steps.cache-restore.outputs.cache-hit }}" == "true" || -n "$CACHE_RESTORED_FROM" ]]; then
+            if [[ ! -d "data/download" ]] || [[ -z "$(ls -A data/download 2>/dev/null)" ]]; then
+              echo "::error::Cache was restored, but data/download directory is empty or missing."
+              exit 1
+            fi
 
-          if [[ "${{ env.PIPELINE_MODE }}" == "use-cache" && ! -f "data/download_summary.json" ]]; then
-            echo "::error::'use-cache' mode requires 'data/download_summary.json' but it's missing from cache."
-            exit 1
+            if [[ "${{ env.PIPELINE_MODE }}" == "use-cache" && ! -f "data/download_summary.json" ]]; then
+              echo "::error::'use-cache' mode requires 'data/download_summary.json' but it's missing from cache."
+              exit 1
+            fi
           fi
 
           echo "✅ Cache validated successfully."
@@ -398,8 +403,7 @@ jobs:
         id: cache-key
         run: |
           # Use date-based cache key to limit cache growth (daily rotation)
-          CACHE_DATE=$(date -u '+%Y-%m-%d')
-          CACHE_KEY="data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${CACHE_DATE}-v3"
+          CACHE_KEY="data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-v3"
           echo "cache-key=$CACHE_KEY" >> $GITHUB_OUTPUT
           echo "Generated cache key: $CACHE_KEY"
 

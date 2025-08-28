@@ -1,0 +1,7 @@
+# teams.microsoft.com, teams.office.com
+52.123.129.14
+# raw.githubusercontent.com
+185.199.108.133
+185.199.109.133
+185.199.110.133
+185.199.111.133

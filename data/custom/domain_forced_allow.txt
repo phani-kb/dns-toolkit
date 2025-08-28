@@ -1,1 +1,4 @@
 github.com
+raw.githubusercontent.com
+# for google search
+clients1.google.com
