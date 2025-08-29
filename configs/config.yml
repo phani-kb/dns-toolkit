@@ -55,6 +55,7 @@ dns_toolkit:
     name:
       contains:
         #- "Local"
+        - 'Firehol'
       #type: "domain_top" #"domain_with_comment_suffix" # "adguard"
 multilog:
   handlers:
