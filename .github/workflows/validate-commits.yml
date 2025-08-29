@@ -4,9 +4,9 @@ name: Validate Commit Messages
 
 on:
   push:
-    branches: [main, release/1.0.0]
+    branches: [main]
   pull_request:
-    branches: [main, release/1.0.0]
+    branches: [main]
 
 jobs:
   validate-commits:
