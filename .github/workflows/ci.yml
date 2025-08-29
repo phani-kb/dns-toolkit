@@ -225,7 +225,7 @@ jobs:
           path: |
             data/download
             data/download_summary.json
-          key: data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-v3
+          key: data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-v4
           restore-keys: |
             data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-
             data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-
@@ -234,7 +234,7 @@ jobs:
         if: env.PIPELINE_MODE == 'use-cache' || env.PIPELINE_MODE == 'refresh-cache'
         run: |
           echo "Validating cache availability..."
-          echo "Cache key requested: data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-v3"
+          echo "Cache key requested: data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-v4"
           echo "Cache hit: ${{ steps.cache-restore.outputs.cache-hit }}"
           echo "Cache primary key: ${{ steps.cache-restore.outputs.cache-primary-key }}"
           echo "Cache matched key: ${{ steps.cache-restore.outputs.cache-matched-key }}"
@@ -470,7 +470,7 @@ jobs:
           # Use date-based cache key to limit cache growth (daily rotation)
           # Add timestamp to avoid conflicts between concurrent runs
           TIMESTAMP=$(date -u +%H%M)
-          CACHE_KEY="data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-${TIMESTAMP}-v3"
+          CACHE_KEY="data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-${TIMESTAMP}-v4"
           echo "cache-key=$CACHE_KEY" >> $GITHUB_OUTPUT
           echo "Generated cache key: $CACHE_KEY"
 
