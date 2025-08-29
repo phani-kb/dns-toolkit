@@ -469,7 +469,9 @@ jobs:
         id: cache-key
         run: |
           # Use date-based cache key to limit cache growth (daily rotation)
-          CACHE_KEY="data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-v3"
+          # Add timestamp to avoid conflicts between concurrent runs
+          TIMESTAMP=$(date -u +%H%M)
+          CACHE_KEY="data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-${TIMESTAMP}-v3"
           echo "cache-key=$CACHE_KEY" >> $GITHUB_OUTPUT
           echo "Generated cache key: $CACHE_KEY"
 
@@ -526,8 +528,11 @@ jobs:
           if [[ "${{ steps.cache-save-attempt.outcome }}" == "success" ]]; then
             echo "✅ Data cache saved successfully."
             echo "Cached: ${{ steps.count-files.outputs.download-count }} files (${{ steps.count-files.outputs.download-size }})"
+            echo "Cache key: ${{ steps.cache-key.outputs.cache-key }}"
+          elif [[ "${{ steps.cache-save-attempt.outcome }}" == "failure" ]]; then
+            echo "❌ Data cache save failed."
           else
-            echo "⚠️ Data cache save failed or was skipped."
+            echo "⚠️ Data cache save was skipped."
           fi
 
       - name: Final Summary
