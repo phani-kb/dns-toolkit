@@ -230,8 +230,8 @@ jobs:
             data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-
             data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-
 
-      - name: Validate cache (for use-cache & refresh-cache modes)
-        if: env.PIPELINE_MODE == 'use-cache' || env.PIPELINE_MODE == 'refresh-cache'
+      - name: Validate cache (for use-cache mode only)
+        if: env.PIPELINE_MODE == 'use-cache'
         run: |
           echo "Validating cache availability..."
           echo "Cache key requested: data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-v4"
