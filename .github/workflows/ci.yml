@@ -309,39 +309,6 @@ jobs:
             echo "Cache timestamp: $(cat data/download/.cache_timestamp)"
           fi
 
-      - name: Backup data files
-        if: env.SHOULD_PUBLISH == 'true'
-        run: |
-          echo "Backing up data files for branch switching..."
-          mkdir -p /tmp/data-backup
-
-          # Backup download directory and summary file
-          if [[ -d "data/download" ]]; then
-            DOWNLOAD_FILE_COUNT=$(find data/download -type f | wc -l)
-            echo "Found $DOWNLOAD_FILE_COUNT files in data/download before backup"
-            cp -r data/download /tmp/data-backup/
-            
-            # Verify backup
-            BACKUP_FILE_COUNT=$(find /tmp/data-backup/download -type f | wc -l)
-            echo "Backup contains $BACKUP_FILE_COUNT files"
-            if [[ "$BACKUP_FILE_COUNT" != "$DOWNLOAD_FILE_COUNT" ]]; then
-              echo "ERROR: Backup file count mismatch! Original: $DOWNLOAD_FILE_COUNT, Backup: $BACKUP_FILE_COUNT"
-              exit 1
-            fi
-            echo "✅ Successfully backed up data/download directory"
-          else
-            echo "⚠️ data/download directory not found, skipping backup"
-          fi
-
-          if [[ -f "data/download_summary.json" ]]; then
-            cp data/download_summary.json /tmp/data-backup/
-            echo "✅ Backed up data/download_summary.json"
-          else
-            echo "⚠️ data/download_summary.json not found, skipping backup"
-          fi
-
-          echo "Data backup completed"
-
       - name: Run DNS Toolkit Pipeline
         id: pipeline
         run: |
@@ -398,6 +365,39 @@ jobs:
             echo "::error::No output files generated. Pipeline might have failed silently."
             exit 1
           fi
+
+      - name: Backup data files
+        if: env.SHOULD_PUBLISH == 'true'
+        run: |
+          echo "Backing up data files for branch switching..."
+          mkdir -p /tmp/data-backup
+
+          # Backup download directory and summary file
+          if [[ -d "data/download" ]]; then
+            DOWNLOAD_FILE_COUNT=$(find data/download -type f | wc -l)
+            echo "Found $DOWNLOAD_FILE_COUNT files in data/download before backup"
+            cp -r data/download /tmp/data-backup/
+            
+            # Verify backup
+            BACKUP_FILE_COUNT=$(find /tmp/data-backup/download -type f | wc -l)
+            echo "Backup contains $BACKUP_FILE_COUNT files"
+            if [[ "$BACKUP_FILE_COUNT" != "$DOWNLOAD_FILE_COUNT" ]]; then
+              echo "ERROR: Backup file count mismatch! Original: $DOWNLOAD_FILE_COUNT, Backup: $BACKUP_FILE_COUNT"
+              exit 1
+            fi
+            echo "✅ Successfully backed up data/download directory"
+          else
+            echo "⚠️ data/download directory not found, skipping backup"
+          fi
+
+          if [[ -f "data/download_summary.json" ]]; then
+            cp data/download_summary.json /tmp/data-backup/
+            echo "✅ Backed up data/download_summary.json"
+          else
+            echo "⚠️ data/download_summary.json not found, skipping backup"
+          fi
+
+          echo "Data backup completed"
 
       - name: Publish results
         if: env.SHOULD_PUBLISH == 'true'
