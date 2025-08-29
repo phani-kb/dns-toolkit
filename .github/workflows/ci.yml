@@ -22,9 +22,9 @@ on:
           - 'use-cache'
           - 'refresh-cache'
   push:
-    branches: [main]
+    branches-ignore: [main]
   pull_request:
-    branches: [main]
+    branches-ignore: [main]
 
 permissions:
   contents: read
