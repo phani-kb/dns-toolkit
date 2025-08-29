@@ -255,6 +255,27 @@ jobs:
           # Only validate directory contents if cache was actually restored
           if [[ "$CACHE_HIT" == "true" ]] || [[ -n "$CACHE_RESTORED_FROM" ]]; then
             echo "Cache was restored, validating contents..."
+            
+            echo "Current directory contents:"
+            ls -la
+            
+            echo "Data directory contents:"
+            if [[ -d "data" ]]; then
+              ls -la data/
+            else
+              echo "data/ directory does not exist"
+            fi
+            
+            echo "Download directory check:"
+            if [[ -d "data/download" ]]; then
+              echo "data/download exists, contents:"
+              ls -la data/download/
+              FILE_COUNT=$(find data/download -type f 2>/dev/null | wc -l)
+              echo "File count in data/download: $FILE_COUNT"
+            else
+              echo "data/download directory does not exist"
+            fi
+            
             if [[ ! -d "data/download" ]] || [[ -z "$(ls -A data/download 2>/dev/null)" ]]; then
               echo "::error::Cache was restored, but data/download directory is empty or missing."
               exit 1
