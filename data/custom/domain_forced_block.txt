@@ -1,0 +1,14 @@
+onelink.me
+# marketing
+lddy.no
+# ads
+aboutads.info
+analytics.barnebys.sh
+app.e.sigsauer.com
+api.narrativ.com
+# trackers
+assoc-redirect.amazon.com
+at.adtech.redventures.io
+attn.tv
+bugsnag.com
+
