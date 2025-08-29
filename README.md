@@ -2,7 +2,7 @@
 
 [![Go CI Workflow](https://github.com/phani-kb/dns-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/phani-kb/dns-toolkit/actions/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/phani-kb/dns-toolkit)](https://goreportcard.com/report/github.com/phani-kb/dns-toolkit)
-[![codecov](https://codecov.io/gh/phani-kb/dns-toolkit/branch/main/graph/badge.svg)](https://codecov.io/gh/phani-kb/dns-toolkit)
+[![codecov](https://codecov.io/gh/phani-kb/dns-toolkit/branch/release/1.0.0/graph/badge.svg)](https://codecov.io/gh/phani-kb/dns-toolkit)
 [![GoDoc](https://godoc.org/github.com/phani-kb/dns-toolkit?status.svg)](https://godoc.org/github.com/phani-kb/dns-toolkit)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Go Version](https://img.shields.io/badge/Go-1.24-blue.svg)](https://golang.org/doc/go1.24)
@@ -76,7 +76,7 @@ flowchart LR
 <!-- BRANCH_SIZES_START -->
 ## Branch Sizes
 
-**Note:** The repo size badge above only reflects the default branch (`main`).
+**Note:** The repo size badge above only reflects the default branch (`release/1.0.0`).
 
 - **Output branch size:** 389.20 MB
 - **Summaries branch size:** 1.34 MB
@@ -347,7 +347,7 @@ Sources are configured in `data/config/sources*.json` files. Each source specifi
 - Categories (ads, malware, privacy, etc.)
 - License and website information
 
-[View and edit source configuration files in `data/config/`](https://github.com/phani-kb/dns-toolkit/tree/main/data/config)
+[View and edit source configuration files in `data/config/`](https://github.com/phani-kb/dns-toolkit/tree/release/1.0.0/data/config)
 
 > **To add, modify, or review sources, always refer to the files in `data/config/`.**
 

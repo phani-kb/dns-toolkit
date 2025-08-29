@@ -251,7 +251,7 @@ func generateBranchSizesSection(outputSize, summariesSize string) string {
 	var sb strings.Builder
 	sb.WriteString("<!-- BRANCH_SIZES_START -->\n")
 	sb.WriteString("## Branch Sizes\n\n")
-	sb.WriteString("**Note:** The repo size badge above only reflects the default branch (`main`).\n\n")
+	sb.WriteString("**Note:** The repo size badge above only reflects the default branch (`release/1.0.0`).\n\n")
 	sb.WriteString(fmt.Sprintf("- **Output branch size:** %s\n", outputSize))
 	sb.WriteString(fmt.Sprintf("- **Summaries branch size:** %s\n", summariesSize))
 	sb.WriteString("\n<!-- BRANCH_SIZES_END -->")
