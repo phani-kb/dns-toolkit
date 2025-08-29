@@ -233,20 +233,28 @@ jobs:
         if: env.PIPELINE_MODE == 'use-cache' || env.PIPELINE_MODE == 'refresh-cache'
         run: |
           echo "Validating cache availability..."
-          echo "Cache key used: data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-v3"
+          echo "Cache key used: data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-v3"
           echo "Cache hit: ${{ steps.cache-restore.outputs.cache-hit }}"
+          echo "Cache primary key: ${{ steps.cache-restore.outputs.cache-primary-key }}"
+          echo "Cache matched key: ${{ steps.cache-restore.outputs.cache-matched-key }}"
 
           # Check if cache was restored (either exact match or via restore-keys)
           CACHE_RESTORED_FROM="${{ steps.cache-restore.outputs.cache-primary-key }}"
           if [[ -z "$CACHE_RESTORED_FROM" ]]; then
             CACHE_RESTORED_FROM="${{ steps.cache-restore.outputs.cache-matched-key }}"
           fi
-          if [[ "${{ steps.cache-restore.outputs.cache-hit }}" != "true" && -z "$CACHE_RESTORED_FROM" ]]; then
+
+          # Determine if any cache was actually restored
+          CACHE_HIT="${{ steps.cache-restore.outputs.cache-hit }}"
+          if [[ "$CACHE_HIT" != "true" && -z "$CACHE_RESTORED_FROM" ]]; then
             echo "::error::Cache MISS. '${{ env.PIPELINE_MODE }}' mode requires an existing cache."
+            echo "No cache found for key or restore-keys pattern."
             exit 1
           fi
 
-          if [[ "${{ steps.cache-restore.outputs.cache-hit }}" == "true" || -n "$CACHE_RESTORED_FROM" ]]; then
+          # Only validate directory contents if cache was actually restored
+          if [[ "$CACHE_HIT" == "true" ]] || [[ -n "$CACHE_RESTORED_FROM" ]]; then
+            echo "Cache was restored, validating contents..."
             if [[ ! -d "data/download" ]] || [[ -z "$(ls -A data/download 2>/dev/null)" ]]; then
               echo "::error::Cache was restored, but data/download directory is empty or missing."
               exit 1
@@ -256,14 +264,19 @@ jobs:
               echo "::error::'use-cache' mode requires 'data/download_summary.json' but it's missing from cache."
               exit 1
             fi
+            
+            echo "✅ Cache contents validated successfully."
+          else
+            echo "::error::Unexpected cache state - cache outputs suggest restoration but no keys found."
+            exit 1
           fi
 
-          echo "✅ Cache validated successfully."
+          echo "✅ Cache validation completed successfully."
 
-          if [[ "${{ steps.cache-restore.outputs.cache-hit }}" == "true" ]]; then
+          if [[ "$CACHE_HIT" == "true" ]]; then
             echo "Cache: Exact key match"
             echo "Key: ${{ steps.cache-restore.outputs.cache-primary-key }}"
-          else
+          elif [[ -n "$CACHE_RESTORED_FROM" ]]; then
             echo "Cache: Restored via fallback key"
             echo "Matched key: $CACHE_RESTORED_FROM"
           fi
