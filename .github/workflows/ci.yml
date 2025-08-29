@@ -243,16 +243,21 @@ jobs:
           CACHE_MATCHED_KEY="${{ steps.cache-restore.outputs.cache-matched-key }}"
           CACHE_HIT="${{ steps.cache-restore.outputs.cache-hit }}"
 
-          if [[ "$CACHE_HIT" == "true" && -n "$CACHE_MATCHED_KEY" ]]; then
-            echo "✅ Cache restored from key: $CACHE_MATCHED_KEY"
-          elif [[ "$CACHE_HIT" != "true" ]]; then
+          # Success conditions:
+          # 1. cache-hit: true (exact key match)
+          # 2. cache-hit: false BUT cache-matched-key exists (restore-keys match)
+          if [[ "$CACHE_HIT" == "true" ]]; then
+            echo "✅ Cache restored (exact match): $CACHE_MATCHED_KEY"
+          elif [[ -n "$CACHE_MATCHED_KEY" ]]; then
+            echo "✅ Cache restored (restore-keys match): $CACHE_MATCHED_KEY"
+          else
             echo "::error::Cache MISS. '${{ env.PIPELINE_MODE }}' mode requires an existing cache."
             echo "No cache found for key or restore-keys pattern."
             exit 1
           fi
 
           # Only validate directory contents if cache was actually restored
-          if [[ "$CACHE_HIT" == "true" ]] || [[ -n "$CACHE_RESTORED_FROM" ]]; then
+          if [[ "$CACHE_HIT" == "true" ]] || [[ -n "$CACHE_MATCHED_KEY" ]]; then
             echo "Cache was restored, validating contents..."
             
             echo "Current directory contents:"
