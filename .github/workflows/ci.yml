@@ -310,20 +310,34 @@ jobs:
           fi
 
       - name: Backup data files
-        if: env.PIPELINE_MODE == 'full-pipeline' && needs.test-and-build.outputs.should-publish == 'true'
+        if: env.SHOULD_PUBLISH == 'true'
         run: |
           echo "Backing up data files for branch switching..."
           mkdir -p /tmp/data-backup
 
           # Backup download directory and summary file
           if [[ -d "data/download" ]]; then
-            cp -r data/download /tmp/data-backup/ 2>/dev/null || true
-            echo "Backed up data/download directory"
+            DOWNLOAD_FILE_COUNT=$(find data/download -type f | wc -l)
+            echo "Found $DOWNLOAD_FILE_COUNT files in data/download before backup"
+            cp -r data/download /tmp/data-backup/
+            
+            # Verify backup
+            BACKUP_FILE_COUNT=$(find /tmp/data-backup/download -type f | wc -l)
+            echo "Backup contains $BACKUP_FILE_COUNT files"
+            if [[ "$BACKUP_FILE_COUNT" != "$DOWNLOAD_FILE_COUNT" ]]; then
+              echo "ERROR: Backup file count mismatch! Original: $DOWNLOAD_FILE_COUNT, Backup: $BACKUP_FILE_COUNT"
+              exit 1
+            fi
+            echo "✅ Successfully backed up data/download directory"
+          else
+            echo "⚠️ data/download directory not found, skipping backup"
           fi
 
           if [[ -f "data/download_summary.json" ]]; then
-            cp data/download_summary.json /tmp/data-backup/ 2>/dev/null || true
-            echo "Backed up data/download_summary.json"
+            cp data/download_summary.json /tmp/data-backup/
+            echo "✅ Backed up data/download_summary.json"
+          else
+            echo "⚠️ data/download_summary.json not found, skipping backup"
           fi
 
           echo "Data backup completed"
@@ -420,16 +434,34 @@ jobs:
         if: env.PIPELINE_MODE == 'full-pipeline' && env.SHOULD_PUBLISH == 'true'
         run: |
           echo "Restoring data files after branch operations..."
+
           # Restore download directory and summary file from backup
           if [[ -d "/tmp/data-backup/download" ]]; then
+            BACKUP_FILE_COUNT=$(find /tmp/data-backup/download -type f | wc -l)
+            echo "Backup contains $BACKUP_FILE_COUNT files to restore"
+            
             mkdir -p data
-            cp -r /tmp/data-backup/download data/ 2>/dev/null || true
-            echo "Restored data/download directory"
+            cp -r /tmp/data-backup/download data/
+            
+            # Verify restoration
+            RESTORED_FILE_COUNT=$(find data/download -type f | wc -l)
+            echo "Restored $RESTORED_FILE_COUNT files"
+            if [[ "$RESTORED_FILE_COUNT" != "$BACKUP_FILE_COUNT" ]]; then
+              echo "ERROR: Restore file count mismatch! Backup: $BACKUP_FILE_COUNT, Restored: $RESTORED_FILE_COUNT"
+              exit 1
+            fi
+            echo "✅ Successfully restored data/download directory"
+          else
+            echo "⚠️ No backup directory found at /tmp/data-backup/download"
           fi
+
           if [[ -f "/tmp/data-backup/download_summary.json" ]]; then
-            cp /tmp/data-backup/download_summary.json data/ 2>/dev/null || true
-            echo "Restored data/download_summary.json"
+            cp /tmp/data-backup/download_summary.json data/
+            echo "✅ Restored data/download_summary.json"
+          else
+            echo "⚠️ No backup summary file found at /tmp/data-backup/download_summary.json"
           fi
+
           echo "Data restoration completed"
 
       - name: Generate cache key for save
@@ -441,6 +473,28 @@ jobs:
           echo "cache-key=$CACHE_KEY" >> $GITHUB_OUTPUT
           echo "Generated cache key: $CACHE_KEY"
 
+      - name: Validate data before cache save
+        if: (env.PIPELINE_MODE == 'refresh-cache' || env.PIPELINE_MODE == 'full-pipeline')
+        run: |
+          echo "🔍 Pre-cache validation:"
+          if [[ -d "data/download" ]]; then
+            DOWNLOAD_COUNT=$(find data/download -type f | wc -l)
+            DOWNLOAD_SIZE=$(du -sh data/download | cut -f1)
+            echo "✅ data/download exists with $DOWNLOAD_COUNT files ($DOWNLOAD_SIZE)"
+          else
+            echo "❌ data/download directory missing!"
+            echo "Current working directory: $(pwd)"
+            echo "Contents of data/ directory:"
+            ls -la data/ || echo "data/ directory doesn't exist"
+            exit 1
+          fi
+
+          if [[ -f "data/download_summary.json" ]]; then
+            echo "✅ data/download_summary.json exists"
+          else
+            echo "❌ data/download_summary.json missing!"
+          fi
+
       - name: Save data cache
         if: (env.PIPELINE_MODE == 'refresh-cache' || env.PIPELINE_MODE == 'full-pipeline') && (steps.count-files.outputs.download-count > 0)
         uses: actions/cache/save@v4
@@ -451,6 +505,20 @@ jobs:
           key: ${{ steps.cache-key.outputs.cache-key }}
         continue-on-error: true
         id: cache-save-attempt
+
+      - name: Validate cache before save
+        if: (env.PIPELINE_MODE == 'refresh-cache' || env.PIPELINE_MODE == 'full-pipeline')
+        run: |
+          echo "Validating cache content before save..."
+          DOWNLOAD_COUNT=$(find data/download -type f 2>/dev/null | wc -l)
+          echo "Actual download files found: $DOWNLOAD_COUNT"
+          echo "Reported download count: ${{ steps.count-files.outputs.download-count }}"
+
+          if [[ "$DOWNLOAD_COUNT" -eq 0 ]]; then
+            echo "::warning::No download files found - cache will not be saved or will be empty"
+          else
+            echo "✅ Download files validated: $DOWNLOAD_COUNT files ready for caching"
+          fi
 
       - name: Cache save status check
         if: always() && (env.PIPELINE_MODE == 'refresh-cache' || env.PIPELINE_MODE == 'full-pipeline')
