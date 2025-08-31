@@ -1120,8 +1120,8 @@ func IsSkipIP(_ *multilog.Logger, ip string) bool {
 func ShouldDownloadSource(logger *multilog.Logger, summaryFile string, sourceName string) bool {
 	summary, err := GetLastSummary[c.DownloadSummary](logger, summaryFile, sourceName)
 	if err != nil {
-		logger.Errorf("Getting last download summary error: %v", err)
-		return false
+		logger.Warnf("Could not get download summary for %s: %v, will download", sourceName, err)
+		return true // if we can't read the summary, we should download
 	}
 
 	lastDownload := summary.LastDownloadTimestamp

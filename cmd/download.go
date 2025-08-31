@@ -70,7 +70,7 @@ var downloadCmd = &cobra.Command{
 		defer ticker.Stop()
 
 		// Stats to track a download process
-		var totalSources, successCount, failCount int
+		var totalSources, successCount, failCount, downloadedCount int
 		var statsMutex sync.Mutex
 
 		for _, sourcesConfig := range SourcesConfigs {
@@ -166,6 +166,9 @@ var downloadCmd = &cobra.Command{
 						} else {
 							statsMutex.Lock()
 							successCount++
+							if !fetchSkipped {
+								downloadedCount++
+							}
 							statsMutex.Unlock()
 
 							if fetchSkipped {
@@ -232,8 +235,8 @@ var downloadCmd = &cobra.Command{
 
 		workerPool.Wait()
 
-		Logger.Infof("Download complete: %d sources processed, %d successful, %d failed",
-			totalSources, successCount, failCount)
+		Logger.Infof("Download complete: %d sources processed, %d successful (%d downloaded, %d skipped), %d failed",
+			totalSources, successCount, downloadedCount, successCount-downloadedCount, failCount)
 
 		summaryFile := filepath.Join(
 			constants.SummaryDir,

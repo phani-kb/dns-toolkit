@@ -395,10 +395,38 @@ func (d *DefaultDownloader) ShouldDownload(
 	file c.DownloadFile,
 ) bool {
 	filePath := filepath.Join(file.Folder, file.Filename)
-	if _, err := os.Stat(filePath); err == nil {
-		logger.Debugf("File %s already exists", filePath)
-		return u.ShouldDownloadSource(logger, summaryFile, file.Name)
+	fileExists := false
+
+	if info, err := os.Stat(filePath); err == nil {
+		fileExists = true
+		logger.Debugf("File %s already exists (size: %d bytes, modified: %s)",
+			filePath, info.Size(), info.ModTime().Format("2006-01-02 15:04:05"))
 	}
+
+	if !fileExists {
+		logger.Debugf("File %s does not exist, should download", filePath)
+		return true
+	}
+
+	if !u.ShouldDownloadSource(logger, summaryFile, file.Name) {
+		return false
+	}
+
+	summary, err := u.GetLastSummary[c.DownloadSummary](logger, summaryFile, file.Name)
+	if err != nil {
+		return true
+	}
+
+	if summary.URL != "" && summary.URL != file.URL {
+		logger.Infof("URL changed for %s: %s -> %s, should download", file.Name, summary.URL, file.URL)
+		return true
+	}
+
+	if summary.Error != "" {
+		logger.Infof("Previous download error for %s: %s, should retry", file.Name, summary.Error)
+		return true
+	}
+
 	return true
 }
 
