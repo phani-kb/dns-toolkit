@@ -190,7 +190,7 @@ jobs:
           echo "Building DNS toolkit..."
           go build -o bin/dns-toolkit .
           chmod +x bin/dns-toolkit
-          mkdir -p data/{download,output}
+          mkdir -p data/{download,output} logs
           echo "Build completed successfully"
 
       - name: Display pipeline mode summary
@@ -319,12 +319,15 @@ jobs:
           echo "Running DNS toolkit pipeline in '${{ env.PIPELINE_MODE }}' mode..."
           # Step 1: Download (conditional)
           if [[ "${{ env.PIPELINE_MODE }}" == "full-pipeline" || "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]]; then
-            echo "Step 1: Downloading fresh data..."
+            echo "Step 1: Downloading fresh data with debug logging..."
+            # Clear any existing log file to ensure fresh debug output
+            > logs/dns-toolkit.log
             ./bin/dns-toolkit download
             echo "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" > data/download/.cache_timestamp
             DOWNLOAD_COUNT=$(find data/download -type f 2>/dev/null | wc -l)
             DOWNLOAD_SIZE=$(du -sh data/download 2>/dev/null | cut -f1 || echo "0")
             echo "Downloaded: $DOWNLOAD_COUNT files ($DOWNLOAD_SIZE)"
+            echo "Debug logs written to logs/dns-toolkit.log"
           else
             echo "Step 1: Using cached data (skipping download)"
             CACHED_COUNT=$(find data/download -type f 2>/dev/null | wc -l)
@@ -539,6 +542,15 @@ jobs:
             echo "⚠️ Data cache save was skipped."
           fi
 
+      - name: Upload debug logs as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dns-toolkit-debug-logs-${{ env.PIPELINE_MODE }}-${{ github.run_id }}
+          path: logs/dns-toolkit.log
+          retention-days: 7
+          if-no-files-found: warn
+
       - name: Final Summary
         if: always()
         run: |
@@ -568,5 +580,9 @@ jobs:
             fi
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
+
+          echo "### Debug Information" >> $GITHUB_STEP_SUMMARY
+          echo "- **Debug Logs**: Available as artifact \`dns-toolkit-debug-logs-${{ env.PIPELINE_MODE }}-${{ github.run_id }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
           echo "See full logs for details."
