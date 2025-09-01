@@ -408,8 +408,23 @@ func (d *DefaultDownloader) ShouldDownload(
 		return true
 	}
 
-	if !u.ShouldDownloadSource(logger, summaryFile, file.Name) {
-		logger.Infof("Skipping download due to frequency window not elapsed: %s", filePath)
+	shouldDownload, frequency, lastTime, remaining := u.ShouldDownloadSourceInfo(logger, summaryFile, file.Name)
+	if !shouldDownload {
+		if lastTime.IsZero() {
+			logger.Infof(
+				"Skipping download due to frequency window (%s) not elapsed: %s (remaining %s)",
+				frequency,
+				filePath,
+				remaining.Truncate(time.Second),
+			)
+		} else {
+			logger.Infof("Skipping download due to frequency window (%s) not elapsed: %s (last: %s, remaining: %s)",
+				frequency,
+				filePath,
+				lastTime.Format("2006-01-02 15:04:05"),
+				remaining.Truncate(time.Second),
+			)
+		}
 		return false
 	}
 

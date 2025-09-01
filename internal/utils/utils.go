@@ -1118,33 +1118,61 @@ func IsSkipIP(_ *multilog.Logger, ip string) bool {
 }
 
 func ShouldDownloadSource(logger *multilog.Logger, summaryFile string, sourceName string) bool {
+	should, _, _, _ := ShouldDownloadSourceInfo(logger, summaryFile, sourceName)
+	return should
+}
+
+// ShouldDownloadSourceInfo checks if a fresh download should occur for the given source.
+// Returns:
+//
+//	shouldDownload - whether a fresh download should occur
+//	frequencyLabel - daily, weekly or monthly
+//	lastDownloadTime - zero time if not available
+//	remaining - duration until next allowed download (zero if shouldDownload == true)
+func ShouldDownloadSourceInfo(
+	logger *multilog.Logger,
+	summaryFile string,
+	sourceName string,
+) (bool, string, time.Time, time.Duration) {
 	summary, err := GetLastSummary[c.DownloadSummary](logger, summaryFile, sourceName)
 	if err != nil {
-		logger.Warnf("Could not get download summary for %s: %v, will download", sourceName, err)
-		return true // if we can't read the summary, we should download
+		return true, "", time.Time{}, 0
 	}
 
 	lastDownload := summary.LastDownloadTimestamp
 	if lastDownload == "" || lastDownload == "0001-01-01T00:00:00Z" {
-		return true
+		return true, summary.Frequency, time.Time{}, 0
 	}
 
 	lastDownloadTime, err := time.Parse(constants.TimestampFormat, lastDownload)
 	if err != nil {
 		logger.Errorf("Parsing last download timestamp error: %v", err)
-		return false
+		return false, summary.Frequency, time.Time{}, 0
 	}
+
 	now := time.Now()
+	elapsed := now.Sub(lastDownloadTime)
+
+	var threshold time.Duration
 	switch summary.Frequency {
 	case constants.FrequencyDaily:
-		return now.Sub(lastDownloadTime) >= 24*time.Hour
+		threshold = 24 * time.Hour
 	case constants.FrequencyWeekly:
-		return now.Sub(lastDownloadTime) >= 7*24*time.Hour
+		threshold = 7 * 24 * time.Hour
 	case constants.FrequencyMonthly:
-		return now.Sub(lastDownloadTime) >= 30*24*time.Hour
+		threshold = 30 * 24 * time.Hour
 	default:
-		return now.Sub(lastDownloadTime) >= 24*time.Hour
+		threshold = 24 * time.Hour
 	}
+
+	if elapsed >= threshold {
+		return true, summary.Frequency, lastDownloadTime, 0
+	}
+	remaining := threshold - elapsed
+	if remaining < 0 {
+		remaining = 0
+	}
+	return false, summary.Frequency, lastDownloadTime, remaining
 }
 
 // IsAlphanumericWithUnderscoresAndDashes checks if a string contains only alphanumeric characters,
