@@ -390,6 +390,9 @@ jobs:
         run: |
           echo "Backing up data files for branch switching..."
           mkdir -p /tmp/data-backup
+          if [[ -f "logs/dns-toolkit.log" ]]; then
+            cp logs/dns-toolkit.log /tmp/data-backup/dns-toolkit.log || true
+          fi
 
           # Backup download directory and summary file
           if [[ -d "data/download" ]]; then
@@ -453,6 +456,10 @@ jobs:
         if: env.PIPELINE_MODE == 'full-pipeline' && env.SHOULD_PUBLISH == 'true'
         run: |
           echo "Restoring data files after branch operations..."
+          mkdir -p logs
+          if [[ -f "/tmp/data-backup/dns-toolkit.log" ]]; then
+            cp /tmp/data-backup/dns-toolkit.log logs/dns-toolkit.log || true
+          fi
 
           # Restore download directory and summary file from backup
           if [[ -d "/tmp/data-backup/download" ]]; then
@@ -555,6 +562,14 @@ jobs:
           fi
 
       - name: Upload debug logs as artifact
+        if: always()
+        run: |
+          mkdir -p logs
+          if [[ ! -f logs/dns-toolkit.log ]]; then
+            echo "(placeholder) log file was missing at upload time" > logs/dns-toolkit.log
+          fi
+        shell: bash
+      - name: Publish debug log artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
