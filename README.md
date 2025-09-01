@@ -107,7 +107,7 @@ flowchart LR
 
 This project is made possible by the following blocklist and allowlist sources:
 
-Legend: S = Status, C/U/X = Count / Unique / Conflicts
+Legend: S = Status, C/U/X = Count / Unique / Conflicts, AL = Allowlist, BL = Blocklist
 
 <details>
 <summary><strong>📄 sources_domain_al.json</strong> (19 sources)</summary>
