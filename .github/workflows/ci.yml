@@ -21,6 +21,14 @@ on:
           - 'full-pipeline'
           - 'use-cache'
           - 'refresh-cache'
+      forceDownload:
+        description: 'Force re-download of all sources (ignore previous summaries)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
   push:
     branches: [release/1.0.0]
   pull_request:
@@ -37,6 +45,7 @@ env:
   GO_VERSION: '1.24'
   COVERAGE_THRESHOLD: 80
   GOLANGCI_LINT_VERSION: v2.1.6
+  DNS_TOOLKIT_FORCE_DOWNLOAD: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.forceDownload || 'false' }}
 
 jobs:
   test-and-build:
@@ -163,6 +172,7 @@ jobs:
     env:
       PIPELINE_MODE: ${{ needs.test-and-build.outputs.pipeline-mode }}
       SHOULD_PUBLISH: ${{ needs.test-and-build.outputs.should-publish }}
+      DNS_TOOLKIT_FORCE_DOWNLOAD: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.forceDownload || 'false' }}
 
     steps:
       - name: Checkout code
@@ -317,6 +327,8 @@ jobs:
         id: pipeline
         run: |
           echo "Running DNS toolkit pipeline in '${{ env.PIPELINE_MODE }}' mode..."
+          mkdir -p logs
+          touch logs/dns-toolkit.log
           # Step 1: Download (conditional)
           if [[ "${{ env.PIPELINE_MODE }}" == "full-pipeline" || "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]]; then
             echo "Step 1: Downloading fresh data with debug logging..."

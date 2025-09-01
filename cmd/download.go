@@ -24,6 +24,14 @@ var downloadCmd = &cobra.Command{
 	Use:   "download",
 	Short: "Download enabled sources",
 	Run: func(cmd *cobra.Command, args []string) {
+		forceFlag, getBoolErr := cmd.Flags().GetBool("force")
+		if getBoolErr != nil {
+			Logger.Warnf("Failed to parse --force flag (defaulting to false): %v", getBoolErr)
+			forceFlag = false
+		}
+		forceEnv := os.Getenv("DNS_TOOLKIT_FORCE_DOWNLOAD") == "true" || os.Getenv("DNS_TOOLKIT_FORCE_DOWNLOAD") == "1"
+		forceDownload := forceFlag || forceEnv
+
 		if err := u.EnsureDirectoryExists(Logger, constants.DownloadDir); err != nil {
 			Logger.Errorf("Failed to create download directory: %v", err)
 			os.Exit(1)
@@ -31,6 +39,21 @@ var downloadCmd = &cobra.Command{
 		if err := u.EnsureDirectoryExists(Logger, constants.SummaryDir); err != nil {
 			Logger.Errorf("Failed to create summary directory: %v", err)
 			os.Exit(1)
+		}
+
+		summaryFile := filepath.Join(constants.SummaryDir, constants.DefaultSummaryFiles["download"])
+		if forceDownload {
+			if _, err := os.Stat(summaryFile); err == nil {
+				Logger.Infof(
+					"Force download enabled. Removing existing summary file to bypass frequency checks: %s",
+					summaryFile,
+				)
+				if rmErr := os.Remove(summaryFile); rmErr != nil {
+					Logger.Warnf("Failed to remove summary file %s: %v", summaryFile, rmErr)
+				}
+			} else {
+				Logger.Infof("Force download enabled. No existing summary file to remove.")
+			}
 		}
 
 		maxRetries := defaultMaxRetries
@@ -83,6 +106,10 @@ var downloadCmd = &cobra.Command{
 				source := source // local copy for goroutine
 				workerPool.Submit(func() {
 					<-ticker.C
+
+					if forceDownload {
+						Logger.Debugf("Force downloading source: %s", source.Name)
+					}
 
 					downloadFile, err := source.GetDownloadFile(Logger, constants.DownloadDir)
 					if err != nil {
@@ -185,7 +212,7 @@ var downloadCmd = &cobra.Command{
 							shouldReprocess := !fetchSkipped
 
 							if fetchSkipped {
-								summaryFile := filepath.Join(constants.SummaryDir, constants.DefaultSummaryFiles["download"])
+								// use existing summaryFile variable defined in outer scope to avoid shadowing
 								if prevSummary, err := loadPreviousDownloadSummary(Logger, summaryFile, source.Name); err == nil && prevSummary != nil { // nolint:lll
 									if prevSummary.CountToConsider != summary.CountToConsider {
 										Logger.Infof("Count to consider changed for %s: %d -> %d, re-processing...",
@@ -238,10 +265,6 @@ var downloadCmd = &cobra.Command{
 		Logger.Infof("Download complete: %d sources processed, %d successful (%d downloaded, %d skipped), %d failed",
 			totalSources, successCount, downloadedCount, successCount-downloadedCount, failCount)
 
-		summaryFile := filepath.Join(
-			constants.SummaryDir,
-			constants.DefaultSummaryFiles["download"],
-		)
 		_, err := u.SaveSummaries(Logger, summaries, summaryFile, c.DownloadSummaryLessFunc)
 		if err != nil {
 			Logger.Errorf("Saving summaries error: %v", err)
@@ -263,4 +286,8 @@ func loadPreviousDownloadSummary(
 		return nil, nil
 	}
 	return &summary, nil
+}
+
+func init() {
+	downloadCmd.Flags().Bool("force", false, "Force re-download of all sources (ignores existing summaries)")
 }
