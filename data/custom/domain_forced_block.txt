@@ -11,4 +11,10 @@ assoc-redirect.amazon.com
 at.adtech.redventures.io
 attn.tv
 bugsnag.com
+cookielaw.org
+cdn.cookielaw.org
+dynatrace.com
+newrelic.com
+nelreports.net
+sentry.io
 

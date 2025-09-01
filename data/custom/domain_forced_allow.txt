@@ -3,3 +3,5 @@ raw.githubusercontent.com
 # for google search
 clients1.google.com
 click.redditmail.com
+click.dji.com
+click.email.newegg.com
