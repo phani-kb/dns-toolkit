@@ -1156,7 +1156,21 @@ func ShouldDownloadSourceInfo(
 	var threshold time.Duration
 	switch summary.Frequency {
 	case constants.FrequencyDaily:
-		threshold = 24 * time.Hour
+		ldHour := lastDownloadTime.UTC().Hour()
+		curHour := now.UTC().Hour()
+		lastDay := lastDownloadTime.UTC().YearDay()
+		nowDay := now.UTC().YearDay()
+		if (nowDay != lastDay || now.UTC().Year() != lastDownloadTime.UTC().Year()) && elapsed >= 12*time.Hour {
+			return true, summary.Frequency, lastDownloadTime, 0
+		}
+		if elapsed < 24*time.Hour {
+			if nowDay == lastDay && now.UTC().Year() == lastDownloadTime.UTC().Year() && ldHour < 12 && curHour >= 17 {
+				return true, summary.Frequency, lastDownloadTime, 0 // permitted second same-day window
+			}
+			remaining := max(24*time.Hour-elapsed, 0)
+			return false, summary.Frequency, lastDownloadTime, remaining
+		}
+		return true, summary.Frequency, lastDownloadTime, 0
 	case constants.FrequencyWeekly:
 		threshold = 7 * 24 * time.Hour
 	case constants.FrequencyMonthly:
