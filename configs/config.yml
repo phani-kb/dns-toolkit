@@ -65,7 +65,7 @@ multilog:
       pattern: '[[time]]-[[level]] [msg]'
     - type: file
       subtype: text
-      level: debug
+      level: info
       enabled: true
       pattern: '[date] - [[time]] [[level]] [[source]] [msg]'
       file: logs/dns-toolkit.log
