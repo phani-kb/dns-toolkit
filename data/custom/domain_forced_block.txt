@@ -1,6 +1,7 @@
 onelink.me
 # marketing
 lddy.no
+rebrand.ly
 # ads
 aboutads.info
 analytics.barnebys.sh
@@ -17,4 +18,10 @@ dynatrace.com
 newrelic.com
 nelreports.net
 sentry.io
-
+# campaigns
+links.iterable.com
+list-manage.com
+mandrillapp.com
+# other
+inbake.com
+urbanairship.com
