@@ -8,3 +8,5 @@ click.email.newegg.com
 # msn voice search
 otf.msn.com
 wallet-api.urbanairship.com
+# school newsletters
+track.spe.schoolmessenger.com
