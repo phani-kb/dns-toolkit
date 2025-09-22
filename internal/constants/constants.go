@@ -419,7 +419,7 @@ var CommentPrefixes = []string{
 
 const PunycodePrefix = "xn--"
 
-const ContentSeparator = "###\n"
+const ContentSeparator = "###"
 
 // SummaryTypesMap maps summary type constants to their string values
 var SummaryTypesMap = map[string]string{
