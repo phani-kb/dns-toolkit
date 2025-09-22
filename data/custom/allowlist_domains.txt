@@ -1,6 +1,7 @@
 click.redditmail.com
 drive.google.com
 internet.nl
+play.googleapis.com
 teams.microsoft.com
 web.whatsapp.com
 ### START sources
