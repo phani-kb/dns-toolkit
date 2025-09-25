@@ -4,6 +4,7 @@ internet.nl
 play.googleapis.com
 teams.microsoft.com
 web.whatsapp.com
+login.newrelic.com
 ### START sources
 adaway.org
 adguardteam.github.io
