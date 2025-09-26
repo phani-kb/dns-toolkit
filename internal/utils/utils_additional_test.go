@@ -357,3 +357,44 @@ func TestExtractZipErrorCases(t *testing.T) {
 func createMinimalTarGz(filename string) error {
 	return os.WriteFile(filename, []byte{}, 0644)
 }
+
+func TestWriteValidEntriesToFile(t *testing.T) {
+	logger := createTestLogger(t)
+
+	tempDir, err := os.MkdirTemp("", "test_write_valid_*")
+	require.NoError(t, err)
+	defer func(path string) {
+		_ = os.RemoveAll(path)
+	}(tempDir)
+
+	outputFile := filepath.Join(tempDir, "valid.txt")
+
+	entries := []string{
+		"# comment line",
+		"example.org",
+		"  ",
+		"// another comment",
+		"z-domain.com",
+		"example.org",
+		"a-domain.net",
+		"! exclaim comment",
+	}
+
+	err = WriteValidEntriesToFile(logger, outputFile, entries)
+	assert.NoError(t, err)
+
+	content, err := os.ReadFile(outputFile)
+	require.NoError(t, err)
+
+	lines := strings.Split(strings.TrimSpace(string(content)), "\n")
+	assert.Equal(t, []string{"a-domain.net", "example.org", "example.org", "z-domain.com"}, lines)
+
+	emptyFile := filepath.Join(tempDir, "empty.txt")
+	err = WriteValidEntriesToFile(logger, emptyFile, []string{})
+	assert.NoError(t, err)
+	_, statErr := os.ReadFile(emptyFile)
+	assert.Error(t, statErr)
+
+	err = WriteValidEntriesToFile(logger, "/non/existent/dir/valid.txt", []string{"abc"})
+	assert.Error(t, err)
+}

@@ -28,6 +28,7 @@ func initializeSourceTypeCounts() map[string]int {
 		constants.SourceTypeDomain:                   0,
 		constants.SourceTypeDomainFinder:             0,
 		constants.SourceTypeAdguard:                  0,
+		constants.SourceTypeAdguardDomain:            0,
 		constants.SourceTypeIpv4Hostname:             0,
 		constants.SourceTypeHostname:                 0,
 		constants.SourceTypeUnknown:                  0,

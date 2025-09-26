@@ -155,6 +155,7 @@ const (
 	SourceTypeDomainComment              = "domain_comment"
 	SourceTypeDomainFinder               = "domain_finder"
 	SourceTypeAdguard                    = "adguard"
+	SourceTypeAdguardDomain              = "adguard_domain"
 	SourceTypeIpv4Hostname               = "ipv4_hostname"
 	SourceTypeMixed                      = "mixed"
 	SourceTypeHostname                   = "hostname"
@@ -193,6 +194,7 @@ var (
 		SourceTypeDomainComment:              true,
 		SourceTypeDomainFinder:               true,
 		SourceTypeAdguard:                    true,
+		SourceTypeAdguardDomain:              true,
 		SourceTypeIpv4Hostname:               true,
 		SourceTypeMixed:                      true,
 		SourceTypeHostname:                   true,

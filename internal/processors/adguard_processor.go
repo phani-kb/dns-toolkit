@@ -12,6 +12,7 @@ import (
 const (
 	sourceTypeAdguard       = "adguard"
 	adguardSourceTypeDomain = "domain_adguard"
+	sourceTypeAdguardDomain = "adguard_domain"
 	adguardExceptionPrefix  = "@@"
 	adguardBlockPrefix      = "||"
 	adguardBlockSuffix      = "^"
@@ -146,6 +147,72 @@ func ExtractBlocklistDomains(logger *multilog.Logger, content string) ([]string,
 	return validEntries, invalidEntries
 }
 
+// AdGuardDomainBlocklistProcessor converts plain domains into AdGuard blocklist rules (||domain^)
+type AdGuardDomainBlocklistProcessor struct {
+	BaseProcessor
+}
+
+// NewAdGuardDomainBlocklistProcessor creates a new processor for adguard_domain blocklist
+func NewAdGuardDomainBlocklistProcessor(sourceType, listType string) *AdGuardDomainBlocklistProcessor {
+	return &AdGuardDomainBlocklistProcessor{BaseProcessor: NewBaseProcessor(sourceType, listType)}
+}
+
+// Process converts each valid domain into an AdGuard block rule
+func (p *AdGuardDomainBlocklistProcessor) Process(_ *multilog.Logger, content string) ([]string, []string) {
+	var validEntries, invalidEntries []string
+	lines := strings.Split(content, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" || u.IsComment(line) {
+			continue
+		}
+
+		if strings.HasPrefix(line, adguardBlockPrefix) || strings.HasPrefix(line, adguardExceptionPrefix) {
+			invalidEntries = append(invalidEntries, line)
+			continue
+		}
+		if u.IsDomain(line) {
+			validEntries = append(validEntries, adguardBlockPrefix+line+adguardBlockSuffix)
+		} else {
+			invalidEntries = append(invalidEntries, line)
+		}
+	}
+	return validEntries, invalidEntries
+}
+
+// AdGuardDomainAllowlistProcessor converts plain domains into AdGuard allowlist rules (@@||domain^)
+type AdGuardDomainAllowlistProcessor struct {
+	BaseProcessor
+}
+
+// NewAdGuardDomainAllowlistProcessor creates a new processor for adguard_domain allowlist
+func NewAdGuardDomainAllowlistProcessor(sourceType, listType string) *AdGuardDomainAllowlistProcessor {
+	return &AdGuardDomainAllowlistProcessor{BaseProcessor: NewBaseProcessor(sourceType, listType)}
+}
+
+// Process converts each valid domain into an AdGuard allow rule
+func (p *AdGuardDomainAllowlistProcessor) Process(_ *multilog.Logger, content string) ([]string, []string) {
+	var validEntries, invalidEntries []string
+	lines := strings.Split(content, "\n")
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" || u.IsComment(line) {
+			continue
+		}
+
+		if strings.HasPrefix(line, adguardBlockPrefix) || strings.HasPrefix(line, adguardExceptionPrefix) {
+			invalidEntries = append(invalidEntries, line)
+			continue
+		}
+		if u.IsDomain(line) {
+			validEntries = append(validEntries, adguardExceptionPrefix+adguardBlockPrefix+line+adguardBlockSuffix)
+		} else {
+			invalidEntries = append(invalidEntries, line)
+		}
+	}
+	return validEntries, invalidEntries
+}
+
 func init() {
 	SpecialProcessors.Register(sourceTypeAdguard, constants.ListTypeBlocklist,
 		func(st string, lt string) Processor {
@@ -161,4 +228,11 @@ func init() {
 
 	RegisterGenericProcessor(adguardSourceTypeDomain, ExtractAllowlistDomains, false, true)
 	RegisterGenericProcessor(adguardSourceTypeDomain, ExtractBlocklistDomains, true, false)
+
+	SpecialProcessors.Register(sourceTypeAdguardDomain, constants.ListTypeBlocklist, func(st, lt string) Processor {
+		return NewAdGuardDomainBlocklistProcessor(st, lt)
+	})
+	SpecialProcessors.Register(sourceTypeAdguardDomain, constants.ListTypeAllowlist, func(st, lt string) Processor {
+		return NewAdGuardDomainAllowlistProcessor(st, lt)
+	})
 }

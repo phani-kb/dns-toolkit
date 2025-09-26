@@ -670,6 +670,25 @@ func WriteEntriesToFile(logger *multilog.Logger, filepath string, entries []stri
 	return writer.Flush()
 }
 
+// WriteValidEntriesToFile filters out comments from the entries and writes the valid entries to the specified file.
+//
+// Parameters:
+//   - logger: Logger for recording operations and errors
+//   - filepath: Path to the file to write
+//   - entries: Slice of strings to filter and write
+//
+// Returns:
+//   - An error object if writing fails, nil on success
+func WriteValidEntriesToFile(logger *multilog.Logger, filepath string, entries []string) error {
+	validEntries := make([]string, 0, len(entries))
+	for _, entry := range entries {
+		if !IsComment(entry) {
+			validEntries = append(validEntries, entry)
+		}
+	}
+	return WriteEntriesToFile(logger, filepath, validEntries)
+}
+
 // GetMapKeys returns the keys of a map as a slice.
 // This is a generic function that works with any map that has comparable keys.
 //

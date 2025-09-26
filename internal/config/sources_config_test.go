@@ -4,10 +4,12 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
+	"github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -158,7 +160,11 @@ func TestSourceValidation(t *testing.T) {
 		}
 		err := source.Validate()
 		assert.Error(t, err)
-		assert.Contains(t, err.Error(), "url is required")
+		assert.Contains(
+			t,
+			err.Error(),
+			"one of url, content, url_per_category, content_per_category, url_per_group or content_per_group is required",
+		)
 	})
 
 	t.Run("Missing types fails validation", func(t *testing.T) {
@@ -825,4 +831,89 @@ func TestSkipGeneralConsolidation(t *testing.T) {
 		assert.True(t, config.Sources[1].ShouldIncludeInCategoriesConsolidation())  // skip-general-source
 		assert.False(t, config.Sources[2].ShouldIncludeInCategoriesConsolidation()) // disabled-source
 	})
+}
+
+func TestLoadSourcesConfigContent(t *testing.T) {
+	projectRoot, err := utils.FindProjectRoot("")
+	if err != nil {
+		t.Fatalf("failed to find project root: %v", err)
+	}
+	testDataDir := filepath.Join(projectRoot, "testdata")
+	baseDir := filepath.Join(testDataDir, "data", "custom")
+	sourcesPath := filepath.Join(baseDir, "test_sources_content.json")
+	if _, err := os.Stat(sourcesPath); err != nil {
+		t.Fatalf("expected fixture file not found: %v", err)
+	}
+
+	origTestMode := os.Getenv("DNS_TOOLKIT_TEST_MODE")
+	require.NoError(t, os.Setenv("DNS_TOOLKIT_TEST_MODE", "true"))
+	defer func() { _ = os.Setenv("DNS_TOOLKIT_TEST_MODE", origTestMode) }()
+
+	logger := createTestLogger(t)
+	config, err := LoadSourcesConfig(logger, sourcesPath)
+	require.NoError(t, err)
+
+	assert.Equal(t, 6, len(config.Sources))
+	got := make(map[string]Source)
+	for _, s := range config.Sources {
+		got[s.Name] = s
+	}
+
+	assert.Contains(t, got, "with-url")
+	assert.True(t, strings.HasPrefix(got["with-url"].URL, "http://"))
+
+	assert.Contains(t, got, "with-content")
+	assert.True(t, strings.HasPrefix(got["with-content"].URL, "file://"))
+	assert.Empty(t, got["with-content"].Content)
+
+	wc := got["with-url-per-category"]
+	assert.True(t, strings.HasPrefix(wc.URL, "http://"))
+	assert.False(t, wc.SkipCategoriesConsolidation)
+	assert.True(t, wc.SkipGroupsConsolidation)
+	assert.Empty(t, wc.URLPerCategory)
+
+	wcc := got["with-content-per-category"]
+	assert.True(t, strings.HasPrefix(wcc.URL, "file://"))
+	assert.False(t, wcc.SkipCategoriesConsolidation)
+	assert.True(t, wcc.SkipGroupsConsolidation)
+	assert.Empty(t, wcc.ContentPerCategory)
+
+	wg := got["with-url-per-group"]
+	assert.True(t, strings.HasPrefix(wg.URL, "http://"))
+	assert.False(t, wg.SkipGroupsConsolidation)
+	assert.True(t, wg.SkipCategoriesConsolidation)
+	assert.Empty(t, wg.URLPerGroup)
+
+	wcg := got["with-content-per-group"]
+	assert.True(t, strings.HasPrefix(wcg.URL, "file://"))
+	assert.False(t, wcg.SkipGroupsConsolidation)
+	assert.True(t, wcg.SkipCategoriesConsolidation)
+	assert.Empty(t, wcg.ContentPerGroup)
+
+	assert.NotContains(t, got, "skipped-empty")
+}
+
+func TestLoadSourcesConfig_EmptyFile(t *testing.T) {
+	logger := createTestLogger(t)
+	tmpDir, err := os.MkdirTemp("", "empty_sources_cfg")
+	require.NoError(t, err)
+	defer os.RemoveAll(tmpDir)
+
+	emptyFile := filepath.Join(tmpDir, "empty.json")
+	require.NoError(t, os.WriteFile(emptyFile, []byte("   \n\t"), 0644))
+
+	cfg, err := LoadSourcesConfig(logger, emptyFile)
+	require.NoError(t, err)
+	assert.NotNil(t, cfg)
+	assert.Equal(t, 0, len(cfg.Sources))
+}
+
+func TestSourcesConfigValidateWithConfig_EmptyAllowed(t *testing.T) {
+	orig := os.Getenv("DNS_TOOLKIT_ALLOW_EMPTY_SOURCES")
+	_ = os.Setenv("DNS_TOOLKIT_ALLOW_EMPTY_SOURCES", "true")
+	defer func() { _ = os.Setenv("DNS_TOOLKIT_ALLOW_EMPTY_SOURCES", orig) }()
+
+	sc := &SourcesConfig{Sources: []Source{}}
+	err := sc.ValidateWithConfig(nil)
+	assert.NoError(t, err)
 }

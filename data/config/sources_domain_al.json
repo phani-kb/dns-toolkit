@@ -91,6 +91,7 @@
     },
     {
       "name": "AdGuardTeam_HttpsExclusions_sensitive",
+      "skip_general_consolidation": true,
       "types": [
         {
           "name": "domain",
