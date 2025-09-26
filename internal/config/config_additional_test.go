@@ -414,19 +414,17 @@ func TestLoadAppConfigEdgeCases(t *testing.T) {
 	tempFile, err := os.CreateTemp("", "invalid_config_*.yml")
 	require.NoError(t, err)
 	defer func() {
-		if err := os.Remove(tempFile.Name()); err != nil {
-			t.Logf("Failed to remove temp file: %v", err)
-		}
-	}()
-	defer func() {
 		if err := tempFile.Close(); err != nil {
 			t.Logf("Failed to close temp file: %v", err)
 		}
 	}()
+	defer func() {
+		if err := os.Remove(tempFile.Name()); err != nil {
+			t.Logf("Failed to remove temp file: %v", err)
+		}
+	}()
 
 	_, err = tempFile.WriteString("invalid: yaml: content: [")
-	require.NoError(t, err)
-	err = tempFile.Close()
 	require.NoError(t, err)
 
 	_, _, err = LoadAppConfig(logger, tempFile.Name())
@@ -448,19 +446,17 @@ multilog:
 	tempFile2, err := os.CreateTemp("", "valid_config_*.yml")
 	require.NoError(t, err)
 	defer func() {
-		if err := os.Remove(tempFile2.Name()); err != nil {
-			t.Logf("Failed to remove temp file: %v", err)
-		}
-	}()
-	defer func() {
 		if err := tempFile2.Close(); err != nil {
 			t.Logf("Failed to close temp file: %v", err)
 		}
 	}()
+	defer func() {
+		if err := os.Remove(tempFile2.Name()); err != nil {
+			t.Logf("Failed to remove temp file: %v", err)
+		}
+	}()
 
 	_, err = tempFile2.WriteString(validYAML)
-	require.NoError(t, err)
-	err = tempFile2.Close()
 	require.NoError(t, err)
 
 	_, _, err = LoadAppConfig(logger, tempFile2.Name())
