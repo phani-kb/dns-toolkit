@@ -23,6 +23,8 @@ dns_toolkit:
     - data/config/sources_domain_top.json
     - data/config/sources_domain_new.json
     - data/config/sources_mis.json
+    - data/config/sources_local_category.json
+    - data/config/sources_local_group.json
   files_checksum:
     enabled: true
     algorithm: 'md5' # md5, sha256
@@ -49,7 +51,7 @@ dns_toolkit:
         path: data/consolidated_allowlist.txt
       - name: blocklist
         path: data/consolidated_blocklist.txt
-  max_workers: 1
+  max_workers: 2
   max_retries: 3
   source_filters:
     name:

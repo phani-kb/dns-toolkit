@@ -322,3 +322,90 @@ func Test_ExtractAllowlistDomains(t *testing.T) {
 		})
 	}
 }
+
+func TestNewAdGuardDomainBlocklistProcessor(t *testing.T) {
+	t.Parallel()
+	sourceType := "adguard_domain"
+	listType := "blocklist"
+	processor := processors.NewAdGuardDomainBlocklistProcessor(sourceType, listType)
+	assert.NotNil(t, processor)
+	assert.Equal(t, sourceType, processor.GetSourceType())
+	assert.Equal(t, listType, processor.GetListType())
+}
+
+func TestAdGuardDomainBlocklistProcessor_Process(t *testing.T) {
+	logger := multilog.NewLogger()
+	processor := processors.NewAdGuardDomainBlocklistProcessor("adguard_domain", "blocklist")
+
+	tests := []struct {
+		name            string
+		content         string
+		expectedValid   []string
+		expectedInvalid []string
+	}{
+		{name: "empty", content: "", expectedValid: nil, expectedInvalid: nil},
+		{name: "single domain", content: "example.com", expectedValid: []string{"||example.com^"}},
+		{
+			name:          "with comments",
+			content:       "# c\nexample.com\n! x\nsub.test.org",
+			expectedValid: []string{"||example.com^", "||sub.test.org^"},
+		},
+		{
+			name:            "mixed",
+			content:         "example.com\n||already.com^\n# c\ninvalid_domain",
+			expectedValid:   []string{"||example.com^"},
+			expectedInvalid: []string{"||already.com^", "invalid_domain"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			valid, invalid := processor.Process(logger, tt.content)
+			assert.Equal(t, tt.expectedValid, valid)
+			assert.Equal(t, tt.expectedInvalid, invalid)
+		})
+	}
+}
+
+func TestNewAdGuardDomainAllowlistProcessor(t *testing.T) {
+	t.Parallel()
+	sourceType := "adguard_domain"
+	listType := "allowlist"
+	processor := processors.NewAdGuardDomainAllowlistProcessor(sourceType, listType)
+	assert.NotNil(t, processor)
+	assert.Equal(t, sourceType, processor.GetSourceType())
+	assert.Equal(t, listType, processor.GetListType())
+}
+
+func TestAdGuardDomainAllowlistProcessor_Process(t *testing.T) {
+	t.Parallel()
+	logger := multilog.NewLogger()
+	processor := processors.NewAdGuardDomainAllowlistProcessor("adguard_domain", "allowlist")
+
+	tests := []struct {
+		name            string
+		content         string
+		expectedValid   []string
+		expectedInvalid []string
+	}{
+		{name: "empty", content: "", expectedValid: nil, expectedInvalid: nil},
+		{name: "single domain", content: "example.com", expectedValid: []string{"@@||example.com^"}},
+		{
+			name:          "with comments",
+			content:       "# c\nexample.com\n! x\nsub.test.org",
+			expectedValid: []string{"@@||example.com^", "@@||sub.test.org^"},
+		},
+		{
+			name:            "mixed",
+			content:         "example.com\n@@||already.com^\n# c\ninvalid_domain",
+			expectedValid:   []string{"@@||example.com^"},
+			expectedInvalid: []string{"@@||already.com^", "invalid_domain"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			valid, invalid := processor.Process(logger, tt.content)
+			assert.Equal(t, tt.expectedValid, valid)
+			assert.Equal(t, tt.expectedInvalid, invalid)
+		})
+	}
+}

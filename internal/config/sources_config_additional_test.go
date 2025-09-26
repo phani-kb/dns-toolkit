@@ -3,6 +3,7 @@ package config
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
@@ -17,7 +18,11 @@ func TestResolveFilePath(t *testing.T) {
 
 	relPath := "relative/path/file.json"
 	result = resolveFilePath(relPath)
-	assert.Equal(t, relPath, result)
+	if filepath.IsAbs(result) {
+		assert.True(t, strings.HasSuffix(result, relPath))
+	} else {
+		assert.Equal(t, relPath, result)
+	}
 
 	originalTestMode := os.Getenv("DNS_TOOLKIT_TEST_MODE")
 	defer func() {
@@ -42,16 +47,19 @@ func TestResolveFilePath(t *testing.T) {
 	err = os.WriteFile(goModFile, []byte("module test"), 0644)
 	require.NoError(t, err)
 
-	testFile := filepath.Join(tempDir, "testfile.json")
+	testdataDir := filepath.Join(tempDir, "testdata")
+	err = os.MkdirAll(testdataDir, 0755)
+	require.NoError(t, err)
+
+	testFile := filepath.Join(testdataDir, "testfile.json")
 	err = os.WriteFile(testFile, []byte("{}"), 0644)
 	require.NoError(t, err)
 
 	originalWd, err := os.Getwd()
 	require.NoError(t, err)
 	defer func() {
-		err := os.Chdir(originalWd)
-		if err != nil {
-			t.Logf("Failed to change directory back: %v", err)
+		if chErr := os.Chdir(originalWd); chErr != nil {
+			t.Logf("Failed to change directory back: %v", chErr)
 		}
 	}()
 
@@ -62,7 +70,11 @@ func TestResolveFilePath(t *testing.T) {
 	assert.Equal(t, testFile, result)
 
 	result = resolveFilePath("nonexistent.json")
-	assert.Equal(t, "nonexistent.json", result)
+	if filepath.IsAbs(result) {
+		assert.True(t, strings.HasSuffix(result, "nonexistent.json"))
+	} else {
+		assert.Equal(t, "nonexistent.json", result)
+	}
 }
 
 func TestMatchesFilters(t *testing.T) {

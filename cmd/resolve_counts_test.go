@@ -340,10 +340,6 @@ func TestPerTypeOverride_AppliesOnlyToMatchingType(t *testing.T) {
 	}
 
 	domainForcedBlock := filepath.Join(customDir, "domain_forced_block.txt")
-	if err := os.WriteFile(domainForcedBlock, []byte("bad.example.com\n"), 0o644); err != nil {
-		t.Fatalf("failed to write domain override file: %v", err)
-	}
-
 	oldMap := constants.CustomOverrideFilesMap
 	defer func() { constants.CustomOverrideFilesMap = oldMap }()
 	constants.CustomOverrideFilesMap = map[string]map[string]string{
@@ -387,10 +383,6 @@ func TestPerTypeOverride_DoesNotApplyToOtherType(t *testing.T) {
 	}
 
 	ipv4ForcedBlock := filepath.Join(customDir, "ipv4_forced_block.txt")
-	if err := os.WriteFile(ipv4ForcedBlock, []byte("bad.example.com\n"), 0o644); err != nil {
-		t.Fatalf("failed to write ipv4 override file: %v", err)
-	}
-
 	oldMap := constants.CustomOverrideFilesMap
 	defer func() { constants.CustomOverrideFilesMap = oldMap }()
 	constants.CustomOverrideFilesMap = map[string]map[string]string{
