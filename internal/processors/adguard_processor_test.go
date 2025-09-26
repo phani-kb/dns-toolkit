@@ -324,7 +324,6 @@ func Test_ExtractAllowlistDomains(t *testing.T) {
 }
 
 func TestNewAdGuardDomainBlocklistProcessor(t *testing.T) {
-	t.Parallel()
 	sourceType := "adguard_domain"
 	listType := "blocklist"
 	processor := processors.NewAdGuardDomainBlocklistProcessor(sourceType, listType)
@@ -367,7 +366,6 @@ func TestAdGuardDomainBlocklistProcessor_Process(t *testing.T) {
 }
 
 func TestNewAdGuardDomainAllowlistProcessor(t *testing.T) {
-	t.Parallel()
 	sourceType := "adguard_domain"
 	listType := "allowlist"
 	processor := processors.NewAdGuardDomainAllowlistProcessor(sourceType, listType)
@@ -377,7 +375,6 @@ func TestNewAdGuardDomainAllowlistProcessor(t *testing.T) {
 }
 
 func TestAdGuardDomainAllowlistProcessor_Process(t *testing.T) {
-	t.Parallel()
 	logger := multilog.NewLogger()
 	processor := processors.NewAdGuardDomainAllowlistProcessor("adguard_domain", "allowlist")
 

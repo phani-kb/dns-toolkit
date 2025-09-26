@@ -125,8 +125,6 @@ func TestValidateConfig(t *testing.T) {
 }
 
 func TestValidateSourcesCommand(t *testing.T) {
-	t.Parallel()
-
 	assert.NotNil(t, validateSourcesCmd)
 	assert.Equal(t, "validate-sources", validateSourcesCmd.Use)
 	assert.Contains(t, validateSourcesCmd.Short, "Validate")
