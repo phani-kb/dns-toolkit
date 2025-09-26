@@ -51,7 +51,7 @@ dns_toolkit:
         path: data/consolidated_allowlist.txt
       - name: blocklist
         path: data/consolidated_blocklist.txt
-  max_workers: 2
+  max_workers: 1
   max_retries: 3
   source_filters:
     name:
