@@ -395,10 +395,54 @@ func (d *DefaultDownloader) ShouldDownload(
 	file c.DownloadFile,
 ) bool {
 	filePath := filepath.Join(file.Folder, file.Filename)
-	if _, err := os.Stat(filePath); err == nil {
-		logger.Debugf("File %s already exists", filePath)
-		return u.ShouldDownloadSource(logger, summaryFile, file.Name)
+	fileExists := false
+
+	if info, err := os.Stat(filePath); err == nil {
+		fileExists = true
+		logger.Debugf("File %s already exists (size: %d bytes, modified: %s)",
+			filePath, info.Size(), info.ModTime().Format("2006-01-02 15:04:05"))
 	}
+
+	if !fileExists {
+		logger.Debugf("File %s does not exist, should download", filePath)
+		return true
+	}
+
+	shouldDownload, frequency, lastTime, remaining := u.ShouldDownloadSourceInfo(logger, summaryFile, file.Name)
+	if !shouldDownload {
+		if lastTime.IsZero() {
+			logger.Infof(
+				"Skipping download due to frequency window (%s) not elapsed: %s (remaining %s)",
+				frequency,
+				filePath,
+				remaining.Truncate(time.Second),
+			)
+		} else {
+			logger.Infof("Skipping download due to frequency window (%s) not elapsed: %s (last: %s, remaining: %s)",
+				frequency,
+				filePath,
+				lastTime.Format("2006-01-02 15:04:05"),
+				remaining.Truncate(time.Second),
+			)
+		}
+		return false
+	}
+
+	summary, err := u.GetLastSummary[c.DownloadSummary](logger, summaryFile, file.Name)
+	if err != nil {
+		return true
+	}
+
+	if summary.URL != "" && summary.URL != file.URL {
+		logger.Infof("URL changed for %s: %s -> %s, should download", file.Name, summary.URL, file.URL)
+		return true
+	}
+
+	if summary.Error != "" {
+		logger.Infof("Previous download error for %s: %s, should retry", file.Name, summary.Error)
+		return true
+	}
+
 	return true
 }
 

@@ -181,12 +181,17 @@ func LoadAppConfig(logger *multilog.Logger, configPath string) (AppConfig, []Sou
 	for _, sourceFile := range appConfig.DNSToolkit.SourceFiles {
 		sourcesConfig, err := LoadSourcesConfig(logger, sourceFile)
 		if err != nil {
-			return AppConfig{}, nil, fmt.Errorf("loading sources config: %w", err)
+			return AppConfig{}, nil, fmt.Errorf("loading sources config %s: %w", sourceFile, err)
+		}
+
+		if len(sourcesConfig.Sources) == 0 {
+			logger.Debugf("Skipping empty sources config during app config load: %s", sourceFile)
+			continue
 		}
 
 		// Validate the sources config with the AppConfig
 		if err := sourcesConfig.ValidateWithConfig(&appConfig); err != nil {
-			return AppConfig{}, nil, fmt.Errorf("validating sources config: %w", err)
+			return AppConfig{}, nil, fmt.Errorf("validating sources config %s: %w", sourceFile, err)
 		}
 
 		sourcesConfigs = append(sourcesConfigs, sourcesConfig)

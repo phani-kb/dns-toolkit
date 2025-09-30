@@ -494,19 +494,17 @@ func TestLoadSourcesConfig(t *testing.T) {
 	tempFile, err := os.CreateTemp("", "invalid_*.json")
 	assert.NoError(t, err)
 	defer func() {
-		if err := os.Remove(tempFile.Name()); err != nil {
-			t.Logf("Failed to remove temp file: %v", err)
-		}
-	}()
-	defer func() {
 		if err := tempFile.Close(); err != nil {
 			t.Logf("Failed to close temp file: %v", err)
 		}
 	}()
+	defer func() {
+		if err := os.Remove(tempFile.Name()); err != nil {
+			t.Logf("Failed to remove temp file: %v", err)
+		}
+	}()
 
 	_, err = tempFile.WriteString("invalid json")
-	assert.NoError(t, err)
-	err = tempFile.Close()
 	assert.NoError(t, err)
 
 	_, err = LoadSourcesConfig(logger, tempFile.Name())
@@ -531,20 +529,18 @@ func TestLoadSourcesConfig(t *testing.T) {
 	tempFile2, err := os.CreateTemp("", "valid_*.json")
 	assert.NoError(t, err)
 	defer func() {
-		if err := os.Remove(tempFile2.Name()); err != nil {
-			t.Logf("Failed to remove temp file: %v", err)
-		}
-	}()
-	defer func() {
 		err := tempFile2.Close()
 		if err != nil {
 			t.Logf("Failed to close tempFile2: %v", err)
 		}
 	}()
+	defer func() {
+		if err := os.Remove(tempFile2.Name()); err != nil {
+			t.Logf("Failed to remove temp file: %v", err)
+		}
+	}()
 
 	_, err = tempFile2.WriteString(validJSON)
-	assert.NoError(t, err)
-	err = tempFile2.Close()
 	assert.NoError(t, err)
 
 	config, err := LoadSourcesConfig(logger, tempFile2.Name())
