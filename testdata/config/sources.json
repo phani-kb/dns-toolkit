@@ -1,7 +1,7 @@
 {
   "sources": [
     {
-      "name": "Local Allowlist (Domain)",
+      "name": "local_domain_allowlist",
       "types": [
         {
           "name": "domain",

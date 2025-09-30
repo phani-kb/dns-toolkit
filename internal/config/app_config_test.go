@@ -1,6 +1,8 @@
 package config
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 )
 
@@ -12,20 +14,35 @@ func TestAppConfigValidate(t *testing.T) {
 	}{
 		{
 			name: "Valid config",
-			config: AppConfig{
-				Application: ApplicationConfig{
-					Name:        "TestApp",
-					Version:     "1.0.0",
-					Description: "Test application",
-				},
-				DNSToolkit: DNSToolkitConfig{
-					SourceFiles: []string{"../../testdata/valid_sources.json"},
-					MaxWorkers:  4,
-				},
-				Multilog: map[string]interface{}{
-					"level": "info",
-				},
-			},
+			config: func() AppConfig {
+				_ = os.Setenv("DNS_TOOLKIT_TEST_MODE", "true")
+				wd, _ := os.Getwd()
+				projectRoot := wd
+				for projectRoot != "/" {
+					if _, err := os.Stat(filepath.Join(projectRoot, "go.mod")); err == nil {
+						break
+					}
+					projectRoot = filepath.Dir(projectRoot)
+				}
+				vsPath := filepath.Join(projectRoot, "testdata", "valid_sources.json")
+				if _, err := os.Stat(vsPath); err != nil {
+					_ = os.WriteFile(vsPath, []byte(`{"sources":[]}`), 0644)
+				}
+				return AppConfig{
+					Application: ApplicationConfig{
+						Name:        "TestApp",
+						Version:     "1.0.0",
+						Description: "Test application",
+					},
+					DNSToolkit: DNSToolkitConfig{
+						SourceFiles: []string{"testdata/valid_sources.json"},
+						MaxWorkers:  4,
+					},
+					Multilog: map[string]interface{}{
+						"level": "info",
+					},
+				}
+			}(),
 			wantErr: false,
 		},
 		{

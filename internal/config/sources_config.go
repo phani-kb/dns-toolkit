@@ -25,6 +25,9 @@ func (sc *SourcesConfig) Validate() error {
 
 func (sc *SourcesConfig) ValidateWithConfig(appConfig *AppConfig) error {
 	if len(sc.Sources) == 0 {
+		if os.Getenv("DNS_TOOLKIT_ALLOW_EMPTY_SOURCES") == "true" {
+			return nil
+		}
 		return fmt.Errorf("at least one source is required")
 	}
 
@@ -49,10 +52,15 @@ type Source struct {
 	License                     string         `json:"license,omitempty"`
 	Website                     string         `json:"website,omitempty"`
 	Notes                       string         `json:"notes,omitempty"`
+	URLPerCategory              string         `json:"url_per_category,omitempty"`
+	URLPerGroup                 string         `json:"url_per_group,omitempty"`
 	Types                       []c.SourceType `json:"types"`
 	Files                       []string       `json:"files,omitempty"`
 	Categories                  []string       `json:"categories,omitempty"`
 	Countries                   []string       `json:"countries,omitempty"`
+	Content                     []string       `json:"content,omitempty"`
+	ContentPerCategory          []string       `json:"content_per_category,omitempty"`
+	ContentPerGroup             []string       `json:"content_per_group,omitempty"`
 	TypeCount                   int            `json:"type_count"`
 	CountToConsider             int            `json:"count_to_consider,omitempty"`
 	Disabled                    bool           `json:"disabled,omitempty"`
@@ -76,9 +84,21 @@ func (s *Source) ValidateWithConfig(appConfig *AppConfig) error {
 		return fmt.Errorf("name can only contain alphanumeric characters, underscores, and dashes: %s", s.Name)
 	}
 
-	if s.URL == "" {
-		return fmt.Errorf("url is required")
-	} else {
+	hasURL := s.URL != ""
+	hasContent := len(s.Content) > 0
+	hasURLPerCategory := s.URLPerCategory != ""
+	hasContentPerCategory := len(s.ContentPerCategory) > 0
+	hasURLPerGroup := s.URLPerGroup != ""
+	hasContentPerGroup := len(s.ContentPerGroup) > 0
+
+	if !hasURL && !hasContent && !hasURLPerCategory && !hasContentPerCategory && !hasURLPerGroup &&
+		!hasContentPerGroup {
+		return fmt.Errorf(
+			"one of url, content, url_per_category, content_per_category, url_per_group or content_per_group is required",
+		)
+	}
+
+	if hasURL {
 		for _, ext := range constants.ArchiveExtensions {
 			if strings.HasSuffix(s.URL, ext) {
 				if len(s.Files) == 0 {
@@ -231,10 +251,15 @@ func resolveFilePath(filePath string) string {
 
 		projectRoot, err := u.FindProjectRoot(wd)
 		if err == nil && projectRoot != "" {
-			resolvedPath := filepath.Join(projectRoot, filePath)
-			if _, err := os.Stat(resolvedPath); err == nil {
-				return resolvedPath
+			sep := string(os.PathSeparator)
+			if strings.HasPrefix(filePath, "testdata"+sep) {
+				return filepath.Join(projectRoot, filePath)
 			}
+			newPath := filepath.Join(projectRoot, "testdata", filePath)
+			if _, statErr := os.Stat(newPath); statErr == nil {
+				return newPath
+			}
+			return filepath.Join(projectRoot, filePath)
 		}
 	}
 
@@ -259,6 +284,11 @@ func LoadSourcesConfig(logger *multilog.Logger, filePath string) (SourcesConfig,
 	byteValue, err := io.ReadAll(file)
 	if err != nil {
 		return SourcesConfig{}, fmt.Errorf("error reading sources file: %w", err)
+	}
+
+	if len(byteValue) == 0 || len(strings.TrimSpace(string(byteValue))) == 0 {
+		logger.Debugf("Skipping empty sources config file: %s", resolvedPath)
+		return SourcesConfig{Sources: []Source{}}, nil
 	}
 
 	var config SourcesConfig
@@ -314,6 +344,92 @@ func LoadSourcesConfig(logger *multilog.Logger, filePath string) (SourcesConfig,
 		}
 	}
 
+	var expanded []Source
+
+	outBaseDir := resolveFilePath(filepath.Join("data", "custom", "generated_sources"))
+	if err := os.MkdirAll(outBaseDir, 0o755); err != nil {
+		return SourcesConfig{}, fmt.Errorf("creating generated sources dir: %w", err)
+	}
+
+	for _, source := range config.Sources {
+		hasURL := source.URL != ""
+		hasContent := len(source.Content) > 0
+		hasURLPerCategory := source.URLPerCategory != ""
+		hasContentPerCategory := len(source.ContentPerCategory) > 0
+		hasURLPerGroup := source.URLPerGroup != ""
+		hasContentPerGroup := len(source.ContentPerGroup) > 0
+
+		if !hasURL && !hasContent && !hasURLPerCategory && !hasContentPerCategory && !hasURLPerGroup &&
+			!hasContentPerGroup {
+			logger.Warnf("Skipping source %s: no urls or content provided", source.Name)
+			continue
+		}
+
+		// url > content > url-per-category > content-per-category > url-per-group > content-per-group
+		switch {
+		case hasURL:
+			expanded = append(expanded, source)
+
+		case hasContent:
+			fname := fmt.Sprintf("%s.txt", source.Name)
+			outPath := filepath.Join(outBaseDir, fname)
+			if err := u.WriteValidEntriesToFile(logger, outPath, source.Content); err != nil {
+				return SourcesConfig{}, err
+			}
+			ns := source
+			ns.URL = "file://" + outPath
+			ns.Content = nil
+			expanded = append(expanded, ns)
+
+		case hasURLPerCategory:
+			ns := source
+			ns.URL = source.URLPerCategory
+			ns.SkipCategoriesConsolidation = false
+			ns.SkipGroupsConsolidation = true
+			ns.URLPerCategory = ""
+			ns.Content = nil
+			ns.ContentPerCategory = nil
+			expanded = append(expanded, ns)
+
+		case hasContentPerCategory:
+			fname := fmt.Sprintf("%s_category.txt", source.Name)
+			outPath := filepath.Join(outBaseDir, fname)
+			if err := u.WriteValidEntriesToFile(logger, outPath, source.ContentPerCategory); err != nil {
+				return SourcesConfig{}, err
+			}
+			ns := source
+			ns.URL = "file://" + outPath
+			ns.SkipCategoriesConsolidation = false
+			ns.SkipGroupsConsolidation = true
+			ns.ContentPerCategory = nil
+			ns.Content = nil
+			expanded = append(expanded, ns)
+
+		case hasURLPerGroup:
+			ns := source
+			ns.URL = source.URLPerGroup
+			ns.ContentPerGroup = nil
+			ns.Content = nil
+			ns.URLPerGroup = ""
+			ns.SkipGroupsConsolidation = false
+			ns.SkipCategoriesConsolidation = true
+			expanded = append(expanded, ns)
+
+		case hasContentPerGroup:
+			fname := fmt.Sprintf("%s_group.txt", source.Name)
+			outPath := filepath.Join(outBaseDir, fname)
+			if err := u.WriteValidEntriesToFile(logger, outPath, source.ContentPerGroup); err != nil {
+				return SourcesConfig{}, err
+			}
+			ns := source
+			ns.URL = "file://" + outPath
+			ns.ContentPerGroup = nil
+			ns.Content = nil
+			expanded = append(expanded, ns)
+		}
+	}
+
+	config.Sources = expanded
 	return config, nil
 }
 

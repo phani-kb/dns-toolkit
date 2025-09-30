@@ -21,6 +21,14 @@ on:
           - 'full-pipeline'
           - 'use-cache'
           - 'refresh-cache'
+      forceDownload:
+        description: 'Force re-download of all sources (ignore previous summaries)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
   push:
     branches-ignore: [main]
   pull_request:
@@ -37,6 +45,7 @@ env:
   GO_VERSION: '1.24'
   COVERAGE_THRESHOLD: 80
   GOLANGCI_LINT_VERSION: v2.1.6
+  DNS_TOOLKIT_FORCE_DOWNLOAD: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.forceDownload || 'false' }}
 
 jobs:
   test-and-build:
@@ -163,6 +172,7 @@ jobs:
     env:
       PIPELINE_MODE: ${{ needs.test-and-build.outputs.pipeline-mode }}
       SHOULD_PUBLISH: ${{ needs.test-and-build.outputs.should-publish }}
+      DNS_TOOLKIT_FORCE_DOWNLOAD: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.forceDownload || 'false' }}
 
     steps:
       - name: Checkout code
@@ -190,7 +200,7 @@ jobs:
           echo "Building DNS toolkit..."
           go build -o bin/dns-toolkit .
           chmod +x bin/dns-toolkit
-          mkdir -p data/{download,output}
+          mkdir -p data/{download,output} logs
           echo "Build completed successfully"
 
       - name: Display pipeline mode summary
@@ -214,6 +224,10 @@ jobs:
               ;;
           esac
 
+      - name: Generate date for cache key
+        id: date
+        run: echo "date=$(date -u '+%Y-%m-%d')" >> $GITHUB_OUTPUT
+
       - name: Restore data cache
         uses: actions/cache/restore@v4
         id: cache-restore
@@ -221,44 +235,83 @@ jobs:
           path: |
             data/download
             data/download_summary.json
-          key: data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-v3
+          key: data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-v4
           restore-keys: |
-            data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-
-            data-download-${{ runner.os }}-
+            data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-
+            data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-
 
-      - name: Validate cache (for use-cache & refresh-cache modes)
-        if: env.PIPELINE_MODE == 'use-cache' || env.PIPELINE_MODE == 'refresh-cache'
+      - name: Validate cache (for use-cache mode only)
+        if: env.PIPELINE_MODE == 'use-cache'
         run: |
           echo "Validating cache availability..."
-          echo "Cache key used: data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-v3"
+          echo "Cache key requested: data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-v4"
           echo "Cache hit: ${{ steps.cache-restore.outputs.cache-hit }}"
+          echo "Cache primary key: ${{ steps.cache-restore.outputs.cache-primary-key }}"
+          echo "Cache matched key: ${{ steps.cache-restore.outputs.cache-matched-key }}"
 
           # Check if cache was restored (either exact match or via restore-keys)
-          CACHE_RESTORED_FROM="${{ steps.cache-restore.outputs.cache-primary-key }}"
-          if [[ -z "$CACHE_RESTORED_FROM" ]]; then
-            CACHE_RESTORED_FROM="${{ steps.cache-restore.outputs.cache-matched-key }}"
-          fi
-          if [[ "${{ steps.cache-restore.outputs.cache-hit }}" != "true" && -z "$CACHE_RESTORED_FROM" ]]; then
+          CACHE_MATCHED_KEY="${{ steps.cache-restore.outputs.cache-matched-key }}"
+          CACHE_HIT="${{ steps.cache-restore.outputs.cache-hit }}"
+
+          # Success conditions:
+          # 1. cache-hit: true (exact key match)
+          # 2. cache-hit: false BUT cache-matched-key exists (restore-keys match)
+          if [[ "$CACHE_HIT" == "true" ]]; then
+            echo "✅ Cache restored (exact match): $CACHE_MATCHED_KEY"
+          elif [[ -n "$CACHE_MATCHED_KEY" ]]; then
+            echo "✅ Cache restored (restore-keys match): $CACHE_MATCHED_KEY"
+          else
             echo "::error::Cache MISS. '${{ env.PIPELINE_MODE }}' mode requires an existing cache."
+            echo "No cache found for key or restore-keys pattern."
             exit 1
           fi
 
-          if [[ ! -d "data/download" ]] || [[ -z "$(ls -A data/download 2>/dev/null)" ]]; then
-            echo "::error::Cache hit reported, but data/download directory is empty or missing."
+          # Only validate directory contents if cache was actually restored
+          if [[ "$CACHE_HIT" == "true" ]] || [[ -n "$CACHE_MATCHED_KEY" ]]; then
+            echo "Cache was restored, validating contents..."
+            
+            echo "Current directory contents:"
+            ls -la
+            
+            echo "Data directory contents:"
+            if [[ -d "data" ]]; then
+              ls -la data/
+            else
+              echo "data/ directory does not exist"
+            fi
+            
+            echo "Download directory check:"
+            if [[ -d "data/download" ]]; then
+              echo "data/download exists, contents:"
+              ls -la data/download/
+              FILE_COUNT=$(find data/download -type f 2>/dev/null | wc -l)
+              echo "File count in data/download: $FILE_COUNT"
+            else
+              echo "data/download directory does not exist"
+            fi
+            
+            if [[ ! -d "data/download" ]] || [[ -z "$(ls -A data/download 2>/dev/null)" ]]; then
+              echo "::error::Cache was restored, but data/download directory is empty or missing."
+              exit 1
+            fi
+
+            if [[ "${{ env.PIPELINE_MODE }}" == "use-cache" && ! -f "data/download_summary.json" ]]; then
+              echo "::error::'use-cache' mode requires 'data/download_summary.json' but it's missing from cache."
+              exit 1
+            fi
+            
+            echo "✅ Cache contents validated successfully."
+          else
+            echo "::error::Unexpected cache state - cache outputs suggest restoration but no keys found."
             exit 1
           fi
 
-          if [[ "${{ env.PIPELINE_MODE }}" == "use-cache" && ! -f "data/download_summary.json" ]]; then
-            echo "::error::'use-cache' mode requires 'data/download_summary.json' but it's missing from cache."
-            exit 1
-          fi
+          echo "✅ Cache validation completed successfully."
 
-          echo "✅ Cache validated successfully."
-
-          if [[ "${{ steps.cache-restore.outputs.cache-hit }}" == "true" ]]; then
+          if [[ "$CACHE_HIT" == "true" ]]; then
             echo "Cache: Exact key match"
             echo "Key: ${{ steps.cache-restore.outputs.cache-primary-key }}"
-          else
+          elif [[ -n "$CACHE_RESTORED_FROM" ]]; then
             echo "Cache: Restored via fallback key"
             echo "Matched key: $CACHE_RESTORED_FROM"
           fi
@@ -270,37 +323,23 @@ jobs:
             echo "Cache timestamp: $(cat data/download/.cache_timestamp)"
           fi
 
-      - name: Backup data files
-        if: env.PIPELINE_MODE == 'full-pipeline' && needs.test-and-build.outputs.should-publish == 'true'
-        run: |
-          echo "Backing up data files for branch switching..."
-          mkdir -p /tmp/data-backup
-
-          # Backup download directory and summary file
-          if [[ -d "data/download" ]]; then
-            cp -r data/download /tmp/data-backup/ 2>/dev/null || true
-            echo "Backed up data/download directory"
-          fi
-
-          if [[ -f "data/download_summary.json" ]]; then
-            cp data/download_summary.json /tmp/data-backup/ 2>/dev/null || true
-            echo "Backed up data/download_summary.json"
-          fi
-
-          echo "Data backup completed"
-
       - name: Run DNS Toolkit Pipeline
         id: pipeline
         run: |
           echo "Running DNS toolkit pipeline in '${{ env.PIPELINE_MODE }}' mode..."
+          mkdir -p logs
+          touch logs/dns-toolkit.log
           # Step 1: Download (conditional)
           if [[ "${{ env.PIPELINE_MODE }}" == "full-pipeline" || "${{ env.PIPELINE_MODE }}" == "refresh-cache" ]]; then
-            echo "Step 1: Downloading fresh data..."
+            echo "Step 1: Downloading fresh data with debug logging..."
+            # Clear any existing log file to ensure fresh debug output
+            > logs/dns-toolkit.log
             ./bin/dns-toolkit download
             echo "$(date -u '+%Y-%m-%d %H:%M:%S UTC')" > data/download/.cache_timestamp
             DOWNLOAD_COUNT=$(find data/download -type f 2>/dev/null | wc -l)
             DOWNLOAD_SIZE=$(du -sh data/download 2>/dev/null | cut -f1 || echo "0")
             echo "Downloaded: $DOWNLOAD_COUNT files ($DOWNLOAD_SIZE)"
+            echo "Debug logs written to logs/dns-toolkit.log"
           else
             echo "Step 1: Using cached data (skipping download)"
             CACHED_COUNT=$(find data/download -type f 2>/dev/null | wc -l)
@@ -346,6 +385,42 @@ jobs:
             exit 1
           fi
 
+      - name: Backup data files
+        if: env.SHOULD_PUBLISH == 'true'
+        run: |
+          echo "Backing up data files for branch switching..."
+          mkdir -p /tmp/data-backup
+          if [[ -f "logs/dns-toolkit.log" ]]; then
+            cp logs/dns-toolkit.log /tmp/data-backup/dns-toolkit.log || true
+          fi
+
+          # Backup download directory and summary file
+          if [[ -d "data/download" ]]; then
+            DOWNLOAD_FILE_COUNT=$(find data/download -type f | wc -l)
+            echo "Found $DOWNLOAD_FILE_COUNT files in data/download before backup"
+            cp -r data/download /tmp/data-backup/
+            
+            # Verify backup
+            BACKUP_FILE_COUNT=$(find /tmp/data-backup/download -type f | wc -l)
+            echo "Backup contains $BACKUP_FILE_COUNT files"
+            if [[ "$BACKUP_FILE_COUNT" != "$DOWNLOAD_FILE_COUNT" ]]; then
+              echo "ERROR: Backup file count mismatch! Original: $DOWNLOAD_FILE_COUNT, Backup: $BACKUP_FILE_COUNT"
+              exit 1
+            fi
+            echo "✅ Successfully backed up data/download directory"
+          else
+            echo "⚠️ data/download directory not found, skipping backup"
+          fi
+
+          if [[ -f "data/download_summary.json" ]]; then
+            cp data/download_summary.json /tmp/data-backup/
+            echo "✅ Backed up data/download_summary.json"
+          else
+            echo "⚠️ data/download_summary.json not found, skipping backup"
+          fi
+
+          echo "Data backup completed"
+
       - name: Publish results
         if: env.SHOULD_PUBLISH == 'true'
         run: |
@@ -381,16 +456,38 @@ jobs:
         if: env.PIPELINE_MODE == 'full-pipeline' && env.SHOULD_PUBLISH == 'true'
         run: |
           echo "Restoring data files after branch operations..."
+          mkdir -p logs
+          if [[ -f "/tmp/data-backup/dns-toolkit.log" ]]; then
+            cp /tmp/data-backup/dns-toolkit.log logs/dns-toolkit.log || true
+          fi
+
           # Restore download directory and summary file from backup
           if [[ -d "/tmp/data-backup/download" ]]; then
+            BACKUP_FILE_COUNT=$(find /tmp/data-backup/download -type f | wc -l)
+            echo "Backup contains $BACKUP_FILE_COUNT files to restore"
+            
             mkdir -p data
-            cp -r /tmp/data-backup/download data/ 2>/dev/null || true
-            echo "Restored data/download directory"
+            cp -r /tmp/data-backup/download data/
+            
+            # Verify restoration
+            RESTORED_FILE_COUNT=$(find data/download -type f | wc -l)
+            echo "Restored $RESTORED_FILE_COUNT files"
+            if [[ "$RESTORED_FILE_COUNT" != "$BACKUP_FILE_COUNT" ]]; then
+              echo "ERROR: Restore file count mismatch! Backup: $BACKUP_FILE_COUNT, Restored: $RESTORED_FILE_COUNT"
+              exit 1
+            fi
+            echo "✅ Successfully restored data/download directory"
+          else
+            echo "⚠️ No backup directory found at /tmp/data-backup/download"
           fi
+
           if [[ -f "/tmp/data-backup/download_summary.json" ]]; then
-            cp /tmp/data-backup/download_summary.json data/ 2>/dev/null || true
-            echo "Restored data/download_summary.json"
+            cp /tmp/data-backup/download_summary.json data/
+            echo "✅ Restored data/download_summary.json"
+          else
+            echo "⚠️ No backup summary file found at /tmp/data-backup/download_summary.json"
           fi
+
           echo "Data restoration completed"
 
       - name: Generate cache key for save
@@ -398,10 +495,33 @@ jobs:
         id: cache-key
         run: |
           # Use date-based cache key to limit cache growth (daily rotation)
-          CACHE_DATE=$(date -u '+%Y-%m-%d')
-          CACHE_KEY="data-download-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${CACHE_DATE}-v3"
+          # Add timestamp to avoid conflicts between concurrent runs
+          TIMESTAMP=$(date -u +%H%M)
+          CACHE_KEY="data-download-${{ github.ref_name }}-${{ runner.os }}-${{ hashFiles('data/config/sources*.json') }}-${{ steps.date.outputs.date }}-${TIMESTAMP}-v4"
           echo "cache-key=$CACHE_KEY" >> $GITHUB_OUTPUT
           echo "Generated cache key: $CACHE_KEY"
+
+      - name: Validate data before cache save
+        if: (env.PIPELINE_MODE == 'refresh-cache' || env.PIPELINE_MODE == 'full-pipeline')
+        run: |
+          echo "🔍 Pre-cache validation:"
+          if [[ -d "data/download" ]]; then
+            DOWNLOAD_COUNT=$(find data/download -type f | wc -l)
+            DOWNLOAD_SIZE=$(du -sh data/download | cut -f1)
+            echo "✅ data/download exists with $DOWNLOAD_COUNT files ($DOWNLOAD_SIZE)"
+          else
+            echo "❌ data/download directory missing!"
+            echo "Current working directory: $(pwd)"
+            echo "Contents of data/ directory:"
+            ls -la data/ || echo "data/ directory doesn't exist"
+            exit 1
+          fi
+
+          if [[ -f "data/download_summary.json" ]]; then
+            echo "✅ data/download_summary.json exists"
+          else
+            echo "❌ data/download_summary.json missing!"
+          fi
 
       - name: Save data cache
         if: (env.PIPELINE_MODE == 'refresh-cache' || env.PIPELINE_MODE == 'full-pipeline') && (steps.count-files.outputs.download-count > 0)
@@ -414,15 +534,49 @@ jobs:
         continue-on-error: true
         id: cache-save-attempt
 
+      - name: Validate cache before save
+        if: (env.PIPELINE_MODE == 'refresh-cache' || env.PIPELINE_MODE == 'full-pipeline')
+        run: |
+          echo "Validating cache content before save..."
+          DOWNLOAD_COUNT=$(find data/download -type f 2>/dev/null | wc -l)
+          echo "Actual download files found: $DOWNLOAD_COUNT"
+          echo "Reported download count: ${{ steps.count-files.outputs.download-count }}"
+
+          if [[ "$DOWNLOAD_COUNT" -eq 0 ]]; then
+            echo "::warning::No download files found - cache will not be saved or will be empty"
+          else
+            echo "✅ Download files validated: $DOWNLOAD_COUNT files ready for caching"
+          fi
+
       - name: Cache save status check
         if: always() && (env.PIPELINE_MODE == 'refresh-cache' || env.PIPELINE_MODE == 'full-pipeline')
         run: |
           if [[ "${{ steps.cache-save-attempt.outcome }}" == "success" ]]; then
             echo "✅ Data cache saved successfully."
             echo "Cached: ${{ steps.count-files.outputs.download-count }} files (${{ steps.count-files.outputs.download-size }})"
+            echo "Cache key: ${{ steps.cache-key.outputs.cache-key }}"
+          elif [[ "${{ steps.cache-save-attempt.outcome }}" == "failure" ]]; then
+            echo "❌ Data cache save failed."
           else
-            echo "⚠️ Data cache save failed or was skipped."
+            echo "⚠️ Data cache save was skipped."
           fi
+
+      - name: Upload debug logs as artifact
+        if: always()
+        run: |
+          mkdir -p logs
+          if [[ ! -f logs/dns-toolkit.log ]]; then
+            echo "(placeholder) log file was missing at upload time" > logs/dns-toolkit.log
+          fi
+        shell: bash
+      - name: Publish debug log artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dns-toolkit-debug-logs-${{ env.PIPELINE_MODE }}-${{ github.run_id }}
+          path: logs/dns-toolkit.log
+          retention-days: 7
+          if-no-files-found: warn
 
       - name: Final Summary
         if: always()
@@ -453,5 +607,9 @@ jobs:
             fi
             echo "" >> $GITHUB_STEP_SUMMARY
           fi
+
+          echo "### Debug Information" >> $GITHUB_STEP_SUMMARY
+          echo "- **Debug Logs**: Available as artifact \`dns-toolkit-debug-logs-${{ env.PIPELINE_MODE }}-${{ github.run_id }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
 
           echo "See full logs for details."

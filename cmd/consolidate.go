@@ -226,7 +226,7 @@ func getLocalBlocklistEntries(genericSourceType string, processedFiles []c.Proce
 		if file.GenericSourceType == genericSourceType &&
 			file.ListType == constants.ListTypeBlocklist &&
 			file.Valid &&
-			strings.HasPrefix(file.Name, "Local") {
+			strings.HasPrefix(strings.ToLower(file.Name), "local") {
 			localBlocklistFiles = append(localBlocklistFiles, file)
 		}
 	}

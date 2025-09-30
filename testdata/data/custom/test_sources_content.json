@@ -1,0 +1,73 @@
+{
+  "sources": [
+    {
+      "name": "with-url",
+      "url": "http://example.com/a.txt",
+      "types": [
+        {
+          "name": "domain"
+        }
+      ]
+    },
+    {
+      "name": "with-content",
+      "content": [
+        "example.com"
+      ],
+      "types": [
+        {
+          "name": "domain"
+        }
+      ]
+    },
+    {
+      "name": "with-url-per-category",
+      "url_per_category": "http://example.com/cat.txt",
+      "types": [
+        {
+          "name": "domain"
+        }
+      ]
+    },
+    {
+      "name": "with-content-per-category",
+      "content_per_category": [
+        "cat.com"
+      ],
+      "types": [
+        {
+          "name": "domain"
+        }
+      ]
+    },
+    {
+      "name": "with-url-per-group",
+      "url_per_group": "http://example.com/group.txt",
+      "types": [
+        {
+          "name": "domain"
+        }
+      ]
+    },
+    {
+      "name": "with-content-per-group",
+      "skip_categories_consolidation": true,
+      "content_per_group": [
+        "grp.com"
+      ],
+      "types": [
+        {
+          "name": "domain"
+        }
+      ]
+    },
+    {
+      "name": "skipped-empty",
+      "types": [
+        {
+          "name": "domain"
+        }
+      ]
+    }
+  ]
+}

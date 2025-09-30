@@ -25,6 +25,8 @@
       "categories": "ads",
       "countries": "VN",
       "license": "GPL-3.0",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "adguard",
@@ -1029,8 +1031,8 @@
       "name": "OISD Blocklist NSFW Small",
       "categories": "adult",
       "license": "GPL-3.0",
-      "skip_general_consolidation": false,
-      "skip_groups_consolidation": false,
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "adguard",
@@ -1465,8 +1467,8 @@
       "website": "https://github.com/StevenBlack/hosts"
     },
     {
-      "name": "StevenBlack_Fake_Gambling_Porn",
-      "categories": "ads, adult, fake, fakenews, gambling",
+      "name": "StevenBlack_Fake_Gambling",
+      "categories": "ads, fake, fakenews, gambling",
       "license": "MIT",
       "types": [
         {
@@ -1479,7 +1481,47 @@
           ]
         }
       ],
-      "url": "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling-porn/hosts",
+      "url": "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews-gambling/hosts",
+      "website": "https://github.com/StevenBlack/hosts"
+    },
+    {
+      "name": "StevenBlack_Porn",
+      "categories": "adult",
+      "license": "MIT",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "hostname",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/porn-only/hosts",
+      "website": "https://github.com/StevenBlack/hosts"
+    },
+    {
+      "name": "StevenBlack_Social",
+      "categories": "social",
+      "license": "MIT",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "hostname",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/social-only/hosts",
       "website": "https://github.com/StevenBlack/hosts"
     },
     {
@@ -1522,6 +1564,8 @@
       "categories": "ads",
       "countries": "UA",
       "license": "GPL-3.0",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "adguard"
@@ -1535,6 +1579,8 @@
       "categories": "annoyance",
       "countries": "UA",
       "license": "GPL-3.0",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "adguard"
@@ -1548,6 +1594,8 @@
       "categories": "privacy, trackers",
       "countries": "UA",
       "license": "GPL-3.0",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "adguard",
@@ -1579,6 +1627,8 @@
       "categories": "malicious, threat",
       "countries": "UA",
       "license": "GPL-3.0",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
       "types": [
         {
           "name": "domain"

@@ -34,6 +34,8 @@ logs/
 # coverage files
 coverage/
 
+bin/
+
 # Data directories
 data/download/
 data/processed/
@@ -48,13 +50,16 @@ data/backup/
 data/profiles/
 data/*.json
 data/allowlist_*.txt
+data/custom/generated_sources/
 
 # Test files
 testdata/**/*.json
 testdata/**/*.tgz
 testdata/output/
+testdata/data/output/
+testdata/data/custom/generated_sources/
+testdata/data/allowlist_*.txt
 # profiling files
 testdata/**/*.prof
-testdata/data/
 testdata/*.md
 testdata/*.txt
