@@ -522,7 +522,11 @@ func TestGenerateBranchSizesSection(t *testing.T) {
 	assert.Contains(t, section, "<!-- BRANCH_SIZES_START -->")
 	assert.Contains(t, section, "<!-- BRANCH_SIZES_END -->")
 	assert.Contains(t, section, "## Branch Sizes")
-	assert.Contains(t, section, "**Note:** The repo size badge above only reflects the default branch (`main`).")
+	assert.Contains(
+		t,
+		section,
+		"**Note:** The repo size badge above only reflects the default branch (`release/1.0.0`).",
+	)
 	assert.Contains(t, section, "- **Output branch size:** 12.34 MB")
 	assert.Contains(t, section, "- **Summaries branch size:** 56.78 MB")
 	assert.True(t, strings.HasSuffix(section, "<!-- BRANCH_SIZES_END -->"))

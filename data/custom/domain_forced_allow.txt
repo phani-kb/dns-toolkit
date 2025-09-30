@@ -1,1 +1,12 @@
 github.com
+raw.githubusercontent.com
+# for google search
+clients1.google.com
+click.redditmail.com
+click.dji.com
+click.email.newegg.com
+# msn voice search
+otf.msn.com
+wallet-api.urbanairship.com
+# school newsletters
+track.spe.schoolmessenger.com

@@ -670,6 +670,25 @@ func WriteEntriesToFile(logger *multilog.Logger, filepath string, entries []stri
 	return writer.Flush()
 }
 
+// WriteValidEntriesToFile filters out comments from the entries and writes the valid entries to the specified file.
+//
+// Parameters:
+//   - logger: Logger for recording operations and errors
+//   - filepath: Path to the file to write
+//   - entries: Slice of strings to filter and write
+//
+// Returns:
+//   - An error object if writing fails, nil on success
+func WriteValidEntriesToFile(logger *multilog.Logger, filepath string, entries []string) error {
+	validEntries := make([]string, 0, len(entries))
+	for _, entry := range entries {
+		if !IsComment(entry) {
+			validEntries = append(validEntries, entry)
+		}
+	}
+	return WriteEntriesToFile(logger, filepath, validEntries)
+}
+
 // GetMapKeys returns the keys of a map as a slice.
 // This is a generic function that works with any map that has comparable keys.
 //
@@ -1118,33 +1137,75 @@ func IsSkipIP(_ *multilog.Logger, ip string) bool {
 }
 
 func ShouldDownloadSource(logger *multilog.Logger, summaryFile string, sourceName string) bool {
+	should, _, _, _ := ShouldDownloadSourceInfo(logger, summaryFile, sourceName)
+	return should
+}
+
+// ShouldDownloadSourceInfo checks if a fresh download should occur for the given source.
+// Returns:
+//
+//	shouldDownload - whether a fresh download should occur
+//	frequencyLabel - daily, weekly or monthly
+//	lastDownloadTime - zero time if not available
+//	remaining - duration until next allowed download (zero if shouldDownload == true)
+func ShouldDownloadSourceInfo(
+	logger *multilog.Logger,
+	summaryFile string,
+	sourceName string,
+) (bool, string, time.Time, time.Duration) {
 	summary, err := GetLastSummary[c.DownloadSummary](logger, summaryFile, sourceName)
 	if err != nil {
-		logger.Errorf("Getting last download summary error: %v", err)
-		return false
+		return true, "", time.Time{}, 0
 	}
 
 	lastDownload := summary.LastDownloadTimestamp
 	if lastDownload == "" || lastDownload == "0001-01-01T00:00:00Z" {
-		return true
+		return true, summary.Frequency, time.Time{}, 0
 	}
 
 	lastDownloadTime, err := time.Parse(constants.TimestampFormat, lastDownload)
 	if err != nil {
 		logger.Errorf("Parsing last download timestamp error: %v", err)
-		return false
+		return false, summary.Frequency, time.Time{}, 0
 	}
+
 	now := time.Now()
+	elapsed := now.Sub(lastDownloadTime)
+
+	var threshold time.Duration
 	switch summary.Frequency {
 	case constants.FrequencyDaily:
-		return now.Sub(lastDownloadTime) >= 24*time.Hour
+		ldHour := lastDownloadTime.UTC().Hour()
+		curHour := now.UTC().Hour()
+		lastDay := lastDownloadTime.UTC().YearDay()
+		nowDay := now.UTC().YearDay()
+		if (nowDay != lastDay || now.UTC().Year() != lastDownloadTime.UTC().Year()) && elapsed >= 12*time.Hour {
+			return true, summary.Frequency, lastDownloadTime, 0
+		}
+		if elapsed < 24*time.Hour {
+			if nowDay == lastDay && now.UTC().Year() == lastDownloadTime.UTC().Year() && ldHour < 12 && curHour >= 17 {
+				return true, summary.Frequency, lastDownloadTime, 0 // permitted second same-day window
+			}
+			remaining := max(24*time.Hour-elapsed, 0)
+			return false, summary.Frequency, lastDownloadTime, remaining
+		}
+		return true, summary.Frequency, lastDownloadTime, 0
 	case constants.FrequencyWeekly:
-		return now.Sub(lastDownloadTime) >= 7*24*time.Hour
+		threshold = 7 * 24 * time.Hour
 	case constants.FrequencyMonthly:
-		return now.Sub(lastDownloadTime) >= 30*24*time.Hour
+		threshold = 30 * 24 * time.Hour
 	default:
-		return now.Sub(lastDownloadTime) >= 24*time.Hour
+		threshold = 24 * time.Hour
 	}
+
+	if elapsed >= threshold {
+		return true, summary.Frequency, lastDownloadTime, 0
+	}
+	remaining := threshold - elapsed
+	if remaining < 0 {
+		remaining = 0
+	}
+	return false, summary.Frequency, lastDownloadTime, remaining
 }
 
 // IsAlphanumericWithUnderscoresAndDashes checks if a string contains only alphanumeric characters,

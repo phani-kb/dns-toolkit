@@ -125,6 +125,9 @@ func BuildResolutionSets(
 
 	applyManualOverrides(logger, sourceMaps, result)
 
+	// Filter out manually overridden entries from conflicts
+	result.Conflicts = filterConflictsAfterOverrides(result)
+
 	fillDetailsForResolution(sourceMaps, result)
 
 	return result.AllowByType,
@@ -201,6 +204,23 @@ func resolveByCounts(maps *SourceMaps, result *ResolutionResult) []ConflictDetai
 	}
 
 	return conflicts
+}
+
+// filterConflictsAfterOverrides removes manually overridden entries from conflicts list
+func filterConflictsAfterOverrides(result *ResolutionResult) []ConflictDetail {
+	filteredConflicts := make([]ConflictDetail, 0)
+
+	for _, conflict := range result.Conflicts {
+		// Skip if this entry was manually overridden
+		_, isAllowToBlock := result.ManualOverride.AllowToBlock[conflict.Entry]
+		_, isBlockToAllow := result.ManualOverride.BlockToAllow[conflict.Entry]
+
+		if !isAllowToBlock && !isBlockToAllow {
+			filteredConflicts = append(filteredConflicts, conflict)
+		}
+	}
+
+	return filteredConflicts
 }
 
 // applyManualOverrides applies manual overrides
