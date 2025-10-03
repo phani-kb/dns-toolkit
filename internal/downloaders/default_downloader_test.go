@@ -579,6 +579,25 @@ func TestDownloadEdgeCases_Merged(t *testing.T) {
 		assert.Contains(t, string(content), "final content")
 	})
 
+	t.Run("RedirectLoopDetection", func(t *testing.T) {
+		var loopServer *httptest.Server
+		loopServer = httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			http.Redirect(w, r, loopServer.URL, http.StatusFound)
+		}))
+		defer loopServer.Close()
+
+		d := NewDefaultDownloaderWithRetries(1)
+		file := c.DownloadFile{
+			URL:      loopServer.URL,
+			Folder:   downloadDir,
+			Filename: "redirect_loop.txt",
+		}
+
+		_, _, err := d.Download(logger, file, false, nil, config.ApplicationConfig{})
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "redirect loop detected")
+	})
+
 	t.Run("LargeFile", func(t *testing.T) {
 		t.Parallel()
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -3,6 +3,7 @@ package cmd
 import (
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -92,18 +93,24 @@ var consolidateAllCmd = &cobra.Command{
 
 		// Second phase: Process all blocklists in parallel, now that we have all allowlist entries
 		Logger.Infof("Processing blocklists...")
-		var wg sync.WaitGroup
 		blocklistTypes := make([]string, len(genericSourceTypes))
 		copy(
 			blocklistTypes,
 			genericSourceTypes,
 		) // Make a copy to prevent loop variable capture issues
 
+		maxWorkers := runtime.GOMAXPROCS(0)
+		if AppConfig != nil && AppConfig.DNSToolkit.MaxWorkers > 0 {
+			maxWorkers = AppConfig.DNSToolkit.MaxWorkers
+		}
+		maxWorkers = max(maxWorkers, 1)
+		Logger.Infof("Using worker pool with %d worker(s) for consolidation", maxWorkers)
+		workerPool := c.NewDTWorkerPool(maxWorkers)
+
 		for i := range blocklistTypes {
 			genericSourceType := blocklistTypes[i] // Local variable for this iteration
-			wg.Add(1)
-			go func(gst string) {
-				defer wg.Done()
+			workerPool.Submit(func() {
+				gst := genericSourceType
 				Logger.Debugf("Processing blocklist for generic source type: %s", gst)
 
 				allowlistEntries := allowlistEntriesByType[gst]
@@ -141,11 +148,11 @@ var consolidateAllCmd = &cobra.Command{
 					)
 					mu.Unlock()
 				}
-			}(genericSourceType)
+			})
 		}
 
 		Logger.Debugf("Waiting for all blocklists to finish processing...")
-		wg.Wait()
+		workerPool.Wait()
 
 		summaryFile := filepath.Join(
 			constants.SummaryDir,
