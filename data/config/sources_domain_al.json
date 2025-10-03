@@ -250,7 +250,8 @@
           ]
         }
       ],
-      "url": "https://raw.githubusercontent.com/notracking/hosts-blocklists-scripts/master/hostnames.whitelist.txt"
+      "url": "https://raw.githubusercontent.com/notracking/hosts-blocklists-scripts/master/hostnames.whitelist.txt",
+      "website": "https://github.com/notracking/hosts-blocklists"
     },
     {
       "name": "ShadowWhisperer_Allowlist",

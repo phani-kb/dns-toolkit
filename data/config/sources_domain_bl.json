@@ -422,6 +422,7 @@
       "name": "CybercrimeTracker_All",
       "categories": "botnet, malicious, malware",
       "license": "CC0",
+    "notes": "Redirect loops may occur",
       "types": [
         {
           "name": "domain_url",
@@ -478,6 +479,7 @@
       "name": "CybercrimeTracker_CCPMGate",
       "categories": "botnet, malicious, malware",
       "license": "CC0",
+      "notes": "Redirect loops may occur",
       "types": [
         {
           "name": "domain_http_url",

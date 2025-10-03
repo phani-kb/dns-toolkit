@@ -1,6 +1,6 @@
 application:
   name: dns-toolkit
-  version: 1.0.0
+  version: 1.0.2
   description: A toolkit for DNS data processing and analysis.
 dns_toolkit:
   folders:
@@ -51,7 +51,7 @@ dns_toolkit:
         path: data/consolidated_allowlist.txt
       - name: blocklist
         path: data/consolidated_blocklist.txt
-  max_workers: 1
+  max_workers: 3
   max_retries: 3
   source_filters:
     name:

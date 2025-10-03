@@ -382,11 +382,12 @@ const (
 	MaxSampleLinesToCategorize    = 100
 	TimestampFormat               = "20060102_150405"
 	BackupFileTimestampFormat     = "20060102_150405"
-	DownloadInterval              = 1000 * time.Millisecond
+	DownloadInterval              = 2000 * time.Millisecond
 	DefaultHashAlgorithm          = "md5"
 	DefaultMaxRetries             = 3
 	DefaultRetryDelayInSeconds    = 10
 	DefaultClientTimeoutInSeconds = 30
+	DefaultMaxRedirects           = 20
 	EntryAverageCharLength        = 30
 	EntryMinCharLength            = 6
 	MaxPreallocEntries            = 10_000_000
