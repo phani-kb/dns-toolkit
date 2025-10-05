@@ -406,3 +406,50 @@ func TestAdGuardDomainAllowlistProcessor_Process(t *testing.T) {
 		})
 	}
 }
+
+func TestAdGuardHttpUrlProcessor_Process(t *testing.T) {
+	logger := multilog.NewLogger()
+	processor := processors.NewAdGuardHttpUrlProcessor("adguard_http_url", "blocklist")
+
+	tests := []struct {
+		name    string
+		input   string
+		want    []string
+		wantInv []string
+	}{
+		{
+			name:  "valid https raw github",
+			input: "https://raw.githubusercontent.com/abc/xyz/main/test.exe",
+			want:  []string{"||raw.githubusercontent.com/abc/xyz/main/test.exe$"},
+		},
+		{
+			name:  "valid http with path and query",
+			input: "http://example.com/path?query=1",
+			want:  []string{"||example.com/path?query=1$"},
+		},
+		{
+			name:    "already adguard rule",
+			input:   "||example.com^",
+			want:    []string{},
+			wantInv: []string{"||example.com^"},
+		},
+		{
+			name:    "invalid line",
+			input:   "not a url",
+			want:    []string{},
+			wantInv: []string{"not a url"},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, gotInv := processor.Process(logger, tt.input)
+			if !processors.EqualUnorderedAdg(got, tt.want) {
+				t.Errorf("valid entries: got %v, want %v", got, tt.want)
+			}
+			if !processors.EqualUnorderedAdg(gotInv, tt.wantInv) {
+				t.Errorf("invalid entries: got %v, want %v", gotInv, tt.wantInv)
+			}
+		})
+	}
+}

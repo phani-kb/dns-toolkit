@@ -156,6 +156,8 @@ const (
 	SourceTypeDomainFinder               = "domain_finder"
 	SourceTypeAdguard                    = "adguard"
 	SourceTypeAdguardDomain              = "adguard_domain"
+	SourceTypeAdguardHttpUrl             = "adguard_http_url"
+	SourceTypeAdguardCsvHttpUrlFind      = "adguard_csv_http_url_find"
 	SourceTypeIpv4Hostname               = "ipv4_hostname"
 	SourceTypeMixed                      = "mixed"
 	SourceTypeHostname                   = "hostname"
@@ -195,6 +197,8 @@ var (
 		SourceTypeDomainFinder:               true,
 		SourceTypeAdguard:                    true,
 		SourceTypeAdguardDomain:              true,
+		SourceTypeAdguardCsvHttpUrlFind:      true,
+		SourceTypeAdguardHttpUrl:             true,
 		SourceTypeIpv4Hostname:               true,
 		SourceTypeMixed:                      true,
 		SourceTypeHostname:                   true,

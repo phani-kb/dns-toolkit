@@ -298,12 +298,13 @@
           "list_types": [
             {
               "name": "allowlist",
-              "groups": "big"
+              "groups": "normal"
             }
           ]
         }
       ],
-      "url": "https://raw.githubusercontent.com/TogoFire-Home/AD-Settings/main/Filters/whitelist.txt"
+      "url": "https://raw.githubusercontent.com/TogoFire-Home/AD-Settings/main/Filters/whitelist.txt",
+      "website": "https://github.com/TogoFire-Home/AD-Settings"
     }
   ]
 }
