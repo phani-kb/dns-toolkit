@@ -422,7 +422,7 @@
       "name": "CybercrimeTracker_All",
       "categories": "botnet, malicious, malware",
       "license": "CC0",
-    "notes": "Redirect loops may occur",
+      "notes": "Redirect loops may occur",
       "types": [
         {
           "name": "domain_url",
@@ -435,6 +435,15 @@
         },
         {
           "name": "ipv4_url",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        },
+        {
+          "name": "adguard_http_url",
           "list_types": [
             {
               "name": "blocklist",
@@ -486,7 +495,7 @@
           "list_types": [
             {
               "name": "blocklist",
-              "groups": "mini"
+              "groups": "normal"
             }
           ]
         },
@@ -495,7 +504,16 @@
           "list_types": [
             {
               "name": "blocklist",
-              "groups": "mini"
+              "groups": "normal"
+            }
+          ]
+        },
+        {
+          "name": "adguard_http_url",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
             }
           ]
         }
@@ -1092,10 +1110,26 @@
       "categories": "phishing",
       "types": [
         {
-          "name": "domain_http_url"
+          "name": "domain_http_url",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "mini"
+            }
+          ]
+        },
+        {
+          "name": "adguard_http_url",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "mini"
+            }
+          ]
         }
       ],
-      "url": "https://openphish.com/feed.txt"
+      "url": "https://openphish.com/feed.txt",
+      "website": "https://openphish.com"
     },
     {
       "name": "Peter Lowe's Blocklist",
@@ -1694,6 +1728,9 @@
         },
         {
           "name": "ipv4_csv_http_url_find"
+        },
+        {
+          "name": "adguard_csv_http_url_find"
         }
       ],
       "url": "https://tracker.viriback.com/dump.php"
