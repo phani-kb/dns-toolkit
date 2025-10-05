@@ -617,6 +617,9 @@
       "types": [
         {
           "name": "ipv4_http_url"
+        },
+        {
+          "name": "adguard_http_url"
         }
       ],
       "url": "https://urlhaus.abuse.ch/downloads/text/",
