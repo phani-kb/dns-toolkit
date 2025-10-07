@@ -10,3 +10,12 @@ otf.msn.com
 wallet-api.urbanairship.com
 # school newsletters
 track.spe.schoolmessenger.com
+# amazon
+unagi.amazon.com
+assoc-redirect.amazon.com
+aax-us-iad.amazon.com
+# hp
+click.instantink.hpsmart.com
+# samsung
+oempprd.samsungcloudsolution.com
+oempprd.samsungcloudsolution.net
