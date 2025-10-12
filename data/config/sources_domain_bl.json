@@ -1842,8 +1842,10 @@
     {
       "name": "youtube_GoodbyeAds",
       "categories": "ads",
+      "disabled": false,
       "frequency": "monthly",
       "license": "MIT",
+      "notes": "No update since 2024-11-21",
       "types": [
         {
           "name": "hostname"

@@ -322,6 +322,7 @@ type ConsolidatedSummary struct {
 	Files                     []string `json:"files"`                           // List of source files that were consolidated
 	FilesCount                int      `json:"files_count"`                     // Number of source files consolidated
 	Count                     int      `json:"count"`                           // Number of entries in the file
+	OriginalCount             int      `json:"original_count,omitempty"`        // Original count before any resolution/overwrite
 	IgnoredEntriesCount       int      `json:"ignored_entries_count,omitempty"` // Number of entries ignored during consolidation
 	Valid                     bool     `json:"valid"`                           // Whether this contains valid entries
 }
@@ -474,6 +475,8 @@ type TemplateData struct {
 	Description    string
 	Files          string
 	Count          int
+	OriginalCount  int
+	Removed        int
 }
 
 // TopSummary contains information about the top entries found across multiple sources.

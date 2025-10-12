@@ -66,7 +66,7 @@ func ResolveConflictsByCounts(
 ) (string, string, string, error) {
 	logger.Infof("Resolving conflicts and producing final sets...")
 
-	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap := BuildResolutionSets(
+	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap := GetCachedResolutionSets(
 		logger,
 		processedFiles,
 	)
@@ -121,12 +121,14 @@ func BuildResolutionSets(
 		DetailsMap:  make(map[string]ConflictDetail),
 	}
 
-	result.Conflicts = resolveByCounts(sourceMaps, result)
+	result.Conflicts = resolveByCounts(logger, sourceMaps, result)
+	logger.Infof("Total conflicts before manual overrides: %d", len(result.Conflicts))
 
 	applyManualOverrides(logger, sourceMaps, result)
 
 	// Filter out manually overridden entries from conflicts
 	result.Conflicts = filterConflictsAfterOverrides(result)
+	logger.Infof("Total conflicts after manual overrides: %d", len(result.Conflicts))
 
 	fillDetailsForResolution(sourceMaps, result)
 
@@ -170,7 +172,7 @@ func buildSourceMaps(logger *multilog.Logger, processedFiles []c.ProcessedFile) 
 }
 
 // resolveByCounts performs count-based resolution with single pass
-func resolveByCounts(maps *SourceMaps, result *ResolutionResult) []ConflictDetail {
+func resolveByCounts(_ *multilog.Logger, maps *SourceMaps, result *ResolutionResult) []ConflictDetail {
 	conflicts := make([]ConflictDetail, 0)
 
 	allEntries := getAllUniqueEntries(maps.BlockMap, maps.AllowMap)
@@ -191,11 +193,34 @@ func resolveByCounts(maps *SourceMaps, result *ResolutionResult) []ConflictDetai
 
 		result.DetailsMap[entry] = detail
 
+		minAllow := 1
+		minBlock := 1
+		if AppConfig != nil && AppConfig.DNSToolkit.Override.Enabled {
+			for _, t := range AppConfig.DNSToolkit.Override.Thresholds {
+				if strings.EqualFold(t.Name, "allowlist") && t.MinSources > 0 {
+					minAllow = t.MinSources
+				}
+				if strings.EqualFold(t.Name, "blocklist") && t.MinSources > 0 {
+					minBlock = t.MinSources
+				}
+			}
+		}
+
 		switch {
 		case blockCount > allowCount:
-			addToBlockSets(result, entry, maps.EntryTypes[entry])
+			// accept block decision if it meets configured minimum sources
+			if blockCount >= minBlock {
+				addToBlockSets(result, entry, maps.EntryTypes[entry])
+			} else if blockCount > 0 || allowCount > 0 {
+				conflicts = append(conflicts, detail)
+			}
 		case allowCount > blockCount:
-			addToAllowSets(result, entry, maps.EntryTypes[entry])
+			// accept allow decision if it meets configured minimum sources
+			if allowCount >= minAllow {
+				addToAllowSets(result, entry, maps.EntryTypes[entry])
+			} else if blockCount > 0 || allowCount > 0 {
+				conflicts = append(conflicts, detail)
+			}
 		default:
 			if blockCount > 0 { // Equal non-zero counts = conflict
 				conflicts = append(conflicts, detail)

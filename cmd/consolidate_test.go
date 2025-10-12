@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"os"
 	"strings"
 	"testing"
 
@@ -461,5 +462,48 @@ func TestGetLocalBlocklistEntries(t *testing.T) {
 				assert.True(t, result.Contains(expectedEntry), "Should contain %s", expectedEntry)
 			}
 		})
+	}
+}
+
+func TestIgnoredEntriesAnnotation(t *testing.T) {
+	mock := &mockConsolidator{
+		mockEntries: u.NewStringSet([]string{"keep.com", "ignore.com"}),
+		mockFiles:   []c.FileInfo{{Name: "file1.txt", SourceType: "domain", Filepath: "/tmp/file1.txt", Count: 2}},
+	}
+
+	testRegistry := con.NewConsolidatorRegistry()
+	testRegistry.RegisterConsolidator("domain", "blocklist", mock)
+
+	origRegistry := con.Consolidators
+	con.Consolidators = testRegistry
+	defer func() { con.Consolidators = origRegistry }()
+
+	origConsolidatedDir := constants.ConsolidatedDir
+	tmpDir := t.TempDir()
+	constants.ConsolidatedDir = tmpDir
+	defer func() { constants.ConsolidatedDir = origConsolidatedDir }()
+
+	logger := multilog.NewLogger()
+
+	entriesToIgnore := u.NewStringSet([]string{"ignore.com"})
+
+	processedFiles := []c.ProcessedFile{{Valid: true}}
+
+	gotEntries, gotSummary := consolidateFilesBasedOnSTLT(
+		logger,
+		"domain",
+		"blocklist",
+		true,
+		entriesToIgnore,
+		processedFiles,
+	)
+
+	assert.Equal(t, 1, len(gotEntries))
+	assert.True(t, gotEntries.Contains("keep.com"))
+
+	if assert.NotEmpty(t, gotSummary.IgnoredFilepath) {
+		content, err := os.ReadFile(gotSummary.IgnoredFilepath)
+		assert.NoError(t, err)
+		assert.Contains(t, string(content), "ignore.com # ignored: filtered by consolidated allowlist")
 	}
 }
