@@ -47,7 +47,7 @@ var consolidateGroupsCmd = &cobra.Command{
 
 		// Process each size group and create consolidated lists
 		for _, group := range constants.SizeGroups {
-			groupResults := processGroupConsolidation(
+			groupResults := processGroupConsolidationWithAllow(
 				Logger,
 				group,
 				processedFiles,
@@ -155,13 +155,13 @@ func getFilesForGroup(processedFiles []c.ProcessedFile, group string) []c.Proces
 	return groupFiles
 }
 
-// processGroupConsolidation processes consolidation for a specific group
-func processGroupConsolidation(
+func processGroupConsolidationWithAllow(
 	logger *multilog.Logger,
 	group string,
 	processedFiles []c.ProcessedFile,
 	genericSourceTypes []string,
 ) map[string][]c.ConsolidatedSummary {
+	allowByType, _, _, _, _, _ := GetCachedResolutionSets(logger, processedFiles)
 	config := ProcessingConfig{
 		Identifier:         group,
 		IdentifierField:    "Group",
@@ -169,6 +169,7 @@ func processGroupConsolidation(
 		GenericSourceTypes: genericSourceTypes,
 		GetFilesFunc:       getFilesForGroup,
 		ConsolidateFunc:    consolidateByGroup,
+		AllowFilterByType:  allowByType,
 	}
 
 	return processConsolidationWithTransform(logger, config)

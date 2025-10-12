@@ -131,8 +131,22 @@ func consolidateGeneric(
 			params.OutputDir,
 			filenamePrefix+"_ignored.txt",
 		)
-		err := consolidator.SaveEntries(logger, ignoredEntries, ignoredFilePath)
-		if err != nil {
+
+		// annotate ignored entries with a reason
+		reason := "filtered by provided filter set"
+		switch params.ListType {
+		case constants.ListTypeBlocklist:
+			reason = "filtered by consolidated allowlist"
+		case constants.ListTypeAllowlist:
+			reason = "filtered by local blocklist"
+		}
+
+		annotated := make([]string, 0, len(ignoredEntries))
+		for entry := range ignoredEntries {
+			annotated = append(annotated, fmt.Sprintf("%s # ignored: %s", entry, reason))
+		}
+
+		if err := u.WriteEntriesToFile(logger, ignoredFilePath, annotated); err != nil {
 			logger.Errorf("Error writing ignored entry(s) to file %s: %v", ignoredFilePath, err)
 		} else {
 			consolidatedSummary.IgnoredFilepath = ignoredFilePath
@@ -171,6 +185,7 @@ func consolidateGeneric(
 type ProcessingConfig struct {
 	GetFilesFunc       func([]c.ProcessedFile, string) []c.ProcessedFile
 	ConsolidateFunc    func(*multilog.Logger, string, string, string, u.StringSet, []c.ProcessedFile) (u.StringSet, c.ConsolidatedSummary) // nolint:lll
+	AllowFilterByType  map[string]u.StringSet
 	Identifier         string
 	IdentifierField    string
 	ProcessedFiles     []c.ProcessedFile
@@ -255,7 +270,17 @@ func processIdentifierConsolidation(
 		}
 
 		if len(blocklistFiles) > 0 {
-			allowlistEntries := allowlistEntriesByType[gst]
+			var allowlistEntries u.StringSet
+			if config.AllowFilterByType != nil {
+				if aset, ok := config.AllowFilterByType[gst]; ok && aset != nil && aset.Size() > 0 {
+					allowlistEntries = aset
+				} else {
+					allowlistEntries = allowlistEntriesByType[gst]
+				}
+			} else {
+				allowlistEntries = allowlistEntriesByType[gst]
+			}
+
 			_, blocklistSummary := config.ConsolidateFunc(
 				logger,
 				gst,
