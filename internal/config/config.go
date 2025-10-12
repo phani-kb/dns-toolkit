@@ -365,7 +365,7 @@ func filterEnabledSummaries(
 		if IsEnabledSource(summary.Name, sourcesConfigs, appConfig) {
 			enabledSummaries = append(enabledSummaries, summary)
 		} else {
-			logger.Infof("Skipping summary %s: not enabled", summary.Name)
+			logger.Debugf("Skipping summary %s: not enabled", summary.Name)
 		}
 	}
 	return enabledSummaries
@@ -383,7 +383,7 @@ func filterEnabledSummariesForConsolidation(
 		if IsEnabledSourceForConsolidation(summary.Name, sourcesConfigs, appConfig, consolidationType) {
 			enabledSummaries = append(enabledSummaries, summary)
 		} else {
-			logger.Infof("Skipping summary %s: not enabled for consolidation", summary.Name)
+			logger.Debugf("Skipping summary %s: not enabled for consolidation", summary.Name)
 		}
 	}
 	return enabledSummaries

@@ -406,11 +406,11 @@ func (d *DefaultDownloader) canSkipDownload(
 		if lastModStr := resp.Header.Get("Last-Modified"); lastModStr != "" {
 			lastMod, err := time.Parse(http.TimeFormat, lastModStr)
 			if err == nil && !lastMod.After(localModTime) {
-				logger.Infof("Skipping download, local file is up-to-date: %s", filePath)
+				logger.Debugf("Skipping download, local file is up-to-date: %s", filePath)
 				return true
 			}
 		} else {
-			logger.Infof("Skipping download, local file exists with same size: %s", filePath)
+			logger.Debugf("Skipping download, local file exists with same size: %s", filePath)
 			return true
 		}
 	}
@@ -423,14 +423,14 @@ func (d *DefaultDownloader) handleArchiveFile(logger *multilog.Logger, file c.Do
 			logger.Errorf("Failed to extract archive: %v", err)
 			return err
 		}
-		logger.Infof("Extracted archive %s", filePath)
+		logger.Debugf("Extracted archive %s", filePath)
 		for _, target := range file.Targets {
 			if err := u.CopySourceToTarget(logger, target); err != nil {
 				logger.Errorf("Failed to copy target file: %v", err)
 				return err
 			}
 		}
-		logger.Infof("Copied target %d file(s)", len(file.Targets))
+		logger.Debugf("Copied target %d file(s)", len(file.Targets))
 		return nil
 	}
 	return nil
@@ -466,7 +466,7 @@ func (d *DefaultDownloader) ShouldDownload(
 				frequency,
 			)
 		}
-		logger.Infof("Skipping download for %s %s", filePath, msg)
+		logger.Debugf("Skipping download for %s %s", file.Name, msg)
 		return false
 	}
 
