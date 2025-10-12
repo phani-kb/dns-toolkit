@@ -229,6 +229,7 @@ func TestCreateOutputFromFile(t *testing.T) {
 		"Test Description",
 		42,
 		0,
+		0,
 		outputFile,
 		"Files:\n  - test file 1\n  - test file 2",
 	)
@@ -282,7 +283,16 @@ func TestProcessRegularFiles(t *testing.T) {
 		inputFile: {},
 	}
 
-	processRegularFiles(dynTmpl, staticTemplate, "testtype", typeFiles, fileCount, filesInvolved, map[string]int{})
+	processRegularFiles(
+		dynTmpl,
+		staticTemplate,
+		"testtype",
+		typeFiles,
+		fileCount,
+		filesInvolved,
+		map[string]int{},
+		map[string]int{},
+	)
 
 	outputFile := filepath.Join(tempDir, "input.txt")
 	assert.FileExists(t, outputFile)
@@ -371,7 +381,7 @@ func TestProcessFilesForSummaryType(t *testing.T) {
 			summaryData: `[{"filepath":"file1.txt","list_type":"blocklist","count":10,"ignored_entries_count":2,"ignored_filepath":"file1_ignored.txt"}]`,
 			wantType:    map[string]string{"file1.txt": "blocklist"},
 			wantCount:   map[string]int{"file1.txt": 10},
-			wantIgnored: map[string]int{"file1_ignored.txt": 2},
+			wantIgnored: map[string]int{"file1.txt": 2},
 		},
 		{
 			name:        "consolidated_groups summary",
@@ -387,7 +397,7 @@ func TestProcessFilesForSummaryType(t *testing.T) {
 			summaryData: `[{"filepath":"file3.txt","list_type":"blocklist","count":7,"ignored_entries_count":1,"ignored_filepath":"file3_ignored.txt"}]`,
 			wantType:    map[string]string{"file3.txt": "blocklist"},
 			wantCount:   map[string]int{"file3.txt": 7},
-			wantIgnored: map[string]int{"file3_ignored.txt": 1},
+			wantIgnored: map[string]int{"file3.txt": 1},
 		},
 		{
 			name:        "top summary",
