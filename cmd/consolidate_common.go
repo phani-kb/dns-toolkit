@@ -69,22 +69,45 @@ func consolidateGeneric(
 	consolidatedEntries, fileInfos := consolidator.Consolidate(logger, processedFiles)
 	consolidatedFileStrings := getFileStrings(fileInfos)
 
-	if len(consolidatedEntries) > 0 {
-		logger.Infof(
-			"Consolidated %s %s %d entry(s) for %s %s",
-			params.ListType,
-			params.GenericSourceType,
-			len(consolidatedEntries),
-			params.IdentifierField,
-			params.Identifier,
-		)
-	}
-
 	allEntries, ignoredEntries := consolidator.FilterEntries(
 		logger,
 		consolidatedEntries,
 		entriesToIgnore,
 	)
+
+	originalCount := calculateOriginalCount(fileInfos)
+
+	if len(consolidatedEntries) > 0 {
+		identifierStr := fmt.Sprintf("%s %s", params.IdentifierField, params.Identifier)
+		if params.IdentifierField == "" {
+			identifierStr = "" // For regular consolidation without identifier
+		} else {
+			identifierStr = " [" + identifierStr + "]"
+		}
+
+		if len(ignoredEntries) > 0 {
+			logger.Infof(
+				"%s %s%s: %d sources, %d total → %d final (%d filtered)",
+				params.GenericSourceType,
+				params.ListType,
+				identifierStr,
+				len(fileInfos),
+				originalCount,
+				len(allEntries),
+				len(ignoredEntries),
+			)
+		} else {
+			logger.Infof(
+				"%s %s%s: %d sources, %d total → %d final",
+				params.GenericSourceType,
+				params.ListType,
+				identifierStr,
+				len(fileInfos),
+				originalCount,
+				len(allEntries),
+			)
+		}
+	}
 
 	if len(allEntries) <= 0 {
 		logger.Infof(
@@ -104,6 +127,7 @@ func consolidateGeneric(
 		Files:                     consolidatedFileStrings,
 		Valid:                     true,
 		Count:                     len(allEntries),
+		OriginalCount:             calculateOriginalCount(fileInfos),
 		IgnoredEntriesCount:       len(ignoredEntries),
 		ListType:                  params.ListType,
 		LastConsolidatedTimestamp: u.GetTimestamp(),
@@ -118,14 +142,6 @@ func consolidateGeneric(
 	}
 
 	if len(ignoredEntries) > 0 {
-		logger.Infof(
-			"Ignored %s %s %d entry(s) for %s %s",
-			params.ListType,
-			params.GenericSourceType,
-			len(ignoredEntries),
-			params.IdentifierField,
-			params.Identifier,
-		)
 		filenamePrefix := fmt.Sprintf("%s_%s_%s", params.Identifier, params.GenericSourceType, params.ListType)
 		ignoredFilePath := filepath.Join(
 			params.OutputDir,
@@ -157,6 +173,22 @@ func consolidateGeneric(
 	filenamePrefix := fmt.Sprintf("%s_%s_%s", params.Identifier, params.GenericSourceType, params.ListType)
 	consolidatedFilePath := filepath.Join(params.OutputDir, filenamePrefix+".txt")
 	consolidatedSummary.Filepath = consolidatedFilePath
+
+	resolvedBefore := 0
+	if allEntries != nil {
+		resolvedBefore = allEntries.Size()
+	}
+
+	resolvedAfter := resolvedBefore
+
+	logger.Debugf(
+		"Writing %s for %s_%s: original=%d final=%d",
+		params.ListType,
+		params.Identifier,
+		params.GenericSourceType,
+		calculateOriginalCount(fileInfos),
+		resolvedAfter,
+	)
 
 	err := consolidator.SaveEntries(logger, allEntries, consolidatedSummary.Filepath)
 	if err != nil {
@@ -200,21 +232,19 @@ func processIdentifierConsolidation(
 	consolidatedSummariesByIdentifier := make(map[string][]c.ConsolidatedSummary)
 	consolidatedSummariesByIdentifier[config.Identifier] = []c.ConsolidatedSummary{}
 
-	var logMessage string
-	switch config.IdentifierField {
-	case "Group":
-		logMessage = fmt.Sprintf("Processing size group: %s", config.Identifier)
-	case "Category":
-		logMessage = fmt.Sprintf("Processing category: %s", config.Identifier)
-	default:
-		logMessage = fmt.Sprintf("Processing %s: %s", config.IdentifierField, config.Identifier)
-	}
-	logger.Infof("%s", logMessage)
-
-	// Filter processed files by identifier
+	// filter processed files by identifier
 	identifierFiles := config.GetFilesFunc(config.ProcessedFiles, config.Identifier)
 	if len(identifierFiles) == 0 {
-		logger.Infof("No files found for %s: %s", strings.ToLower(config.IdentifierField), config.Identifier)
+		var identifierType string
+		switch config.IdentifierField {
+		case "Group":
+			identifierType = "size group"
+		case "Category":
+			identifierType = "category"
+		default:
+			identifierType = strings.ToLower(config.IdentifierField)
+		}
+		logger.Infof("No files found for %s: %s", identifierType, config.Identifier)
 		return consolidatedSummariesByIdentifier
 	}
 
@@ -275,10 +305,10 @@ func processIdentifierConsolidation(
 				if aset, ok := config.AllowFilterByType[gst]; ok && aset != nil && aset.Size() > 0 {
 					allowlistEntries = aset
 				} else {
-					allowlistEntries = allowlistEntriesByType[gst]
+					allowlistEntries = u.NewStringSet([]string{})
 				}
 			} else {
-				allowlistEntries = allowlistEntriesByType[gst]
+				allowlistEntries = u.NewStringSet([]string{})
 			}
 
 			_, blocklistSummary := config.ConsolidateFunc(

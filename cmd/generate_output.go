@@ -227,7 +227,7 @@ func processFilesForSummaryType(
 			fileEntriesCount[key] = value.Count
 
 			if value.IgnoredEntriesCount > 0 && value.IgnoredFilepath != "" {
-				ignoredFilesCount[value.IgnoredFilepath] = value.IgnoredEntriesCount
+				ignoredFilesCount[key] = value.IgnoredEntriesCount
 			}
 
 			filesInvolved[key] = parseFilesFromConsolidatedSummary(value)
@@ -248,7 +248,7 @@ func processFilesForSummaryType(
 			typeFiles[key] = value.ListType
 			fileEntriesCount[key] = value.Count
 			if value.IgnoredEntriesCount > 0 && value.IgnoredFilepath != "" {
-				ignoredFilesCount[value.IgnoredFilepath] = value.IgnoredEntriesCount
+				ignoredFilesCount[key] = value.IgnoredEntriesCount
 			}
 
 			filesInvolved[key] = parseFilesFromConsolidatedSummary(value)
@@ -268,7 +268,7 @@ func processFilesForSummaryType(
 			typeFiles[key] = value.ListType
 			fileEntriesCount[key] = value.Count
 			if value.IgnoredEntriesCount > 0 && value.IgnoredFilepath != "" {
-				ignoredFilesCount[value.IgnoredFilepath] = value.IgnoredEntriesCount
+				ignoredFilesCount[key] = value.IgnoredEntriesCount
 			}
 			filesInvolved[key] = parseFilesFromConsolidatedSummary(value)
 			if value.OriginalCount > 0 {
@@ -304,6 +304,7 @@ func createOutputFromFile(
 	description string,
 	count int,
 	originalCount int,
+	filteredCount int,
 	outputPath string,
 	files string,
 ) error {
@@ -317,9 +318,11 @@ func createOutputFromFile(
 
 	// Execute dynamic template
 	var dynamicOutput bytes.Buffer
-	removed := 0
-	if originalCount > count {
-		removed = originalCount - count
+
+	// duplicates: originalCount - count - filteredCount
+	duplicates := 0
+	if originalCount > (count + filteredCount) {
+		duplicates = originalCount - count - filteredCount
 	}
 
 	err := tmpl.Execute(&dynamicOutput, common.TemplateData{
@@ -331,7 +334,9 @@ func createOutputFromFile(
 		Description:    description,
 		Count:          count,
 		OriginalCount:  originalCount,
-		Removed:        removed,
+		Removed:        duplicates,
+		Duplicates:     duplicates,
+		Filtered:       filteredCount,
 		Files:          files,
 	})
 	if err != nil {
@@ -368,6 +373,7 @@ func processRegularFiles(
 	fileCount map[string]int,
 	filesInvolved map[string][]common.FileInfo,
 	originalCounts map[string]int,
+	ignoredFilesCount map[string]int,
 ) {
 	for filePath, listType := range typeFiles {
 		fileName := filepath.Base(filePath)
@@ -391,6 +397,11 @@ func processRegularFiles(
 			}
 		}
 
+		filteredCount := 0
+		if fc, ok := ignoredFilesCount[filePath]; ok {
+			filteredCount = fc
+		}
+
 		err := createOutputFromFile(
 			tmpl,
 			staticTemplate,
@@ -399,6 +410,7 @@ func processRegularFiles(
 			description,
 			fileCount[filePath],
 			originalCount,
+			filteredCount,
 			outputFilePath,
 			files,
 		)
@@ -446,6 +458,7 @@ func processIgnoredFiles(
 			ignoredFileName,
 			ignoredDescription,
 			ignoredCount,
+			0,
 			0,
 			ignoredOutputPath,
 			"", // No files list for ignored files
@@ -533,6 +546,7 @@ var generateOutputCmd = &cobra.Command{
 				fileEntriesCount,
 				filesInvolved,
 				originalCounts,
+				ignoredFilesCount,
 			)
 
 			// Process ignored files

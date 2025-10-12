@@ -43,7 +43,17 @@ func GetCachedResolutionSets(logger *multilog.Logger, processedFiles []c.Process
 	resolutionCacheMu.Lock()
 	defer resolutionCacheMu.Unlock()
 
+	logger.Debugf("Cache check: files=%d, keyMatch=%v, cacheExists=%v",
+		len(processedFiles), key == resolutionCacheKey, resolutionCachedAllow != nil)
+
 	if key != "" && key == resolutionCacheKey && resolutionCachedAllow != nil {
+		logger.Debugf("Counts FROM cache: allow=%d, block=%d, conflicts=%d, manualAllow=%d, manualBlock=%d",
+			len(resolutionCachedAllow),
+			len(resolutionCachedBlock),
+			len(resolutionCachedConflicts),
+			len(resolutionCachedManualAllow),
+			len(resolutionCachedManualBlock),
+		)
 		return resolutionCachedAllow,
 			resolutionCachedBlock,
 			resolutionCachedConflicts,
@@ -52,6 +62,7 @@ func GetCachedResolutionSets(logger *multilog.Logger, processedFiles []c.Process
 			resolutionCachedDetails
 	}
 
+	logger.Debugf("Cache miss - rebuilding resolution sets")
 	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap := BuildResolutionSets(
 		logger,
 		processedFiles,
@@ -64,6 +75,14 @@ func GetCachedResolutionSets(logger *multilog.Logger, processedFiles []c.Process
 	resolutionCachedManualAllow = manualAllowToBlock
 	resolutionCachedManualBlock = manualBlockToAllow
 	resolutionCachedDetails = detailsMap
+
+	logger.Infof("Counts TO cache: allow=%d, block=%d, conflicts=%d, manualAllow=%d, manualBlock=%d",
+		len(resolutionCachedAllow),
+		len(resolutionCachedBlock),
+		len(resolutionCachedConflicts),
+		len(resolutionCachedManualAllow),
+		len(resolutionCachedManualBlock),
+	)
 
 	return allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap
 }

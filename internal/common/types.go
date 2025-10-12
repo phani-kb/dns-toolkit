@@ -477,6 +477,8 @@ type TemplateData struct {
 	Count          int
 	OriginalCount  int
 	Removed        int
+	Duplicates     int
+	Filtered       int
 }
 
 // TopSummary contains information about the top entries found across multiple sources.
