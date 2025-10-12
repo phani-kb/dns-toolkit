@@ -486,11 +486,26 @@ func getAutomaticDecisions(result *ResolutionResult) []OverrideRecord {
 		var decision string
 		switch {
 		case detail.BlockCount > detail.AllowCount:
-			decision = DecisionBlock
+			for _, set := range result.BlockByType {
+				if set != nil && set.Contains(entry) {
+					decision = DecisionBlock
+					break
+				}
+			}
 		case detail.AllowCount > detail.BlockCount:
-			decision = DecisionAllow
+			for _, set := range result.AllowByType {
+				if set != nil && set.Contains(entry) {
+					decision = DecisionAllow
+					break
+				}
+			}
 		default:
-			continue // equal counts handled separately
+			continue
+		}
+
+		if decision == "" {
+			// conflict
+			continue
 		}
 
 		records = append(records, OverrideRecord{
