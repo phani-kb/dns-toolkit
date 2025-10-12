@@ -78,8 +78,8 @@ flowchart LR
 
 **Note:** The repo size badge above only reflects the default branch (`release/1.0.0`).
 
-- **Output branch size:** 340.18 MB
-- **Summaries branch size:** 3.15 MB
+- **Output branch size:** 355.26 MB
+- **Summaries branch size:** 3.16 MB
 
 <!-- BRANCH_SIZES_END -->
 
@@ -98,7 +98,7 @@ flowchart LR
 | **Categories** | 39 | ads, adult, ai, annoyance, anonymizer, botnet, browser, cryptocurrency, dating, discord, dns, doh, fake, fakenews, finance, gambling, issues, kad, local, mac, malicious, malware, mobile, others, phishing, privacy, proxy, ransomware, scam, smarttv, social, spam, spyware, threat, topdomains, torrent_trackers, trackers, url_shorteners, windows |
 | **Source Types** | 30 | adguard, adguard_csv_http_url_find, adguard_domain, adguard_http_url, cidr_ipv4, domain, domain_adguard, domain_comment, domain_csv_http_url_find, domain_custom_csv_blackbook, domain_custom_csv_maltrail, domain_custom_html_ccam, domain_custom_html_puppyscams, domain_http_url, domain_top, domain_url, domain_with_comment_suffix, hostname, ipv4, ipv4_cidr_expand, ipv4_csv_http_url_find, ipv4_custom_html_ccam, ipv4_find, ipv4_from_domain, ipv4_http_url, ipv4_range_expand, ipv4_url, ipv6, ipv6_find, ipv6_htaccess |
 | **Geographic Coverage** | 21 countries | CN, CZ, DE, ES, FI, FR, HU, ID, IL, IT, KR, LV, MY, NL, RO, RU, SA, SK, UA, US, VN |
-| **Last Updated** | 2025-10-05 15:29:38 UTC | Statistics generation time |
+| **Last Updated** | 2025-10-11 21:20:42 UTC | Statistics generation time |
 
 <!-- STATS_END -->
 
@@ -127,10 +127,10 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | China_CDN_Whitelist | ❌ | others | - | - |
 | DandelionSprout_AdGuardHome_Whitelist | ✅ | others | 285 / 40 / 0 | - |
 | Dogino_Discord_Official | ✅ | discord | 43 / 0 / 14 | - |
-| fabriziosalmi_allowlist | ✅ | others | 2264 / 1048 / 803 | - |
+| fabriziosalmi_allowlist | ✅ | others | 2264 / 1046 / 805 | - |
 | Freekers_Whitelist | ❌ | others | - | No update since 2019 |
 | Notracking_Hosts_whitelist | ❌ | others | - | Archived by the owner on Aug 8, 2023 |
-| ShadowWhisperer_Allowlist | ✅ | others | 655 / 298 / 265 | - |
+| ShadowWhisperer_Allowlist | ✅ | others | 659 / 301 / 266 | - |
 | T145_allowlist-domains | ❌ | others | - | Huge list, use with caution |
 | TogoFire_AD_Settings_whitelist | ✅ | others | 1764 / 1519 / 0 | Huge list, use with caution |
 
@@ -142,108 +142,108 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | Name | S | Categories |         C / U / X        | Notes |
 |------|---|------------|--------------------------|-------|
 | 1Hosts (Lite) | ✅ | ads, trackers | 128566 / 0 / 179 | 100% covered by other sources |
-| abpvn_hosts | ✅ | ads | 1100 / 987 / 0 | - |
+| abpvn_hosts | ✅ | ads | 1116 / 999 / 0 | - |
 | Adaway | ✅ | ads | 6540 / 0 / 107 | >99% overlap with StevenBlack Fake Gambling list |
 | AdBlockID | ✅ | ads | 3877 / 3840 / 0 | - |
-| AdGuard Base filter | ✅ | ads, trackers | 102241 / 0 / 0 | - |
-| AdGuard CNAME Mail Trackers | ✅ | trackers | 32852 / 32814 / 0 | - |
-| AdGuard CNAME Trackers | ✅ | trackers | 78469 / 57926 / 10 | - |
-| AdGuard DNS filter | ✅ | ads, trackers | 136557 / 0 / 0 | - |
-| AdGuard Spyware Filter - Mobile | ✅ | ads, mobile, spyware | 1096 / 0 / 0 | - |
-| AntiAdBlockFilters | ✅ | annoyance | 1709 / 1704 / 0 | - |
+| AdGuard Base filter | ✅ | ads, trackers | 103808 / 0 / 0 | - |
+| AdGuard CNAME Mail Trackers | ✅ | trackers | 32292 / 32252 / 0 | - |
+| AdGuard CNAME Trackers | ✅ | trackers | 76998 / 56252 / 10 | - |
+| AdGuard DNS filter | ✅ | ads, trackers | 139959 / 0 / 0 | - |
+| AdGuard Spyware Filter - Mobile | ✅ | ads, mobile, spyware | 1105 / 0 / 0 | - |
+| AntiAdBlockFilters | ✅ | annoyance | 1708 / 1703 / 0 | - |
 | anudeepND_adservers | ❌ | ads | - | No update since 2023-01-16 |
-| bigdargon_hostsVN | ✅ | ads | 19027 / 0 / 149 | - |
-| Blocklists UT1 Cryptojacking | ✅ | cryptocurrency | 16291 / 14815 / 8 | - |
-| Blocklists UT1 Malware | ✅ | malware | 238541 / 0 / 4 | >80% overlap with phishing_army |
+| bigdargon_hostsVN | ✅ | ads | 19034 / 0 / 149 | - |
+| Blocklists UT1 Cryptojacking | ✅ | cryptocurrency | 16291 / 14808 / 8 | - |
+| Blocklists UT1 Malware | ✅ | malware | 241087 / 0 / 4 | >80% overlap with phishing_army |
 | Blocklists UT1 Publicite | ✅ | ads | 4270 / 0 / 129 | 100% covered by other sources |
 | Blocklists UT1 Shortener | ✅ | url_shorteners | 4518 / 0 / 21 | - |
-| Boutetnico_URL_Shorteners | ✅ | url_shorteners | 418 / 218 / 24 | - |
+| Boutetnico_URL_Shorteners | ✅ | url_shorteners | 418 / 219 / 24 | - |
 | Cameleon | ❌ | ads | - | No update since 2018-03-17 |
 | CF Torrent Trackers | ✅ | torrent_trackers | - | - |
-| CJX Annoyance | ✅ | annoyance | 1800 / 1724 / 0 | - |
-| CybercrimeTracker_All | ✅ | botnet, malicious, malware | 2864 / 1784 / 0 | Redirect loops may occur |
+| CJX Annoyance | ✅ | annoyance | 1804 / 1728 / 0 | - |
+| CybercrimeTracker_All | ✅ | botnet, malicious, malware | 2864 / 1793 / 0 | Redirect loops may occur |
 | CybercrimeTracker_CCAM | ❌ | botnet, malicious, malware | - | No regular updates |
-| CybercrimeTracker_CCPMGate | ✅ | botnet, malicious, malware | 103 / 34 / 0 | Redirect loops may occur |
-| cyberhost_malware-blocklist | ✅ | malware | 19454 / 706 / 3 | - |
+| CybercrimeTracker_CCPMGate | ✅ | botnet, malicious, malware | 103 / 38 / 0 | Redirect loops may occur |
+| cyberhost_malware-blocklist | ✅ | malware | 19478 / 554 / 3 | - |
 | Dan Pollock's List | ✅ | ads, malware, trackers | 11808 / 0 / 32 | >95% overlap with StevenBlack Fake Gambling list |
 | DandelionSprout-Anti-Malware-List | ✅ | malware | 27498 / 27487 / 0 | - |
-| Easy Privacy | ✅ | privacy, trackers | 53581 / 16887 / 1 | - |
-| EasyList | ✅ | ads | 58719 / 0 / 0 | 100% covered by other sources |
+| Easy Privacy | ✅ | privacy, trackers | 53590 / 16574 / 1 | - |
+| EasyList | ✅ | ads | 60237 / 0 / 0 | 100% covered by other sources |
 | fabriziosalmi_blocklists | ❌ | malicious, threat | - | Huge list, >3 million entries |
 | FadeMind_2o7Net | ❌ | ads, privacy, trackers | - | No update since 2023-11-30 |
-| FakeWebshopListHUN | ✅ | fake, phishing, scam, threat | 8210 / 4751 / 1 | - |
-| Frogeye-firstparty-trackers | ✅ | trackers | 32573 / 17857 / 11 | - |
-| GetAdmiral Domains Filter List | ✅ | ads, annoyance | 1773 / 0 / 0 | - |
-| GlobalAntiScamOrg-blocklist-domains | ✅ | scam | 11117 / 7415 / 2 | - |
-| HaGeZi Amazon Tracker | ✅ | privacy, trackers | 623 / 0 / 34 | >98% overlap with HaGeZi Pro |
+| FakeWebshopListHUN | ✅ | fake, phishing, scam, threat | 8210 / 4739 / 1 | - |
+| Frogeye-firstparty-trackers | ✅ | trackers | 30453 / 15834 / 10 | - |
+| GetAdmiral Domains Filter List | ✅ | ads, annoyance | 1770 / 0 / 0 | - |
+| GlobalAntiScamOrg-blocklist-domains | ✅ | scam | 11117 / 7385 / 2 | - |
+| HaGeZi Amazon Tracker | ✅ | privacy, trackers | 628 / 0 / 34 | >98% overlap with HaGeZi Pro |
 | HaGeZi Apple Tracker | ✅ | privacy, trackers | 290 / 0 / 7 | >80% overlap with HaGeZi Pro |
-| HaGeZi DNS TIF Mini | ✅ | malicious, threat | 142030 / 36372 / 2 | 100% covered by other sources |
-| HaGeZi Encrypted DNS Servers | ✅ | doh | 3286 / 2036 / 9 | - |
-| HaGeZi Gambling Only Domains | ✅ | gambling | 192613 / 184457 / 5 | Huge list and gambling-specific focus |
-| HaGeZi Microsoft Tracker | ✅ | privacy, trackers | 1651 / 0 / 12 | >75% overlap with HaGeZi Pro |
+| HaGeZi DNS TIF Mini | ✅ | malicious, threat | 182614 / 61053 / 3 | 100% covered by other sources |
+| HaGeZi Encrypted DNS Servers | ✅ | doh | 3420 / 2171 / 9 | - |
+| HaGeZi Gambling Only Domains | ✅ | gambling | 203291 / 194455 / 6 | Huge list and gambling-specific focus |
+| HaGeZi Microsoft Tracker | ✅ | privacy, trackers | 1939 / 0 / 12 | >75% overlap with HaGeZi Pro |
 | HaGeZi Most Abused TLDs | ✅ | spam | 432 / 430 / 0 | - |
 | HaGeZi Normal | ❌ | ads, malware, trackers | - | 100% overlap with HaGeZi Pro |
-| HaGeZi Pro | ✅ | ads, malware, phishing, trackers | 334609 / 0 / 182 | - |
-| HaGeZi Xiaomi Tracker | ✅ | privacy, trackers | 471 / 0 / 0 | >95% overlap with HaGeZi Pro |
+| HaGeZi Pro | ✅ | ads, malware, phishing, trackers | 355257 / 0 / 183 | - |
+| HaGeZi Xiaomi Tracker | ✅ | privacy, trackers | 472 / 0 / 0 | >95% overlap with HaGeZi Pro |
 | Hestat_Minerchk | ❌ | cryptocurrency | - | No update since 2018 |
 | hkamran80_smarttv | ✅ | smarttv | 294 / 0 / 14 | - |
 | Hostsfile | ❌ | ads | - | No update since 2018-04-20 |
 | hufilter | ✅ | ads | 100 / 0 / 3 | >90% overlap with HaGeZi Pro |
 | iam-py-test_my-filters-001-antitypo | ✅ | fake | 824 / 823 / 0 | - |
-| jarelllama_Scam-Blocklist | ✅ | scam | 457737 / 414851 / 11 | Disabled due to very large size (457K entries) - scam-specific focus |
-| kadantiscam | ✅ | kad | 52678 / 0 / 2 | peer-to-peer network protocol |
+| jarelllama_Scam-Blocklist | ✅ | scam | 457737 / 414248 / 11 | Disabled due to very large size (457K entries) - scam-specific focus |
+| kadantiscam | ✅ | kad | 54830 / 0 / 2 | peer-to-peer network protocol |
 | Korlabs_UrlShortener | ✅ | url_shorteners | 237 / 0 / 17 | - |
-| Malicious URL Blocklist (URLHaus) | ✅ | ads | 4013 / 0 / 0 | 100% covered by other sources |
-| Maltrail_StaticTrails | ✅ | malware, threat | 204945 / 177720 / 5 | - |
-| malware-filter_phishing-filter | ✅ | malware, phishing | 23515 / 0 / 0 | - |
-| OISD Blocklist Big | ✅ | ads, cryptocurrency, malware, phishing, ransomware, trackers | 199196 / 0 / 75 | Huge list |
-| OISD Blocklist NSFW Small | ✅ | adult | 21046 / 0 / 13 | - |
-| OISD Blocklist Small | ✅ | ads, cryptocurrency, malware, phishing, ransomware, trackers | 47707 / 0 / 51 | - |
-| OpenPhish_Feed | ✅ | phishing | 277 / 0 / 0 | - |
-| Peter Lowe's Blocklist | ✅ | ads | 3438 / 0 / 96 | 100% covered by other sources |
+| Malicious URL Blocklist (URLHaus) | ✅ | ads | 5122 / 0 / 0 | 100% covered by other sources |
+| Maltrail_StaticTrails | ✅ | malware, threat | 209697 / 181458 / 5 | - |
+| malware-filter_phishing-filter | ✅ | malware, phishing | 23137 / 0 / 0 | - |
+| OISD Blocklist Big | ✅ | ads, cryptocurrency, malware, phishing, ransomware, trackers | 202540 / 0 / 76 | Huge list |
+| OISD Blocklist NSFW Small | ✅ | adult | 20855 / 0 / 13 | - |
+| OISD Blocklist Small | ✅ | ads, cryptocurrency, malware, phishing, ransomware, trackers | 47750 / 0 / 52 | - |
+| OpenPhish_Feed | ✅ | phishing | 275 / 17 / 0 | - |
+| Peter Lowe's Blocklist | ✅ | ads | 3436 / 0 / 96 | 100% covered by other sources |
 | pexcn Torrent Trackers | ✅ | torrent_trackers | - | - |
-| phishing_army | ✅ | phishing | 139023 / 0 / 2 | - |
+| phishing_army | ✅ | phishing | 143094 / 0 / 2 | - |
 | Policeman_SimpleDomainsBlocklist | ❌ | malicious | - | Archived on 2021-12-26 |
 | PuppyScams | ✅ | fake, scam | 102 / 91 / 0 | List of top 100 pet scams is not being shared anymore, https://puppyscams.org/top-100-pet-scams |
 | quidsup_notrack-annoyance | ✅ | annoyance | 469 / 0 / 1 | >90% overlap with HaGeZi Pro |
 | quidsup_notrack-malware | ✅ | malware | 149 / 0 / 0 | - |
 | quidsup_notrack-tracker | ✅ | trackers | 15645 / 0 / 162 | - |
 | RedDragonWebDesign_block-everything | ✅ | ads, malicious, trackers | 665 / 661 / 0 | - |
-| RPiList_specials-malware | ✅ | malware | 236895 / 0 / 0 | Huge list |
-| RPiList_specials-phishing | ✅ | phishing | 864781 / 565182 / 0 | Huge list |
+| RPiList_specials-malware | ✅ | malware | 244699 / 0 / 0 | Huge list |
+| RPiList_specials-phishing | ✅ | phishing | 872909 / 569537 / 0 | Huge list |
 | ShadowWhisperer's Dating List | ✅ | dating | - | - |
-| ShadowWhisperer_BlockLists Ads | ✅ | ads | 23508 / 0 / 78 | - |
-| ShadowWhisperer_BlockLists Adult | ✅ | adult | 228872 / 170380 / 12 | Huge list and adult-specific focus |
-| ShadowWhisperer_BlockLists Malware | ✅ | malware | 40246 / 0 / 4 | - |
-| ShadowWhisperer_BlockLists Scam | ✅ | scam | 7850 / 5233 / 0 | - |
-| ShadowWhisperer_UrlShortener | ✅ | url_shorteners | 5696 / 1090 / 2 | - |
+| ShadowWhisperer_BlockLists Ads | ✅ | ads | 23585 / 0 / 78 | - |
+| ShadowWhisperer_BlockLists Adult | ✅ | adult | 228994 / 170550 / 12 | Huge list and adult-specific focus |
+| ShadowWhisperer_BlockLists Malware | ✅ | malware | 40255 / 0 / 4 | - |
+| ShadowWhisperer_BlockLists Scam | ✅ | scam | 7877 / 5242 / 0 | - |
+| ShadowWhisperer_UrlShortener | ✅ | url_shorteners | 5707 / 1103 / 2 | - |
 | Sinfonietta_Adult | ✅ | adult | 58961 / 0 / 18 | - |
 | Sinfonietta_Gambling | ✅ | gambling | 2639 / 0 / 1 | - |
 | Sinfonietta_Social | ✅ | social | 3242 / 0 / 107 | - |
-| Spam404 | ✅ | spam | 8140 / 5873 / 1 | - |
+| Spam404 | ✅ | spam | 8140 / 5848 / 1 | - |
 | Stamparm_Blackbook | ✅ | malicious, threat | 18145 / 0 / 0 | >95% overlap with Blocklists UT1 Malware |
 | StevenBlack_Adhoc_list | ❌ | ads, malware, trackers | - | 100% overlap with StevenBlack Fake Gambling list |
-| StevenBlack_Fake_Gambling | ✅ | ads, fake, fakenews, gambling | 91036 / 0 / 207 | - |
+| StevenBlack_Fake_Gambling | ✅ | ads, fake, fakenews, gambling | 90984 / 0 / 207 | - |
 | StevenBlack_Porn | ✅ | adult | 75479 / 0 / 23 | - |
 | StevenBlack_Social | ✅ | social | 3242 / 0 / 107 | - |
 | T145_black-mirror | ❌ | malicious, threat | - | Huge list, >8 million entries |
-| Torrent Trackers | ✅ | torrent_trackers | 515 / 485 / 0 | - |
-| Ukrainian Ad Filter | ✅ | ads | 1449 / 1249 / 0 | - |
+| Torrent Trackers | ✅ | torrent_trackers | 521 / 490 / 0 | - |
+| Ukrainian Ad Filter | ✅ | ads | 1455 / 1257 / 0 | - |
 | Ukrainian Annoyance Filter | ✅ | annoyance | - | - |
-| Ukrainian Privacy Filter | ✅ | privacy, trackers | 347 / 50 / 1 | - |
-| Ukrainian Security Filter | ✅ | malicious, threat | 1736 / 1170 / 0 | - |
+| Ukrainian Privacy Filter | ✅ | privacy, trackers | 366 / 51 / 1 | - |
+| Ukrainian Security Filter | ✅ | malicious, threat | 1736 / 1135 / 0 | - |
 | UncheckyAds | ❌ | ads, privacy, trackers | - | No update since 2021 |
 | URLHaus (Abuse.ch) | ✅ | malware | - | - |
-| USOM-Blocklists-domains | ✅ | malicious, threat | 412471 / 359940 / 18 | Huge list |
-| Viriback_Dump | ✅ | malware | 4667 / 0 / 0 | - |
+| USOM-Blocklists-domains | ✅ | malicious, threat | 413841 / 360091 / 18 | Huge list |
+| Viriback_Dump | ✅ | malware | 4673 / 0 / 0 | - |
 | WaLLy3K | ✅ | ads | 350 / 0 / 12 | - |
 | Warui_Adhosts | ✅ | ads | 75775 / 0 / 243 | Huge list |
 | WindowsSpyBlocker_Hosts_spy | ❌ | privacy, trackers | - | No update since 2022-05-16 |
 | Winhelp2002 | ❌ | ads | - | No update since 2021-03-06 |
 | YousList | ✅ | ads | 624 / 0 / 3 | - |
 | YousList-AdGuard | ✅ | ads | 7360 / 7185 / 0 | - |
-| youtube_GoodbyeAds | ✅ | ads | 97645 / 97168 / 14 | - |
-| Yoyo Adservers-Hosts | ✅ | ads | 3438 / 0 / 96 | >95% overlap with StevenBlack Fake Gambling list |
+| youtube_GoodbyeAds | ✅ | ads | 97645 / 97168 / 14 | No update since 2024-11-21 |
+| Yoyo Adservers-Hosts | ✅ | ads | 3436 / 0 / 96 | >95% overlap with StevenBlack Fake Gambling list |
 
 </details>
 
@@ -261,7 +261,7 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 
 | Name | S | Categories |         C / U / X        | Notes |
 |------|---|------------|--------------------------|-------|
-| tranco | ✅ | topdomains | 1000 / 0 / 1235 | - |
+| tranco | ✅ | topdomains | 1000 / 0 / 1238 | - |
 
 </details>
 
@@ -273,43 +273,43 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | AlienVault_Reputation | ❌ | malicious, threat | - | Not available anymore. The service has been discontinued. |
 | BinaryDefense_Banlist | ✅ | malicious, threat | 3023 / 0 / 0 | This is for public use only. |
 | Blackhole_Today | ❌ | malicious, threat | - | Download fails frequently due to network instability or potential blocking. |
-| BlockListDE_Brute | ✅ | threat | 615 / 0 / 0 | >95% overlap with Firehol_level2 |
-| BlockListDE_Strong | ✅ | malicious, threat | 283 / 0 / 0 | >95% overlap with Borestad_AbuseIPDB_S100_3d |
-| Borestad_AbuseIPDB_S100_3d | ✅ | malicious, threat | 62278 / 0 / 0 | - |
-| BruteforceBlocker | ✅ | threat | 263 / 0 / 0 | >95% overlap with EmergingThreats_CompromisedIPs |
+| BlockListDE_Brute | ✅ | threat | 636 / 0 / 0 | >95% overlap with Firehol_level2 |
+| BlockListDE_Strong | ✅ | malicious, threat | 284 / 0 / 0 | >95% overlap with Borestad_AbuseIPDB_S100_3d |
+| Borestad_AbuseIPDB_S100_3d | ✅ | malicious, threat | 63877 / 0 / 0 | - |
+| BruteforceBlocker | ✅ | threat | 302 / 0 / 0 | >95% overlap with EmergingThreats_CompromisedIPs |
 | CINSScore_BadGuys_Army | ✅ | malicious, threat | 15000 / 0 / 0 | - |
-| DoH_IP_blocklists | ✅ | doh | 2663 / 750 / 1 | >90% overlap with HaGeZi Encrypted DNS Servers |
+| DoH_IP_blocklists | ✅ | doh | 2655 / 764 / 1 | >90% overlap with HaGeZi Encrypted DNS Servers |
 | DoH_IP_list | ✅ | doh | 731 / 0 / 0 | - |
 | DShield | ✅ | malicious, threat | 5120 / 0 / 0 | 100% overlap with Firehol_level2/Firehol_level3 |
-| EmergingThreats_CompromisedIPs | ✅ | malicious, threat | 262 / 0 / 0 | >95% overlap with Firehol_level3,  and Borestad_AbuseIPDB_S100_3d |
-| ET_fwip | ✅ | malicious, threat | 1477 / 111 / 0 | - |
+| EmergingThreats_CompromisedIPs | ✅ | malicious, threat | 283 / 0 / 0 | >95% overlap with Firehol_level3,  and Borestad_AbuseIPDB_S100_3d |
+| ET_fwip | ✅ | malicious, threat | 1496 / 118 / 0 | - |
 | FabrizioSalmi_DNS | ✅ | dns | 66 / 0 / 0 | - |
 | Firehol_abusers_30d | ❌ | malicious, threat | - | False positives are common, use with caution. |
-| Firehol_BitcoinNodes_1d | ✅ | cryptocurrency | 7387 / 7268 / 0 | - |
-| Firehol_Botscout_1d | ✅ | malicious, threat | 587 / 452 / 0 | - |
-| Firehol_CleanTalk | ✅ | malicious, threat | 494 / 441 / 0 | - |
-| Firehol_CleanTalk_Top20 | ✅ | malicious, threat | 20 / 6 / 0 | - |
-| Firehol_GPF_Comics | ✅ | malicious, threat | 2715 / 1617 / 0 | - |
-| Firehol_level1 | ✅ | malicious, threat | 4413 / 3047 / 0 | - |
-| Firehol_level2 | ✅ | malicious, threat | 14066 / 0 / 0 | - |
-| Firehol_level3 | ✅ | malicious, threat | 12350 / 0 / 3 | - |
-| Firehol_SocksProxy_7d | ✅ | anonymizer, privacy, proxy | 2232 / 1979 / 0 | - |
-| Firehol_SSLProxies_1d | ✅ | anonymizer, privacy, proxy | 251 / 179 / 0 | - |
+| Firehol_BitcoinNodes_1d | ✅ | cryptocurrency | 7658 / 7528 / 0 | - |
+| Firehol_Botscout_1d | ✅ | malicious, threat | 617 / 466 / 0 | - |
+| Firehol_CleanTalk | ✅ | malicious, threat | 494 / 444 / 0 | - |
+| Firehol_CleanTalk_Top20 | ✅ | malicious, threat | 20 / 7 / 0 | - |
+| Firehol_GPF_Comics | ✅ | malicious, threat | 2740 / 1466 / 0 | - |
+| Firehol_level1 | ✅ | malicious, threat | 4439 / 3061 / 0 | - |
+| Firehol_level2 | ✅ | malicious, threat | 15519 / 0 / 0 | - |
+| Firehol_level3 | ✅ | malicious, threat | 12162 / 0 / 3 | - |
+| Firehol_SocksProxy_7d | ✅ | anonymizer, privacy, proxy | 1998 / 1777 / 0 | - |
+| Firehol_SSLProxies_1d | ✅ | anonymizer, privacy, proxy | 246 / 178 / 0 | - |
 | GlobalAntiScamOrg-blocklist-ips | ✅ | scam | - | - |
-| Greensnow | ✅ | malicious, malware, threat | 5597 / 0 / 0 | >95% overlap with Firehol_level2 |
-| HaGeZi_DoH | ✅ | doh | 1716 / 0 / 0 | >90% overlap with DoH_IP_blocklists |
-| HaGeZi_TIF | ✅ | malicious, threat | 63307 / 0 / 0 | No unique contribution |
+| Greensnow | ✅ | malicious, malware, threat | 5564 / 0 / 0 | >95% overlap with Firehol_level2 |
+| HaGeZi_DoH | ✅ | doh | 1710 / 0 / 0 | >90% overlap with DoH_IP_blocklists |
+| HaGeZi_TIF | ✅ | malicious, threat | 62940 / 0 / 0 | No unique contribution |
 | MyIP_MS_Blocklist | ✅ | malicious, threat | - | - |
-| Public_DNS4 | ✅ | dns | 62607 / 61685 / 0 | - |
-| Rutgers_DROP | ✅ | malicious, threat | 2494 / 0 / 0 | - |
-| Sblam_Blocklist | ✅ | spam | 1788 / 1194 / 0 | - |
-| ScriptzTeam_BadIPS | ✅ | malicious, threat | 2567 / 1009 / 0 | - |
-| Sentinel_Greylist | ✅ | malicious, threat | 6458 / 0 / 2 | - |
+| Public_DNS4 | ✅ | dns | 62607 / 61684 / 0 | - |
+| Rutgers_DROP | ✅ | malicious, threat | 2051 / 0 / 0 | - |
+| Sblam_Blocklist | ✅ | spam | 1859 / 1233 / 0 | - |
+| ScriptzTeam_BadIPS | ✅ | malicious, threat | 2567 / 932 / 0 | - |
+| Sentinel_Greylist | ✅ | malicious, threat | 8277 / 0 / 2 | - |
 | spamhaus_drop | ✅ | spam, threat | - | - |
 | T145_allowlist-ips | ❌ | others | - | Huge list, use with caution. More than its blocklist counterpart. |
 | T145_blocklist | ❌ | malicious, malware, threat | - | Huge list, use with caution. |
-| URLHaus_Text | ✅ | malware | 19367 / 0 / 0 | - |
-| USOM-Blocklists-ips | ✅ | malicious, threat | 12922 / 7221 / 0 | - |
+| URLHaus_Text | ✅ | malware | 19316 / 0 / 0 | - |
+| USOM-Blocklists-ips | ✅ | malicious, threat | 13063 / 7297 / 0 | - |
 | Yoyo AdServers-IPList | ✅ | ads | 8940 / 8889 / 0 | - |
 
 </details>
@@ -321,11 +321,11 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 |------|---|------------|--------------------------|-------|
 | local_adg_allowlist | ✅ | local | - | - |
 | local_adg_blocklist | ✅ | local | 7 / 0 / 0 | - |
-| local_ai_allowlist | ✅ | ai | 49 / 0 / 50 | - |
-| local_ai_blocklist | ✅ | ai | 49 / 0 / 50 | - |
+| local_ai_allowlist | ✅ | ai | 50 / 0 / 51 | - |
+| local_ai_blocklist | ✅ | ai | 50 / 0 / 50 | - |
 | local_domain_blocklist | ✅ | local | 8 / 0 / 2 | - |
 | local_source_domain_allowlist | ✅ | local | 44 / 26 / 0 | - |
-| local_source_ipv4_allowlist | ✅ | local | 56 / 46 / 9 | - |
+| local_source_ipv4_allowlist | ✅ | local | 56 / 48 / 8 | - |
 
 </details>
 
@@ -334,7 +334,7 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 
 | Name | S | Categories |         C / U / X        | Notes |
 |------|---|------------|--------------------------|-------|
-| local_miscellaneous_allowlist | ✅ | local | 6 / 0 / 10 | - |
+| local_miscellaneous_allowlist | ✅ | local | 6 / 0 / 9 | - |
 | local_mobile_allowlist | ✅ | local, mobile | 4 / 2 / 2 | - |
 | local_social_allowlist | ✅ | local, social | 1 / 0 / 2 | - |
 
@@ -345,7 +345,7 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 
 | Name | S | Categories |         C / U / X        | Notes |
 |------|---|------------|--------------------------|-------|
-| VXVault_URLList | ✅ | malware | 39 / 0 / 0 | >95% overlap with Firehol_level3 |
+| VXVault_URLList | ✅ | malware | 40 / 0 / 0 | >95% overlap with Firehol_level3 |
 
 </details>
 

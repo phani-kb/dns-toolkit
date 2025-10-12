@@ -2,6 +2,7 @@
 # File name: {{.FileName}}
 # Last Updated: {{.LastUpdated}}
 # Format: {{.Description}}
-# Count: {{.Count}}{{if .Files}}
+# Count: {{.Count}}{{if gt .OriginalCount 0}} (original: {{.OriginalCount}}){{end}}{{if gt .OriginalCount .Count}}
+# Removed: {{subtract .OriginalCount .Count}}{{end}}{{if .Files}}
 # Files:
 {{.Files}}{{end}}

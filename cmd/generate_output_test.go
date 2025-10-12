@@ -228,6 +228,7 @@ func TestCreateOutputFromFile(t *testing.T) {
 		"input.txt",
 		"Test Description",
 		42,
+		0,
 		outputFile,
 		"Files:\n  - test file 1\n  - test file 2",
 	)
@@ -281,7 +282,7 @@ func TestProcessRegularFiles(t *testing.T) {
 		inputFile: {},
 	}
 
-	processRegularFiles(dynTmpl, staticTemplate, "testtype", typeFiles, fileCount, filesInvolved)
+	processRegularFiles(dynTmpl, staticTemplate, "testtype", typeFiles, fileCount, filesInvolved, map[string]int{})
 
 	outputFile := filepath.Join(tempDir, "input.txt")
 	assert.FileExists(t, outputFile)
@@ -408,7 +409,7 @@ func TestProcessFilesForSummaryType(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			gotType, gotCount, gotFilesInvolved, gotIgnored := processFilesForSummaryType(
+			gotType, gotCount, gotFilesInvolved, gotIgnored, _ := processFilesForSummaryType(
 				tt.summaryType,
 				[]byte(tt.summaryData),
 			)

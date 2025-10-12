@@ -45,7 +45,7 @@ dns_toolkit:
       - name: allowlist
         min_sources: 3
       - name: blocklist
-        min_sources: 2
+        min_sources: 3
     consolidated_files:
       - name: allowlist
         path: data/consolidated_allowlist.txt

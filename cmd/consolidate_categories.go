@@ -185,6 +185,7 @@ func processCategoryConsolidation(
 	processedFiles []c.ProcessedFile,
 	genericSourceTypes []string,
 ) map[string][]c.ConsolidatedSummary {
+	allowByType, _, _, _, _, _ := GetCachedResolutionSets(logger, processedFiles)
 	config := ProcessingConfig{
 		Identifier:         category,
 		IdentifierField:    "Category",
@@ -192,6 +193,7 @@ func processCategoryConsolidation(
 		GenericSourceTypes: genericSourceTypes,
 		GetFilesFunc:       getFilesForCategory,
 		ConsolidateFunc:    consolidateByCategory,
+		AllowFilterByType:  allowByType,
 	}
 
 	return processConsolidationWithTransform(logger, config)

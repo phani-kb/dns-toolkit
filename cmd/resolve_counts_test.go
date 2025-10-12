@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
+	"github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/dns-toolkit/internal/utils"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
@@ -177,7 +178,8 @@ func TestResolveByCounts_Integration(t *testing.T) {
 		DetailsMap:  make(map[string]ConflictDetail),
 	}
 
-	conflicts := resolveByCounts(maps, result)
+	logger, _ := multilog.NewTestLogger(t)
+	conflicts := resolveByCounts(logger, maps, result)
 
 	assert.Contains(t, result.BlockByType[constants.SourceTypeDomain], "conflict.com")
 	assert.NotContains(t, result.AllowByType[constants.SourceTypeDomain], "conflict.com")
@@ -190,6 +192,47 @@ func TestResolveByCounts_Integration(t *testing.T) {
 	assert.Equal(t, "equal.com", conflicts[0].Entry)
 	assert.Equal(t, 1, conflicts[0].BlockCount)
 	assert.Equal(t, 1, conflicts[0].AllowCount)
+}
+
+func TestResolve_MinSourcesThresholdsApplied(t *testing.T) {
+	logger, _ := multilog.NewTestLogger(t)
+
+	// create maps where allow has higher count but below min_sources
+	maps := &SourceMaps{
+		BlockMap: map[string]map[string]struct{}{
+			"maybe.com": {"block1": {}},
+		},
+		AllowMap: map[string]map[string]struct{}{
+			// allow has 2 sources
+			"maybe.com": {"allow1": {}, "allow2": {}},
+		},
+		EntryTypes: map[string]map[string]struct{}{
+			"maybe.com": {constants.SourceTypeDomain: {}},
+		},
+	}
+
+	result := &ResolutionResult{
+		AllowByType: make(map[string]u.StringSet),
+		BlockByType: make(map[string]u.StringSet),
+		DetailsMap:  make(map[string]ConflictDetail),
+	}
+
+	oldAppConfig := AppConfig
+	AppConfig = &config.AppConfig{}
+	AppConfig.DNSToolkit.Override.Enabled = true
+	AppConfig.DNSToolkit.Override.Thresholds = []config.ThresholdConfig{
+		{Name: "allowlist", MinSources: 3},
+		{Name: "blocklist", MinSources: 3},
+	}
+	defer func() { AppConfig = oldAppConfig }()
+
+	conflicts := resolveByCounts(logger, maps, result)
+
+	// allow had higher count (2) but below min_sources (3), conflict
+	assert.Len(t, conflicts, 1)
+	assert.Equal(t, "maybe.com", conflicts[0].Entry)
+	assert.False(t, result.AllowByType[constants.SourceTypeDomain].Contains("maybe.com"))
+	assert.False(t, result.BlockByType[constants.SourceTypeDomain].Contains("maybe.com"))
 }
 
 func TestConflictProcessing(t *testing.T) {
