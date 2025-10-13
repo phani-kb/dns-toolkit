@@ -375,7 +375,7 @@
       "website": "https://sysctl.org/cameleon"
     },
     {
-      "name": "CF Torrent Trackers",
+      "name": "CF_Torrent_Trackers",
       "categories": "torrent_trackers",
       "license": "GPL-3.0",
       "skip_general_consolidation": true,
@@ -666,7 +666,10 @@
       "categories": "fake, phishing, scam, threat",
       "types": [
         {
-          "name": "domain"
+          "name": "adguard"
+        },
+        {
+          "name": "domain_adguard"
         }
       ],
       "url": "https://raw.githubusercontent.com/FakesiteListHUN/FakeWebshopListHUN/refs/heads/main/fakewebshoplist",
@@ -1350,13 +1353,14 @@
       "categories": "dating",
       "types": [
         {
-          "name": "adguard"
+          "name": "domain"
         },
         {
-          "name": "domain_adguard"
+          "name": "adguard_domain"
         }
       ],
-      "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/refs/heads/master/Lists/Dating"
+      "url": "https://raw.githubusercontent.com/ShadowWhisperer/BlockLists/refs/heads/master/Lists/Dating",
+      "website": "https://github.com/ShadowWhisperer/BlockLists"
     },
     {
       "name": "ShadowWhisperer_BlockLists Ads",
@@ -1711,7 +1715,7 @@
       "license": "CC BY-NC-SA 4.0",
       "types": [
         {
-          "name": "domain",
+          "name": "hostname",
           "list_types": [
             {
               "name": "blocklist"

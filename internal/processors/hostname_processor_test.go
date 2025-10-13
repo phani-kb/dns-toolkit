@@ -151,13 +151,17 @@ func TestHostnameProcessor_Process(t *testing.T) {
 
 # More valid entries
 127.0.0.1       sub.domain.com
-0.0.0.0         another.test.org`,
+0.0.0.0         another.test.org
+127.0.0.1	abc1.net
+127.0.0.1	xn--abc1.cc`,
 			expectedValid: []string{
 				"example.com",
 				"malicious.com",
 				"ads.tracker.com",
 				"sub.domain.com",
 				"another.test.org",
+				"abc1.net",
+				"xn--abc1.cc",
 			},
 			expectedInvalid: []string{
 				"127.0.0.1       localhost",
