@@ -1285,6 +1285,22 @@ func TestExtractEntriesWithRegex(t *testing.T) {
 	}
 }
 
+func TestExtractDomains(t *testing.T) {
+	t.Parallel()
+
+	content := `# Comment
+example.com
+761.xn--p1ai
+
+bad_domain
+`
+
+	valid, invalid := ExtractDomains(content)
+
+	assert.Equal(t, []string{"761.xn--p1ai", "example.com"}, valid)
+	assert.Equal(t, []string{"bad_domain"}, invalid)
+}
+
 func TestForceCopySourceToTarget(t *testing.T) {
 	logger := createTestLogger(t)
 	tmpDir := t.TempDir()
@@ -1542,4 +1558,27 @@ func TestGetFilesInDir(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, files)
 	})
+}
+
+func TestIsDomain_IDNA(t *testing.T) {
+	cases := []struct {
+		name  string
+		input string
+		want  bool
+	}{
+		{"ascii domain", "example.com", true},
+		{"empty string", "", false},
+		{"ip address", "192.168.1.1", false},
+		{"malformed ace", "xn--notvalid-label", false},
+		{"ace in middle", "example.xn--fiqs8s", true},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			got := IsDomain(c.input)
+			if got != c.want {
+				t.Fatalf("IsDomain(%q) = %v, want %v", c.input, got, c.want)
+			}
+		})
+	}
 }

@@ -1165,6 +1165,24 @@
       "website": "https://github.com/pexcn"
     },
     {
+      "name": "ph00lt0_blocklist",
+      "categories": "ads, trackers",
+      "license": "CC BY-SA 4.0, MIT",
+      "notes": "100% covered by other sources, ~50 ip addresses in domain list",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "domain"
+        },
+        {
+          "name": "adguard_domain"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/ph00lt0/blocklist/master/domains.txt",
+      "website": "https://github.com/ph00lt0/blocklist"
+    },
+    {
       "name": "phishing_army",
       "categories": "phishing",
       "disabled": false,

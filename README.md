@@ -11,17 +11,23 @@
 
 A command-line utility for downloading, processing, resolving, and consolidating DNS blocklists and allowlists from multiple sources. Performs DNS-to-IP resolution, reverse lookups, and overlap detection. Generates ready-to-use lists for DNS sinkholes, Pi-hole, AdGuard Home, and other network security tools.
 
-A compact table of the most commonly used outputs. Click any link to open the file — raw files are available under the [`output`](https://github.com/phani-kb/dns-toolkit/tree/output) branch.
+Most commonly used outputs; Click any link to open the file — raw files are available under the [`output`](https://github.com/phani-kb/dns-toolkit/tree/output) branch.
 
-| Category                                          | Files (click to open)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-|---------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 🗂️ Consolidated                                  | **Blocklists:** [adguard](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/adguard_blocklist.txt) · [cidr_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/cidr_ipv4_blocklist.txt) · [domain](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/domain_blocklist.txt) · [ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/ipv4_blocklist.txt) · [ipv6](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/ipv6_blocklist.txt)  <br> **Allowlists:** [adguard (allowlist)](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/adguard_allowlist.txt) · [domain (allowlist)](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/domain_allowlist.txt) · [ipv4 (allowlist)](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/ipv4_allowlist.txt)                                                               |
-| 🟢 Mini — low false positives                      | [mini_adguard](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/mini_adguard_blocklist.txt), [mini_cidr_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/mini_cidr_ipv4_blocklist.txt), [mini_domain](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/mini_domain_blocklist.txt), [mini_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/mini_ipv4_blocklist.txt)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| 🟡 Lite — balanced protection                      | [lite_adguard](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/lite_adguard_blocklist.txt), [lite_cidr_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/lite_cidr_ipv4_blocklist.txt), [lite_domain](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/lite_domain_blocklist.txt), [lite_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/lite_ipv4_blocklist.txt)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| 🔵 Normal — broader protection                     | [normal_adguard](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/normal_adguard_blocklist.txt), [normal_cidr_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/normal_cidr_ipv4_blocklist.txt), [normal_domain](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/normal_domain_blocklist.txt), [normal_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/normal_ipv4_blocklist.txt)                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| 🔴 Big — aggressive coverage                       | [big_adguard](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/big_adguard_blocklist.txt), [big_cidr_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/big_cidr_ipv4_blocklist.txt), [big_domain](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/big_domain_blocklist.txt), [big_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/big_ipv4_blocklist.txt), [big_ipv6](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/big_ipv6_blocklist.txt)                                                                                                                                                                                                                                                                                                                                                                 |
-| ⭐ High-confidence (top) lists — min3 to min5       | [top_adguard_min3](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_adguard_blocklist_min3.txt), [top_adguard_min5](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_adguard_blocklist_min5.txt) · [top_domain_min3](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_domain_blocklist_min3.txt), [top_domain_min5](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_domain_blocklist_min5.txt) · [top_ipv4_min3](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_ipv4_blocklist_min3.txt), [top_ipv4_min5](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_ipv4_blocklist_min5.txt) (Top lists count how many distinct sources contain an entry — `min3` means "at least 3 sources", `min5` means "at least 5 sources", etc.; higher `minN` → higher confidence, fewer entries.) |
-| ⚡ Quick usage                                     | Add a raw URL such as `https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/domain_blocklist.txt` to your DNS filtering tool (Pi-hole, AdGuard Home, pfBlockerNG).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| Category                                       | Files (click to open)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+|------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| 🗂️&nbsp;Consolidated                               | 🛑 **Blocklists:** [adguard](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/adguard_blocklist.txt) · [cidr_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/cidr_ipv4_blocklist.txt) · [domain](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/domain_blocklist.txt) · [ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/ipv4_blocklist.txt) · [ipv6](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/ipv6_blocklist.txt)  <br>✅ **Allowlists:** [adguard (allowlist)](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/adguard_allowlist.txt) · [domain (allowlist)](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/domain_allowlist.txt) · [ipv4 (allowlist)](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/ipv4_allowlist.txt)                                                               |
+| 📏&nbsp;Mini&nbsp;—&nbsp;low&nbsp;false&nbsp;positives&nbsp;🟢               | [mini_adguard](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/mini_adguard_blocklist.txt), [mini_cidr_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/mini_cidr_ipv4_blocklist.txt), [mini_domain](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/mini_domain_blocklist.txt), [mini_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/mini_ipv4_blocklist.txt)                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 📏&nbsp;Lite&nbsp;—&nbsp;balanced&nbsp;protection&nbsp;🟡               | [lite_adguard](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/lite_adguard_blocklist.txt), [lite_cidr_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/lite_cidr_ipv4_blocklist.txt), [lite_domain](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/lite_domain_blocklist.txt), [lite_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/lite_ipv4_blocklist.txt)                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 📏&nbsp;Normal&nbsp;—&nbsp;broader&nbsp;protection&nbsp;🔵              | [normal_adguard](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/normal_adguard_blocklist.txt), [normal_cidr_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/normal_cidr_ipv4_blocklist.txt), [normal_domain](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/normal_domain_blocklist.txt), [normal_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/normal_ipv4_blocklist.txt)                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| 📏&nbsp;Big&nbsp;—&nbsp;aggressive&nbsp;coverage&nbsp;🔴                | [big_adguard](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/big_adguard_blocklist.txt), [big_cidr_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/big_cidr_ipv4_blocklist.txt), [big_domain](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/big_domain_blocklist.txt), [big_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/big_ipv4_blocklist.txt), [big_ipv6](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/big_ipv6_blocklist.txt)                                                                                                                                                                                                                                                                                                                                                                |
+| ⭐&nbsp;High-confidence&nbsp;(top)&nbsp;lists&nbsp;—&nbsp;min3&nbsp;to&nbsp;min12  | [top_adguard_min3](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_adguard_blocklist_min3.txt), [top_adguard_min5](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_adguard_blocklist_min5.txt) · [top_domain_min3](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_domain_blocklist_min3.txt), [top_domain_min5](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_domain_blocklist_min5.txt) · [top_ipv4_min3](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_ipv4_blocklist_min3.txt), [top_ipv4_min5](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_ipv4_blocklist_min5.txt) (Top lists count how many distinct sources contain an entry — `min3` means "at least 3 sources", `min5` means "at least 5 sources", etc.; higher `minN` → higher confidence, fewer entries.) |
+| ⚡ Quick usage                                  | Add a raw URL such as `https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/domain_blocklist.txt` to your DNS filtering tool (Pi-hole, AdGuard Home, pfBlockerNG).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+
+**[View Detailed Overlap Analysis](https://github.com/phani-kb/dns-toolkit/blob/output/overlap.md)** Comprehensive analysis showing how entries are shared across different DNS sources.
+
+**[Conflicts Report (allowlist vs. blocklist)](https://github.com/phani-kb/dns-toolkit/blob/output/conflicts.md)** A daily-generated report listing entries found in both allowlists and blocklists, including the source(s) where they were found.
+
+**Processing summaries and metadata are archived in the [`summaries`](https://github.com/phani-kb/dns-toolkit/tree/summaries) branch with 1-year retention.**
 
 ## Published Outputs
 
@@ -66,10 +72,6 @@ https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/domain_blocklist.t
 
 **Usage:** Add `https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/[filename]` to your DNS filtering tool.
 
-**[View Detailed Overlap Analysis](https://github.com/phani-kb/dns-toolkit/blob/output/overlap.md)** Comprehensive analysis showing how entries are shared across different DNS sources.
-
-**[Conflicts Report (allowlist vs. blocklist)](https://github.com/phani-kb/dns-toolkit/blob/output/conflicts.md)** A daily-generated report listing entries found in both allowlists and blocklists, including the source(s) where they were found.
-
 > 🔍 **Overlap Analysis**
 >
 > **Why it matters:** the overlap analysis helps to identify redundant or conflicting sources.
@@ -80,8 +82,6 @@ https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/domain_blocklist.t
 >
 > Run `dns-toolkit overlap` or open `overlap.md` to explore details.
 >
-
-**Processing summaries and metadata are archived in the [`summaries`](https://github.com/phani-kb/dns-toolkit/tree/summaries) branch with 1-year retention.**
 
 ---
 
@@ -124,7 +124,7 @@ flowchart LR
 
 **Note:** The repo size badge above only reflects the default branch (`release/1.0.0`).
 
-- **Output branch size:** 354.91 MB
+- **Output branch size:** 470.62 MB
 - **Summaries branch size:** 3.17 MB
 
 <!-- BRANCH_SIZES_END -->
@@ -138,13 +138,13 @@ flowchart LR
 
 | Metric | Count | Details |
 |--------|-------|---------|
-| **Total Sources** | 176 | 150 enabled, 26 disabled |
-| **Blocklist Sources** | 148 | Sources providing blocking rules |
-| **Allowlist Sources** | 40 | Sources providing exception rules |
-| **Categories** | 39 | ads, adult, ai, annoyance, anonymizer, botnet, browser, cryptocurrency, dating, discord, dns, doh, fake, fakenews, finance, gambling, issues, kad, local, mac, malicious, malware, mobile, others, phishing, privacy, proxy, ransomware, scam, smarttv, social, spam, spyware, threat, topdomains, torrent_trackers, trackers, url_shorteners, windows |
-| **Source Types** | 30 | adguard, adguard_csv_http_url_find, adguard_domain, adguard_http_url, cidr_ipv4, domain, domain_adguard, domain_comment, domain_csv_http_url_find, domain_custom_csv_blackbook, domain_custom_csv_maltrail, domain_custom_html_ccam, domain_custom_html_puppyscams, domain_http_url, domain_top, domain_url, domain_with_comment_suffix, hostname, ipv4, ipv4_cidr_expand, ipv4_csv_http_url_find, ipv4_custom_html_ccam, ipv4_find, ipv4_from_domain, ipv4_http_url, ipv4_range_expand, ipv4_url, ipv6, ipv6_find, ipv6_htaccess |
-| **Geographic Coverage** | 21 countries | CN, CZ, DE, ES, FI, FR, HU, ID, IL, IT, KR, LV, MY, NL, RO, RU, SA, SK, UA, US, VN |
-| **Last Updated** | 2025-10-12 03:19:26 UTC | Statistics generation time |
+| **Total&nbsp;Sources** | 178 | 152 enabled, 26 disabled |
+| **Blocklist&nbsp;Sources** | 150 | Sources providing blocking rules |
+| **Allowlist&nbsp;Sources** | 40 | Sources providing exception rules |
+| **Categories** | 40 | ads, adult, ai, annoyance, anonymizer, botnet, browser, cryptocurrency, dating, discord, dns, doh, fake, fakenews, finance, gambling, issues, kad, local, mac, malicious, malware, mobile, others, phishing, privacy, proxy, ransomware, scam, smarttv, social, spam, spyware, threat, topdomains, tor, torrent_trackers, trackers, url_shorteners, windows |
+| **Source&nbsp;Types** | 30 | adguard, adguard_csv_http_url_find, adguard_domain, adguard_http_url, cidr_ipv4, domain, domain_adguard, domain_comment, domain_csv_http_url_find, domain_custom_csv_blackbook, domain_custom_csv_maltrail, domain_custom_html_ccam, domain_custom_html_puppyscams, domain_http_url, domain_top, domain_url, domain_with_comment_suffix, hostname, ipv4, ipv4_cidr_expand, ipv4_csv_http_url_find, ipv4_custom_html_ccam, ipv4_find, ipv4_from_domain, ipv4_http_url, ipv4_range_expand, ipv4_url, ipv6, ipv6_find, ipv6_htaccess |
+| **Geographic&nbsp;Coverage** | 21 countries | CN, CZ, DE, ES, FI, FR, HU, ID, IL, IT, KR, LV, MY, NL, RO, RU, SA, SK, UA, US, VN |
+| **Last&nbsp;Updated** | 2025-10-13 14:40:14 UTC | Statistics generation time |
 
 <!-- STATS_END -->
 
@@ -161,94 +161,95 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | Name | S | Categories |         C / U / X        | Notes |
 |------|---|------------|--------------------------|-------|
 | AdGuardSDNSFilter_exclusions | ✅ | others | - | - |
-| AdGuardTeam_HttpsExclusions_android | ✅ | mobile | 97 / 70 / 15 | - |
-| AdGuardTeam_HttpsExclusions_banks | ✅ | finance | 3972 / 3937 / 15 | - |
+| AdGuardTeam_HttpsExclusions_android | ✅ | mobile | 97 / 65 / 20 | - |
+| AdGuardTeam_HttpsExclusions_banks | ✅ | finance | 3974 / 3932 / 22 | - |
 | AdGuardTeam_HttpsExclusions_firefox | ✅ | browser | 18 / 13 / 0 | - |
 | AdGuardTeam_HttpsExclusions_issues | ✅ | issues | 68 / 61 / 3 | - |
-| AdGuardTeam_HttpsExclusions_mac | ✅ | mac | 11 / 5 / 0 | - |
-| AdGuardTeam_HttpsExclusions_sensitive | ✅ | others | 170 / 142 / 13 | - |
+| AdGuardTeam_HttpsExclusions_mac | ✅ | mac | 11 / 4 / 1 | - |
+| AdGuardTeam_HttpsExclusions_sensitive | ✅ | others | 170 / 141 / 14 | - |
 | AdGuardTeam_HttpsExclusions_windows | ✅ | windows | 7 / 6 / 0 | - |
 | anudeepND_Allowlist | ❌ | others | - | Last updated on 2021-12-01. This list is no longer maintained. |
 | BlahDNS_whitelist | ❌ | others | - | Too many conflicts with other sources |
 | China_CDN_Whitelist | ❌ | others | - | - |
 | DandelionSprout_AdGuardHome_Whitelist | ✅ | others | 285 / 40 / 0 | - |
 | Dogino_Discord_Official | ✅ | discord | 43 / 0 / 14 | - |
-| fabriziosalmi_allowlist | ✅ | others | 2264 / 1045 / 806 | - |
+| fabriziosalmi_allowlist | ✅ | others | 2264 / 860 / 991 | - |
 | Freekers_Whitelist | ❌ | others | - | No update since 2019 |
 | Notracking_Hosts_whitelist | ❌ | others | - | Archived by the owner on Aug 8, 2023 |
-| ShadowWhisperer_Allowlist | ✅ | others | 659 / 300 / 267 | - |
+| ShadowWhisperer_Allowlist | ✅ | others | 660 / 239 / 329 | - |
 | T145_allowlist-domains | ❌ | others | - | Huge list, use with caution |
 | TogoFire_AD_Settings_whitelist | ✅ | others | 1764 / 1519 / 0 | Huge list, use with caution |
 
 </details>
 
 <details>
-<summary><strong>📄 sources_domain_bl.json</strong> (103 sources)</summary>
+<summary><strong>📄 sources_domain_bl.json</strong> (104 sources)</summary>
 
 | Name | S | Categories |         C / U / X        | Notes |
 |------|---|------------|--------------------------|-------|
-| 1Hosts (Lite) | ✅ | ads, trackers | 128566 / 0 / 179 | 100% covered by other sources |
-| abpvn_hosts | ✅ | ads | 1115 / 998 / 0 | - |
+| 1Hosts (Lite) | ✅ | ads, trackers | 128569 / 0 / 179 | 100% covered by other sources |
+| abpvn_hosts | ✅ | ads | 1113 / 996 / 0 | - |
 | Adaway | ✅ | ads | 6540 / 0 / 107 | >99% overlap with StevenBlack Fake Gambling list |
 | AdBlockID | ✅ | ads | 3877 / 3840 / 0 | - |
-| AdGuard Base filter | ✅ | ads, trackers | 103898 / 0 / 0 | - |
-| AdGuard CNAME Mail Trackers | ✅ | trackers | 32292 / 32252 / 0 | - |
-| AdGuard CNAME Trackers | ✅ | trackers | 76998 / 56252 / 10 | - |
-| AdGuard DNS filter | ✅ | ads, trackers | 140046 / 0 / 0 | - |
-| AdGuard Spyware Filter - Mobile | ✅ | ads, mobile, spyware | 1105 / 0 / 0 | - |
-| AntiAdBlockFilters | ✅ | annoyance | 1708 / 1703 / 0 | - |
+| AdGuard Base filter | ✅ | ads, trackers | 104314 / 0 / 0 | - |
+| AdGuard CNAME Mail Trackers | ✅ | trackers | 34524 / 34481 / 0 | - |
+| AdGuard CNAME Trackers | ✅ | trackers | 79241 / 59312 / 10 | - |
+| AdGuard DNS filter | ✅ | ads, trackers | 140180 / 0 / 0 | - |
+| AdGuard Spyware Filter - Mobile | ✅ | ads, mobile, spyware | 1107 / 0 / 0 | - |
+| AntiAdBlockFilters | ✅ | annoyance | 1708 / 1702 / 0 | - |
 | anudeepND_adservers | ❌ | ads | - | No update since 2023-01-16 |
 | bigdargon_hostsVN | ✅ | ads | 19034 / 0 / 149 | - |
-| Blocklists UT1 Cryptojacking | ✅ | cryptocurrency | 16291 / 14808 / 8 | - |
-| Blocklists UT1 Malware | ✅ | malware | 241087 / 0 / 4 | >80% overlap with phishing_army |
+| Blocklists UT1 Cryptojacking | ✅ | cryptocurrency | 16291 / 14755 / 8 | - |
+| Blocklists UT1 Malware | ✅ | malware | 245259 / 0 / 4 | >80% overlap with phishing_army |
 | Blocklists UT1 Publicite | ✅ | ads | 4270 / 0 / 129 | 100% covered by other sources |
-| Blocklists UT1 Shortener | ✅ | url_shorteners | 4518 / 0 / 21 | - |
-| Boutetnico_URL_Shorteners | ✅ | url_shorteners | 418 / 217 / 24 | - |
+| Blocklists UT1 Shortener | ✅ | url_shorteners | 4520 / 0 / 21 | - |
+| Boutetnico_URL_Shorteners | ✅ | url_shorteners | 418 / 205 / 24 | - |
 | Cameleon | ❌ | ads | - | No update since 2018-03-17 |
 | CF Torrent Trackers | ✅ | torrent_trackers | - | - |
-| CJX Annoyance | ✅ | annoyance | 1804 / 1728 / 0 | - |
+| CJX Annoyance | ✅ | annoyance | 1804 / 1715 / 0 | - |
 | CybercrimeTracker_All | ✅ | botnet, malicious, malware | 2864 / 1793 / 0 | Redirect loops may occur |
 | CybercrimeTracker_CCAM | ❌ | botnet, malicious, malware | - | No regular updates |
 | CybercrimeTracker_CCPMGate | ✅ | botnet, malicious, malware | 103 / 38 / 0 | Redirect loops may occur |
-| cyberhost_malware-blocklist | ✅ | malware | 19478 / 558 / 3 | - |
+| cyberhost_malware-blocklist | ✅ | malware | 19478 / 596 / 3 | - |
 | Dan Pollock's List | ✅ | ads, malware, trackers | 11808 / 0 / 32 | >95% overlap with StevenBlack Fake Gambling list |
 | DandelionSprout-Anti-Malware-List | ✅ | malware | 27498 / 27487 / 0 | - |
-| Easy Privacy | ✅ | privacy, trackers | 53590 / 16578 / 1 | - |
-| EasyList | ✅ | ads | 60322 / 0 / 0 | 100% covered by other sources |
+| Easy Privacy | ✅ | privacy, trackers | 53592 / 16852 / 1 | - |
+| EasyList | ✅ | ads | 60704 / 0 / 0 | 100% covered by other sources |
 | fabriziosalmi_blocklists | ❌ | malicious, threat | - | Huge list, >3 million entries |
 | FadeMind_2o7Net | ❌ | ads, privacy, trackers | - | No update since 2023-11-30 |
-| FakeWebshopListHUN | ✅ | fake, phishing, scam, threat | 8210 / 4739 / 1 | - |
-| Frogeye-firstparty-trackers | ✅ | trackers | 30453 / 15835 / 10 | - |
-| GetAdmiral Domains Filter List | ✅ | ads, annoyance | 1770 / 0 / 0 | - |
-| GlobalAntiScamOrg-blocklist-domains | ✅ | scam | 11117 / 7385 / 2 | - |
+| FakeWebshopListHUN | ✅ | fake, phishing, scam, threat | 8214 / 4746 / 1 | - |
+| Frogeye-firstparty-trackers | ✅ | trackers | 30453 / 16499 / 10 | - |
+| GetAdmiral Domains Filter List | ✅ | ads, annoyance | 1786 / 0 / 0 | - |
+| GlobalAntiScamOrg-blocklist-domains | ✅ | scam | 11150 / 7425 / 2 | - |
 | HaGeZi Amazon Tracker | ✅ | privacy, trackers | 628 / 0 / 34 | >98% overlap with HaGeZi Pro |
 | HaGeZi Apple Tracker | ✅ | privacy, trackers | 290 / 0 / 7 | >80% overlap with HaGeZi Pro |
-| HaGeZi DNS TIF Mini | ✅ | malicious, threat | 182378 / 61065 / 3 | 100% covered by other sources |
-| HaGeZi Encrypted DNS Servers | ✅ | doh | 3420 / 2178 / 9 | - |
-| HaGeZi Gambling Only Domains | ✅ | gambling | 203150 / 194318 / 6 | Huge list and gambling-specific focus |
+| HaGeZi DNS TIF Mini | ✅ | malicious, threat | 184130 / 61185 / 3 | 100% covered by other sources |
+| HaGeZi Encrypted DNS Servers | ✅ | doh | 3433 / 2188 / 9 | - |
+| HaGeZi Gambling Only Domains | ✅ | gambling | 200927 / 191645 / 6 | Huge list and gambling-specific focus |
 | HaGeZi Microsoft Tracker | ✅ | privacy, trackers | 1939 / 0 / 12 | >75% overlap with HaGeZi Pro |
 | HaGeZi Most Abused TLDs | ✅ | spam | 432 / 430 / 0 | - |
 | HaGeZi Normal | ❌ | ads, malware, trackers | - | 100% overlap with HaGeZi Pro |
-| HaGeZi Pro | ✅ | ads, malware, phishing, trackers | 354173 / 0 / 183 | - |
+| HaGeZi Pro | ✅ | ads, malware, phishing, trackers | 355614 / 0 / 183 | - |
 | HaGeZi Xiaomi Tracker | ✅ | privacy, trackers | 472 / 0 / 0 | >95% overlap with HaGeZi Pro |
 | Hestat_Minerchk | ❌ | cryptocurrency | - | No update since 2018 |
 | hkamran80_smarttv | ✅ | smarttv | 294 / 0 / 14 | - |
 | Hostsfile | ❌ | ads | - | No update since 2018-04-20 |
 | hufilter | ✅ | ads | 100 / 0 / 3 | >90% overlap with HaGeZi Pro |
 | iam-py-test_my-filters-001-antitypo | ✅ | fake | 824 / 823 / 0 | - |
-| jarelllama_Scam-Blocklist | ✅ | scam | 457737 / 414271 / 11 | Disabled due to very large size (457K entries) - scam-specific focus |
-| kadantiscam | ✅ | kad | 54626 / 0 / 2 | peer-to-peer network protocol |
+| jarelllama_Scam-Blocklist | ✅ | scam | 468729 / 425252 / 11 | Disabled due to very large size (457K entries) - scam-specific focus |
+| kadantiscam | ✅ | kad | 53849 / 0 / 2 | peer-to-peer network protocol |
 | Korlabs_UrlShortener | ✅ | url_shorteners | 237 / 0 / 17 | - |
-| Malicious URL Blocklist (URLHaus) | ✅ | ads | 5298 / 0 / 0 | 100% covered by other sources |
-| Maltrail_StaticTrails | ✅ | malware, threat | 209700 / 181317 / 5 | - |
-| malware-filter_phishing-filter | ✅ | malware, phishing | 23004 / 0 / 0 | - |
-| OISD Blocklist Big | ✅ | ads, cryptocurrency, malware, phishing, ransomware, trackers | 201840 / 0 / 76 | Huge list |
-| OISD Blocklist NSFW Small | ✅ | adult | 20858 / 0 / 13 | - |
-| OISD Blocklist Small | ✅ | ads, cryptocurrency, malware, phishing, ransomware, trackers | 47504 / 0 / 52 | - |
-| OpenPhish_Feed | ✅ | phishing | 266 / 44 / 5 | - |
-| Peter Lowe's Blocklist | ✅ | ads | 3437 / 0 / 96 | 100% covered by other sources |
+| Malicious URL Blocklist (URLHaus) | ✅ | ads | 5799 / 0 / 0 | 100% covered by other sources |
+| Maltrail_StaticTrails | ✅ | malware, threat | 209704 / 181615 / 5 | - |
+| malware-filter_phishing-filter | ✅ | malware, phishing | 22778 / 0 / 0 | - |
+| OISD Blocklist Big | ✅ | ads, cryptocurrency, malware, phishing, ransomware, trackers | 199600 / 0 / 76 | Huge list |
+| OISD Blocklist NSFW Small | ✅ | adult | 20846 / 0 / 13 | - |
+| OISD Blocklist Small | ✅ | ads, cryptocurrency, malware, phishing, ransomware, trackers | 46625 / 0 / 52 | - |
+| OpenPhish_Feed | ✅ | phishing | 269 / 0 / 5 | - |
+| Peter Lowe's Blocklist | ✅ | ads | 3438 / 0 / 96 | 100% covered by other sources |
 | pexcn Torrent Trackers | ✅ | torrent_trackers | - | - |
-| phishing_army | ✅ | phishing | 143481 / 0 / 2 | - |
+| ph00lt0_blocklist | ✅ | ads, trackers | 21734 / 0 / 475 | 100% covered by other sources, ~50 ip addresses in domain list |
+| phishing_army | ✅ | phishing | 144130 / 0 / 2 | - |
 | Policeman_SimpleDomainsBlocklist | ❌ | malicious | - | Archived on 2021-12-26 |
 | PuppyScams | ✅ | fake, scam | 102 / 91 / 0 | List of top 100 pet scams is not being shared anymore, https://puppyscams.org/top-100-pet-scams |
 | quidsup_notrack-annoyance | ✅ | annoyance | 469 / 0 / 1 | >90% overlap with HaGeZi Pro |
@@ -256,40 +257,40 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | quidsup_notrack-tracker | ✅ | trackers | 15645 / 0 / 162 | - |
 | RedDragonWebDesign_block-everything | ✅ | ads, malicious, trackers | 665 / 661 / 0 | - |
 | RPiList_specials-malware | ✅ | malware | 244699 / 0 / 0 | Huge list |
-| RPiList_specials-phishing | ✅ | phishing | 872909 / 569930 / 0 | Huge list |
+| RPiList_specials-phishing | ✅ | phishing | 872909 / 572359 / 0 | Huge list |
 | ShadowWhisperer's Dating List | ✅ | dating | - | - |
-| ShadowWhisperer_BlockLists Ads | ✅ | ads | 23585 / 0 / 78 | - |
-| ShadowWhisperer_BlockLists Adult | ✅ | adult | 228994 / 170547 / 12 | Huge list and adult-specific focus |
-| ShadowWhisperer_BlockLists Malware | ✅ | malware | 40255 / 0 / 4 | - |
-| ShadowWhisperer_BlockLists Scam | ✅ | scam | 7877 / 5242 / 0 | - |
-| ShadowWhisperer_UrlShortener | ✅ | url_shorteners | 5707 / 1103 / 2 | - |
+| ShadowWhisperer_BlockLists Ads | ✅ | ads | 23608 / 0 / 78 | - |
+| ShadowWhisperer_BlockLists Adult | ✅ | adult | 228994 / 170479 / 12 | Huge list and adult-specific focus |
+| ShadowWhisperer_BlockLists Malware | ✅ | malware | 40256 / 0 / 4 | - |
+| ShadowWhisperer_BlockLists Scam | ✅ | scam | 7886 / 5250 / 0 | - |
+| ShadowWhisperer_UrlShortener | ✅ | url_shorteners | 5715 / 1079 / 2 | - |
 | Sinfonietta_Adult | ✅ | adult | 58961 / 0 / 18 | - |
 | Sinfonietta_Gambling | ✅ | gambling | 2639 / 0 / 1 | - |
 | Sinfonietta_Social | ✅ | social | 3242 / 0 / 107 | - |
-| Spam404 | ✅ | spam | 8140 / 5849 / 1 | - |
+| Spam404 | ✅ | spam | 8140 / 5850 / 1 | - |
 | Stamparm_Blackbook | ✅ | malicious, threat | 18145 / 0 / 0 | >95% overlap with Blocklists UT1 Malware |
 | StevenBlack_Adhoc_list | ❌ | ads, malware, trackers | - | 100% overlap with StevenBlack Fake Gambling list |
-| StevenBlack_Fake_Gambling | ✅ | ads, fake, fakenews, gambling | 90984 / 0 / 207 | - |
+| StevenBlack_Fake_Gambling | ✅ | ads, fake, fakenews, gambling | 90684 / 0 / 207 | - |
 | StevenBlack_Porn | ✅ | adult | 75479 / 0 / 23 | - |
 | StevenBlack_Social | ✅ | social | 3242 / 0 / 107 | - |
 | T145_black-mirror | ❌ | malicious, threat | - | Huge list, >8 million entries |
-| Torrent Trackers | ✅ | torrent_trackers | 521 / 490 / 0 | - |
-| Ukrainian Ad Filter | ✅ | ads | 1455 / 1257 / 0 | - |
+| Torrent Trackers | ✅ | torrent_trackers | 522 / 491 / 0 | - |
+| Ukrainian Ad Filter | ✅ | ads | 1455 / 1248 / 0 | - |
 | Ukrainian Annoyance Filter | ✅ | annoyance | - | - |
-| Ukrainian Privacy Filter | ✅ | privacy, trackers | 366 / 51 / 1 | - |
-| Ukrainian Security Filter | ✅ | malicious, threat | 1736 / 1135 / 0 | - |
+| Ukrainian Privacy Filter | ✅ | privacy, trackers | 366 / 30 / 1 | - |
+| Ukrainian Security Filter | ✅ | malicious, threat | 1736 / 1128 / 0 | - |
 | UncheckyAds | ❌ | ads, privacy, trackers | - | No update since 2021 |
 | URLHaus (Abuse.ch) | ✅ | malware | - | - |
-| USOM-Blocklists-domains | ✅ | malicious, threat | 413841 / 360093 / 18 | Huge list |
-| Viriback_Dump | ✅ | malware | 4673 / 0 / 0 | - |
+| USOM-Blocklists-domains | ✅ | malicious, threat | 414179 / 360281 / 18 | Huge list |
+| Viriback_Dump | ✅ | malware | 4675 / 0 / 0 | - |
 | WaLLy3K | ✅ | ads | 350 / 0 / 12 | - |
-| Warui_Adhosts | ✅ | ads | 75775 / 0 / 243 | Huge list |
+| Warui_Adhosts | ✅ | ads | 75777 / 0 / 243 | Huge list |
 | WindowsSpyBlocker_Hosts_spy | ❌ | privacy, trackers | - | No update since 2022-05-16 |
 | Winhelp2002 | ❌ | ads | - | No update since 2021-03-06 |
 | YousList | ✅ | ads | 624 / 0 / 3 | - |
-| YousList-AdGuard | ✅ | ads | 7360 / 7185 / 0 | - |
-| youtube_GoodbyeAds | ✅ | ads | 97645 / 97168 / 14 | No update since 2024-11-21 |
-| Yoyo Adservers-Hosts | ✅ | ads | 3437 / 0 / 96 | >95% overlap with StevenBlack Fake Gambling list |
+| YousList-AdGuard | ✅ | ads | 7360 / 7178 / 0 | - |
+| youtube_GoodbyeAds | ✅ | ads | 97645 / 97133 / 14 | No update since 2024-11-21 |
+| Yoyo Adservers-Hosts | ✅ | ads | 3438 / 0 / 96 | >95% overlap with StevenBlack Fake Gambling list |
 
 </details>
 
@@ -307,55 +308,56 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 
 | Name | S | Categories |         C / U / X        | Notes |
 |------|---|------------|--------------------------|-------|
-| tranco | ✅ | topdomains | 1000 / 0 / 1240 | - |
+| tranco | ✅ | topdomains | 1000 / 0 / 1453 | - |
 
 </details>
 
 <details>
-<summary><strong>📄 sources_ip.json</strong> (41 sources)</summary>
+<summary><strong>📄 sources_ip.json</strong> (42 sources)</summary>
 
 | Name | S | Categories |         C / U / X        | Notes |
 |------|---|------------|--------------------------|-------|
 | AlienVault_Reputation | ❌ | malicious, threat | - | Not available anymore. The service has been discontinued. |
 | BinaryDefense_Banlist | ✅ | malicious, threat | 3023 / 0 / 0 | This is for public use only. |
 | Blackhole_Today | ❌ | malicious, threat | - | Download fails frequently due to network instability or potential blocking. |
-| BlockListDE_Brute | ✅ | threat | 635 / 0 / 0 | >95% overlap with Firehol_level2 |
-| BlockListDE_Strong | ✅ | malicious, threat | 285 / 0 / 0 | >95% overlap with Borestad_AbuseIPDB_S100_3d |
+| BlockListDE_Brute | ✅ | threat | 915 / 0 / 0 | >95% overlap with Firehol_level2 |
+| BlockListDE_Strong | ✅ | malicious, threat | 288 / 0 / 0 | >95% overlap with Borestad_AbuseIPDB_S100_3d |
 | Borestad_AbuseIPDB_S100_3d | ✅ | malicious, threat | 63877 / 0 / 0 | - |
-| BruteforceBlocker | ✅ | threat | 302 / 0 / 0 | >95% overlap with EmergingThreats_CompromisedIPs |
+| BruteforceBlocker | ✅ | threat | 309 / 0 / 0 | >95% overlap with EmergingThreats_CompromisedIPs |
 | CINSScore_BadGuys_Army | ✅ | malicious, threat | 15000 / 0 / 0 | - |
-| DoH_IP_blocklists | ✅ | doh | 2641 / 729 / 3 | >90% overlap with HaGeZi Encrypted DNS Servers |
+| DanMeUK_TorExitNodes | ✅ | tor | 1252 / 3 / 0 | - |
+| DoH_IP_blocklists | ✅ | doh | 2633 / 737 / 3 | >90% overlap with HaGeZi Encrypted DNS Servers |
 | DoH_IP_list | ✅ | doh | 731 / 0 / 0 | - |
 | DShield | ✅ | malicious, threat | 5120 / 0 / 0 | 100% overlap with Firehol_level2/Firehol_level3 |
 | EmergingThreats_CompromisedIPs | ✅ | malicious, threat | 283 / 0 / 0 | >95% overlap with Firehol_level3,  and Borestad_AbuseIPDB_S100_3d |
-| ET_fwip | ✅ | malicious, threat | 1496 / 117 / 0 | - |
+| ET_fwip | ✅ | malicious, threat | 1496 / 120 / 0 | - |
 | FabrizioSalmi_DNS | ✅ | dns | 66 / 0 / 0 | - |
 | Firehol_abusers_30d | ❌ | malicious, threat | - | False positives are common, use with caution. |
-| Firehol_BitcoinNodes_1d | ✅ | cryptocurrency | 7658 / 7528 / 0 | - |
-| Firehol_Botscout_1d | ✅ | malicious, threat | 617 / 446 / 0 | - |
-| Firehol_CleanTalk | ✅ | malicious, threat | 494 / 442 / 0 | - |
-| Firehol_CleanTalk_Top20 | ✅ | malicious, threat | 20 / 7 / 0 | - |
-| Firehol_GPF_Comics | ✅ | malicious, threat | 2744 / 1457 / 0 | - |
-| Firehol_level1 | ✅ | malicious, threat | 4438 / 3059 / 0 | - |
-| Firehol_level2 | ✅ | malicious, threat | 15666 / 0 / 0 | - |
-| Firehol_level3 | ✅ | malicious, threat | 12300 / 0 / 3 | - |
-| Firehol_SocksProxy_7d | ✅ | anonymizer, privacy, proxy | 1998 / 1778 / 0 | - |
-| Firehol_SSLProxies_1d | ✅ | anonymizer, privacy, proxy | 246 / 177 / 0 | - |
+| Firehol_BitcoinNodes_1d | ✅ | cryptocurrency | 7675 / 7546 / 0 | - |
+| Firehol_Botscout_1d | ✅ | malicious, threat | 608 / 488 / 0 | - |
+| Firehol_CleanTalk | ✅ | malicious, threat | 494 / 428 / 0 | - |
+| Firehol_CleanTalk_Top20 | ✅ | malicious, threat | 20 / 0 / 0 | - |
+| Firehol_GPF_Comics | ✅ | malicious, threat | 2742 / 1256 / 0 | - |
+| Firehol_level1 | ✅ | malicious, threat | 4434 / 3058 / 0 | - |
+| Firehol_level2 | ✅ | malicious, threat | 15282 / 0 / 0 | - |
+| Firehol_level3 | ✅ | malicious, threat | 12509 / 0 / 3 | - |
+| Firehol_SocksProxy_7d | ✅ | anonymizer, privacy, proxy | 1998 / 1786 / 0 | - |
+| Firehol_SSLProxies_1d | ✅ | anonymizer, privacy, proxy | 246 / 172 / 0 | - |
 | GlobalAntiScamOrg-blocklist-ips | ✅ | scam | - | - |
-| Greensnow | ✅ | malicious, malware, threat | 6373 / 0 / 0 | >95% overlap with Firehol_level2 |
-| HaGeZi_DoH | ✅ | doh | 1710 / 0 / 0 | >90% overlap with DoH_IP_blocklists |
-| HaGeZi_TIF | ✅ | malicious, threat | 63234 / 0 / 0 | No unique contribution |
+| Greensnow | ✅ | malicious, malware, threat | 6142 / 0 / 0 | >95% overlap with Firehol_level2 |
+| HaGeZi_DoH | ✅ | doh | 1711 / 0 / 0 | >90% overlap with DoH_IP_blocklists |
+| HaGeZi_TIF | ✅ | malicious, threat | 60919 / 0 / 0 | No unique contribution |
 | MyIP_MS_Blocklist | ✅ | malicious, threat | - | - |
-| Public_DNS4 | ✅ | dns | 62607 / 61686 / 0 | - |
-| Rutgers_DROP | ✅ | malicious, threat | 1853 / 0 / 0 | - |
-| Sblam_Blocklist | ✅ | spam | 1899 / 1233 / 0 | - |
-| ScriptzTeam_BadIPS | ✅ | malicious, threat | 2567 / 916 / 0 | - |
-| Sentinel_Greylist | ✅ | malicious, threat | 7513 / 0 / 3 | - |
+| Public_DNS4 | ✅ | dns | 62607 / 61681 / 0 | - |
+| Rutgers_DROP | ✅ | malicious, threat | 2060 / 0 / 0 | - |
+| Sblam_Blocklist | ✅ | spam | 1882 / 1022 / 0 | - |
+| ScriptzTeam_BadIPS | ✅ | malicious, threat | 2567 / 880 / 0 | - |
+| Sentinel_Greylist | ✅ | malicious, threat | 9357 / 0 / 1 | - |
 | spamhaus_drop | ✅ | spam, threat | - | - |
 | T145_allowlist-ips | ❌ | others | - | Huge list, use with caution. More than its blocklist counterpart. |
 | T145_blocklist | ❌ | malicious, malware, threat | - | Huge list, use with caution. |
-| URLHaus_Text | ✅ | malware | 19339 / 0 / 0 | - |
-| USOM-Blocklists-ips | ✅ | malicious, threat | 13063 / 7277 / 0 | - |
+| URLHaus_Text | ✅ | malware | 19301 / 0 / 0 | - |
+| USOM-Blocklists-ips | ✅ | malicious, threat | 13065 / 7258 / 0 | - |
 | Yoyo AdServers-IPList | ✅ | ads | 8940 / 8889 / 0 | - |
 
 </details>
@@ -370,8 +372,8 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | local_ai_allowlist | ✅ | ai | 49 / 0 / 51 | - |
 | local_ai_blocklist | ✅ | ai | 49 / 0 / 50 | - |
 | local_domain_blocklist | ✅ | local | 8 / 0 / 2 | - |
-| local_source_domain_allowlist | ✅ | local | 44 / 26 / 0 | - |
-| local_source_ipv4_allowlist | ✅ | local | 54 / 43 / 10 | - |
+| local_source_domain_allowlist | ✅ | local | 45 / 27 / 0 | - |
+| local_source_ipv4_allowlist | ✅ | local | 57 / 46 / 10 | - |
 
 </details>
 
@@ -380,8 +382,8 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 
 | Name | S | Categories |         C / U / X        | Notes |
 |------|---|------------|--------------------------|-------|
-| local_miscellaneous_allowlist | ✅ | local | 6 / 0 / 9 | - |
-| local_mobile_allowlist | ✅ | local, mobile | 4 / 1 / 3 | - |
+| local_miscellaneous_allowlist | ✅ | local | 6 / 0 / 10 | - |
+| local_mobile_allowlist | ✅ | local, mobile | 4 / 3 / 1 | - |
 | local_social_allowlist | ✅ | local, social | 1 / 0 / 2 | - |
 
 </details>
