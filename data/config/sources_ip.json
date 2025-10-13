@@ -141,6 +141,19 @@
       "website": "http://cinsscore.com"
     },
     {
+      "name": "DanMeUK_TorExitNodes",
+      "categories": "tor",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://www.dan.me.uk/torlist/?exit",
+      "website": "https://www.dan.me.uk/tornodes"
+    },
+    {
       "name": "DoH_IP_blocklists",
       "categories": "doh",
       "license": "GPL-3.0",
