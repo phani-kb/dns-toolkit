@@ -148,7 +148,7 @@ func generateOutputBranchReadme() string {
 
 		sb.WriteString("<details>\n")
 		sb.WriteString(
-			"<summary><strong>📋 Consolidated Blocklists and Allowlists</strong></summary>\n\n",
+			"<summary><strong>🗂️ Consolidated Blocklists and Allowlists</strong></summary>\n\n",
 		)
 
 		if len(blocklistFiles) > 0 {

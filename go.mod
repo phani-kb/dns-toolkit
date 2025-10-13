@@ -7,6 +7,7 @@ require (
 	github.com/phani-kb/multilog v0.3.0
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.10.0
+	golang.org/x/net v0.39.0
 	golang.org/x/text v0.26.0
 	golang.org/x/time v0.13.0
 	gopkg.in/yaml.v2 v2.4.0
@@ -25,6 +26,5 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/stretchr/objx v0.5.2 // indirect
-	golang.org/x/net v0.39.0 // indirect
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1 // indirect
 )
