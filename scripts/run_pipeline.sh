@@ -71,7 +71,7 @@ fi
 if [ "$#" -gt 0 ]; then
     IFS=',' read -ra steps <<< "$1"
 else
-    steps=("ga" "d" "p" "c" "cg" "cc" "t" "o" "op" "gr" "gor" "gsr" "gs" "gc" "cp")
+    steps=("ga" "d" "p" "c" "cg" "cc" "t" "o" "op" "gr" "gor" "gsr" "gs" "gc" "cp")i # ga,d,p,c,cg,cc,t,o,op,gr,gor,gsr,gs,gc,cp
 fi
 
 for step in "${steps[@]}"; do
@@ -123,7 +123,7 @@ for step in "${steps[@]}"; do
             ;;
         op)
             echo "Step 9: Generating output files..."
-            ./bin/dns-toolkit generate output -i
+            ./bin/dns-toolkit generate output
             ;;
         gr)
             echo "Step 10: Generating output README..."
