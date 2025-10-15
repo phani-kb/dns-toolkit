@@ -11,7 +11,17 @@
 
 A command-line utility for downloading, processing, resolving, and consolidating DNS blocklists and allowlists from multiple sources. Performs DNS-to-IP resolution, reverse lookups, and overlap detection. Generates ready-to-use lists for DNS sinkholes, Pi-hole, AdGuard Home, and other network security tools.
 
-Most commonly used outputs; Click any link to open the file — **raw files are available under the [`output`](https://github.com/phani-kb/dns-toolkit/tree/output) branch**.
+## Published Outputs
+
+**Ready-to-use blocklist files are published daily to the [`output`](https://github.com/phani-kb/dns-toolkit/tree/output) branch:**
+
+- Domain and IP blocklists/allowlists compatible with Pi-hole, pfBlockerNG, AdGuard Home
+- Lists organized by size (mini, lite, normal, big) and category (ads, malware, privacy)
+- Top entries based on source frequency for high-confidence blocking
+
+**⚡ Quick Usage:** Add `https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/[filename]` to your DNS filtering tool (Pi-hole, AdGuard Home, pfBlockerNG).
+
+Most commonly used outputs; Click any link to open the file.
 
 | Category                                                       | Files (click to open)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
 |----------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -20,16 +30,14 @@ Most commonly used outputs; Click any link to open the file — **raw files are 
 | 📏&nbsp;Lite&nbsp;—&nbsp;balanced&nbsp;protection&nbsp;🟡      | [lite_adguard](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/lite_adguard_blocklist.txt), [lite_cidr_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/lite_cidr_ipv4_blocklist.txt), [lite_domain](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/lite_domain_blocklist.txt), [lite_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/lite_ipv4_blocklist.txt)                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | 📏&nbsp;Normal&nbsp;—&nbsp;broader&nbsp;protection&nbsp;🔵     | [normal_adguard](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/normal_adguard_blocklist.txt), [normal_cidr_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/normal_cidr_ipv4_blocklist.txt), [normal_domain](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/normal_domain_blocklist.txt), [normal_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/normal_ipv4_blocklist.txt)                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 | 📏&nbsp;Big&nbsp;—&nbsp;aggressive&nbsp;coverage&nbsp;🔴       | [big_adguard](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/big_adguard_blocklist.txt), [big_cidr_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/big_cidr_ipv4_blocklist.txt), [big_domain](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/big_domain_blocklist.txt), [big_ipv4](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/big_ipv4_blocklist.txt), [big_ipv6](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/big_ipv6_blocklist.txt)                                                                                                                                                                                                                                                                                                                                                                |
-| ⭐ Top lists&nbsp;—&nbsp;min3&nbsp;to&nbsp;min12                | [top_adguard_min3](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_adguard_blocklist_min3.txt), [top_adguard_min5](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_adguard_blocklist_min5.txt) · [top_domain_min3](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_domain_blocklist_min3.txt), [top_domain_min5](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_domain_blocklist_min5.txt) · [top_ipv4_min3](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_ipv4_blocklist_min3.txt), [top_ipv4_min5](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_ipv4_blocklist_min5.txt) (Top lists count how many distinct sources contain an entry — `min3` means "at least 3 sources", `min5` means "at least 5 sources", etc.; higher `minN` → higher confidence, fewer entries.) |
-| ⚡ Quick usage                                                  | Add a raw URL such as `https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/domain_blocklist.txt` to your DNS filtering tool (Pi-hole, AdGuard Home, pfBlockerNG).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ⭐ Top lists&nbsp;—&nbsp;min3&nbsp;to&nbsp;min12                | [top_adguard_min3](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_adguard_blocklist_min3.txt), [top_adguard_min5](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_adguard_blocklist_min5.txt) · [top_domain_min3](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_domain_blocklist_min3.txt), [top_domain_min5](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_domain_blocklist_min5.txt) · [top_ipv4_min3](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_ipv4_blocklist_min3.txt), [top_ipv4_min5](https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/top/top_ipv4_blocklist_min5.txt) (`min3` means "at least 3 sources", `min5` means "at least 5 sources", etc.; higher `minN` → higher confidence, fewer entries.) |
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 
 **[View Detailed Overlap Analysis](https://github.com/phani-kb/dns-toolkit/blob/output/overlap.md)** Comprehensive analysis showing how entries are shared across different DNS sources.
 
 **[Conflicts Report (allowlist vs. blocklist)](https://github.com/phani-kb/dns-toolkit/blob/output/conflicts.md)** A daily-generated report listing entries found in both allowlists and blocklists, including the source(s) where they were found.
 
 **Processing summaries and metadata are archived in the [`summaries`](https://github.com/phani-kb/dns-toolkit/tree/summaries) branch with 1-year retention.**
-
-## Published Outputs
 
 ## Quick add (copy-ready URLs)
 
@@ -47,15 +55,6 @@ https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/domain_blocklist.t
 https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/adguard_blocklist.txt
 ```
 
-### Mini group examples
-
-```text
-https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/mini_domain_blocklist.txt
-https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/groups/mini_adguard_blocklist.txt
-```
-
-Tip: paste the raw URL into the Blocklist/Add URL field of Pi-hole or the 'Custom filtering' → 'URL list' area in AdGuard Home.
-
 ### pfBlockerNG (pfSense)
 
 Use the 'DNSBL' > 'DNSBL Groups' section and add a custom list using the raw URL. Example domain list (paste into pfBlockerNG custom list):
@@ -63,27 +62,6 @@ Use the 'DNSBL' > 'DNSBL Groups' section and add a custom list using the raw URL
 ```text
 https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/domain_blocklist.txt
 ```
-
-**Ready-to-use blocklist files are published daily to the [`output`](https://github.com/phani-kb/dns-toolkit/tree/output) branch:**
-
-- Domain and IP blocklists/allowlists compatible with Pi-hole, pfBlockerNG, AdGuard Home
-- Lists organized by size (mini, lite, normal, big) and category (ads, malware, privacy)
-- Top entries based on source frequency for high-confidence blocking
-
-**Usage:** Add `https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/[filename]` to your DNS filtering tool.
-
-> 🔍 **Overlap Analysis**
->
-> **Why it matters:** the overlap analysis helps to identify redundant or conflicting sources.
->
-> - **Unique Entries = 0** → source is fully covered by same-list sources (low value-add).
-> - **Conflicts > 0** → entries appear in different list types (e.g., blocklist vs. allowlist); investigate mismatches.
-> - **Overlap % (table)** → shown relative to the *target*; high values mean the target is largely covered by this source.
->
-> Run `dns-toolkit overlap` or open `overlap.md` to explore details.
->
-
----
 
 ## Pipeline Flow
 
@@ -117,8 +95,6 @@ flowchart LR
     style n2 stroke-width:2px,stroke-dasharray: 2
 ```
 
----
-
 <!-- BRANCH_SIZES_START -->
 ## Branch Sizes
 
@@ -128,8 +104,6 @@ flowchart LR
 - **Summaries branch size:** 3.17 MB
 
 <!-- BRANCH_SIZES_END -->
-
----
 
 <!-- STATS_START -->
 ## Source Statistics
@@ -408,14 +382,9 @@ Sources are configured in `data/config/sources*.json` files. Each source specifi
 - Categories (ads, malware, privacy, etc.)
 - License and website information
 
-[View and edit source configuration files in `data/config/`](https://github.com/phani-kb/dns-toolkit/tree/release/1.0.0/data/config)
-
-> **To add, modify, or review sources, always refer to the files in `data/config/`.**
-
 ## Special Note on Top Domains (tranco-list.eu)
 
-Top domains sourced from the tranco-list.eu list (`domain_top` type) are treated as an allowlist. You can configure the `count_to_consider` value in the relevant config file (`data/config/sources_domain_top.json`) to increase the number of top domains included in the allowlist. This is useful for fine-tuning the strictness or permissiveness of your DNS filtering setup.
-
+Top domains sourced from the tranco-list.eu list (`domain_top` type) are treated as an allowlist.
 ## Allowlist Generation Flow
 
 ```mermaid
@@ -444,8 +413,6 @@ flowchart LR
     style horizontal fill:transparent,stroke:transparent
 
 ```
-
----
 
 ## Installation
 
@@ -506,22 +473,20 @@ Use "dns-toolkit [command] --help" for more information about a command.
 
 ```text
 data/output/
-├── *_blocklist.txt            # Blocklists for various source types (adguard, domain, ipv4, ipv6, cidr)
-├── *_allowlist.txt            # Allowlists for various source types (adguard, domain, etc.)
-├── categories/                # Lists by category (ads, malware, privacy, etc.)
-├── groups/                    # Lists by size (mini, lite, normal, big)
-├── top/                       # Top entries based on source frequency
-├── ignored/                   # Entries filtered by allowlists
-└── summaries/                 # Processing metadata and statistics
+├── *_blocklist.txt    # Blocklists for various source types (adguard, domain, ipv4, ipv6, cidr)
+├── *_allowlist.txt    # Allowlists for various source types (adguard, domain, etc.)
+├── categories/        # Lists by category (ads, malware, privacy, etc.)
+├── groups/            # Lists by size (mini, lite, normal, big)
+├── top/               # Top entries based on source frequency
+└── summaries/         # Processing metadata and statistics
 ```
 
 ## Contributing
 
 1. Fork the repository
 2. Create a feature branch
-3. Make your changes with tests
-4. **Validate commit messages** before pushing. Commit messages must reference a GitHub issue.
-5. Submit a pull request
+3. Make your changes
+4. Submit a pull request
 
 ## Issues
 
