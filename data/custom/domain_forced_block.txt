@@ -22,3 +22,6 @@ list-manage.com
 mandrillapp.com
 # other
 inbake.com
+linklist.bio
+uid.mavencoalition.io
+telecid.ru
