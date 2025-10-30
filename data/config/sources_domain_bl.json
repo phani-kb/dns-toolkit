@@ -421,8 +421,9 @@
     {
       "name": "CybercrimeTracker_All",
       "categories": "botnet, malicious, malware",
+      "disabled": true,
       "license": "CC0",
-      "notes": "Redirect loops may occur",
+      "notes": "Redirect loops may occur; website unavailable since 2025-10-27",
       "types": [
         {
           "name": "domain_url",
@@ -487,8 +488,9 @@
     {
       "name": "CybercrimeTracker_CCPMGate",
       "categories": "botnet, malicious, malware",
+      "disabled": true,
       "license": "CC0",
-      "notes": "Redirect loops may occur",
+      "notes": "Redirect loops may occur; website unavailable since 2025-10-27",
       "types": [
         {
           "name": "domain_http_url",
