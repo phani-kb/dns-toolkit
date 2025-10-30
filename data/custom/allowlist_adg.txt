@@ -12,6 +12,7 @@
 @@||easylist.to^
 @@||filters.adtidy.org^
 @@||github.com^
+@@||gitlab.com^
 @@||hostfiles.frogeye.fr^
 @@||iplists.firehol.org^
 @@||lists.blocklist.de^
@@ -25,7 +26,6 @@
 @@||pgl.yoyo.org^
 @@||phishing.army^
 @@||public-dns.info^
-@@||quidsup.net^
 @@||raw.githubusercontent.com^
 @@||report.cs.rutgers.edu^
 @@||rules.emergingthreats.net^
