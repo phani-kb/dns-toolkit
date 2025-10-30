@@ -701,9 +701,16 @@
               "name": "blocklist",
               "must_consider": true,
               "groups": "mini"
-            },
+            }
+          ]
+        },
+        {
+          "name": "domain_adguard",
+          "list_types": [
             {
-              "name": "allowlist"
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "mini"
             }
           ]
         }
@@ -847,7 +854,13 @@
       "license": "GPL-3.0",
       "types": [
         {
-          "name": "domain"
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
         }
       ],
       "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/domains/pro.txt",
@@ -1139,16 +1152,16 @@
     {
       "name": "Peter Lowe's Blocklist",
       "categories": "ads",
-      "disabled": false,
+      "disabled": true,
       "license": "MCRAE GENERAL PUBLIC LICENSE (version 4.r53)",
-      "notes": "100% covered by other sources",
+      "notes": "100% covered by other sources, same as yoyo adservers list",
       "types": [
         {
           "name": "domain",
           "list_types": [
             {
               "name": "blocklist",
-              "groups": "lite"
+              "groups": "mini"
             }
           ]
         }
@@ -1257,7 +1270,7 @@
           ]
         }
       ],
-      "url": "https://quidsup.net/notrack/blocklist.php?download=annoyancedomains",
+      "url": "https://gitlab.com/quidsup/notrack-annoyance-blocklist/-/raw/master/annoyance.list",
       "website": "https://quidsup.net/notrack/blocklist.php"
     },
     {
@@ -1275,7 +1288,7 @@
           ]
         }
       ],
-      "url": "https://quidsup.net/notrack/blocklist.php?download=malwaredomains",
+      "url": "https://gitlab.com/quidsup/notrack-blocklists/-/raw/master/malware.list",
       "website": "https://quidsup.net/notrack/blocklist.php"
     },
     {
@@ -1289,7 +1302,7 @@
           "name": "domain"
         }
       ],
-      "url": "https://quidsup.net/notrack/blocklist.php?download=trackersdomains",
+      "url": "https://gitlab.com/quidsup/notrack-blocklists/-/raw/master/trackers.list",
       "website": "https://quidsup.net/notrack/blocklist.php"
     },
     {
@@ -1754,7 +1767,8 @@
           "name": "hostname",
           "list_types": [
             {
-              "name": "blocklist"
+              "name": "blocklist",
+              "groups": "mini"
             }
           ]
         }
@@ -1799,7 +1813,13 @@
       "license": "CC BY 4.0",
       "types": [
         {
-          "name": "domain"
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
         }
       ],
       "url": "https://v.firebog.net/hosts/static/w3kbl.txt",
@@ -1920,7 +1940,13 @@
       "notes": ">95% overlap with StevenBlack Fake Gambling list",
       "types": [
         {
-          "name": "hostname"
+          "name": "hostname",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "mini"
+            }
+          ]
         }
       ],
       "url": "https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext",
