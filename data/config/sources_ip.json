@@ -625,6 +625,24 @@
       "website": "https://github.com/T145/black-mirror"
     },
     {
+      "name": "ThreatView_IP_HighConfidence",
+      "categories": "malicious, phishing, threat",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "mini"
+            }
+          ]
+        }
+      ],
+      "url": "https://threatview.io/Downloads/IP-High-Confidence-Feed.txt",
+      "website": "https://threatview.io"
+    },
+    {
       "name": "URLHaus_Text",
       "categories": "malware",
       "types": [

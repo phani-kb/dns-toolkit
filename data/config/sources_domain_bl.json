@@ -1607,6 +1607,41 @@
       "website": "https://github.com/T145/black-mirror"
     },
     {
+      "name": "ThreatFox_Hostfile",
+      "categories": "malware, threat",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        }
+      ],
+      "url": "https://threatfox.abuse.ch/downloads/hostfile/",
+      "website": "https://threatfox.abuse.ch"
+    },
+    {
+      "name": "ThreatView_Domain_High-Confidence",
+      "categories": "malware, phishing, threat",
+      "notes": "Huge list, when compared to IPv4 feed from the same source",
+      "skip_general_consolidation": true,
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "blocklist"
+            }
+          ]
+        }
+      ],
+      "url": "https://threatview.io/Downloads/DOMAIN-High-Confidence-Feed.txt",
+      "website": "https://threatview.io"
+    },
+    {
       "name": "Torrent Trackers",
       "categories": "torrent_trackers",
       "license": "MIT",
@@ -1714,7 +1749,6 @@
     {
       "name": "URLHaus (Abuse.ch)",
       "categories": "malware",
-      "license": "CC BY-NC-SA 4.0",
       "types": [
         {
           "name": "hostname",
