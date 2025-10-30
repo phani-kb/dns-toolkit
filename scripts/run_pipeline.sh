@@ -71,7 +71,7 @@ fi
 if [ "$#" -gt 0 ]; then
     IFS=',' read -ra steps <<< "$1"
 else
-    steps=("ga" "d" "p" "c" "cg" "cc" "t" "o" "op" "gr" "gor" "gsr" "gs" "gc" "cp")i # ga,d,p,c,cg,cc,t,o,op,gr,gor,gsr,gs,gc,cp
+    steps=("ga" "d" "p" "c" "cg" "cc" "t" "o" "op" "gr" "gor" "gsr" "gs" "gc" "cp") # ga,d,p,c,cg,cc,t,o,op,gr,gor,gsr,gs,gc,cp
 fi
 
 for step in "${steps[@]}"; do

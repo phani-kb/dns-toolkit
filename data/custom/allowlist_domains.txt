@@ -6,7 +6,6 @@ blocklist.greensnow.co
 cdn.jsdelivr.net
 cf.trackerslist.com
 cinsscore.com
-cybercrime-tracker.net
 danger.rulez.sk
 dsi.ut-capitole.fr
 easylist-downloads.adblockplus.org
