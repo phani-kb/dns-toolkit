@@ -32,6 +32,8 @@ rules.emergingthreats.net
 sblam.com
 small.oisd.nl
 someonewhocares.org
+threatfox.abuse.ch
+threatview.io
 tracker.viriback.com
 tranco-list.eu
 urlhaus.abuse.ch
