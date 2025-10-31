@@ -1624,7 +1624,7 @@
       "categories": "malware, threat",
       "types": [
         {
-          "name": "domain",
+          "name": "hostname",
           "list_types": [
             {
               "name": "blocklist",

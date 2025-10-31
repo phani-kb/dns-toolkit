@@ -117,7 +117,7 @@ https://raw.githubusercontent.com/phani-kb/dns-toolkit/output/domain_blocklist.t
 | **Categories** | 40 | ads, adult, ai, annoyance, anonymizer, botnet, browser, cryptocurrency, dating, discord, dns, doh, fake, fakenews, finance, gambling, issues, kad, local, mac, malicious, malware, mobile, others, phishing, privacy, proxy, ransomware, scam, smarttv, social, spam, spyware, threat, topdomains, tor, torrent_trackers, trackers, url_shorteners, windows |
 | **Source&nbsp;Types** | 30 | adguard, adguard_csv_http_url_find, adguard_domain, adguard_http_url, cidr_ipv4, domain, domain_adguard, domain_comment, domain_csv_http_url_find, domain_custom_csv_blackbook, domain_custom_csv_maltrail, domain_custom_html_ccam, domain_custom_html_puppyscams, domain_http_url, domain_top, domain_url, domain_with_comment_suffix, hostname, ipv4, ipv4_cidr_expand, ipv4_csv_http_url_find, ipv4_custom_html_ccam, ipv4_find, ipv4_from_domain, ipv4_http_url, ipv4_range_expand, ipv4_url, ipv6, ipv6_find, ipv6_htaccess |
 | **Geographic&nbsp;Coverage** | 21 countries | CN, CZ, DE, ES, FI, FR, HU, ID, IL, IT, KR, LV, MY, NL, RO, RU, SA, SK, UA, US, VN |
-| **Last&nbsp;Updated** | 2025-10-30 19:13:09 UTC | Statistics generation time |
+| **Last&nbsp;Updated** | 2025-10-30 20:32:22 UTC | Statistics generation time |
 
 <!-- STATS_END -->
 
@@ -146,10 +146,10 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | China_CDN_Whitelist | ❌ | others | - | - |
 | DandelionSprout_AdGuardHome_Whitelist | ✅ | others | 285 / 40 / 0 | - |
 | Dogino_Discord_Official | ✅ | discord | 43 / 0 / 14 | - |
-| fabriziosalmi_allowlist | ✅ | others | 2264 / 870 / 980 | - |
+| fabriziosalmi_allowlist | ✅ | others | 2264 / 869 / 981 | - |
 | Freekers_Whitelist | ❌ | others | - | No update since 2019 |
 | Notracking_Hosts_whitelist | ❌ | others | - | Archived by the owner on Aug 8, 2023 |
-| ShadowWhisperer_Allowlist | ✅ | others | 661 / 251 / 318 | - |
+| ShadowWhisperer_Allowlist | ✅ | others | 661 / 252 / 317 | - |
 | T145_allowlist-domains | ❌ | others | - | Huge list, use with caution |
 | TogoFire_AD_Settings_whitelist | ✅ | others | 1764 / 1519 / 0 | Huge list, use with caution |
 
@@ -172,11 +172,11 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | AntiAdBlockFilters | ✅ | annoyance | 1708 / 1702 / 0 | - |
 | anudeepND_adservers | ❌ | ads | - | No update since 2023-01-16 |
 | bigdargon_hostsVN | ✅ | ads | 19057 / 0 / 149 | - |
-| Blocklists UT1 Cryptojacking | ✅ | cryptocurrency | 16288 / 14760 / 8 | - |
+| Blocklists UT1 Cryptojacking | ✅ | cryptocurrency | 16288 / 14756 / 8 | - |
 | Blocklists UT1 Malware | ✅ | malware | 254789 / 0 / 4 | >80% overlap with phishing_army |
 | Blocklists UT1 Publicite | ✅ | ads | 4270 / 0 / 129 | 100% covered by other sources |
 | Blocklists UT1 Shortener | ✅ | url_shorteners | 4522 / 0 / 21 | - |
-| Boutetnico_URL_Shorteners | ✅ | url_shorteners | 418 / 211 / 24 | - |
+| Boutetnico_URL_Shorteners | ✅ | url_shorteners | 418 / 210 / 24 | - |
 | Cameleon | ❌ | ads | - | No update since 2018-03-17 |
 | CF_Torrent_Trackers | ✅ | torrent_trackers | 149 / 0 / 0 | - |
 | CJX Annoyance | ✅ | annoyance | 1805 / 1713 / 0 | - |
@@ -196,7 +196,7 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | GlobalAntiScamOrg-blocklist-domains | ✅ | scam | 11150 / 7417 / 2 | - |
 | HaGeZi Amazon Tracker | ✅ | privacy, trackers | 606 / 0 / 34 | >98% overlap with HaGeZi Pro |
 | HaGeZi Apple Tracker | ✅ | privacy, trackers | 102 / 0 / 7 | >80% overlap with HaGeZi Pro |
-| HaGeZi DNS TIF Mini | ✅ | malicious, threat | 149965 / 30005 / 1 | 100% covered by other sources |
+| HaGeZi DNS TIF Mini | ✅ | malicious, threat | 149965 / 28216 / 1 | 100% covered by other sources |
 | HaGeZi Encrypted DNS Servers | ✅ | doh | 3402 / 2162 / 9 | - |
 | HaGeZi Gambling Only Domains | ✅ | gambling | 199936 / 191866 / 6 | Huge list and gambling-specific focus |
 | HaGeZi Microsoft Tracker | ✅ | privacy, trackers | 754 / 0 / 12 | >75% overlap with HaGeZi Pro |
@@ -209,7 +209,7 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | Hostsfile | ❌ | ads | - | No update since 2018-04-20 |
 | hufilter | ✅ | ads | 100 / 0 / 3 | >90% overlap with HaGeZi Pro |
 | iam-py-test_my-filters-001-antitypo | ✅ | fake | 824 / 823 / 0 | - |
-| jarelllama_Scam-Blocklist | ✅ | scam | 468729 / 426373 / 11 | Disabled due to very large size (457K entries) - scam-specific focus |
+| jarelllama_Scam-Blocklist | ✅ | scam | 468729 / 426345 / 11 | Disabled due to very large size (457K entries) - scam-specific focus |
 | kadantiscam | ✅ | kad | 79433 / 0 / 2 | peer-to-peer network protocol |
 | Korlabs_UrlShortener | ✅ | url_shorteners | 237 / 0 / 17 | - |
 | Malicious URL Blocklist (URLHaus) | ✅ | ads | 8602 / 0 / 0 | 100% covered by other sources |
@@ -218,7 +218,7 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | OISD Blocklist Big | ✅ | ads, cryptocurrency, malware, phishing, ransomware, trackers | 209200 / 0 / 76 | Huge list |
 | OISD Blocklist NSFW Small | ✅ | adult | 18556 / 0 / 12 | - |
 | OISD Blocklist Small | ✅ | ads, cryptocurrency, malware, phishing, ransomware, trackers | 47733 / 0 / 52 | - |
-| OpenPhish_Feed | ✅ | phishing | 229 / 0 / 1 | - |
+| OpenPhish_Feed | ✅ | phishing | 220 / 141 / 2 | - |
 | Peter Lowe's Blocklist | ❌ | ads | - | 100% covered by other sources, same as yoyo adservers list |
 | pexcn Torrent Trackers | ✅ | torrent_trackers | 88 / 0 / 0 | - |
 | ph00lt0_blocklist | ✅ | ads, trackers | 21760 / 0 / 476 | 100% covered by other sources, ~50 ip addresses in domain list |
@@ -233,10 +233,10 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | RPiList_specials-phishing | ✅ | phishing | 905653 / 598798 / 0 | Huge list |
 | ShadowWhisperer's Dating List | ✅ | dating | 1262 / 1063 / 0 | - |
 | ShadowWhisperer_BlockLists Ads | ✅ | ads | 24133 / 0 / 78 | - |
-| ShadowWhisperer_BlockLists Adult | ✅ | adult | 231630 / 174281 / 12 | Huge list and adult-specific focus |
+| ShadowWhisperer_BlockLists Adult | ✅ | adult | 231630 / 174280 / 12 | Huge list and adult-specific focus |
 | ShadowWhisperer_BlockLists Malware | ✅ | malware | 41977 / 0 / 4 | - |
-| ShadowWhisperer_BlockLists Scam | ✅ | scam | 7137 / 4807 / 0 | - |
-| ShadowWhisperer_UrlShortener | ✅ | url_shorteners | 5720 / 1072 / 2 | - |
+| ShadowWhisperer_BlockLists Scam | ✅ | scam | 7137 / 4806 / 0 | - |
+| ShadowWhisperer_UrlShortener | ✅ | url_shorteners | 5720 / 1074 / 2 | - |
 | Sinfonietta_Adult | ✅ | adult | 58961 / 0 / 18 | - |
 | Sinfonietta_Gambling | ✅ | gambling | 2639 / 0 / 1 | - |
 | Sinfonietta_Social | ✅ | social | 3242 / 0 / 107 | - |
@@ -247,8 +247,8 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | StevenBlack_Porn | ✅ | adult | 75482 / 0 / 23 | - |
 | StevenBlack_Social | ✅ | social | 3242 / 0 / 107 | - |
 | T145_black-mirror | ❌ | malicious, threat | - | Huge list, >8 million entries |
-| ThreatFox_Hostfile | ✅ | malware, threat | - | - |
-| ThreatView_Domain_High-Confidence | ✅ | malware, phishing, threat | 181778 / 70647 / 0 | Huge list, when compared to IPv4 feed from the same source |
+| ThreatFox_Hostfile | ✅ | malware, threat | 36338 / 0 / 0 | - |
+| ThreatView_Domain_High-Confidence | ✅ | malware, phishing, threat | 181778 / 47298 / 0 | Huge list, when compared to IPv4 feed from the same source |
 | Torrent Trackers | ✅ | torrent_trackers | 528 / 262 / 0 | - |
 | Ukrainian Ad Filter | ✅ | ads | 1457 / 1250 / 0 | - |
 | Ukrainian Annoyance Filter | ✅ | annoyance | - | - |
@@ -256,7 +256,7 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 | Ukrainian Security Filter | ✅ | malicious, threat | 1736 / 1148 / 0 | - |
 | UncheckyAds | ❌ | ads, privacy, trackers | - | No update since 2021 |
 | URLHaus (Abuse.ch) | ✅ | malware | 880 / 0 / 0 | - |
-| USOM-Blocklists-domains | ✅ | malicious, threat | 418111 / 355664 / 19 | Huge list |
+| USOM-Blocklists-domains | ✅ | malicious, threat | 418111 / 355052 / 19 | Huge list |
 | Viriback_Dump | ✅ | malware | 4701 / 69 / 0 | - |
 | WaLLy3K | ✅ | ads | 350 / 0 / 12 | - |
 | Warui_Adhosts | ✅ | ads | 75777 / 0 / 243 | Huge list |
@@ -283,7 +283,7 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 
 | Name | S | Categories |         C / U / X        | Notes |
 |------|---|------------|--------------------------|-------|
-| tranco | ✅ | topdomains | 1000 / 0 / 1376 | - |
+| tranco | ✅ | topdomains | 1000 / 0 / 1377 | - |
 
 </details>
 
@@ -345,11 +345,11 @@ Legend: S = Status, C/U/X = Count / Unique / Conflicts
 |------|---|------------|--------------------------|-------|
 | local_adg_allowlist | ✅ | local | - | - |
 | local_adg_blocklist | ✅ | local | 7 / 0 / 0 | - |
-| local_ai_allowlist | ✅ | ai | 54 / 0 / 55 | - |
-| local_ai_blocklist | ✅ | ai | 54 / 0 / 55 | - |
+| local_ai_allowlist | ✅ | ai | 55 / 0 / 56 | - |
+| local_ai_blocklist | ✅ | ai | 55 / 0 / 56 | - |
 | local_domain_blocklist | ✅ | local | 7 / 0 / 1 | - |
 | local_source_domain_allowlist | ✅ | local | 46 / 26 / 0 | - |
-| local_source_ipv4_allowlist | ✅ | local | 58 / 49 / 8 | - |
+| local_source_ipv4_allowlist | ✅ | local | 56 / 47 / 8 | - |
 
 </details>
 
