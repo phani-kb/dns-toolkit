@@ -21,3 +21,6 @@ oempprd.samsungcloudsolution.com
 oempprd.samsungcloudsolution.net
 # banks
 wallet.advcash.com
+# twitter shortners
+t.co
+# other

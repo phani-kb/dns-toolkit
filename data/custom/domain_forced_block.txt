@@ -1,12 +1,20 @@
-onelink.me
 # marketing
 lddy.no
 rebrand.ly
+go.skimresources.com
+pjtra.com
+statics-marketingsites-eus-ms-com.akamaized.net
+vtwenty.com
+t.lt02.net
+target.georiot.com
 # ads
 aboutads.info
 analytics.barnebys.sh
 app.e.sigsauer.com
 api.narrativ.com
+avantlink.com
+click.linksynergy.com
+thenai.org
 # trackers
 assoc-redirect.amazon.com
 at.adtech.redventures.io
@@ -16,12 +24,39 @@ cookielaw.org
 cdn.cookielaw.org
 dynatrace.com
 nelreports.net
+segment.io
+shalltry.com
+trk.klclick1.com
+cdn.webclicks24.com
+click.pstmrk.it
 # campaigns
 links.iterable.com
 list-manage.com
 mandrillapp.com
+# geolocation
+geolocation-db.com
+geo1.presslabs.net
+geoip-db.com
+# google
+gvt2.com
+# games
+nease.net
 # other
 inbake.com
 linklist.bio
 uid.mavencoalition.io
 telecid.ru
+etrk.asus.com
+asadcdn.com
+7eer.net
+appsflyersdk.com
+onelink.me
+lnks.gd
+prodregistryv2.org
+secureir.ebaystatic.com
+c2.piano.io
+collector-pxzc5j78di.hsprotect.net
+events.release.narrativ.com
+onesignal.com
+onetrust.com
+shareasale-analytics.com
