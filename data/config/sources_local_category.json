@@ -9,7 +9,8 @@
         "internet.nl",
         "teams.microsoft.com",
         "login.newrelic.com",
-        "newrelic.com"
+        "newrelic.com",
+        "onenr.io"
       ],
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
@@ -35,9 +36,7 @@
     {
       "name": "local_mobile_allowlist",
       "categories": "local, mobile",
-      "content": [
-        "play.googleapis.com"
-      ],
+      "content": ["play.googleapis.com"],
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
@@ -70,9 +69,7 @@
     {
       "name": "local_social_allowlist",
       "categories": "local, social",
-      "content": [
-        "web.whatsapp.com"
-      ],
+      "content": ["web.whatsapp.com"],
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
