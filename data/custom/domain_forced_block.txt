@@ -7,6 +7,7 @@ statics-marketingsites-eus-ms-com.akamaized.net
 vtwenty.com
 t.lt02.net
 target.georiot.com
+cj.dotomi.com
 # ads
 aboutads.info
 analytics.barnebys.sh
@@ -60,3 +61,9 @@ events.release.narrativ.com
 onesignal.com
 onetrust.com
 shareasale-analytics.com
+overload.su
+collector-pxzc5j78di.px-client.net
+redirect.viglink.com
+sentry.io
+workers.dev
+pages.dev
