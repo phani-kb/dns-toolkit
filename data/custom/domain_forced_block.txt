@@ -16,6 +16,8 @@ api.narrativ.com
 avantlink.com
 click.linksynergy.com
 thenai.org
+# spam
+websitewelcome.com
 # trackers
 assoc-redirect.amazon.com
 at.adtech.redventures.io
@@ -67,3 +69,4 @@ redirect.viglink.com
 sentry.io
 workers.dev
 pages.dev
+click.mc.crimsontrace.com
