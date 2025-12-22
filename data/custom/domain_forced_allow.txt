@@ -25,4 +25,5 @@ wallet.advcash.com
 t.co
 # other
 webto.salesforce.com
-
+# android
+urbanairship.com
