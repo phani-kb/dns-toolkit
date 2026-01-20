@@ -10,7 +10,6 @@ danger.rulez.sk
 dsi.ut-capitole.fr
 easylist-downloads.adblockplus.org
 easylist.to
-filters.adtidy.org
 github.com
 gitlab.com
 hostfiles.frogeye.fr

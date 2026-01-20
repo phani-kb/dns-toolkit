@@ -107,6 +107,7 @@ const (
 	CategoryFake            = "fake"
 	CategoryFakeNews        = "fakenews"
 	CategoryGambling        = "gambling"
+	CategoryGaming          = "gaming"
 	CategoryThreat          = "threat"
 	CategoryPrivacy         = "privacy"
 	CategorySecurity        = "security"
@@ -352,6 +353,7 @@ var (
 		CategoryAI:              true,
 		CategorySpyware:         true,
 		CategoryTOR:             true,
+		CategoryGaming:          true,
 	}
 
 	ValidGroups = map[string]bool{
