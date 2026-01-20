@@ -5,7 +5,6 @@
       "categories": "ads, trackers",
       "disabled": false,
       "license": "MPLv2",
-      "notes": "100% covered by other sources",
       "types": [
         {
           "name": "domain",
@@ -17,7 +16,7 @@
           ]
         }
       ],
-      "url": "https://o0.pages.dev/Lite/domains.txt",
+      "url": "https://raw.githubusercontent.com/badmojr/1Hosts/refs/heads/master/Lite/domains.txt",
       "website": "https://github.com/badmojr/1Hosts"
     },
     {
@@ -997,6 +996,26 @@
       ],
       "url": "https://raw.githubusercontent.com/korlabsio/urlshortener/refs/heads/main/names.txt",
       "website": "https://github.com/korlabsio/urlshortener"
+    },
+    {
+      "name": "lightswitch05",
+      "categories": "ads, trackers",
+      "disabled": true,
+      "license": "Apache-2.0",
+      "notes": "Archived on 2024-06-17",
+      "types": [
+        {
+          "name": "domain",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "normal"
+            }
+          ]
+        }
+      ],
+      "url": "https://www.github.developerdan.com/hosts/lists/ads-and-tracking-extended.txt",
+      "website": "https://github.com/lightswitch05/hosts"
     },
     {
       "name": "Malicious URL Blocklist (URLHaus)",
