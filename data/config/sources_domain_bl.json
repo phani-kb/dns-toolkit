@@ -106,7 +106,7 @@
     },
     {
       "name": "AdGuard Base filter",
-      "categories": "ads, trackers",
+      "categories": "ads",
       "license": "GPL-3.0",
       "types": [
         {
@@ -114,13 +114,8 @@
           "list_types": [
             {
               "name": "blocklist",
+              "must_consider": true,
               "groups": "lite"
-            },
-            {
-              "name": "allowlist",
-              "groups": "lite",
-              "disabled": true,
-              "notes": "Too many conflicts with other sources"
             }
           ]
         },
@@ -128,14 +123,14 @@
           "name": "domain_adguard",
           "list_types": [
             {
-              "name": "allowlist",
-              "disabled": true,
-              "notes": "Too many conflicts with other sources"
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "lite"
             }
           ]
         }
       ],
-      "url": "https://filters.adtidy.org/extension/firefox/filters/2.txt",
+      "url": "https://raw.githubusercontent.com/AdguardTeam/AdguardFilters/refs/heads/master/BaseFilter/sections/adservers.txt",
       "website": "https://github.com/AdguardTeam/AdGuardFilters"
     },
     {
@@ -168,7 +163,7 @@
     },
     {
       "name": "AdGuard DNS filter",
-      "categories": "ads, trackers",
+      "categories": "ads, mobile, social, trackers",
       "license": "GPL-3.0",
       "types": [
         {
@@ -191,6 +186,10 @@
               "name": "allowlist",
               "disabled": true,
               "notes": "Conflicts with other sources"
+            },
+            {
+              "name": "blocklist",
+              "groups": "lite"
             }
           ]
         }
