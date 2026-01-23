@@ -290,25 +290,25 @@ func Test_ExtractAllowlistDomains(t *testing.T) {
 	}{
 		{
 			name:            "valid adguard allow entries",
-			content:         "@@example.com\n@@test.org\n",
+			content:         "@@||example.com^\n@@||test.org^\n",
 			expectedValid:   []string{"example.com", "test.org"},
 			expectedInvalid: nil,
 		},
 		{
 			name:            "invalid allow entry",
-			content:         "example.com\n@@notadomain\n",
+			content:         "example.com\n@@||notadomain^\n",
 			expectedValid:   nil,
-			expectedInvalid: []string{"example.com", "@@notadomain"},
+			expectedInvalid: []string{"example.com", "@@||notadomain^"},
 		},
 		{
 			name:            "mixed valid and invalid",
-			content:         "@@good.com\nbadline\n@@bad\n",
+			content:         "@@||good.com^\nbadline\n@@bad\n",
 			expectedValid:   []string{"good.com"},
 			expectedInvalid: []string{"badline", "@@bad"},
 		},
 		{
 			name:            "comments and whitespace",
-			content:         "# comment\n  @@space.com  \n! another\n",
+			content:         "# comment\n  @@||space.com^  \n! another\n",
 			expectedValid:   []string{"space.com"},
 			expectedInvalid: nil,
 		},
