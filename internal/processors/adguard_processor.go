@@ -87,22 +87,24 @@ func ExtractAllowlistDomains(logger *multilog.Logger, content string) ([]string,
 	var validEntries, invalidEntries []string
 	lines := strings.Split(content, "\n")
 
-	domainRegex := constants.SourceTypeRegexMap[constants.SourceTypeDomainFinder]
-	if domainRegex == nil {
-		logger.Errorf("Regex not found for source type: %s", adguardSourceTypeDomain)
-		return nil, nil
-	}
-
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if u.IsComment(line) {
 			continue
 		}
 
-		if strings.HasPrefix(line, AdguardExceptionPrefix) {
-			domain := domainRegex.FindString(line)
-			if u.IsDomain(domain) {
-				validEntries = append(validEntries, domain)
+		if domain, ok := strings.CutPrefix(line, AdguardExceptionPrefix); ok {
+			// extract domain between @@|| and ^
+			if domain, ok := strings.CutPrefix(domain, AdguardBlockPrefix); ok {
+				if domain, ok := strings.CutSuffix(domain, AdguardBlockSuffix); ok {
+					if u.IsDomain(domain) {
+						validEntries = append(validEntries, domain)
+					} else {
+						invalidEntries = append(invalidEntries, line)
+					}
+				} else {
+					invalidEntries = append(invalidEntries, line)
+				}
 			} else {
 				invalidEntries = append(invalidEntries, line)
 			}
@@ -118,12 +120,6 @@ func ExtractBlocklistDomains(logger *multilog.Logger, content string) ([]string,
 	var validEntries, invalidEntries []string
 	lines := strings.Split(content, "\n")
 
-	domainRegex := constants.SourceTypeRegexMap[constants.SourceTypeDomainFinder]
-	if domainRegex == nil {
-		logger.Errorf("Regex not found for source type: %s", adguardSourceTypeDomain)
-		return nil, nil
-	}
-
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if u.IsComment(line) {
@@ -131,10 +127,13 @@ func ExtractBlocklistDomains(logger *multilog.Logger, content string) ([]string,
 		}
 
 		// extract domain between || and ^
-		if strings.HasPrefix(line, AdguardBlockPrefix) && strings.HasSuffix(line, AdguardBlockSuffix) {
-			domain := domainRegex.FindString(line)
-			if u.IsDomain(domain) {
-				validEntries = append(validEntries, domain)
+		if domain, ok := strings.CutPrefix(line, AdguardBlockPrefix); ok {
+			if domain, ok := strings.CutSuffix(domain, AdguardBlockSuffix); ok {
+				if u.IsDomain(domain) {
+					validEntries = append(validEntries, domain)
+				} else {
+					invalidEntries = append(invalidEntries, line)
+				}
 			} else {
 				invalidEntries = append(invalidEntries, line)
 			}
