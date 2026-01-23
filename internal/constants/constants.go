@@ -13,6 +13,11 @@ const (
 	GitHubRepoURL  = "https://github.com/phani-kb/dns-toolkit"
 )
 
+const (
+	MaxDomainLength = 253 // max total FQDN length
+	MaxLabelLength  = 63  // max length per label
+)
+
 // SummaryTypes - Enum-like constants for summary types
 const (
 	SummaryTypeDownload               = "download"
@@ -241,14 +246,27 @@ var ListTypeMap = map[string]string{
 }
 
 var SourceTypeRegexMap = map[string]*regexp.Regexp{
-	SourceTypeIpv4:     regexp.MustCompile(`\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b`),
+	// match only standalone IPs, not those in CIDR notation (for line-based matching)
+	SourceTypeIpv4:     regexp.MustCompile(`(?:^|[^/\d])(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(?:[^\d/]|$)`),
 	SourceTypeIpv6:     regexp.MustCompile(`\b([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b`),
 	SourceTypeCidrIpv4: regexp.MustCompile(`\b\d{1,3}(\.\d{1,3}){3}/\d{1,2}\b`),
-	SourceTypeDomain:   regexp.MustCompile(`^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$`),
-	SourceTypeIpv4Hostname: regexp.MustCompile(
-		`^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$`,
+	SourceTypeDomain: regexp.MustCompile(
+		`^([a-zA-Z0-9_]([a-zA-Z0-9\-_]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})$`,
 	),
-	SourceTypeDomainFinder: regexp.MustCompile(`([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}`),
+	// regex for validating hostnames from hosts files - allows labels to start with hyphens
+	SourceTypeHostname: regexp.MustCompile(
+		`^([a-zA-Z0-9_-]([a-zA-Z0-9\-_]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})$`,
+	),
+	SourceTypeIpv4Hostname: regexp.MustCompile(
+		`^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+([a-zA-Z0-9_-]+\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})$`,
+	),
+	SourceTypeDomainFinder: regexp.MustCompile(
+		`([a-zA-Z0-9_]([a-zA-Z0-9\-_]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})`,
+	),
+}
+
+var SourceTypeExtractorRegexMap = map[string]*regexp.Regexp{
+	SourceTypeIpv4: regexp.MustCompile(`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`),
 }
 
 const (
