@@ -5,6 +5,7 @@ import (
 
 	"github.com/phani-kb/multilog"
 
+	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/dns-toolkit/internal/utils"
 )
 
@@ -46,7 +47,8 @@ func (p *HostnameProcessor) Process(_ *multilog.Logger, content string) ([]strin
 			domain := strings.TrimSpace(fields[1])
 
 			// Validate and store domain
-			if utils.IsDomain(domain) {
+			if constants.SourceTypeRegexMap[constants.SourceTypeHostname].MatchString(domain) &&
+				len(domain) <= constants.MaxDomainLength {
 				validEntries = append(validEntries, domain)
 			} else {
 				invalidEntries = append(invalidEntries, line)

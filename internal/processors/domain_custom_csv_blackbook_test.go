@@ -116,7 +116,7 @@ func TestDomainCustomCsvBlackbookProcessor_EdgeCases(t *testing.T) {
 			expectedInvalid: nil,
 		},
 		{
-			name:            "domains with underscores (invalid)",
+			name:            "domains with underscores in SLD (invalid - not registrable)",
 			content:         "Domain,Malware,Date added,Source\nvalid-domain.com,malware1,2024-09-01,Source1\ninvalid_domain.com,malware2,2024-09-01,Source2\nanother-valid.org,malware3,2024-09-01,Source3",
 			expectedValid:   []string{"valid-domain.com", "another-valid.org"},
 			expectedInvalid: []string{"invalid_domain.com"},

@@ -46,7 +46,7 @@ func (p *Ipv4CustomHtmlCcamProcessor) Process(logger *multilog.Logger, content s
 	return extractUniqueFromHtmlTableCells(
 		logger,
 		content,
-		constants.SourceTypeRegexMap[constants.SourceTypeIpv4],
+		constants.SourceTypeExtractorRegexMap[constants.SourceTypeIpv4],
 		utils.IsIP,
 	)
 }
