@@ -93,10 +93,10 @@ func ExtractAllowlistDomains(logger *multilog.Logger, content string) ([]string,
 			continue
 		}
 
-		if domain, ok := strings.CutPrefix(line, AdguardExceptionPrefix); ok {
+		if afterException, ok := strings.CutPrefix(line, AdguardExceptionPrefix); ok {
 			// extract domain between @@|| and ^
-			if domain, ok := strings.CutPrefix(domain, AdguardBlockPrefix); ok {
-				if domain, ok := strings.CutSuffix(domain, AdguardBlockSuffix); ok {
+			if afterBlock, ok := strings.CutPrefix(afterException, AdguardBlockPrefix); ok {
+				if domain, ok := strings.CutSuffix(afterBlock, AdguardBlockSuffix); ok {
 					if u.IsDomain(domain) {
 						validEntries = append(validEntries, domain)
 					} else {
@@ -127,8 +127,8 @@ func ExtractBlocklistDomains(logger *multilog.Logger, content string) ([]string,
 		}
 
 		// extract domain between || and ^
-		if domain, ok := strings.CutPrefix(line, AdguardBlockPrefix); ok {
-			if domain, ok := strings.CutSuffix(domain, AdguardBlockSuffix); ok {
+		if afterBlock, ok := strings.CutPrefix(line, AdguardBlockPrefix); ok {
+			if domain, ok := strings.CutSuffix(afterBlock, AdguardBlockSuffix); ok {
 				if u.IsDomain(domain) {
 					validEntries = append(validEntries, domain)
 				} else {
