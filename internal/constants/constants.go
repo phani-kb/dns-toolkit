@@ -137,6 +137,7 @@ const (
 	CategoryAI              = "ai"
 	CategorySpyware         = "spyware"
 	CategoryTOR             = "tor"
+	CategoryBot             = "bot"
 
 	GroupMini   = "mini"
 	GroupLite   = "lite"
@@ -354,6 +355,7 @@ var (
 		CategorySpyware:         true,
 		CategoryTOR:             true,
 		CategoryGaming:          true,
+		CategoryBot:             true,
 	}
 
 	ValidGroups = map[string]bool{
