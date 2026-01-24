@@ -111,7 +111,7 @@ func TestDomainCustomCsvMaltrailProcessor_EdgeCases(t *testing.T) {
 			expectedInvalid: nil,
 		},
 		{
-			name:            "domains with underscores (invalid)",
+			name:            "domains with underscores in SLD (invalid - not registrable)",
 			content:         "example-site.com,malware,hyphen domain\ntest_site.org,phishing,underscore domain\nsite123.net,tracker,numeric domain",
 			expectedValid:   []string{"example-site.com", "site123.net"},
 			expectedInvalid: []string{"test_site.org"},

@@ -233,6 +233,16 @@
               "must_consider": true
             }
           ]
+        },
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "mini",
+              "must_consider": true
+            }
+          ]
         }
       ],
       "url": "https://rules.emergingthreats.net/fwrules/emerging-Block-IPs.txt",
@@ -577,7 +587,6 @@
           "list_types": [
             {
               "name": "blocklist",
-              "disabled": true,
               "notes": ">95% overlap with ET_fwip"
             }
           ]
