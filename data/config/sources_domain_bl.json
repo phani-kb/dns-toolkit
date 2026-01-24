@@ -664,12 +664,10 @@
     {
       "name": "FakeWebshopListHUN",
       "categories": "fake, phishing, scam, threat",
+      "countries": "HU",
       "types": [
         {
-          "name": "adguard"
-        },
-        {
-          "name": "domain_adguard"
+          "name": "domain"
         }
       ],
       "url": "https://raw.githubusercontent.com/FakesiteListHUN/FakeWebshopListHUN/refs/heads/main/fakewebshoplist",
@@ -1704,7 +1702,9 @@
       "name": "Ukrainian Annoyance Filter",
       "categories": "annoyance",
       "countries": "UA",
+      "disabled": true,
       "license": "GPL-3.0",
+      "notes": "Filtering rules not compatible with DNS-level blocking",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
@@ -1967,7 +1967,7 @@
           ]
         }
       ],
-      "url": "https://pgl.yoyo.org/adservers/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext",
+      "url": "https://pgl.yoyo.org/as/serverlist.php?hostformat=hosts&showintro=0&mimetype=plaintext",
       "website": "https://pgl.yoyo.org/adservers"
     }
   ]
