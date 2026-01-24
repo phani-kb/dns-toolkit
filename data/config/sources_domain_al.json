@@ -1,7 +1,7 @@
 {
   "sources": [
     {
-      "name": "AdGuardSDNSFilter_exclusions",
+      "name": "AdGuardSDNSFilter_exceptions",
       "types": [
         {
           "name": "adguard",
@@ -12,7 +12,7 @@
           ]
         }
       ],
-      "url": "https://raw.githubusercontent.com/AdguardTeam/AdGuardSDNSFilter/master/Filters/exclusions.txt"
+      "url": "https://raw.githubusercontent.com/AdguardTeam/AdGuardSDNSFilter/master/Filters/exceptions.txt"
     },
     {
       "name": "AdGuardTeam_HttpsExclusions_android",

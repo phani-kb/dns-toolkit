@@ -381,6 +381,8 @@ func TestIsComment(t *testing.T) {
 	assert.True(t, IsComment("  # comment with spaces"))
 	assert.True(t, IsComment("// comment"))
 	assert.True(t, IsComment("! comment"))
+	assert.True(t, IsComment("[Adblock Plus 2.0]"))
+	assert.True(t, IsComment("  [metadata]"))
 
 	assert.False(t, IsComment("example.com"))
 	assert.False(t, IsComment("192.168.1.1"))
@@ -1299,6 +1301,47 @@ bad_domain
 
 	assert.Equal(t, []string{"761.xn--p1ai", "example.com"}, valid)
 	assert.Equal(t, []string{"bad_domain"}, invalid)
+}
+
+func TestExtractDomains_AdBlockPlusFormat(t *testing.T) {
+	t.Parallel()
+
+	content := `[Adblock Plus 2.0]
+! Version: 2.26.0
+! Title: Test Blocklist
+! Last modified: 2026.01.01
+
+!fork:
+!www.example.com
+valid-domain.com
+another-example.org
+sub.domain.example.net
+test_subdomain.example.com
+invalid-.domain
+-invalid.domain
+192.168.1.1
+
+! More comments
+final-domain.io
+`
+
+	valid, invalid := ExtractDomains(content)
+
+	expectedValid := []string{
+		"another-example.org",
+		"final-domain.io",
+		"sub.domain.example.net",
+		"test_subdomain.example.com",
+		"valid-domain.com",
+	}
+	expectedInvalid := []string{
+		"-invalid.domain",
+		"192.168.1.1",
+		"invalid-.domain",
+	}
+
+	assert.Equal(t, expectedValid, valid, "Valid domains should match")
+	assert.Equal(t, expectedInvalid, invalid, "Invalid entries should match")
 }
 
 func TestForceCopySourceToTarget(t *testing.T) {

@@ -253,12 +253,8 @@ var SourceTypeRegexMap = map[string]*regexp.Regexp{
 	SourceTypeDomain: regexp.MustCompile(
 		`^([a-zA-Z0-9_]([a-zA-Z0-9\-_]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})$`,
 	),
-	// regex for validating hostnames from hosts files - allows labels to start with hyphens
-	SourceTypeHostname: regexp.MustCompile(
-		`^([a-zA-Z0-9_-]([a-zA-Z0-9\-_]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})$`,
-	),
 	SourceTypeIpv4Hostname: regexp.MustCompile(
-		`^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+([a-zA-Z0-9_-]+\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})$`,
+		`^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+([a-zA-Z0-9_-]+\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})$`, // nolint:lll
 	),
 	SourceTypeDomainFinder: regexp.MustCompile(
 		`([a-zA-Z0-9_]([a-zA-Z0-9\-_]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})`,
@@ -271,6 +267,11 @@ var SourceTypeExtractorRegexMap = map[string]*regexp.Regexp{
 
 const (
 	DomainHttpUrlRegex = `^(?:https?:\/\/)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(?::\d+)?(?:\/[^\s]*)?$`
+)
+
+// HostnameRegex regex for validating hostnames from hosts files - allows labels to start with hyphens and digits
+var HostnameRegex = regexp.MustCompile(
+	`^([a-zA-Z0-9_-]([a-zA-Z0-9\-_]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})$`,
 )
 
 var (
