@@ -554,6 +554,28 @@
       "website": "https://github.com/scriptzteam/badIPS"
     },
     {
+      "name": "Sefinek_Known_Bots_IP",
+      "categories": "bot",
+      "license": "MIT",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist"
+            },
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/sefinek/known-bots-ip-whitelist/main/lists/all-safe-ips.txt",
+      "website": "https://github.com/sefinek/known-bots-ip-whitelist"
+    },
+    {
       "name": "Sentinel_Greylist",
       "categories": "malicious, threat",
       "license": "CC BY-NC-SA 4.0",
