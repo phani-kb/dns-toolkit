@@ -185,6 +185,24 @@ func TestIsDomain(t *testing.T) {
 		{"example-.com", false},
 		{"exam ple.com", false}, // Space in domain
 		{"very-long-subdomain-name-that-exceeds-normal-length.example.com", true},
+		// RFC 2181: underscores are allowed in DNS labels
+		{"23_01.example.net", true},
+		{"test_example.com", false},
+		{"com_abc_xyz_photos.example-v1.prod.mobile.etc.11c3.com", true},
+		{"_service.example.com", true},
+		{"example-.com", false}, // cannot end with hyphen
+		{"test_subdomain.example.com", true},
+		// service records, labels can start with underscore
+		{"_http._tcp.example.com", true},
+		{"_domainkey.example.com", true},
+		{"10dkim1._domainkey.alerts.cvs.com", true},
+		{"_dmarc.example.org", true},
+		{"51dkim1._domainkey.info-de.genesis.com", true},
+		// RFC 1035: total domain length limits
+		{strings.Repeat("a", 63) + ".com", true}, // max label length (63 chars)
+		{strings.Repeat("a", 64) + ".com", false},
+		{strings.Repeat("label.", 50) + "example.com", false},                            // exceeds 253 chars total
+		{strings.Repeat("a", 63) + "." + strings.Repeat("b", 63) + ".example.com", true}, // under 253 total
 	}
 
 	for _, tt := range tests {

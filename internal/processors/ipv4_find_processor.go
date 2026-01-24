@@ -31,8 +31,8 @@ func (p *Ipv4FindProcessor) Process(_ *multilog.Logger, content string) ([]strin
 			continue
 		}
 
-		if constants.SourceTypeRegexMap[constants.SourceTypeIpv4].MatchString(line) {
-			ip := constants.SourceTypeRegexMap[constants.SourceTypeIpv4].FindString(line)
+		if constants.SourceTypeExtractorRegexMap[constants.SourceTypeIpv4].MatchString(line) {
+			ip := constants.SourceTypeExtractorRegexMap[constants.SourceTypeIpv4].FindString(line)
 			validEntries = append(validEntries, ip)
 		} else {
 			invalidEntries = append(invalidEntries, line)

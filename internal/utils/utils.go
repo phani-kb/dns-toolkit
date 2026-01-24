@@ -512,6 +512,10 @@ func IsDomain(domain string) bool {
 		return false
 	}
 
+	if len(domain) > constants.MaxDomainLength {
+		return false
+	}
+
 	if IsIP(domain) {
 		return false
 	}
@@ -525,7 +529,7 @@ func IsDomain(domain string) bool {
 		return false
 	}
 
-	if asciiDomain == "" || len(asciiDomain) > 253 {
+	if asciiDomain == "" || len(asciiDomain) > constants.MaxDomainLength {
 		return false
 	}
 
@@ -557,7 +561,7 @@ func IsDomain(domain string) bool {
 }
 
 func isValidASCIILabel(label string) bool {
-	if label == "" || len(label) > 63 {
+	if label == "" || len(label) > constants.MaxLabelLength {
 		return false
 	}
 	if label[0] == '-' || label[len(label)-1] == '-' {
