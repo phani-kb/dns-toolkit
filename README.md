@@ -1,7 +1,6 @@
 
-![dns-toolkit logo](assets/logo-250.png)
-
----
+## dns-toolkit
+![dns-toolkit logo](assets/logo-150-t.png)
 
 [![Go CI Workflow](https://github.com/phani-kb/dns-toolkit/actions/workflows/ci.yml/badge.svg)](https://github.com/phani-kb/dns-toolkit/actions/workflows/ci.yml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/phani-kb/dns-toolkit)](https://goreportcard.com/report/github.com/phani-kb/dns-toolkit)
