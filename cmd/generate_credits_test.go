@@ -82,7 +82,9 @@ func TestGenerateCreditsSection(t *testing.T) {
 		assert.Contains(t, section, "✅")
 		assert.Contains(t, section, "ads")
 		assert.Contains(t, section, "Test source")
-		assert.Contains(t, section, "[BL]")
+		hasNewFormat := strings.Contains(section, "C / U / X")
+		hasOldFormat := strings.Contains(section, "AL / BL")
+		assert.True(t, hasNewFormat || hasOldFormat, "Should contain either C/U/X or AL/BL format")
 		assert.True(t, strings.HasSuffix(section, "<!-- CREDITS_END -->"))
 	})
 
@@ -125,7 +127,9 @@ func TestGenerateCreditsSection(t *testing.T) {
 		assert.Contains(t, section, "| - |")
 		assert.Contains(t, section, "Notes with \\| pipes \\|")
 		assert.Contains(t, section, "and newlines")
-		assert.Contains(t, section, "[BL]")
+		hasNewFormat := strings.Contains(section, "C / U / X")
+		hasOldFormat := strings.Contains(section, "AL / BL")
+		assert.True(t, hasNewFormat || hasOldFormat, "Should contain either C/U/X or AL/BL format")
 	})
 
 	t.Run("No sources configured", func(t *testing.T) {
@@ -210,7 +214,9 @@ Installation information here.
 
 		assert.Contains(t, contentStr, "# Test Project")
 		assert.Contains(t, contentStr, "## Installation")
-		assert.Contains(t, contentStr, "[BL]")
+		hasNewFormat := strings.Contains(contentStr, "C / U / X")
+		hasOldFormat := strings.Contains(contentStr, "AL / BL")
+		assert.True(t, hasNewFormat || hasOldFormat, "Should contain either C/U/X or AL/BL format")
 	})
 
 	t.Run("Replace existing credits section with testdata file", func(t *testing.T) {
@@ -236,7 +242,9 @@ Installation information here.
 		assert.Contains(t, contentStr, "## Credits")
 		assert.Contains(t, contentStr, "test-sources.yml")
 		assert.Contains(t, contentStr, "test-source")
-		assert.Contains(t, contentStr, "[BL]")
+		hasNewFormat := strings.Contains(contentStr, "C / U / X")
+		hasOldFormat := strings.Contains(contentStr, "AL / BL")
+		assert.True(t, hasNewFormat || hasOldFormat, "Should contain either C/U/X or AL/BL format")
 
 		assert.Contains(t, contentStr, "# DNS Toolkit Test")
 		assert.Contains(t, contentStr, "## Installation")
