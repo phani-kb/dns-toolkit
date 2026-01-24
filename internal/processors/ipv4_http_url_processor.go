@@ -39,7 +39,7 @@ func (p *Ipv4HttpUrlProcessor) Process(_ *multilog.Logger, content string) ([]st
 		}
 
 		if match := urlRegex.FindString(line); match != "" {
-			if ipv4 := constants.SourceTypeRegexMap[constants.SourceTypeIpv4].FindString(match); ipv4 != "" &&
+			if ipv4 := constants.SourceTypeExtractorRegexMap[constants.SourceTypeIpv4].FindString(match); ipv4 != "" &&
 				isValidIPv4(ipv4) {
 				validEntries = append(validEntries, ipv4)
 			} else {
