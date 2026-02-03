@@ -20,7 +20,6 @@ malware-filter.gitlab.io
 myip.ms
 nsfw-small.oisd.nl
 opendbl.net
-openphish.com
 pgl.yoyo.org
 phishing.army
 public-dns.info
