@@ -1142,6 +1142,8 @@
     {
       "name": "OpenPhish_Feed",
       "categories": "phishing",
+      "disabled": true,
+      "notes": "Temporary disable due to secret key leak issue",
       "types": [
         {
           "name": "domain_http_url",
@@ -1162,7 +1164,7 @@
           ]
         }
       ],
-      "url": "https://openphish.com/feed.txt",
+      "url": "https://raw.githubusercontent.com/openphish/public_feed/refs/heads/main/feed.txt",
       "website": "https://openphish.com"
     },
     {
