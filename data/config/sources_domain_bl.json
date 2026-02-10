@@ -1142,8 +1142,7 @@
     {
       "name": "OpenPhish_Feed",
       "categories": "phishing",
-      "disabled": true,
-      "notes": "Temporary disable due to secret key leak issue",
+      "disabled": false,
       "types": [
         {
           "name": "domain_http_url",
