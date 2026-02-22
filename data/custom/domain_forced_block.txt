@@ -70,3 +70,6 @@ sentry.io
 workers.dev
 pages.dev
 click.mc.crimsontrace.com
+dcf.espn.com
+classic.avantlink.com
+rapid-cdn.yottaa.com

@@ -143,6 +143,7 @@
     {
       "name": "DanMeUK_TorExitNodes",
       "categories": "tor",
+      "frequency": "weekly",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [
