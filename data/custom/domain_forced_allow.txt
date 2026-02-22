@@ -27,3 +27,5 @@ t.co
 webto.salesforce.com
 # android
 urbanairship.com
+pulsar.ebay.com
+addtoany.com
