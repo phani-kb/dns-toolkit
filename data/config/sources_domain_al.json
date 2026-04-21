@@ -1,7 +1,7 @@
 {
   "sources": [
     {
-      "name": "AdGuardSDNSFilter_exclusions",
+      "name": "AdGuardSDNSFilter_exceptions",
       "types": [
         {
           "name": "adguard",
@@ -12,7 +12,7 @@
           ]
         }
       ],
-      "url": "https://raw.githubusercontent.com/AdguardTeam/AdGuardSDNSFilter/master/Filters/exclusions.txt"
+      "url": "https://raw.githubusercontent.com/AdguardTeam/AdGuardSDNSFilter/master/Filters/exceptions.txt"
     },
     {
       "name": "AdGuardTeam_HttpsExclusions_android",
@@ -250,7 +250,8 @@
           ]
         }
       ],
-      "url": "https://raw.githubusercontent.com/notracking/hosts-blocklists-scripts/master/hostnames.whitelist.txt"
+      "url": "https://raw.githubusercontent.com/notracking/hosts-blocklists-scripts/master/hostnames.whitelist.txt",
+      "website": "https://github.com/notracking/hosts-blocklists"
     },
     {
       "name": "ShadowWhisperer_Allowlist",
@@ -297,12 +298,13 @@
           "list_types": [
             {
               "name": "allowlist",
-              "groups": "big"
+              "groups": "normal"
             }
           ]
         }
       ],
-      "url": "https://raw.githubusercontent.com/TogoFire-Home/AD-Settings/main/Filters/whitelist.txt"
+      "url": "https://raw.githubusercontent.com/TogoFire-Home/AD-Settings/main/Filters/whitelist.txt",
+      "website": "https://github.com/TogoFire-Home/AD-Settings"
     }
   ]
 }

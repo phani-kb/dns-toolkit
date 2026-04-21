@@ -141,6 +141,20 @@
       "website": "http://cinsscore.com"
     },
     {
+      "name": "DanMeUK_TorExitNodes",
+      "categories": "tor",
+      "frequency": "weekly",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "ipv4"
+        }
+      ],
+      "url": "https://www.dan.me.uk/torlist/?exit",
+      "website": "https://www.dan.me.uk/tornodes"
+    },
+    {
       "name": "DoH_IP_blocklists",
       "categories": "doh",
       "license": "GPL-3.0",
@@ -213,6 +227,16 @@
       "types": [
         {
           "name": "cidr_ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "groups": "mini",
+              "must_consider": true
+            }
+          ]
+        },
+        {
+          "name": "ipv4",
           "list_types": [
             {
               "name": "blocklist",
@@ -541,6 +565,28 @@
       "website": "https://github.com/scriptzteam/badIPS"
     },
     {
+      "name": "Sefinek_Known_Bots_IP",
+      "categories": "bot",
+      "license": "MIT",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist"
+            },
+            {
+              "name": "allowlist"
+            }
+          ]
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/sefinek/known-bots-ip-whitelist/main/lists/all-safe-ips.txt",
+      "website": "https://github.com/sefinek/known-bots-ip-whitelist"
+    },
+    {
       "name": "Sentinel_Greylist",
       "categories": "malicious, threat",
       "license": "CC BY-NC-SA 4.0",
@@ -564,7 +610,6 @@
           "list_types": [
             {
               "name": "blocklist",
-              "disabled": true,
               "notes": ">95% overlap with ET_fwip"
             }
           ]
@@ -612,11 +657,32 @@
       "website": "https://github.com/T145/black-mirror"
     },
     {
+      "name": "ThreatView_IP_HighConfidence",
+      "categories": "malicious, phishing, threat",
+      "types": [
+        {
+          "name": "ipv4",
+          "list_types": [
+            {
+              "name": "blocklist",
+              "must_consider": true,
+              "groups": "mini"
+            }
+          ]
+        }
+      ],
+      "url": "https://threatview.io/Downloads/IP-High-Confidence-Feed.txt",
+      "website": "https://threatview.io"
+    },
+    {
       "name": "URLHaus_Text",
       "categories": "malware",
       "types": [
         {
           "name": "ipv4_http_url"
+        },
+        {
+          "name": "adguard_http_url"
         }
       ],
       "url": "https://urlhaus.abuse.ch/downloads/text/",

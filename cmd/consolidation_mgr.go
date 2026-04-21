@@ -22,7 +22,7 @@ func (cm *ConsolidationManager) GenerateConflictReport(processedFiles []c.Proces
 	cm.logger.Infof("Building resolution sets for conflict report...")
 
 	// Build resolution sets for conflict analysis
-	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap := BuildResolutionSets(
+	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap := GetCachedResolutionSets(
 		cm.logger,
 		processedFiles,
 	)

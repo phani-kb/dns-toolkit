@@ -90,7 +90,11 @@ func loadTemplates() (*template.Template, []byte, error) {
 		return nil, nil, fmt.Errorf("failed to read dynamic template: %w", err)
 	}
 
-	tmpl, err := template.New("dynamic").Parse(string(dynamicTemplateTxt))
+	funcMap := template.FuncMap{
+		"subtract": func(a, b int) int { return a - b },
+	}
+
+	tmpl, err := template.New("dynamic").Funcs(funcMap).Parse(string(dynamicTemplateTxt))
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to parse dynamic template: %w", err)
 	}
@@ -203,18 +207,19 @@ func generateFilesList(
 func processFilesForSummaryType(
 	summaryType string,
 	summaryData []byte,
-) (map[string]string, map[string]int, map[string][]common.FileInfo, map[string]int) {
+) (map[string]string, map[string]int, map[string][]common.FileInfo, map[string]int, map[string]int) {
 	typeFiles := make(map[string]string)
 	fileEntriesCount := make(map[string]int)
 	filesInvolved := make(map[string][]common.FileInfo)
 	ignoredFilesCount := make(map[string]int)
+	originalCounts := make(map[string]int)
 
 	switch summaryType {
 	case constants.SummaryTypeConsolidated:
 		var summaries []common.ConsolidatedSummary
 		if err := json.Unmarshal(summaryData, &summaries); err != nil {
 			Logger.Error("Failed to unmarshal consolidated summary", "error", err)
-			return typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount
+			return typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount, originalCounts
 		}
 		files := u.GetFilesFromSummaries(summaries, constants.SummaryTypeConsolidated)
 		for key, value := range files {
@@ -222,10 +227,13 @@ func processFilesForSummaryType(
 			fileEntriesCount[key] = value.Count
 
 			if value.IgnoredEntriesCount > 0 && value.IgnoredFilepath != "" {
-				ignoredFilesCount[value.IgnoredFilepath] = value.IgnoredEntriesCount
+				ignoredFilesCount[key] = value.IgnoredEntriesCount
 			}
 
 			filesInvolved[key] = parseFilesFromConsolidatedSummary(value)
+			if value.OriginalCount > 0 {
+				originalCounts[key] = value.OriginalCount
+			}
 
 		}
 
@@ -233,40 +241,46 @@ func processFilesForSummaryType(
 		var summaries []common.ConsolidatedSummary
 		if err := json.Unmarshal(summaryData, &summaries); err != nil {
 			Logger.Error("Failed to unmarshal consolidated groups summary", "error", err)
-			return typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount
+			return typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount, originalCounts
 		}
 		files := u.GetFilesFromSummaries(summaries, constants.SummaryTypeConsolidatedGroups)
 		for key, value := range files {
 			typeFiles[key] = value.ListType
 			fileEntriesCount[key] = value.Count
 			if value.IgnoredEntriesCount > 0 && value.IgnoredFilepath != "" {
-				ignoredFilesCount[value.IgnoredFilepath] = value.IgnoredEntriesCount
+				ignoredFilesCount[key] = value.IgnoredEntriesCount
 			}
 
 			filesInvolved[key] = parseFilesFromConsolidatedSummary(value)
+			if value.OriginalCount > 0 {
+				originalCounts[key] = value.OriginalCount
+			}
 		}
 
 	case constants.SummaryTypeConsolidatedCategories:
 		var summaries []common.ConsolidatedSummary
 		if err := json.Unmarshal(summaryData, &summaries); err != nil {
 			Logger.Error("Failed to unmarshal consolidated categories summary", "error", err)
-			return typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount
+			return typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount, originalCounts
 		}
 		files := u.GetFilesFromSummaries(summaries, constants.SummaryTypeConsolidatedCategories)
 		for key, value := range files {
 			typeFiles[key] = value.ListType
 			fileEntriesCount[key] = value.Count
 			if value.IgnoredEntriesCount > 0 && value.IgnoredFilepath != "" {
-				ignoredFilesCount[value.IgnoredFilepath] = value.IgnoredEntriesCount
+				ignoredFilesCount[key] = value.IgnoredEntriesCount
 			}
 			filesInvolved[key] = parseFilesFromConsolidatedSummary(value)
+			if value.OriginalCount > 0 {
+				originalCounts[key] = value.OriginalCount
+			}
 		}
 
 	case constants.SummaryTypeTop:
 		var topSummaries []common.TopSummary
 		if err := json.Unmarshal(summaryData, &topSummaries); err != nil {
 			Logger.Error("Failed to unmarshal top summary", "error", err)
-			return typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount
+			return typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount, originalCounts
 		}
 		files := u.GetFilesFromSummaries(topSummaries, constants.SummaryTypeTop)
 		for key, value := range files {
@@ -278,7 +292,7 @@ func processFilesForSummaryType(
 		Logger.Error("Unknown summary type", "type", summaryType)
 	}
 
-	return typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount
+	return typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount, originalCounts
 }
 
 // createOutputFromFile creates an output file with template headers
@@ -289,6 +303,8 @@ func createOutputFromFile(
 	fileName string,
 	description string,
 	count int,
+	originalCount int,
+	filteredCount int,
 	outputPath string,
 	files string,
 ) error {
@@ -302,6 +318,13 @@ func createOutputFromFile(
 
 	// Execute dynamic template
 	var dynamicOutput bytes.Buffer
+
+	// duplicates: originalCount - count - filteredCount
+	duplicates := 0
+	if originalCount > (count + filteredCount) {
+		duplicates = originalCount - count - filteredCount
+	}
+
 	err := tmpl.Execute(&dynamicOutput, common.TemplateData{
 		AppName:        AppConfig.Application.Name,
 		AppVersion:     AppConfig.Application.Version,
@@ -310,6 +333,10 @@ func createOutputFromFile(
 		LastUpdated:    lastUpdated,
 		Description:    description,
 		Count:          count,
+		OriginalCount:  originalCount,
+		Removed:        duplicates,
+		Duplicates:     duplicates,
+		Filtered:       filteredCount,
 		Files:          files,
 	})
 	if err != nil {
@@ -345,6 +372,8 @@ func processRegularFiles(
 	typeFiles map[string]string,
 	fileCount map[string]int,
 	filesInvolved map[string][]common.FileInfo,
+	originalCounts map[string]int,
+	ignoredFilesCount map[string]int,
 ) {
 	for filePath, listType := range typeFiles {
 		fileName := filepath.Base(filePath)
@@ -359,6 +388,20 @@ func processRegularFiles(
 		outDir := constants.SummaryTypesOutputDirMap[summaryType]
 		outputFilePath := filepath.Join(outDir, fileName)
 
+		originalCount := 0
+		if oc, ok := originalCounts[filePath]; ok && oc > 0 {
+			originalCount = oc
+		} else {
+			for _, fi := range filesInvolved[filePath] {
+				originalCount += fi.Count
+			}
+		}
+
+		filteredCount := 0
+		if fc, ok := ignoredFilesCount[filePath]; ok {
+			filteredCount = fc
+		}
+
 		err := createOutputFromFile(
 			tmpl,
 			staticTemplate,
@@ -366,6 +409,8 @@ func processRegularFiles(
 			fileName,
 			description,
 			fileCount[filePath],
+			originalCount,
+			filteredCount,
 			outputFilePath,
 			files,
 		)
@@ -413,6 +458,8 @@ func processIgnoredFiles(
 			ignoredFileName,
 			ignoredDescription,
 			ignoredCount,
+			0,
+			0,
 			ignoredOutputPath,
 			"", // No files list for ignored files
 		)
@@ -484,7 +531,7 @@ var generateOutputCmd = &cobra.Command{
 			}
 
 			// Process files based on a summary type
-			typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount := processFilesForSummaryType(
+			typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount, originalCounts := processFilesForSummaryType(
 				summaryType,
 				summaryData,
 			)
@@ -498,6 +545,8 @@ var generateOutputCmd = &cobra.Command{
 				typeFiles,
 				fileEntriesCount,
 				filesInvolved,
+				originalCounts,
+				ignoredFilesCount,
 			)
 
 			// Process ignored files

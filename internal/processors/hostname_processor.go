@@ -5,6 +5,7 @@ import (
 
 	"github.com/phani-kb/multilog"
 
+	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/dns-toolkit/internal/utils"
 )
 
@@ -35,9 +36,30 @@ func (p *HostnameProcessor) Process(_ *multilog.Logger, content string) ([]strin
 			continue
 		}
 
-		// Split by # to remove comments first
-		parts := strings.SplitN(line, "#", 2)
-		cleanLine := strings.TrimSpace(parts[0])
+		cleanLine := line
+		minIndex := len(line)
+		for _, prefix := range constants.CommentPrefixes {
+			if prefix == "--" {
+				// only match -- if it's preceded by whitespace
+				for i := 1; i < len(line); i++ {
+					if line[i-1] == ' ' || line[i-1] == '\t' {
+						if strings.HasPrefix(line[i:], "--") {
+							if i < minIndex {
+								minIndex = i
+							}
+							break
+						}
+					}
+				}
+			} else {
+				if idx := strings.Index(line, prefix); idx != -1 && idx < minIndex {
+					minIndex = idx
+				}
+			}
+		}
+		if minIndex < len(line) {
+			cleanLine = strings.TrimSpace(line[:minIndex])
+		}
 
 		// Split remaining line by whitespace
 		fields := strings.Fields(cleanLine)
@@ -46,7 +68,8 @@ func (p *HostnameProcessor) Process(_ *multilog.Logger, content string) ([]strin
 			domain := strings.TrimSpace(fields[1])
 
 			// Validate and store domain
-			if utils.IsDomain(domain) {
+			if constants.HostnameRegex.MatchString(domain) &&
+				len(domain) <= constants.MaxDomainLength {
 				validEntries = append(validEntries, domain)
 			} else {
 				invalidEntries = append(invalidEntries, line)

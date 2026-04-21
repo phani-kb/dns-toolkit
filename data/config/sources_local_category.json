@@ -9,7 +9,8 @@
         "internet.nl",
         "teams.microsoft.com",
         "login.newrelic.com",
-        "newrelic.com"
+        "newrelic.com",
+        "onenr.io"
       ],
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,

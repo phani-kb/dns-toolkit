@@ -2,6 +2,8 @@
 # File name: {{.FileName}}
 # Last Updated: {{.LastUpdated}}
 # Format: {{.Description}}
-# Count: {{.Count}}{{if .Files}}
+# Count: {{.Count}}{{if gt .OriginalCount 0}} (original: {{.OriginalCount}}){{end}}{{if gt .Duplicates 0}}
+# Duplicates: {{.Duplicates}}{{end}}{{if gt .Filtered 0}}
+# Filtered: {{.Filtered}}{{end}}{{if .Files}}
 # Files:
 {{.Files}}{{end}}
