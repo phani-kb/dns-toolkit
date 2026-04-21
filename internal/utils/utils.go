@@ -27,6 +27,7 @@ import (
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/multilog"
+	"golang.org/x/net/idna"
 )
 
 // FindProjectRoot walks up the directory tree to find the project root (containing go.mod)
@@ -506,15 +507,86 @@ func isCommentFast(line string) bool {
 // Returns:
 //   - true if the string is a valid domain name, false otherwise
 func IsDomain(domain string) bool {
-	if (constants.SourceTypeRegexMap[constants.SourceTypeDomain].MatchString(domain) && !IsIP(domain)) ||
-		isPunycodeEncoded(domain) {
+	domain = strings.TrimSpace(domain)
+	if domain == "" {
+		return false
+	}
+
+	if len(domain) > constants.MaxDomainLength {
+		return false
+	}
+
+	if IsIP(domain) {
+		return false
+	}
+
+	if constants.SourceTypeRegexMap[constants.SourceTypeDomain].MatchString(domain) {
 		return true
 	}
-	return false
+
+	asciiDomain, err := idna.Lookup.ToASCII(domain)
+	if err != nil {
+		return false
+	}
+
+	if asciiDomain == "" || len(asciiDomain) > constants.MaxDomainLength {
+		return false
+	}
+
+	if IsIP(asciiDomain) {
+		return false
+	}
+
+	labels := strings.Split(asciiDomain, ".")
+	if len(labels) < 2 {
+		return false
+	}
+
+	for _, label := range labels {
+		if !isValidASCIILabel(label) {
+			return false
+		}
+	}
+
+	tld := labels[len(labels)-1]
+	if len(tld) < 2 {
+		return false
+	}
+
+	if !containsLetter(tld) && !strings.HasPrefix(strings.ToLower(tld), constants.PunycodePrefix) {
+		return false
+	}
+
+	return true
 }
 
-func isPunycodeEncoded(domain string) bool {
-	return strings.HasPrefix(domain, constants.PunycodePrefix)
+func isValidASCIILabel(label string) bool {
+	if label == "" || len(label) > constants.MaxLabelLength {
+		return false
+	}
+	if label[0] == '-' || label[len(label)-1] == '-' {
+		return false
+	}
+
+	for i := 0; i < len(label); i++ {
+		ch := label[i]
+		if (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9') || ch == '-' {
+			continue
+		}
+		return false
+	}
+
+	return true
+}
+
+func containsLetter(s string) bool {
+	for i := 0; i < len(s); i++ {
+		ch := s[i]
+		if (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') {
+			return true
+		}
+	}
+	return false
 }
 
 // PickRandomLines reads a file and returns a specified number of random lines from it.
@@ -1396,6 +1468,24 @@ func ExtractEntriesWithRegex(content string, regex *regexp.Regexp) ([]string, []
 		if matchedString != "" {
 			validEntries = append(validEntries, matchedString)
 		} else {
+			invalidEntries = append(invalidEntries, line)
+		}
+	}
+	return RemoveDuplicates(validEntries), RemoveDuplicates(invalidEntries)
+}
+
+// ExtractDomains parses content line by line, using IsDomain
+func ExtractDomains(content string) ([]string, []string) {
+	var validEntries, invalidEntries []string
+	lines := strings.SplitSeq(content, "\n")
+	for line := range lines {
+		line = strings.TrimSpace(line)
+		if IsComment(line) {
+			continue
+		}
+		if IsDomain(line) {
+			validEntries = append(validEntries, line)
+		} else if line != "" {
 			invalidEntries = append(invalidEntries, line)
 		}
 	}

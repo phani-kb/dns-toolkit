@@ -303,7 +303,11 @@ func extractEntriesByType(
 ) ([]string, []string) {
 	var validEntries, invalidEntries []string
 
-	if regex, exists := constants.SourceTypeRegexMap[sourceType]; exists {
+	if sourceType == constants.SourceTypeDomain {
+		vEntries, iEntries := u.ExtractDomains(content)
+		validEntries = append(validEntries, vEntries...)
+		invalidEntries = append(invalidEntries, iEntries...)
+	} else if regex, exists := constants.SourceTypeRegexMap[sourceType]; exists {
 		vEntries, iEntries := u.ExtractEntriesWithRegex(content, regex)
 		validEntries = append(validEntries, vEntries...)
 		invalidEntries = append(invalidEntries, iEntries...)

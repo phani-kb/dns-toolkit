@@ -124,6 +124,41 @@ func generateCreditsSection() string {
 		}
 	}
 
+	// read processed_summary.json for sources not in overlap
+	processedFile := filepath.Join(constants.SummaryDir, constants.DefaultSummaryFiles["processed"])
+	if data, err := os.ReadFile(processedFile); err == nil {
+		var processed []struct {
+			Name       string `json:"name"`
+			ValidFiles []struct {
+				NumberOfEntries int `json:"number_of_entries"`
+			} `json:"valid_files"`
+			InvalidFiles []struct {
+				NumberOfEntries int `json:"number_of_entries"`
+			} `json:"invalid_files"`
+		}
+		if err := json.Unmarshal(data, &processed); err == nil {
+			for _, p := range processed {
+				// add if not already in overlapMap
+				if _, exists := overlapMap[p.Name]; !exists {
+					validCount := 0
+					for _, vf := range p.ValidFiles {
+						validCount += vf.NumberOfEntries
+					}
+					invalidCount := 0
+					for _, inf := range p.InvalidFiles {
+						invalidCount += inf.NumberOfEntries
+					}
+					totalCount := validCount + invalidCount
+
+					if totalCount > 0 {
+						// no overlap analysis, show count / 0 / 0
+						overlapMap[p.Name] = [3]int{totalCount, 0, 0}
+					}
+				}
+			}
+		}
+	}
+
 	for _, filename := range filenames {
 		sources := sourcesByFile[filename]
 		if len(sources) == 0 {

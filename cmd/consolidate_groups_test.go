@@ -24,6 +24,15 @@ func createTempFileWithContentGroups(t *testing.T, content string) string {
 	return tmpFile
 }
 
+func processGroupConsolidation(
+	logger *multilog.Logger,
+	group string,
+	processedFiles []c.ProcessedFile,
+	genericSourceTypes []string,
+) map[string][]c.ConsolidatedSummary {
+	return processGroupConsolidationWithAllow(logger, group, processedFiles, genericSourceTypes)
+}
+
 func TestConsolidateGroupsCommand(t *testing.T) {
 	assert.NotNil(t, consolidateGroupsCmd)
 	assert.Equal(t, "groups", consolidateGroupsCmd.Use)

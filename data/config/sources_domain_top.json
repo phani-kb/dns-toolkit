@@ -3,9 +3,10 @@
     {
       "name": "tranco",
       "categories": "topdomains",
-      "count_to_consider": 1000,
+      "count_to_consider": 500,
       "files": "top-1m.csv",
       "frequency": "weekly",
+      "notes": "Reduced to 500, as many conflicts with other sources",
       "types": [
         {
           "name": "domain_top",

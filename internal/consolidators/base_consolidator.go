@@ -39,7 +39,7 @@ func (bc *BaseConsolidator) Consolidate(
 
 	for _, processedFile := range processedFiles {
 		if !bc.IsValid(processedFile) {
-			logger.Debugf("Skipping invalid processed file: %s", processedFile.Filepath)
+			// logger.Debugf("Skipping invalid processed file: %s", processedFile.Filepath)
 			continue
 		}
 		logger.Debugf("Reading entry(s) from file: %s", processedFile.Filepath)
@@ -92,8 +92,8 @@ func (bc *BaseConsolidator) FilterEntries(
 		return filteredSet, ignoredSet
 	}
 
-	logger.Infof(
-		"Filtering %d entry(s) with %d ignored entry(s), source type: %s, list type: %s",
+	logger.Debugf(
+		"Filtering %d entry(s) with %d filter entries, source type: %s, list type: %s",
 		len(entrySet),
 		len(filterSet),
 		bc.sourceType,
@@ -123,7 +123,7 @@ func (bc *BaseConsolidator) FilterEntries(
 		}
 	}
 
-	logger.Infof("Entry(s) %d filtered, %d ignored", len(filteredSet), len(ignoredSet))
+	logger.Debugf("Filtering complete: %d kept, %d ignored", len(filteredSet), len(ignoredSet))
 
 	return filteredSet, ignoredSet
 }

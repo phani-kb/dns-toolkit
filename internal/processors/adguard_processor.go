@@ -1,6 +1,7 @@
 package processors
 
 import (
+	"slices"
 	"strings"
 
 	"github.com/phani-kb/multilog"
@@ -10,12 +11,10 @@ import (
 )
 
 const (
-	sourceTypeAdguard       = "adguard"
-	adguardSourceTypeDomain = "domain_adguard"
-	sourceTypeAdguardDomain = "adguard_domain"
-	adguardExceptionPrefix  = "@@"
-	adguardBlockPrefix      = "||"
-	adguardBlockSuffix      = "^"
+	sourceTypeAdguard        = "adguard"
+	adguardSourceTypeDomain  = "domain_adguard"
+	sourceTypeAdguardDomain  = "adguard_domain"
+	sourceTypeAdguardHttpUrl = "adguard_http_url"
 )
 
 // AdGuardBlocklistProcessor handles AdGuard blocklist entries
@@ -41,7 +40,7 @@ func (p *AdGuardBlocklistProcessor) Process(_ *multilog.Logger, content string) 
 			continue
 		}
 
-		if !strings.HasPrefix(line, adguardExceptionPrefix) {
+		if !strings.HasPrefix(line, AdguardExceptionPrefix) {
 			validEntries = append(validEntries, line)
 		} else {
 			// Matching exception format
@@ -74,7 +73,7 @@ func (p *AdGuardAllowlistProcessor) Process(_ *multilog.Logger, content string) 
 			continue
 		}
 
-		if strings.HasPrefix(line, adguardExceptionPrefix) {
+		if strings.HasPrefix(line, AdguardExceptionPrefix) {
 			validEntries = append(validEntries, line)
 		} else {
 			// Non-matching format for allowlist
@@ -88,22 +87,24 @@ func ExtractAllowlistDomains(logger *multilog.Logger, content string) ([]string,
 	var validEntries, invalidEntries []string
 	lines := strings.Split(content, "\n")
 
-	domainRegex := constants.SourceTypeRegexMap[constants.SourceTypeDomainFinder]
-	if domainRegex == nil {
-		logger.Errorf("Regex not found for source type: %s", adguardSourceTypeDomain)
-		return nil, nil
-	}
-
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if u.IsComment(line) {
 			continue
 		}
 
-		if strings.HasPrefix(line, adguardExceptionPrefix) {
-			domain := domainRegex.FindString(line)
-			if u.IsDomain(domain) {
-				validEntries = append(validEntries, domain)
+		if afterException, ok := strings.CutPrefix(line, AdguardExceptionPrefix); ok {
+			// extract domain between @@|| and ^
+			if afterBlock, ok := strings.CutPrefix(afterException, AdguardBlockPrefix); ok {
+				if domain, ok := strings.CutSuffix(afterBlock, AdguardBlockSuffix); ok {
+					if u.IsDomain(domain) {
+						validEntries = append(validEntries, domain)
+					} else {
+						invalidEntries = append(invalidEntries, line)
+					}
+				} else {
+					invalidEntries = append(invalidEntries, line)
+				}
 			} else {
 				invalidEntries = append(invalidEntries, line)
 			}
@@ -119,12 +120,6 @@ func ExtractBlocklistDomains(logger *multilog.Logger, content string) ([]string,
 	var validEntries, invalidEntries []string
 	lines := strings.Split(content, "\n")
 
-	domainRegex := constants.SourceTypeRegexMap[constants.SourceTypeDomainFinder]
-	if domainRegex == nil {
-		logger.Errorf("Regex not found for source type: %s", adguardSourceTypeDomain)
-		return nil, nil
-	}
-
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if u.IsComment(line) {
@@ -132,10 +127,13 @@ func ExtractBlocklistDomains(logger *multilog.Logger, content string) ([]string,
 		}
 
 		// extract domain between || and ^
-		if strings.HasPrefix(line, adguardBlockPrefix) && strings.HasSuffix(line, adguardBlockSuffix) {
-			domain := domainRegex.FindString(line)
-			if u.IsDomain(domain) {
-				validEntries = append(validEntries, domain)
+		if afterBlock, ok := strings.CutPrefix(line, AdguardBlockPrefix); ok {
+			if domain, ok := strings.CutSuffix(afterBlock, AdguardBlockSuffix); ok {
+				if u.IsDomain(domain) {
+					validEntries = append(validEntries, domain)
+				} else {
+					invalidEntries = append(invalidEntries, line)
+				}
 			} else {
 				invalidEntries = append(invalidEntries, line)
 			}
@@ -144,6 +142,48 @@ func ExtractBlocklistDomains(logger *multilog.Logger, content string) ([]string,
 			invalidEntries = append(invalidEntries, line)
 		}
 	}
+	return validEntries, invalidEntries
+}
+
+// AdGuardHttpUrlProcessor converts http/https URLs into AdGuard blocklist rules (||host/path$)
+type AdGuardHttpUrlProcessor struct {
+	BaseProcessor
+}
+
+// NewAdGuardHttpUrlProcessor creates a new processor for adguard_httpurl
+func NewAdGuardHttpUrlProcessor(sourceType, listType string) *AdGuardHttpUrlProcessor {
+	return &AdGuardHttpUrlProcessor{BaseProcessor: NewBaseProcessor(sourceType, listType)}
+}
+
+// Process converts each valid http/https URL into an AdGuard block rule
+func (p *AdGuardHttpUrlProcessor) Process(_ *multilog.Logger, content string) ([]string, []string) {
+	var validEntries, invalidEntries []string
+	lines := strings.Split(content, "\n")
+	unique := make(map[string]struct{})
+
+	for _, line := range lines {
+		line = strings.TrimSpace(line)
+		if line == "" || u.IsComment(line) {
+			continue
+		}
+
+		if strings.HasPrefix(line, AdguardBlockPrefix) || strings.HasPrefix(line, AdguardExceptionPrefix) {
+			invalidEntries = append(invalidEntries, line)
+			continue
+		}
+
+		if entry, ok := ParseToAdguardEntry(line); ok {
+			unique[entry] = struct{}{}
+		} else {
+			invalidEntries = append(invalidEntries, line)
+		}
+	}
+
+	for e := range unique {
+		validEntries = append(validEntries, e)
+	}
+	slices.Sort(validEntries)
+
 	return validEntries, invalidEntries
 }
 
@@ -167,12 +207,12 @@ func (p *AdGuardDomainBlocklistProcessor) Process(_ *multilog.Logger, content st
 			continue
 		}
 
-		if strings.HasPrefix(line, adguardBlockPrefix) || strings.HasPrefix(line, adguardExceptionPrefix) {
+		if strings.HasPrefix(line, AdguardBlockPrefix) || strings.HasPrefix(line, AdguardExceptionPrefix) {
 			invalidEntries = append(invalidEntries, line)
 			continue
 		}
 		if u.IsDomain(line) {
-			validEntries = append(validEntries, adguardBlockPrefix+line+adguardBlockSuffix)
+			validEntries = append(validEntries, AdguardBlockPrefix+line+AdguardBlockSuffix)
 		} else {
 			invalidEntries = append(invalidEntries, line)
 		}
@@ -200,12 +240,12 @@ func (p *AdGuardDomainAllowlistProcessor) Process(_ *multilog.Logger, content st
 			continue
 		}
 
-		if strings.HasPrefix(line, adguardBlockPrefix) || strings.HasPrefix(line, adguardExceptionPrefix) {
+		if strings.HasPrefix(line, AdguardBlockPrefix) || strings.HasPrefix(line, AdguardExceptionPrefix) {
 			invalidEntries = append(invalidEntries, line)
 			continue
 		}
 		if u.IsDomain(line) {
-			validEntries = append(validEntries, adguardExceptionPrefix+adguardBlockPrefix+line+adguardBlockSuffix)
+			validEntries = append(validEntries, AdguardExceptionPrefix+AdguardBlockPrefix+line+AdguardBlockSuffix)
 		} else {
 			invalidEntries = append(invalidEntries, line)
 		}
@@ -234,5 +274,9 @@ func init() {
 	})
 	SpecialProcessors.Register(sourceTypeAdguardDomain, constants.ListTypeAllowlist, func(st, lt string) Processor {
 		return NewAdGuardDomainAllowlistProcessor(st, lt)
+	})
+
+	SpecialProcessors.Register(sourceTypeAdguardHttpUrl, constants.ListTypeBlocklist, func(st, lt string) Processor {
+		return NewAdGuardHttpUrlProcessor(st, lt)
 	})
 }
