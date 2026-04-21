@@ -37,7 +37,12 @@ type FilesChecksumConfig struct {
 	Enabled   bool   `yaml:"enabled"`
 }
 
+type DatabaseConfig struct {
+	Path string `yaml:"path"`
+}
+
 type DNSToolkitConfig struct {
+	Database                  DatabaseConfig      `yaml:"database,omitempty"`
 	SourceFiles               []string            `yaml:"source_files"`
 	SkipCertVerificationHosts []string            `yaml:"skip_cert_verification_hosts,omitempty"`
 	Folders                   FoldersConfig       `yaml:"folders"`
