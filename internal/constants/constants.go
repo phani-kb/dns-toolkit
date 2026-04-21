@@ -13,6 +13,11 @@ const (
 	GitHubRepoURL  = "https://github.com/phani-kb/dns-toolkit"
 )
 
+const (
+	MaxDomainLength = 253 // max total FQDN length
+	MaxLabelLength  = 63  // max length per label
+)
+
 // SummaryTypes - Enum-like constants for summary types
 const (
 	SummaryTypeDownload               = "download"
@@ -107,6 +112,7 @@ const (
 	CategoryFake            = "fake"
 	CategoryFakeNews        = "fakenews"
 	CategoryGambling        = "gambling"
+	CategoryGaming          = "gaming"
 	CategoryThreat          = "threat"
 	CategoryPrivacy         = "privacy"
 	CategorySecurity        = "security"
@@ -135,6 +141,8 @@ const (
 	CategoryKademlia        = "kad"
 	CategoryAI              = "ai"
 	CategorySpyware         = "spyware"
+	CategoryTOR             = "tor"
+	CategoryBot             = "bot"
 
 	GroupMini   = "mini"
 	GroupLite   = "lite"
@@ -156,6 +164,8 @@ const (
 	SourceTypeDomainFinder               = "domain_finder"
 	SourceTypeAdguard                    = "adguard"
 	SourceTypeAdguardDomain              = "adguard_domain"
+	SourceTypeAdguardHttpUrl             = "adguard_http_url"
+	SourceTypeAdguardCsvHttpUrlFind      = "adguard_csv_http_url_find"
 	SourceTypeIpv4Hostname               = "ipv4_hostname"
 	SourceTypeMixed                      = "mixed"
 	SourceTypeHostname                   = "hostname"
@@ -195,6 +205,8 @@ var (
 		SourceTypeDomainFinder:               true,
 		SourceTypeAdguard:                    true,
 		SourceTypeAdguardDomain:              true,
+		SourceTypeAdguardCsvHttpUrlFind:      true,
+		SourceTypeAdguardHttpUrl:             true,
 		SourceTypeIpv4Hostname:               true,
 		SourceTypeMixed:                      true,
 		SourceTypeHostname:                   true,
@@ -235,18 +247,32 @@ var ListTypeMap = map[string]string{
 }
 
 var SourceTypeRegexMap = map[string]*regexp.Regexp{
-	SourceTypeIpv4:     regexp.MustCompile(`\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b`),
+	// match only standalone IPs, not those in CIDR notation (for line-based matching)
+	SourceTypeIpv4:     regexp.MustCompile(`(?:^|[^/\d])(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})(?:[^\d/]|$)`),
 	SourceTypeIpv6:     regexp.MustCompile(`\b([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b`),
 	SourceTypeCidrIpv4: regexp.MustCompile(`\b\d{1,3}(\.\d{1,3}){3}/\d{1,2}\b`),
-	SourceTypeDomain:   regexp.MustCompile(`^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$`),
-	SourceTypeIpv4Hostname: regexp.MustCompile(
-		`^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$`,
+	SourceTypeDomain: regexp.MustCompile(
+		`^([a-zA-Z0-9_]([a-zA-Z0-9\-_]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})$`,
 	),
-	SourceTypeDomainFinder: regexp.MustCompile(`([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}`),
+	SourceTypeIpv4Hostname: regexp.MustCompile(
+		`^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+([a-zA-Z0-9_-]+\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})$`, // nolint:lll
+	),
+	SourceTypeDomainFinder: regexp.MustCompile(
+		`([a-zA-Z0-9_]([a-zA-Z0-9\-_]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})`,
+	),
+}
+
+var SourceTypeExtractorRegexMap = map[string]*regexp.Regexp{
+	SourceTypeIpv4: regexp.MustCompile(`\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}`),
 }
 
 const (
 	DomainHttpUrlRegex = `^(?:https?:\/\/)?([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(?::\d+)?(?:\/[^\s]*)?$`
+)
+
+// HostnameRegex regex for validating hostnames from hosts files - allows labels to start with hyphens and digits
+var HostnameRegex = regexp.MustCompile(
+	`^([a-zA-Z0-9_-]([a-zA-Z0-9\-_]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})$`,
 )
 
 var (
@@ -346,6 +372,9 @@ var (
 		CategoryKademlia:        true,
 		CategoryAI:              true,
 		CategorySpyware:         true,
+		CategoryTOR:             true,
+		CategoryGaming:          true,
+		CategoryBot:             true,
 	}
 
 	ValidGroups = map[string]bool{
@@ -382,11 +411,12 @@ const (
 	MaxSampleLinesToCategorize    = 100
 	TimestampFormat               = "20060102_150405"
 	BackupFileTimestampFormat     = "20060102_150405"
-	DownloadInterval              = 1000 * time.Millisecond
+	DownloadInterval              = 2000 * time.Millisecond
 	DefaultHashAlgorithm          = "md5"
 	DefaultMaxRetries             = 3
 	DefaultRetryDelayInSeconds    = 10
 	DefaultClientTimeoutInSeconds = 30
+	DefaultMaxRedirects           = 20
 	EntryAverageCharLength        = 30
 	EntryMinCharLength            = 6
 	MaxPreallocEntries            = 10_000_000

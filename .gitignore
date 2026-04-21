@@ -63,3 +63,4 @@ testdata/data/allowlist_*.txt
 testdata/**/*.prof
 testdata/*.md
 testdata/*.txt
+testdata/**/*.txt

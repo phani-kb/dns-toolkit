@@ -355,7 +355,7 @@ jobs:
           ./bin/dns-toolkit consolidate categories
           ./bin/dns-toolkit top
           ./bin/dns-toolkit overlap
-          ./bin/dns-toolkit generate output -i
+          ./bin/dns-toolkit generate output
           ./bin/dns-toolkit generate output-readme
           ./bin/dns-toolkit generate overlap-readme
           ./bin/dns-toolkit generate summaries-readme

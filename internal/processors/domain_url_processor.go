@@ -25,7 +25,7 @@ func (p *DomainUrlProcessor) Process(_ *multilog.Logger, content string) ([]stri
 	var validEntries, invalidEntries []string
 	lines := strings.Split(content, "\n")
 
-	urlRegex := regexp.MustCompile(`^([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})(?::\d+)?(?:/.*)?$`)
+	urlRegex := regexp.MustCompile(`(?i)(?:^[a-z]+://)?([a-z0-9-]+(?:\.[a-z0-9-]+)+)(?::\d+)?(?:/|$)`)
 
 	for _, line := range lines {
 		line = strings.TrimSpace(line)

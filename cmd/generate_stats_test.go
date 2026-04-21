@@ -134,13 +134,13 @@ func TestGenerateStatsSection(t *testing.T) {
 	assert.Contains(t, section, "## Source Statistics")
 	assert.Contains(t, section, "| Metric | Count | Details |")
 
-	assert.Contains(t, section, "| **Total Sources** | 10 | 8 enabled, 2 disabled |")
-	assert.Contains(t, section, "| **Blocklist Sources** | 9 | Sources providing blocking rules |")
-	assert.Contains(t, section, "| **Allowlist Sources** | 3 | Sources providing exception rules |")
+	assert.Contains(t, section, "| **Total&nbsp;Sources** | 10 | 8 enabled, 2 disabled |")
+	assert.Contains(t, section, "| **Blocklist&nbsp;Sources** | 9 | Sources providing blocking rules |")
+	assert.Contains(t, section, "| **Allowlist&nbsp;Sources** | 3 | Sources providing exception rules |")
 	assert.Contains(t, section, "| **Categories** | 2 | ads, malware |")
-	assert.Contains(t, section, "| **Source Types** | 2 | domain, ipv4 |")
-	assert.Contains(t, section, "| **Geographic Coverage** | 2 countries | US, DE |")
-	assert.Contains(t, section, "| **Last Updated** | 2025-01-01 12:00:00 UTC | Statistics generation time |")
+	assert.Contains(t, section, "| **Source&nbsp;Types** | 2 | domain, ipv4 |")
+	assert.Contains(t, section, "| **Geographic&nbsp;Coverage** | 2 countries | US, DE |")
+	assert.Contains(t, section, "| **Last&nbsp;Updated** | 2025-01-01 12:00:00 UTC | Statistics generation time |")
 
 	assert.True(t, strings.HasSuffix(section, "<!-- STATS_END -->"))
 }
@@ -178,7 +178,7 @@ func TestUpdateReadmeWithStats(t *testing.T) {
 		assert.NotContains(t, contentStr, "| **Total Sources** | 99 |")
 
 		assert.Contains(t, contentStr, "## Source Statistics")
-		assert.Contains(t, contentStr, "| **Total Sources** | 5 | 4 enabled, 1 disabled |")
+		assert.Contains(t, contentStr, "| **Total&nbsp;Sources** | 5 | 4 enabled, 1 disabled |")
 		assert.Contains(t, contentStr, "2025-01-01 12:00:00 UTC")
 
 		assert.Contains(t, contentStr, "# DNS Toolkit Test")
@@ -214,7 +214,7 @@ func TestUpdateReadmeWithStats(t *testing.T) {
 		contentStr := string(updatedContent)
 
 		assert.Contains(t, contentStr, "## Source Statistics")
-		assert.Contains(t, contentStr, "| **Total Sources** | 3 | 2 enabled, 1 disabled |")
+		assert.Contains(t, contentStr, "| **Total&nbsp;Sources** | 3 | 2 enabled, 1 disabled |")
 
 		statsIndex := strings.Index(contentStr, "## Source Statistics")
 		outputsIndex := strings.Index(contentStr, "## Installation")
@@ -283,7 +283,7 @@ Output information here.
 		contentStr := string(updatedContent)
 
 		assert.Contains(t, contentStr, "## Source Statistics")
-		assert.Contains(t, contentStr, "| **Total Sources** | 1 | 1 enabled, 0 disabled |")
+		assert.Contains(t, contentStr, "| **Total&nbsp;Sources** | 1 | 1 enabled, 0 disabled |")
 
 		assert.Contains(t, contentStr, "<!-- STATS_START -->")
 		assert.Contains(t, contentStr, "<!-- STATS_END -->")
@@ -325,7 +325,7 @@ Output information here.
 		contentStr := string(updatedContent)
 
 		assert.Contains(t, contentStr, "## Source Statistics")
-		assert.Contains(t, contentStr, "| **Total Sources** | 1 | 1 enabled, 0 disabled |")
+		assert.Contains(t, contentStr, "| **Total&nbsp;Sources** | 1 | 1 enabled, 0 disabled |")
 
 		assert.Contains(t, contentStr, "<!-- STATS_START -->")
 		assert.Contains(t, contentStr, "<!-- STATS_END -->")
@@ -408,7 +408,7 @@ func TestGenerateStatsCommandRun(t *testing.T) {
 	contentStr := string(updatedContent)
 
 	assert.Contains(t, contentStr, "## Source Statistics")
-	assert.Contains(t, contentStr, "| **Total Sources** | 1 | 1 enabled, 0 disabled |")
+	assert.Contains(t, contentStr, "| **Total&nbsp;Sources** | 1 | 1 enabled, 0 disabled |")
 }
 
 func TestCollectSourceStatsWithEmptyData(t *testing.T) {

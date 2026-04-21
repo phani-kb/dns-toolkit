@@ -7,6 +7,7 @@ import (
 	"io"
 	"math/rand"
 	"net/http"
+	"net/http/cookiejar"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -248,6 +249,22 @@ func (d *DefaultDownloader) downloadFile(
 	defer u.CloseBody(logger, resp.Body)
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		if resp.StatusCode >= 300 && resp.StatusCode < 400 {
+			location := resp.Header.Get("Location")
+			if location != "" && resp.Request != nil && resp.Request.URL != nil {
+				target, parseErr := resp.Request.URL.Parse(location)
+				if parseErr == nil {
+					current := canonicalURLString(resp.Request.URL)
+					targetCanonical := canonicalURLString(target)
+					if current == targetCanonical {
+						loopErr := fmt.Errorf("redirect loop detected for %s", targetCanonical)
+						logger.Errorf("%v", loopErr)
+						return "", false, loopErr
+					}
+				}
+			}
+		}
+
 		statusErr := &HTTPStatusError{
 			StatusCode: resp.StatusCode,
 			Status:     resp.Status,
@@ -300,8 +317,14 @@ func (d *DefaultDownloader) createHTTPClient(
 	skipCertHosts []string,
 	parsedURL *url.URL,
 ) *http.Client {
+	jar, jarErr := cookiejar.New(nil)
+	if jarErr != nil {
+		logger.Warnf("Failed to create cookie jar: %v", jarErr)
+	}
+
 	client := &http.Client{
 		Timeout: d.clientTimeout,
+		Jar:     jar,
 	}
 
 	if skipCertVerify {
@@ -319,6 +342,30 @@ func (d *DefaultDownloader) createHTTPClient(
 		}
 	}
 	return client
+}
+
+func canonicalURLString(u *url.URL) string {
+	if u == nil {
+		return ""
+	}
+
+	scheme := strings.ToLower(u.Scheme)
+	host := strings.ToLower(u.Host)
+	path := u.EscapedPath()
+	if path == "" {
+		path = "/"
+	} else {
+		path = strings.TrimRight(path, "/")
+		if path == "" {
+			path = "/"
+		}
+	}
+
+	if u.RawQuery != "" {
+		return fmt.Sprintf("%s://%s%s?%s", scheme, host, path, u.RawQuery)
+	}
+
+	return fmt.Sprintf("%s://%s%s", scheme, host, path)
 }
 
 func (d *DefaultDownloader) canSkipDownload(
@@ -359,11 +406,11 @@ func (d *DefaultDownloader) canSkipDownload(
 		if lastModStr := resp.Header.Get("Last-Modified"); lastModStr != "" {
 			lastMod, err := time.Parse(http.TimeFormat, lastModStr)
 			if err == nil && !lastMod.After(localModTime) {
-				logger.Infof("Skipping download, local file is up-to-date: %s", filePath)
+				logger.Debugf("Skipping download, local file is up-to-date: %s", filePath)
 				return true
 			}
 		} else {
-			logger.Infof("Skipping download, local file exists with same size: %s", filePath)
+			logger.Debugf("Skipping download, local file exists with same size: %s", filePath)
 			return true
 		}
 	}
@@ -376,14 +423,14 @@ func (d *DefaultDownloader) handleArchiveFile(logger *multilog.Logger, file c.Do
 			logger.Errorf("Failed to extract archive: %v", err)
 			return err
 		}
-		logger.Infof("Extracted archive %s", filePath)
+		logger.Debugf("Extracted archive %s", filePath)
 		for _, target := range file.Targets {
 			if err := u.CopySourceToTarget(logger, target); err != nil {
 				logger.Errorf("Failed to copy target file: %v", err)
 				return err
 			}
 		}
-		logger.Infof("Copied target %d file(s)", len(file.Targets))
+		logger.Debugf("Copied target %d file(s)", len(file.Targets))
 		return nil
 	}
 	return nil
@@ -410,21 +457,16 @@ func (d *DefaultDownloader) ShouldDownload(
 
 	shouldDownload, frequency, lastTime, remaining := u.ShouldDownloadSourceInfo(logger, summaryFile, file.Name)
 	if !shouldDownload {
-		if lastTime.IsZero() {
-			logger.Infof(
-				"Skipping download due to frequency window (%s) not elapsed: %s (remaining %s)",
-				frequency,
-				filePath,
-				remaining.Truncate(time.Second),
-			)
-		} else {
-			logger.Infof("Skipping download due to frequency window (%s) not elapsed: %s (last: %s, remaining: %s)",
-				frequency,
-				filePath,
+		remainingStr := remaining.Truncate(time.Second)
+		msg := fmt.Sprintf("%s window not elapsed (remaining %s)", frequency, remainingStr)
+		if !lastTime.IsZero() {
+			msg = fmt.Sprintf("(last: %s, window: %s, remaining: %s)",
 				lastTime.Format("2006-01-02 15:04:05"),
-				remaining.Truncate(time.Second),
+				remainingStr,
+				frequency,
 			)
 		}
+		logger.Debugf("Skipping download for %s %s", file.Name, msg)
 		return false
 	}
 

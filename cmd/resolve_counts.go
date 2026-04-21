@@ -66,7 +66,7 @@ func ResolveConflictsByCounts(
 ) (string, string, string, error) {
 	logger.Infof("Resolving conflicts and producing final sets...")
 
-	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap := BuildResolutionSets(
+	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap := GetCachedResolutionSets(
 		logger,
 		processedFiles,
 	)
@@ -121,12 +121,14 @@ func BuildResolutionSets(
 		DetailsMap:  make(map[string]ConflictDetail),
 	}
 
-	result.Conflicts = resolveByCounts(sourceMaps, result)
+	result.Conflicts = resolveByCounts(logger, sourceMaps, result)
+	logger.Infof("Total conflicts before manual overrides: %d", len(result.Conflicts))
 
 	applyManualOverrides(logger, sourceMaps, result)
 
 	// Filter out manually overridden entries from conflicts
 	result.Conflicts = filterConflictsAfterOverrides(result)
+	logger.Infof("Total conflicts after manual overrides: %d", len(result.Conflicts))
 
 	fillDetailsForResolution(sourceMaps, result)
 
@@ -170,10 +172,15 @@ func buildSourceMaps(logger *multilog.Logger, processedFiles []c.ProcessedFile) 
 }
 
 // resolveByCounts performs count-based resolution with single pass
-func resolveByCounts(maps *SourceMaps, result *ResolutionResult) []ConflictDetail {
+func resolveByCounts(logger *multilog.Logger, maps *SourceMaps, result *ResolutionResult) []ConflictDetail {
 	conflicts := make([]ConflictDetail, 0)
 
 	allEntries := getAllUniqueEntries(maps.BlockMap, maps.AllowMap)
+
+	allowWins := 0
+	blockWins := 0
+	equalCounts := 0
+	allowOnlyAdded := 0
 
 	for entry := range allEntries {
 		blockSources := getSourcesList(maps.BlockMap[entry])
@@ -191,17 +198,60 @@ func resolveByCounts(maps *SourceMaps, result *ResolutionResult) []ConflictDetai
 
 		result.DetailsMap[entry] = detail
 
+		minAllow := 1
+		minBlock := 1
+		if AppConfig != nil && AppConfig.DNSToolkit.Override.Enabled {
+			for _, t := range AppConfig.DNSToolkit.Override.Thresholds {
+				if strings.EqualFold(t.Name, "allowlist") && t.MinSources > 0 {
+					minAllow = t.MinSources
+				}
+				if strings.EqualFold(t.Name, "blocklist") && t.MinSources > 0 {
+					minBlock = t.MinSources
+				}
+			}
+		}
+
 		switch {
 		case blockCount > allowCount:
-			addToBlockSets(result, entry, maps.EntryTypes[entry])
+			if allowCount == 0 {
+				addToBlockSets(result, entry, maps.EntryTypes[entry])
+				blockWins++
+			} else {
+				if blockCount >= minBlock {
+					addToBlockSets(result, entry, maps.EntryTypes[entry])
+					blockWins++
+				} else {
+					conflicts = append(conflicts, detail)
+				}
+			}
 		case allowCount > blockCount:
-			addToAllowSets(result, entry, maps.EntryTypes[entry])
+			if blockCount == 0 {
+				addToAllowSets(result, entry, maps.EntryTypes[entry])
+				allowWins++
+			} else {
+				if allowCount >= minAllow {
+					addToAllowSets(result, entry, maps.EntryTypes[entry])
+					allowWins++
+				} else {
+					conflicts = append(conflicts, detail)
+				}
+			}
 		default:
-			if blockCount > 0 { // Equal non-zero counts = conflict
+			if blockCount > 0 { // equal non-zero counts = conflict
 				conflicts = append(conflicts, detail)
+				equalCounts++
 			}
 		}
 	}
+
+	logger.Infof(
+		"resolveByCounts: allowWins=%d (both sides), blockWins=%d, allowOnlyAdded=%d, equalCounts=%d, conflicts=%d",
+		allowWins,
+		blockWins,
+		allowOnlyAdded,
+		equalCounts,
+		len(conflicts),
+	)
 
 	return conflicts
 }
@@ -265,12 +315,30 @@ func writeResolvedLists(logger *multilog.Logger, result *ResolutionResult) (stri
 
 	allowEntries := collectAllEntries(result.AllowByType)
 	allowPath := filepath.Join(outDir, "consolidated_allowlist.txt")
+	resolvedBeforeAllow := len(allowEntries)
+	logger.Infof(
+		"Writing resolved allowlist %s: original=%d resolved_before=%d must_consider_merged=%d resolved_after=%d",
+		allowPath,
+		-1,
+		resolvedBeforeAllow,
+		0,
+		resolvedBeforeAllow,
+	)
 	if err := u.WriteEntriesToFile(logger, allowPath, allowEntries); err != nil {
 		return "", "", fmt.Errorf("failed to write allowlist: %w", err)
 	}
 
 	blockEntries := collectAllEntries(result.BlockByType)
 	blockPath := filepath.Join(outDir, "consolidated_blocklist.txt")
+	resolvedBeforeBlock := len(blockEntries)
+	logger.Infof(
+		"Writing resolved blocklist %s: original=%d resolved_before=%d must_consider_merged=%d resolved_after=%d",
+		blockPath,
+		-1,
+		resolvedBeforeBlock,
+		0,
+		resolvedBeforeBlock,
+	)
 	if err := u.WriteEntriesToFile(logger, blockPath, blockEntries); err != nil {
 		return allowPath, "", fmt.Errorf("failed to write blocklist: %w", err)
 	}
@@ -303,7 +371,18 @@ func writeOverrideSummary(logger *multilog.Logger, result *ResolutionResult) (st
 func buildOverrideRecords(logger *multilog.Logger, result *ResolutionResult) []OverrideRecord {
 	overrides := make([]OverrideRecord, 0)
 
-	overrides = append(overrides, getAutomaticDecisions(result)...)
+	totalAllowEntries := 0
+	for typeName, set := range result.AllowByType {
+		if set != nil {
+			totalAllowEntries += set.Size()
+			logger.Debugf("AllowByType[%s]: %d entries", typeName, set.Size())
+		} else {
+			logger.Debugf("AllowByType[%s]: nil", typeName)
+		}
+	}
+	logger.Infof("buildOverrideRecords: Total AllowByType entries across all types: %d", totalAllowEntries)
+
+	overrides = append(overrides, getAutomaticDecisions(logger, result)...)
 
 	overrides = append(overrides, getManualOverrideRecords(logger, result)...)
 
@@ -446,8 +525,12 @@ func collectAllEntries(setsByType map[string]u.StringSet) []string {
 	return entries
 }
 
-func getAutomaticDecisions(result *ResolutionResult) []OverrideRecord {
+func getAutomaticDecisions(logger *multilog.Logger, result *ResolutionResult) []OverrideRecord {
 	records := make([]OverrideRecord, 0)
+
+	allowCountGreater := 0
+	allowDecisionSet := 0
+	allowDecisionNotSet := 0
 
 	for entry, detail := range result.DetailsMap {
 		if isManualOverride(entry, result) {
@@ -461,11 +544,36 @@ func getAutomaticDecisions(result *ResolutionResult) []OverrideRecord {
 		var decision string
 		switch {
 		case detail.BlockCount > detail.AllowCount:
-			decision = DecisionBlock
+			for _, set := range result.BlockByType {
+				if set != nil && set.Contains(entry) {
+					decision = DecisionBlock
+					break
+				}
+			}
 		case detail.AllowCount > detail.BlockCount:
-			decision = DecisionAllow
+			allowCountGreater++
+			found := false
+			for _, set := range result.AllowByType {
+				if set != nil && set.Contains(entry) {
+					decision = DecisionAllow
+					found = true
+					break
+				}
+			}
+			if found {
+				allowDecisionSet++
+			} else {
+				allowDecisionNotSet++
+				logger.Debugf("Entry with allowCount>blockCount NOT in AllowByType: %s (allow=%d, block=%d)",
+					entry, detail.AllowCount, detail.BlockCount)
+			}
 		default:
-			continue // equal counts handled separately
+			continue
+		}
+
+		if decision == "" {
+			// conflict
+			continue
 		}
 
 		records = append(records, OverrideRecord{

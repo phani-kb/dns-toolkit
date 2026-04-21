@@ -381,6 +381,8 @@ func TestIsComment(t *testing.T) {
 	assert.True(t, IsComment("  # comment with spaces"))
 	assert.True(t, IsComment("// comment"))
 	assert.True(t, IsComment("! comment"))
+	assert.True(t, IsComment("[Adblock Plus 2.0]"))
+	assert.True(t, IsComment("  [metadata]"))
 
 	assert.False(t, IsComment("example.com"))
 	assert.False(t, IsComment("192.168.1.1"))
@@ -1285,6 +1287,63 @@ func TestExtractEntriesWithRegex(t *testing.T) {
 	}
 }
 
+func TestExtractDomains(t *testing.T) {
+	t.Parallel()
+
+	content := `# Comment
+example.com
+761.xn--p1ai
+
+bad_domain
+`
+
+	valid, invalid := ExtractDomains(content)
+
+	assert.Equal(t, []string{"761.xn--p1ai", "example.com"}, valid)
+	assert.Equal(t, []string{"bad_domain"}, invalid)
+}
+
+func TestExtractDomains_AdBlockPlusFormat(t *testing.T) {
+	t.Parallel()
+
+	content := `[Adblock Plus 2.0]
+! Version: 2.26.0
+! Title: Test Blocklist
+! Last modified: 2026.01.01
+
+!fork:
+!www.example.com
+valid-domain.com
+another-example.org
+sub.domain.example.net
+test_subdomain.example.com
+invalid-.domain
+-invalid.domain
+192.168.1.1
+
+! More comments
+final-domain.io
+`
+
+	valid, invalid := ExtractDomains(content)
+
+	expectedValid := []string{
+		"another-example.org",
+		"final-domain.io",
+		"sub.domain.example.net",
+		"test_subdomain.example.com",
+		"valid-domain.com",
+	}
+	expectedInvalid := []string{
+		"-invalid.domain",
+		"192.168.1.1",
+		"invalid-.domain",
+	}
+
+	assert.Equal(t, expectedValid, valid, "Valid domains should match")
+	assert.Equal(t, expectedInvalid, invalid, "Invalid entries should match")
+}
+
 func TestForceCopySourceToTarget(t *testing.T) {
 	logger := createTestLogger(t)
 	tmpDir := t.TempDir()
@@ -1542,4 +1601,27 @@ func TestGetFilesInDir(t *testing.T) {
 		assert.Error(t, err)
 		assert.Nil(t, files)
 	})
+}
+
+func TestIsDomain_IDNA(t *testing.T) {
+	cases := []struct {
+		name  string
+		input string
+		want  bool
+	}{
+		{"ascii domain", "example.com", true},
+		{"empty string", "", false},
+		{"ip address", "192.168.1.1", false},
+		{"malformed ace", "xn--notvalid-label", false},
+		{"ace in middle", "example.xn--fiqs8s", true},
+	}
+
+	for _, c := range cases {
+		t.Run(c.name, func(t *testing.T) {
+			got := IsDomain(c.input)
+			if got != c.want {
+				t.Fatalf("IsDomain(%q) = %v, want %v", c.input, got, c.want)
+			}
+		})
+	}
 }

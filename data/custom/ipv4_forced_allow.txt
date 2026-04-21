@@ -7,3 +7,5 @@
 185.199.111.133
 # googleapis.com
 216.239.36.223
+# cloudflare.com
+# 172.64.80.1

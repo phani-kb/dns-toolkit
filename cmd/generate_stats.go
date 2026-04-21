@@ -190,19 +190,19 @@ func generateStatsSection(stats *SourceStats) string {
 	sb.WriteString("*Automatically generated statistics from source configuration files*\n\n")
 	sb.WriteString("| Metric | Count | Details |\n")
 	sb.WriteString("|--------|-------|---------|\n")
-	sb.WriteString(fmt.Sprintf("| **Total Sources** | %d | %d enabled, %d disabled |\n",
+	sb.WriteString(fmt.Sprintf("| **Total&nbsp;Sources** | %d | %d enabled, %d disabled |\n",
 		stats.TotalSources, stats.EnabledSources, stats.DisabledSources))
-	sb.WriteString(fmt.Sprintf("| **Blocklist Sources** | %d | Sources providing blocking rules |\n",
+	sb.WriteString(fmt.Sprintf("| **Blocklist&nbsp;Sources** | %d | Sources providing blocking rules |\n",
 		stats.BlocklistSources))
-	sb.WriteString(fmt.Sprintf("| **Allowlist Sources** | %d | Sources providing exception rules |\n",
+	sb.WriteString(fmt.Sprintf("| **Allowlist&nbsp;Sources** | %d | Sources providing exception rules |\n",
 		stats.AllowlistSources))
 	sb.WriteString(fmt.Sprintf("| **Categories** | %d | %s |\n",
 		len(stats.Categories), strings.Join(stats.Categories, ", ")))
-	sb.WriteString(fmt.Sprintf("| **Source Types** | %d | %s |\n",
+	sb.WriteString(fmt.Sprintf("| **Source&nbsp;Types** | %d | %s |\n",
 		len(stats.SourceTypes), strings.Join(stats.SourceTypes, ", ")))
-	sb.WriteString(fmt.Sprintf("| **Geographic Coverage** | %d countries | %s |\n",
+	sb.WriteString(fmt.Sprintf("| **Geographic&nbsp;Coverage** | %d countries | %s |\n",
 		len(stats.Countries), strings.Join(stats.Countries, ", ")))
-	sb.WriteString(fmt.Sprintf("| **Last Updated** | %s | Statistics generation time |\n",
+	sb.WriteString(fmt.Sprintf("| **Last&nbsp;Updated** | %s | Statistics generation time |\n",
 		stats.LastUpdated))
 	sb.WriteString("\n")
 

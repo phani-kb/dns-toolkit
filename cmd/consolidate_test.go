@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"os"
 	"strings"
 	"testing"
 
@@ -327,10 +328,15 @@ func TestProcessAllowlists(t *testing.T) {
 	allowlistEntriesByType := make(map[string]u.StringSet)
 	var allConsolidatedSummaries []c.ConsolidatedSummary
 
+	resolvedAllowByType := make(map[string]u.StringSet)
+	resolvedBlockByType := make(map[string]u.StringSet)
+
 	// Execute the function
 	processAllowlists(
 		genericSourceTypes,
 		processedFiles,
+		resolvedAllowByType,
+		resolvedBlockByType,
 		allowlistEntriesByType,
 		&allConsolidatedSummaries,
 	)
@@ -340,10 +346,10 @@ func TestProcessAllowlists(t *testing.T) {
 	assert.Contains(t, allowlistEntriesByType, "domain")
 
 	domainEntries := allowlistEntriesByType["domain"]
-	assert.Equal(t, 2, len(domainEntries)) // Should have 2 entries after filtering
+	assert.Equal(t, 3, len(domainEntries)) // should have all 3 entries - allowlists are NOT filtered by blocklists
 	assert.True(t, domainEntries.Contains("allow1.com"))
 	assert.True(t, domainEntries.Contains("allow2.com"))
-	assert.False(t, domainEntries.Contains("blocked.com")) // Should be filtered out by local blocklist
+	assert.True(t, domainEntries.Contains("blocked.com")) // should NOT be filtered - allowlists override blocklists
 
 	// Check that we have at least one consolidated summary (may be more if includeInvalid is processed)
 	assert.GreaterOrEqual(t, len(allConsolidatedSummaries), 1)
@@ -364,102 +370,49 @@ func TestProcessAllowlists(t *testing.T) {
 	}
 }
 
-func TestGetLocalBlocklistEntries(t *testing.T) {
-	t.Parallel()
-
-	// Mock consolidator for local blocklist
-	blocklistMock := &mockConsolidator{
-		mockEntries: u.NewStringSet([]string{"local-blocked1.com", "local-blocked2.com"}),
-		mockFiles:   []c.FileInfo{{Name: "local_blocklist.txt", SourceType: "domain", Count: 2}},
+func TestIgnoredEntriesAnnotation(t *testing.T) {
+	mock := &mockConsolidator{
+		mockEntries: u.NewStringSet([]string{"keep.com", "ignore.com"}),
+		mockFiles:   []c.FileInfo{{Name: "file1.txt", SourceType: "domain", Filepath: "/tmp/file1.txt", Count: 2}},
 	}
 
-	// Set up test registry
 	testRegistry := con.NewConsolidatorRegistry()
-	testRegistry.RegisterConsolidator("domain", constants.ListTypeBlocklist, blocklistMock)
+	testRegistry.RegisterConsolidator("domain", "blocklist", mock)
 
 	origRegistry := con.Consolidators
 	con.Consolidators = testRegistry
 	defer func() { con.Consolidators = origRegistry }()
 
-	tests := []struct {
-		name              string
-		genericSourceType string
-		processedFiles    []c.ProcessedFile
-		expectedEntries   []string
-		expectedCount     int
-	}{
-		{
-			name:              "local blocklist found",
-			genericSourceType: "domain",
-			processedFiles: []c.ProcessedFile{
-				{
-					Name:              "Local Blocklist (Domain)",
-					GenericSourceType: "domain",
-					ListType:          constants.ListTypeBlocklist,
-					Valid:             true,
-				},
-				{
-					Name:              "Regular Allowlist",
-					GenericSourceType: "domain",
-					ListType:          constants.ListTypeAllowlist,
-					Valid:             true,
-				},
-			},
-			expectedCount:   2,
-			expectedEntries: []string{"local-blocked1.com", "local-blocked2.com"},
-		},
-		{
-			name:              "no local blocklist found",
-			genericSourceType: "domain",
-			processedFiles: []c.ProcessedFile{
-				{
-					Name:              "Regular Blocklist",
-					GenericSourceType: "domain",
-					ListType:          constants.ListTypeBlocklist,
-					Valid:             true,
-				},
-			},
-			expectedCount:   0,
-			expectedEntries: []string{},
-		},
-		{
-			name:              "invalid local blocklist ignored",
-			genericSourceType: "domain",
-			processedFiles: []c.ProcessedFile{
-				{
-					Name:              "Local Blocklist (Domain)",
-					GenericSourceType: "domain",
-					ListType:          constants.ListTypeBlocklist,
-					Valid:             false, // Invalid file should be ignored
-				},
-			},
-			expectedCount:   0,
-			expectedEntries: []string{},
-		},
-		{
-			name:              "wrong source type ignored",
-			genericSourceType: "ipv4",
-			processedFiles: []c.ProcessedFile{
-				{
-					Name:              "Local Blocklist (Domain)",
-					GenericSourceType: "domain", // Different source type
-					ListType:          constants.ListTypeBlocklist,
-					Valid:             true,
-				},
-			},
-			expectedCount:   0,
-			expectedEntries: []string{},
-		},
-	}
+	origConsolidatedDir := constants.ConsolidatedDir
+	tmpDir := t.TempDir()
+	constants.ConsolidatedDir = tmpDir
+	defer func() { constants.ConsolidatedDir = origConsolidatedDir }()
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := getLocalBlocklistEntries(tt.genericSourceType, tt.processedFiles)
+	logger := multilog.NewLogger()
 
-			assert.Equal(t, tt.expectedCount, len(result))
-			for _, expectedEntry := range tt.expectedEntries {
-				assert.True(t, result.Contains(expectedEntry), "Should contain %s", expectedEntry)
-			}
-		})
+	entriesToIgnore := u.NewStringSet([]string{"ignore.com"})
+
+	processedFiles := []c.ProcessedFile{{Valid: true}}
+
+	gotEntries, gotSummary := consolidateFilesBasedOnSTLT(
+		logger,
+		"domain",
+		"blocklist",
+		true,
+		entriesToIgnore,
+		processedFiles,
+	)
+
+	assert.Equal(t, 1, len(gotEntries))
+	assert.True(t, gotEntries.Contains("keep.com"))
+
+	if assert.NotEmpty(t, gotSummary.IgnoredFilepath) {
+		content, err := os.ReadFile(gotSummary.IgnoredFilepath)
+		assert.NoError(t, err)
+		assert.Contains(
+			t,
+			string(content),
+			"ignore.com # ignored: filtered by resolved allowlist (conflict resolution)",
+		)
 	}
 }

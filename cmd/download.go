@@ -15,6 +15,8 @@ import (
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
 
+	"golang.org/x/time/rate"
+
 	"github.com/spf13/cobra"
 )
 
@@ -86,11 +88,10 @@ var downloadCmd = &cobra.Command{
 				maxWorkers = AppConfig.DNSToolkit.MaxWorkers
 			}
 		}
+		maxWorkers = max(maxWorkers, 1)
 		Logger.Infof("Using worker pool with %d worker(s) for downloads", maxWorkers)
-		workerPool := c.NewDTWorkerPool(maxWorkers)
-
-		ticker := time.NewTicker(constants.DownloadInterval)
-		defer ticker.Stop()
+		limiter := createDownloadRateLimiter(maxWorkers)
+		workerPool := c.NewDTWorkerPoolWithLimiter(maxWorkers, limiter)
 
 		// Stats to track a download process
 		var totalSources, successCount, failCount, downloadedCount int
@@ -105,8 +106,6 @@ var downloadCmd = &cobra.Command{
 				totalSources++
 				source := source // local copy for goroutine
 				workerPool.Submit(func() {
-					<-ticker.C
-
 					if forceDownload {
 						Logger.Debugf("Force downloading source: %s", source.Name)
 					}
@@ -290,4 +289,26 @@ func loadPreviousDownloadSummary(
 
 func init() {
 	downloadCmd.Flags().Bool("force", false, "Force re-download of all sources (ignores existing summaries)")
+}
+
+func createDownloadRateLimiter(maxWorkers int) *rate.Limiter {
+	maxWorkers = max(maxWorkers, 1)
+
+	interval := constants.DownloadInterval
+	if interval <= 0 {
+		return rate.NewLimiter(rate.Inf, maxWorkers)
+	}
+
+	perRequestInterval := interval
+	if maxWorkers > 1 {
+		perRequestInterval = interval / time.Duration(maxWorkers)
+		if perRequestInterval <= 0 {
+			perRequestInterval = time.Millisecond
+		}
+	}
+
+	limit := rate.Every(perRequestInterval)
+	b := max(maxWorkers, 1)
+
+	return rate.NewLimiter(limit, b)
 }
