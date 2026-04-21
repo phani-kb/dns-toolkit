@@ -52,6 +52,11 @@ data/*.json
 data/allowlist_*.txt
 data/custom/generated_sources/
 
+# SQLite database
+data/*.db
+data/*.db-wal
+data/*.db-shm
+
 # Test files
 testdata/**/*.json
 testdata/**/*.tgz
