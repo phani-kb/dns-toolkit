@@ -74,7 +74,7 @@ func updateReadmeWithCredits(logger *multilog.Logger, readmePath string) error {
 		logger.Warnf("Credits section not found in README.md")
 	}
 
-	if err := os.WriteFile(readmePath, []byte(newContent), 0644); err != nil {
+	if err := os.WriteFile(readmePath, []byte(newContent), 0o644); err != nil {
 		return fmt.Errorf("failed to write %s: %w", readmePath, err)
 	}
 
@@ -170,13 +170,7 @@ func generateCreditsSection() string {
 		})
 
 		sb.WriteString("<details>\n")
-		sb.WriteString(
-			fmt.Sprintf(
-				"<summary><strong>📄 %s</strong> (%d sources)</summary>\n\n",
-				filename,
-				len(sources),
-			),
-		)
+		_, _ = fmt.Fprintf(&sb, "<summary><strong>📄 %s</strong> (%d sources)</summary>\n\n", filename, len(sources))
 
 		// If overlapMap has entries, replace AL/BL column with Count/Unique/Conflicts column.
 		hasOverlap := len(overlapMap) > 0
@@ -218,17 +212,13 @@ func generateCreditsSection() string {
 			listTypes := getListTypes(source)
 			if hasOverlap {
 				if vals, ok := overlapMap[source.Name]; ok {
-					sb.WriteString(
-						fmt.Sprintf("| %s | %s | %s | %d / %d / %d | %s |\n",
-							name, status, categories, vals[0], vals[1], vals[2], notes),
-					)
+					_, _ = fmt.Fprintf(&sb, "| %s | %s | %s | %d / %d / %d | %s |\n",
+						name, status, categories, vals[0], vals[1], vals[2], notes)
 				} else {
-					sb.WriteString(fmt.Sprintf("| %s | %s | %s | - | %s |\n",
-						name, status, categories, notes))
+					_, _ = fmt.Fprintf(&sb, "| %s | %s | %s | - | %s |\n", name, status, categories, notes)
 				}
 			} else {
-				sb.WriteString(fmt.Sprintf("| %s | %s | %s | %s | %s |\n",
-					name, status, categories, listTypes, notes))
+				_, _ = fmt.Fprintf(&sb, "| %s | %s | %s | %s | %s |\n", name, status, categories, listTypes, notes)
 			}
 		}
 

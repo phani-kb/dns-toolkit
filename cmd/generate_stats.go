@@ -175,7 +175,7 @@ func updateReadmeWithStats(stats *SourceStats, readmePath string) error {
 	}
 
 	// Write updated content back to README.md
-	if err := os.WriteFile(readmePath, []byte(newContent), 0644); err != nil {
+	if err := os.WriteFile(readmePath, []byte(newContent), 0o644); err != nil {
 		return fmt.Errorf("failed to write %s: %w", readmePath, err)
 	}
 
@@ -190,20 +190,20 @@ func generateStatsSection(stats *SourceStats) string {
 	sb.WriteString("*Automatically generated statistics from source configuration files*\n\n")
 	sb.WriteString("| Metric | Count | Details |\n")
 	sb.WriteString("|--------|-------|---------|\n")
-	sb.WriteString(fmt.Sprintf("| **Total&nbsp;Sources** | %d | %d enabled, %d disabled |\n",
-		stats.TotalSources, stats.EnabledSources, stats.DisabledSources))
-	sb.WriteString(fmt.Sprintf("| **Blocklist&nbsp;Sources** | %d | Sources providing blocking rules |\n",
-		stats.BlocklistSources))
-	sb.WriteString(fmt.Sprintf("| **Allowlist&nbsp;Sources** | %d | Sources providing exception rules |\n",
-		stats.AllowlistSources))
-	sb.WriteString(fmt.Sprintf("| **Categories** | %d | %s |\n",
-		len(stats.Categories), strings.Join(stats.Categories, ", ")))
-	sb.WriteString(fmt.Sprintf("| **Source&nbsp;Types** | %d | %s |\n",
-		len(stats.SourceTypes), strings.Join(stats.SourceTypes, ", ")))
-	sb.WriteString(fmt.Sprintf("| **Geographic&nbsp;Coverage** | %d countries | %s |\n",
-		len(stats.Countries), strings.Join(stats.Countries, ", ")))
-	sb.WriteString(fmt.Sprintf("| **Last&nbsp;Updated** | %s | Statistics generation time |\n",
-		stats.LastUpdated))
+	_, _ = fmt.Fprintf(&sb, "| **Total&nbsp;Sources** | %d | %d enabled, %d disabled |\n",
+		stats.TotalSources, stats.EnabledSources, stats.DisabledSources)
+	_, _ = fmt.Fprintf(&sb, "| **Blocklist&nbsp;Sources** | %d | Sources providing blocking rules |\n",
+		stats.BlocklistSources)
+	_, _ = fmt.Fprintf(&sb, "| **Allowlist&nbsp;Sources** | %d | Sources providing exception rules |\n",
+		stats.AllowlistSources)
+	_, _ = fmt.Fprintf(&sb, "| **Categories** | %d | %s |\n",
+		len(stats.Categories), strings.Join(stats.Categories, ", "))
+	_, _ = fmt.Fprintf(&sb, "| **Source&nbsp;Types** | %d | %s |\n",
+		len(stats.SourceTypes), strings.Join(stats.SourceTypes, ", "))
+	_, _ = fmt.Fprintf(&sb, "| **Geographic&nbsp;Coverage** | %d countries | %s |\n",
+		len(stats.Countries), strings.Join(stats.Countries, ", "))
+	_, _ = fmt.Fprintf(&sb, "| **Last&nbsp;Updated** | %s | Statistics generation time |\n",
+		stats.LastUpdated)
 	sb.WriteString("\n")
 
 	sb.WriteString("<!-- STATS_END -->")
@@ -252,8 +252,8 @@ func generateBranchSizesSection(outputSize, summariesSize string) string {
 	sb.WriteString("<!-- BRANCH_SIZES_START -->\n")
 	sb.WriteString("## Branch Sizes\n\n")
 	sb.WriteString("**Note:** The repo size badge above only reflects the default branch (`release/1.0.0`).\n\n")
-	sb.WriteString(fmt.Sprintf("- **Output branch size:** %s\n", outputSize))
-	sb.WriteString(fmt.Sprintf("- **Summaries branch size:** %s\n", summariesSize))
+	_, _ = fmt.Fprintf(&sb, "- **Output branch size:** %s\n", outputSize)
+	_, _ = fmt.Fprintf(&sb, "- **Summaries branch size:** %s\n", summariesSize)
 	sb.WriteString("\n<!-- BRANCH_SIZES_END -->")
 	return sb.String()
 }
@@ -299,7 +299,7 @@ func updateBranchSizes(readmePath string) error {
 		}
 	}
 
-	if err := os.WriteFile(readmePath, []byte(newContent), 0644); err != nil {
+	if err := os.WriteFile(readmePath, []byte(newContent), 0o644); err != nil {
 		return fmt.Errorf("failed to write %s: %w", readmePath, err)
 	}
 	return nil

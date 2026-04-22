@@ -1,0 +1,262 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/phani-kb/dns-toolkit/data/config/sources_schema.json",
+  "title": "dns-toolkit Sources Configuration",
+  "description": "Schema for dns-toolkit source configuration files (sources_*.json).",
+  "type": "object",
+  "required": ["sources"],
+  "additionalProperties": false,
+  "properties": {
+    "sources": {
+      "type": "array",
+      "description": "List of source configs.",
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    }
+  },
+  "$defs": {
+    "source": {
+      "type": "object",
+      "description": "A blocklist or allowlist source config.",
+      "required": ["name", "types"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Unique source config identifier.",
+          "minLength": 1
+        },
+        "url": {
+          "type": "string",
+          "description": "URL to download the source file from. Supports http://, https://, and file:// protocols.",
+          "pattern": "^(https?://|file://).+"
+        },
+        "url_per_category": {
+          "type": "string",
+          "description": "URL for per-category.",
+          "pattern": "^(https?://|file://).+"
+        },
+        "url_per_group": {
+          "type": "string",
+          "description": "URL per-group.",
+          "pattern": "^(https?://|file://).+"
+        },
+        "frequency": {
+          "type": "string",
+          "description": "How often the source is updated.",
+          "enum": ["daily", "weekly", "monthly"]
+        },
+        "license": {
+          "type": "string",
+          "description": "License of the source data (e.g., MIT, GPL-3.0, MPLv2)."
+        },
+        "website": {
+          "type": "string",
+          "description": "Website URL for the source.",
+          "format": "uri"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes about the source."
+        },
+        "types": {
+          "type": "array",
+          "description": "Source type definitions specifying how to process this source.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/sourceType"
+          }
+        },
+        "categories": {
+          "type": "string",
+          "description": "Comma-separated list of categories this source belongs to.",
+          "pattern": "^[a-z_]+(,\\s*[a-z_]+)*$"
+        },
+        "countries": {
+          "type": "string",
+          "description": "Comma-separated list of 2-letter ISO country codes.",
+          "pattern": "^[A-Z]{2}(,\\s*[A-Z]{2})*$"
+        },
+        "files": {
+          "type": "string",
+          "description": "Comma-separated list of files to extract from an archive."
+        },
+        "content": {
+          "type": "array",
+          "description": "Inline content entries (used instead of a URL for local/embedded sources).",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "content_per_category": {
+          "type": "array",
+          "description": "Inline content entries specific to a category.",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "content_per_group": {
+          "type": "array",
+          "description": "Inline content entries specific to a group.",
+          "minItems": 1,
+          "items": {
+            "type": "string"
+          }
+        },
+        "type_count": {
+          "type": "integer",
+          "description": "Number of source types (auto-calculated, typically omitted).",
+          "minimum": 0
+        },
+        "count_to_consider": {
+          "type": "integer",
+          "description": "Number of entries to consider from the source (e.g., top N entries).",
+          "minimum": 1
+        },
+        "disabled": {
+          "type": "boolean",
+          "description": "Whether this source is disabled and should be skipped.",
+          "default": false
+        },
+        "skip_general_consolidation": {
+          "type": "boolean",
+          "description": "Whether to skip this source during general consolidation.",
+          "default": false
+        },
+        "skip_groups_consolidation": {
+          "type": "boolean",
+          "description": "Whether to skip this source during groups consolidation.",
+          "default": false
+        },
+        "skip_categories_consolidation": {
+          "type": "boolean",
+          "description": "Whether to skip this source during categories consolidation.",
+          "default": false
+        }
+      },
+      "oneOf": [
+        { "required": ["url"] },
+        { "required": ["content"] },
+        { "required": ["url_per_category"] },
+        { "required": ["content_per_category"] },
+        { "required": ["url_per_group"] },
+        { "required": ["content_per_group"] }
+      ],
+      "allOf": [
+        {
+          "if": {
+            "required": ["url"],
+            "properties": {
+              "url": {
+                "pattern": "\\.(zip|tar\\.gz)$"
+              }
+            }
+          },
+          "then": {
+            "required": ["files"]
+          }
+        }
+      ]
+    },
+    "sourceType": {
+      "type": "object",
+      "description": "Defines how a source should be processed based on its content type.",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The source type identifier determining which processor to use.",
+          "enum": [
+            "adguard",
+            "adguard_csv_http_url_find",
+            "adguard_domain",
+            "adguard_http_url",
+            "cidr_ipv4",
+            "domain",
+            "domain_adguard",
+            "domain_comment",
+            "domain_csv_http_url_find",
+            "domain_custom_csv_blackbook",
+            "domain_custom_csv_maltrail",
+            "domain_custom_html_ccam",
+            "domain_custom_html_puppyscams",
+            "domain_finder",
+            "domain_http_url",
+            "domain_top",
+            "domain_url",
+            "domain_with_comment_suffix",
+            "hostname",
+            "ipv4",
+            "ipv4_cidr_expand",
+            "ipv4_csv_http_url_find",
+            "ipv4_custom_html_ccam",
+            "ipv4_find",
+            "ipv4_from_domain",
+            "ipv4_hostname",
+            "ipv4_http_url",
+            "ipv4_range_expand",
+            "ipv4_url",
+            "ipv6",
+            "ipv6_find",
+            "ipv6_htaccess",
+            "mixed",
+            "unknown"
+          ]
+        },
+        "list_types": {
+          "type": "array",
+          "description": "List type definitions for this source type.",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/listType"
+          }
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes about this source type."
+        },
+        "disabled": {
+          "type": "boolean",
+          "description": "Whether this source type is disabled.",
+          "default": false
+        }
+      }
+    },
+    "listType": {
+      "type": "object",
+      "description": "Defines whether entries are for blocking or allowing, and which size groups they belong to.",
+      "required": ["name"],
+      "additionalProperties": false,
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The list type: blocklist for entries to block, allowlist for entries to allow.",
+          "enum": ["blocklist", "allowlist"]
+        },
+        "groups": {
+          "type": "string",
+          "description": "Comma-separated size groups this list type belongs to. Groups are cumulative: mini < lite < normal < big.",
+          "pattern": "^(mini|lite|normal|big)(,\\s*(mini|lite|normal|big))*$"
+        },
+        "must_consider": {
+          "type": "boolean",
+          "description": "Whether entries from this list must always be included regardless of conflict resolution.",
+          "default": false
+        },
+        "notes": {
+          "type": "string",
+          "description": "Additional notes about this list type."
+        },
+        "disabled": {
+          "type": "boolean",
+          "description": "Whether this list type is disabled.",
+          "default": false
+        }
+      }
+    }
+  }
+}

@@ -121,7 +121,7 @@ func TestEntryContains(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			testFile := filepath.Join(tmpDir, "test_file.txt")
-			err := os.WriteFile(testFile, []byte(tt.content), 0644)
+			err := os.WriteFile(testFile, []byte(tt.content), 0o644)
 			require.NoError(t, err)
 
 			result, err := entryContains(tt.query, testFile, tt.exactMatch)
@@ -315,7 +315,7 @@ func TestGetProcessedFiles(t *testing.T) {
 			]
 		}
 	]`
-	require.NoError(t, os.WriteFile(summaryFile, []byte(summaryContent), 0644))
+	require.NoError(t, os.WriteFile(summaryFile, []byte(summaryContent), 0o644))
 
 	// Test getting domain files
 	files, err := getProcessedFiles("domain", summaryFile)
@@ -368,7 +368,7 @@ func TestGetConsolidatedFiles(t *testing.T) {
 			"filepath": "/path/to/ipv4_blocklist.txt"
 		}
 	]`
-	require.NoError(t, os.WriteFile(summaryFile, []byte(summaryContent), 0644))
+	require.NoError(t, os.WriteFile(summaryFile, []byte(summaryContent), 0o644))
 
 	// Test getting domain files
 	files, err := getConsolidatedFiles("domain", summaryFile)
