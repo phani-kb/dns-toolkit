@@ -17,7 +17,7 @@ import (
 func createTempFileWithContent(t *testing.T, content string) string {
 	tmpDir := t.TempDir()
 	tmpFile := filepath.Join(tmpDir, "test.txt")
-	err := os.WriteFile(tmpFile, []byte(content), 0644)
+	err := os.WriteFile(tmpFile, []byte(content), 0o644)
 	if err != nil {
 		t.Fatalf("Failed to create temp file: %v", err)
 	}

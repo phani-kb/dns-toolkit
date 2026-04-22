@@ -2,8 +2,7 @@
 
 set -e
 
-echo "Running golines..."
-find . -name '*.go' | xargs golines --max-len=120 --base-formatter=gofumpt -w
+SCRIPT_DIR=$(dirname -- "$0")
+SCRIPT_DIR=$(cd -- "$SCRIPT_DIR" && pwd)
 
-echo "Running golangci-lint..."
-golangci-lint run
+"$SCRIPT_DIR/tools.sh" format-and-lint
