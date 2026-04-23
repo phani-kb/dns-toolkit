@@ -28,7 +28,7 @@ func TestCopyFile(t *testing.T) {
 	dstFile := filepath.Join(tempDir, "destination.txt")
 
 	testContent := "This is test content for file copying"
-	err = os.WriteFile(srcFile, []byte(testContent), 0644)
+	err = os.WriteFile(srcFile, []byte(testContent), 0o644)
 	require.NoError(t, err)
 
 	err = CopyFile(logger, srcFile, dstFile)
@@ -74,10 +74,10 @@ domain3.com
 domain4.com
 unique2.com`
 
-	err = os.WriteFile(file1, []byte(content1), 0644)
+	err = os.WriteFile(file1, []byte(content1), 0o644)
 	require.NoError(t, err)
 
-	err = os.WriteFile(file2, []byte(content2), 0644)
+	err = os.WriteFile(file2, []byte(content2), 0o644)
 	require.NoError(t, err)
 
 	overlap, count1, count2 := FindOverlap(logger, file1, file2)
@@ -97,9 +97,9 @@ unique2.com`
 
 	emptyFile1 := filepath.Join(tempDir, "empty1.txt")
 	emptyFile2 := filepath.Join(tempDir, "empty2.txt")
-	err = os.WriteFile(emptyFile1, []byte(""), 0644)
+	err = os.WriteFile(emptyFile1, []byte(""), 0o644)
 	require.NoError(t, err)
-	err = os.WriteFile(emptyFile2, []byte(""), 0644)
+	err = os.WriteFile(emptyFile2, []byte(""), 0o644)
 	require.NoError(t, err)
 
 	overlap, count1, count2 = FindOverlap(logger, emptyFile1, emptyFile2)
@@ -333,7 +333,7 @@ func TestExtractTarGzErrorCases(t *testing.T) {
 	assert.Error(t, err)
 
 	invalidFile := filepath.Join(tempDir, "invalid.tar.gz")
-	err = os.WriteFile(invalidFile, []byte("not a tar.gz file"), 0644)
+	err = os.WriteFile(invalidFile, []byte("not a tar.gz file"), 0o644)
 	require.NoError(t, err)
 
 	err = extractTarGz(logger, invalidFile, tempDir)
@@ -365,7 +365,7 @@ func TestExtractZipErrorCases(t *testing.T) {
 	assert.Error(t, err)
 
 	invalidFile := filepath.Join(tempDir, "invalid.zip")
-	err = os.WriteFile(invalidFile, []byte("not a zip file"), 0644)
+	err = os.WriteFile(invalidFile, []byte("not a zip file"), 0o644)
 	require.NoError(t, err)
 
 	err = extractZip(logger, invalidFile, tempDir)
@@ -373,7 +373,7 @@ func TestExtractZipErrorCases(t *testing.T) {
 }
 
 func createMinimalTarGz(filename string) error {
-	return os.WriteFile(filename, []byte{}, 0644)
+	return os.WriteFile(filename, []byte{}, 0o644)
 }
 
 func TestWriteValidEntriesToFile(t *testing.T) {

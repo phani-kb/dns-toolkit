@@ -33,7 +33,7 @@ var overlapCmd = &cobra.Command{
 		Logger.Infof("Using %d worker(s) for overlap entry processing", overlapMaxWorkers)
 		// Validate profile directory
 		if overlapProfileDir != "" {
-			if err := os.MkdirAll(overlapProfileDir, 0755); err != nil {
+			if err := os.MkdirAll(overlapProfileDir, 0o755); err != nil {
 				Logger.Errorf("Failed to create profile directory %s: %v", overlapProfileDir, err)
 				overlapProfileDir = ""
 			} else {

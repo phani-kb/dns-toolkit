@@ -759,7 +759,7 @@ func TestConsolidateGeneric_ChecksumCalculation(t *testing.T) {
 		mockConsolidatorCommon: baseMock,
 		customSaveFunc: func(logger *multilog.Logger, entries u.StringSet, filePath string) error {
 			// Write test content to the expected file path
-			return os.WriteFile(filePath, []byte("example.com\ntest.com\n"), 0644)
+			return os.WriteFile(filePath, []byte("example.com\ntest.com\n"), 0o644)
 		},
 	}
 
@@ -1092,7 +1092,7 @@ func TestConsolidateGeneric_ConfigFlags(t *testing.T) {
 	mock := &mockConsolidatorWithCustomSave{
 		mockConsolidatorCommon: baseMock,
 		customSaveFunc: func(logger *multilog.Logger, entries u.StringSet, filePath string) error {
-			return os.WriteFile(filePath, []byte("example.com\n"), 0644)
+			return os.WriteFile(filePath, []byte("example.com\n"), 0o644)
 		},
 	}
 

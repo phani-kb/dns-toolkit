@@ -14,6 +14,11 @@ const (
 )
 
 const (
+	DataConfigDir     = "data/config"
+	SourcesSchemaFile = "sources_schema.json"
+)
+
+const (
 	MaxDomainLength = 253 // max total FQDN length
 	MaxLabelLength  = 63  // max length per label
 )

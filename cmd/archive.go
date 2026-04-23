@@ -45,7 +45,7 @@ func runArchive(logger *multilog.Logger) {
 	archivePath := filepath.Join(constants.ArchiveDir, archiveFilename)
 
 	// Ensure the archive directory exists
-	if err := os.MkdirAll(constants.ArchiveDir, 0755); err != nil {
+	if err := os.MkdirAll(constants.ArchiveDir, 0o755); err != nil {
 		logger.Errorf("Failed to create archive directory: %v", err)
 		os.Exit(1)
 	}
@@ -173,7 +173,7 @@ func runArchive(logger *multilog.Logger) {
 		return
 	}
 
-	if err := os.WriteFile(summaryPath, summaryJSON, 0644); err != nil {
+	if err := os.WriteFile(summaryPath, summaryJSON, 0o644); err != nil {
 		logger.Errorf("Failed to write archive summary to path %s: %v", summaryPath, err)
 		return
 	}

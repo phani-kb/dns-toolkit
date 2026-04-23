@@ -69,3 +69,4 @@ testdata/**/*.prof
 testdata/*.md
 testdata/*.txt
 testdata/**/*.txt
+testdata/download/

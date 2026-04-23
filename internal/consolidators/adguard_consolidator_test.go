@@ -46,7 +46,7 @@ func TestAdguardConsolidator_Consolidate(t *testing.T) {
 
 	tempDir := t.TempDir()
 	testFile := filepath.Join(tempDir, "test.txt")
-	require.NoError(t, os.WriteFile(testFile, []byte("a.com\nb.com\n"), 0644))
+	require.NoError(t, os.WriteFile(testFile, []byte("a.com\nb.com\n"), 0o644))
 
 	files := []c.ProcessedFile{
 		{
