@@ -16,6 +16,7 @@ const (
 const (
 	DataConfigDir     = "data/config"
 	SourcesSchemaFile = "sources_schema.json"
+	DefaultDBPath     = "data/dns-toolkit.db"
 )
 
 const (
