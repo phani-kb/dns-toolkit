@@ -197,4 +197,5 @@ func init() {
 	rootCmd.AddCommand(searchCmd)
 	rootCmd.AddCommand(archiveCmd)
 	rootCmd.AddCommand(generateCmd)
+	rootCmd.AddCommand(schemaCmd)
 }

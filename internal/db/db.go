@@ -118,3 +118,13 @@ func closeOnError(c io.Closer, op string, opErr error) error {
 	}
 	return fmt.Errorf("%s: %w", op, opErr)
 }
+
+// CloseLogError closes the DB and logs any error.
+func (db *DB) CloseLogError(logger interface{ Warnf(string, ...interface{}) }) {
+	if db.conn == nil {
+		return
+	}
+	if err := db.conn.Close(); err != nil {
+		logger.Warnf("Error closing database: %v", err)
+	}
+}
