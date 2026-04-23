@@ -153,7 +153,7 @@ func TestCopySummaryFile(t *testing.T) {
 	dstPath := filepath.Join(tempDir, "dest.txt")
 
 	content := "test content"
-	err = os.WriteFile(srcPath, []byte(content), 0644)
+	err = os.WriteFile(srcPath, []byte(content), 0o644)
 	assert.NoError(t, err)
 
 	err = copySummaryFile(srcPath, dstPath)
@@ -210,7 +210,7 @@ func TestCreateOutputFromFile(t *testing.T) {
 
 	inputFile := filepath.Join(tempDir, "input.txt")
 	inputContent := "data line 1\ndata line 2"
-	err = os.WriteFile(inputFile, []byte(inputContent), 0644)
+	err = os.WriteFile(inputFile, []byte(inputContent), 0o644)
 	assert.NoError(t, err)
 
 	dynTmpl, err := template.New("dynamic").
@@ -265,7 +265,7 @@ func TestProcessRegularFiles(t *testing.T) {
 
 	inputFile := filepath.Join(tempDir, "input.txt")
 	inputContent := "sample data"
-	err = os.WriteFile(inputFile, []byte(inputContent), 0644)
+	err = os.WriteFile(inputFile, []byte(inputContent), 0o644)
 	assert.NoError(t, err)
 
 	dynTmpl, err := template.New("dynamic").Parse("Header: {{.FileName}} - {{.Description}} - {{.Count}}")
@@ -340,7 +340,7 @@ func TestProcessIgnoredFiles(t *testing.T) {
 	includeIgnored = true
 	ignoredFile := filepath.Join(tempDir, "ignored.txt")
 	ignoredContent := "ignored data"
-	err = os.WriteFile(ignoredFile, []byte(ignoredContent), 0644)
+	err = os.WriteFile(ignoredFile, []byte(ignoredContent), 0o644)
 	assert.NoError(t, err)
 
 	ignoredFilesCount = map[string]int{
@@ -452,8 +452,8 @@ func TestCopySummaryFiles(t *testing.T) {
 	constants.OutputSummariesDir = outputDir
 	constants.SummaryDir = summariesDir
 
-	require.NoError(t, os.MkdirAll(summariesDir, 0755))
-	require.NoError(t, os.MkdirAll(outputDir, 0755))
+	require.NoError(t, os.MkdirAll(summariesDir, 0o755))
+	require.NoError(t, os.MkdirAll(outputDir, 0o755))
 
 	testFiles := []string{
 		constants.DefaultSummaryFiles[constants.SummaryTypeDownload],
@@ -462,7 +462,7 @@ func TestCopySummaryFiles(t *testing.T) {
 	testContent := `{"test": "data"}`
 	for _, filename := range testFiles {
 		filePath := filepath.Join(summariesDir, filename)
-		require.NoError(t, os.WriteFile(filePath, []byte(testContent), 0644))
+		require.NoError(t, os.WriteFile(filePath, []byte(testContent), 0o644))
 	}
 
 	processedFiles := map[string]string{
@@ -514,8 +514,8 @@ func TestArchiveSummaryFiles(t *testing.T) {
 	constants.ArchiveDir = archiveDir
 	constants.SummaryDir = summariesDir
 
-	require.NoError(t, os.MkdirAll(summariesDir, 0755))
-	require.NoError(t, os.MkdirAll(archiveDir, 0755))
+	require.NoError(t, os.MkdirAll(summariesDir, 0o755))
+	require.NoError(t, os.MkdirAll(archiveDir, 0o755))
 
 	testSummaryTypes := []string{"download", "processed"}
 	processedFiles := make(map[string]string)
@@ -523,7 +523,7 @@ func TestArchiveSummaryFiles(t *testing.T) {
 	for _, summaryType := range testSummaryTypes {
 		filename := constants.DefaultSummaryFiles[summaryType]
 		filePath := filepath.Join(summariesDir, filename)
-		require.NoError(t, os.WriteFile(filePath, []byte(`{"archive": "test"}`), 0644))
+		require.NoError(t, os.WriteFile(filePath, []byte(`{"archive": "test"}`), 0o644))
 		processedFiles[summaryType] = filePath
 	}
 
@@ -568,14 +568,14 @@ func TestDeleteFilesAndFoldersAfterGeneration(t *testing.T) {
 	constants.SummaryTypesDirMap[constants.SummaryTypeProcessed] = processedDir
 	deleteFolders = true // Enable deletion
 
-	require.NoError(t, os.MkdirAll(summaryDir, 0755))
-	require.NoError(t, os.MkdirAll(processedDir, 0755))
+	require.NoError(t, os.MkdirAll(summaryDir, 0o755))
+	require.NoError(t, os.MkdirAll(processedDir, 0o755))
 
 	processedSummaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles[constants.SummaryTypeProcessed])
-	require.NoError(t, os.WriteFile(processedSummaryFile, []byte(`{"test": "data"}`), 0644))
+	require.NoError(t, os.WriteFile(processedSummaryFile, []byte(`{"test": "data"}`), 0o644))
 
 	testFile := filepath.Join(processedDir, "test.txt")
-	require.NoError(t, os.WriteFile(testFile, []byte("test content"), 0644))
+	require.NoError(t, os.WriteFile(testFile, []byte("test content"), 0o644))
 
 	assert.FileExists(t, processedSummaryFile)
 	assert.FileExists(t, testFile)
@@ -587,9 +587,9 @@ func TestDeleteFilesAndFoldersAfterGeneration(t *testing.T) {
 
 	deleteFolders = false
 
-	require.NoError(t, os.MkdirAll(processedDir, 0755))
-	require.NoError(t, os.WriteFile(processedSummaryFile, []byte(`{"test": "data"}`), 0644))
-	require.NoError(t, os.WriteFile(testFile, []byte("test content"), 0644))
+	require.NoError(t, os.MkdirAll(processedDir, 0o755))
+	require.NoError(t, os.WriteFile(processedSummaryFile, []byte(`{"test": "data"}`), 0o644))
+	require.NoError(t, os.WriteFile(testFile, []byte("test content"), 0o644))
 
 	deleteFilesAndFoldersAfterGeneration()
 

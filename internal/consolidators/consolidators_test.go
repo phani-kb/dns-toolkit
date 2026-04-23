@@ -121,10 +121,10 @@ func TestBaseConsolidatorConsolidate(t *testing.T) {
 
 	tempDir := t.TempDir()
 	testFile1 := filepath.Join(tempDir, "test1.txt")
-	require.NoError(t, os.WriteFile(testFile1, []byte("domain1.com\ndomain2.com\n"), 0644))
+	require.NoError(t, os.WriteFile(testFile1, []byte("domain1.com\ndomain2.com\n"), 0o644))
 
 	testFile2 := filepath.Join(tempDir, "test2.txt")
-	require.NoError(t, os.WriteFile(testFile2, []byte("domain3.com\ndomain4.com\n"), 0644))
+	require.NoError(t, os.WriteFile(testFile2, []byte("domain3.com\ndomain4.com\n"), 0o644))
 
 	processedFiles := []common.ProcessedFile{
 		{

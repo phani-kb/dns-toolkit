@@ -38,8 +38,8 @@ func TestGenerateOutputBranchReadme(t *testing.T) {
 
 	outputSummariesDir := filepath.Join(tempDir, "summaries")
 	outputDir := filepath.Join(tempDir, "output")
-	require.NoError(t, os.MkdirAll(outputSummariesDir, 0755))
-	require.NoError(t, os.MkdirAll(outputDir, 0755))
+	require.NoError(t, os.MkdirAll(outputSummariesDir, 0o755))
+	require.NoError(t, os.MkdirAll(outputDir, 0o755))
 
 	origOutputSummariesDir := constants.OutputSummariesDir
 	origOutputDir := constants.OutputDir
@@ -57,7 +57,7 @@ func TestGenerateOutputBranchReadme(t *testing.T) {
 	testFiles := []string{"test_blocklist.txt", "test_allowlist.txt"}
 	for _, filename := range testFiles {
 		filePath := filepath.Join(outputDir, filename)
-		require.NoError(t, os.WriteFile(filePath, []byte("test content"), 0644))
+		require.NoError(t, os.WriteFile(filePath, []byte("test content"), 0o644))
 	}
 
 	readme := generateOutputBranchReadme()
@@ -89,7 +89,7 @@ func TestCollectWorkflowSummary(t *testing.T) {
 	}()
 
 	outputSummariesDir := filepath.Join(tempDir, "summaries")
-	require.NoError(t, os.MkdirAll(outputSummariesDir, 0755))
+	require.NoError(t, os.MkdirAll(outputSummariesDir, 0o755))
 
 	origOutputSummariesDir := constants.OutputSummariesDir
 	constants.OutputSummariesDir = outputSummariesDir
@@ -118,7 +118,7 @@ func TestCollectDownloadStats(t *testing.T) {
 	}()
 
 	outputSummariesDir := filepath.Join(tempDir, "summaries")
-	require.NoError(t, os.MkdirAll(outputSummariesDir, 0755))
+	require.NoError(t, os.MkdirAll(outputSummariesDir, 0o755))
 
 	origOutputSummariesDir := constants.OutputSummariesDir
 	constants.OutputSummariesDir = outputSummariesDir
@@ -154,7 +154,7 @@ func TestCollectDownloadStats(t *testing.T) {
 	summaryFile := filepath.Join(outputSummariesDir, constants.DefaultSummaryFiles["download"])
 	content, err := json.Marshal(downloadSummaries)
 	require.NoError(t, err)
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	stats = &DownloadStats{}
 	err = collectDownloadStats(stats)
@@ -179,7 +179,7 @@ func TestCollectProcessingStats(t *testing.T) {
 	}()
 
 	outputSummariesDir := filepath.Join(tempDir, "summaries")
-	require.NoError(t, os.MkdirAll(outputSummariesDir, 0755))
+	require.NoError(t, os.MkdirAll(outputSummariesDir, 0o755))
 
 	origOutputSummariesDir := constants.OutputSummariesDir
 	constants.OutputSummariesDir = outputSummariesDir
@@ -213,7 +213,7 @@ func TestCollectProcessingStats(t *testing.T) {
 	summaryFile := filepath.Join(outputSummariesDir, constants.DefaultSummaryFiles["processed"])
 	content, err := json.Marshal(processedSummaries)
 	require.NoError(t, err)
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	stats = &ProcessingStats{}
 	err = collectProcessingStats(stats)
@@ -236,7 +236,7 @@ func TestCollectGroupsStats(t *testing.T) {
 	}()
 
 	outputSummariesDir := filepath.Join(tempDir, "summaries")
-	require.NoError(t, os.MkdirAll(outputSummariesDir, 0755))
+	require.NoError(t, os.MkdirAll(outputSummariesDir, 0o755))
 
 	origOutputSummariesDir := constants.OutputSummariesDir
 	constants.OutputSummariesDir = outputSummariesDir
@@ -278,7 +278,7 @@ func TestCollectGroupsStats(t *testing.T) {
 	summaryFile := filepath.Join(outputSummariesDir, constants.DefaultSummaryFiles["consolidated_groups"])
 	content, err := json.Marshal(consolidatedSummaries)
 	require.NoError(t, err)
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	stats = &GroupsStats{}
 	err = collectGroupsStats(stats)
@@ -304,7 +304,7 @@ func TestCollectCategoriesStats(t *testing.T) {
 	}()
 
 	outputSummariesDir := filepath.Join(tempDir, "summaries")
-	require.NoError(t, os.MkdirAll(outputSummariesDir, 0755))
+	require.NoError(t, os.MkdirAll(outputSummariesDir, 0o755))
 
 	origOutputSummariesDir := constants.OutputSummariesDir
 	constants.OutputSummariesDir = outputSummariesDir
@@ -344,7 +344,7 @@ func TestCollectCategoriesStats(t *testing.T) {
 	summaryFile := filepath.Join(outputSummariesDir, constants.DefaultSummaryFiles["consolidated_categories"])
 	content, err := json.Marshal(consolidatedSummaries)
 	require.NoError(t, err)
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	stats = &CategoriesStats{}
 	err = collectCategoriesStats(stats)
@@ -371,7 +371,7 @@ func TestCollectConsolidateStats(t *testing.T) {
 	}()
 
 	outputSummariesDir := filepath.Join(tempDir, "summaries")
-	require.NoError(t, os.MkdirAll(outputSummariesDir, 0755))
+	require.NoError(t, os.MkdirAll(outputSummariesDir, 0o755))
 
 	origOutputSummariesDir := constants.OutputSummariesDir
 	constants.OutputSummariesDir = outputSummariesDir
@@ -410,7 +410,7 @@ func TestCollectConsolidateStats(t *testing.T) {
 	summaryFile := filepath.Join(outputSummariesDir, constants.DefaultSummaryFiles["consolidated"])
 	content, err := json.Marshal(consolidatedSummaries)
 	require.NoError(t, err)
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	stats = &ConsolidateStats{}
 	err = collectConsolidateStats(stats)
@@ -438,7 +438,7 @@ func TestCollectOverlapStats(t *testing.T) {
 	}()
 
 	outputSummariesDir := filepath.Join(tempDir, "summaries")
-	require.NoError(t, os.MkdirAll(outputSummariesDir, 0755))
+	require.NoError(t, os.MkdirAll(outputSummariesDir, 0o755))
 
 	origOutputSummariesDir := constants.OutputSummariesDir
 	constants.OutputSummariesDir = outputSummariesDir
@@ -461,7 +461,7 @@ func TestCollectOverlapStats(t *testing.T) {
 	summaryFile := filepath.Join(outputSummariesDir, constants.DefaultSummaryFiles["overlap"])
 	content, err := json.Marshal(overlapSummaries)
 	require.NoError(t, err)
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	stats := &OverlapStats{}
 	err = collectOverlapStats(stats)
@@ -496,13 +496,13 @@ func TestGetTopLevelTxtFiles(t *testing.T) {
 
 	for _, filename := range testFiles {
 		filePath := filepath.Join(tempDir, filename)
-		require.NoError(t, os.WriteFile(filePath, []byte("content"), 0644))
+		require.NoError(t, os.WriteFile(filePath, []byte("content"), 0o644))
 	}
 
 	// Create a subdirectory to ensure it's ignored
 	subDir := filepath.Join(tempDir, "subdir")
-	require.NoError(t, os.MkdirAll(subDir, 0755))
-	require.NoError(t, os.WriteFile(filepath.Join(subDir, "sub.txt"), []byte("content"), 0644))
+	require.NoError(t, os.MkdirAll(subDir, 0o755))
+	require.NoError(t, os.WriteFile(filepath.Join(subDir, "sub.txt"), []byte("content"), 0o644))
 
 	txtFiles, err := getTopLevelTxtFiles()
 	require.NoError(t, err)
@@ -588,7 +588,7 @@ func createTestSummaryFiles(t *testing.T, outputSummariesDir string) {
 	content, err := json.Marshal(downloadSummaries)
 	require.NoError(t, err)
 	summaryFile := filepath.Join(outputSummariesDir, constants.DefaultSummaryFiles["download"])
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	// Processed summary
 	processedSummaries := []c.ProcessedSummary{
@@ -601,7 +601,7 @@ func createTestSummaryFiles(t *testing.T, outputSummariesDir string) {
 	content, err = json.Marshal(processedSummaries)
 	require.NoError(t, err)
 	summaryFile = filepath.Join(outputSummariesDir, constants.DefaultSummaryFiles["processed"])
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	// Consolidated summary
 	consolidatedSummaries := []c.ConsolidatedSummary{
@@ -615,7 +615,7 @@ func createTestSummaryFiles(t *testing.T, outputSummariesDir string) {
 	content, err = json.Marshal(consolidatedSummaries)
 	require.NoError(t, err)
 	summaryFile = filepath.Join(outputSummariesDir, constants.DefaultSummaryFiles["consolidated"])
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	// Overlap summary
 	overlapSummaries := []c.OverlapSummary{
@@ -624,7 +624,7 @@ func createTestSummaryFiles(t *testing.T, outputSummariesDir string) {
 	content, err = json.Marshal(overlapSummaries)
 	require.NoError(t, err)
 	summaryFile = filepath.Join(outputSummariesDir, constants.DefaultSummaryFiles["overlap"])
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	// Top summary
 	topSummaries := []c.TopSummary{
@@ -638,7 +638,7 @@ func createTestSummaryFiles(t *testing.T, outputSummariesDir string) {
 	content, err = json.Marshal(topSummaries)
 	require.NoError(t, err)
 	summaryFile = filepath.Join(outputSummariesDir, constants.DefaultSummaryFiles["top"])
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 }
 
 func TestCollectTopStats(t *testing.T) {
@@ -707,7 +707,7 @@ func TestCollectTopStats(t *testing.T) {
 				}
 
 				topFile := filepath.Join(tempDir, constants.DefaultSummaryFiles["top"])
-				return os.WriteFile(topFile, content, 0644)
+				return os.WriteFile(topFile, content, 0o644)
 			},
 			expectedError: false,
 			expectedFiles: 3,
@@ -720,7 +720,7 @@ func TestCollectTopStats(t *testing.T) {
 			name: "invalid JSON in top summary file",
 			setupFunc: func() error {
 				topFile := filepath.Join(tempDir, constants.DefaultSummaryFiles["top"])
-				return os.WriteFile(topFile, []byte("invalid json"), 0644)
+				return os.WriteFile(topFile, []byte("invalid json"), 0o644)
 			},
 			expectedError: true,
 		},
@@ -728,7 +728,7 @@ func TestCollectTopStats(t *testing.T) {
 			name: "empty top summary file",
 			setupFunc: func() error {
 				topFile := filepath.Join(tempDir, constants.DefaultSummaryFiles["top"])
-				return os.WriteFile(topFile, []byte("[]"), 0644)
+				return os.WriteFile(topFile, []byte("[]"), 0o644)
 			},
 			expectedError: false,
 			expectedFiles: 0,

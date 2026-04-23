@@ -36,7 +36,7 @@ var topEntriesCmd = &cobra.Command{
 		Logger.Infof("Using %d worker(s) for top entry(s) processing", maxWorkers)
 
 		if profileDir != "" {
-			if err := os.MkdirAll(profileDir, 0755); err != nil {
+			if err := os.MkdirAll(profileDir, 0o755); err != nil {
 				Logger.Errorf("Failed to create profile directory %s: %v", profileDir, err)
 				profileDir = ""
 			} else {
@@ -45,7 +45,7 @@ var topEntriesCmd = &cobra.Command{
 		}
 		if profileDir == "" {
 			profileDir = AppConfig.DNSToolkit.Folders.Profiles
-			if err := os.MkdirAll(profileDir, 0755); err != nil {
+			if err := os.MkdirAll(profileDir, 0o755); err != nil {
 				Logger.Errorf(
 					"Failed to create default profile directory %s: %v. Profiling might fail.",
 					profileDir,

@@ -42,7 +42,7 @@ func TestProcessSource(t *testing.T) {
 
 	downloadDir := filepath.Join(tempDir, "download")
 	constants.DownloadDir = downloadDir
-	require.NoError(t, os.MkdirAll(downloadDir, 0755))
+	require.NoError(t, os.MkdirAll(downloadDir, 0o755))
 
 	logger := multilog.NewLogger()
 
@@ -80,7 +80,7 @@ func TestProcessSource(t *testing.T) {
 			setupFunc: func() error {
 				downloadFile := filepath.Join(downloadDir, "Test Domain Source.txt")
 				content := "example.com\nbadsite.net\nmalware.org\n"
-				return os.WriteFile(downloadFile, []byte(content), 0644)
+				return os.WriteFile(downloadFile, []byte(content), 0o644)
 			},
 			expectedCounts: map[string]int{constants.SourceTypeDomain: 1},
 			expectedTotal:  1,
@@ -98,7 +98,7 @@ func TestProcessSource(t *testing.T) {
 			setupFunc: func() error {
 				downloadFile := filepath.Join(downloadDir, "Test IPv4 Source.txt")
 				content := "192.168.1.1\n10.0.0.1\n172.16.0.1\n"
-				return os.WriteFile(downloadFile, []byte(content), 0644)
+				return os.WriteFile(downloadFile, []byte(content), 0o644)
 			},
 			expectedCounts: map[string]int{constants.SourceTypeIpv4: 1},
 			expectedTotal:  1,
@@ -117,7 +117,7 @@ func TestProcessSource(t *testing.T) {
 			setupFunc: func() error {
 				downloadFile := filepath.Join(downloadDir, "Multi Type Source.txt")
 				content := "example.com\n192.168.1.1\nbadsite.net\n10.0.0.1\n"
-				return os.WriteFile(downloadFile, []byte(content), 0644)
+				return os.WriteFile(downloadFile, []byte(content), 0o644)
 			},
 			expectedCounts: map[string]int{
 				constants.SourceTypeDomain: 1,

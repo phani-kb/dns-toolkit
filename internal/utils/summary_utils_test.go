@@ -29,7 +29,7 @@ func TestGetLastSummary(t *testing.T) {
 		}
 	}()
 
-	err = os.WriteFile(tempFile.Name(), []byte("[]"), 0644)
+	err = os.WriteFile(tempFile.Name(), []byte("[]"), 0o644)
 	require.NoError(t, err)
 
 	summary, err = GetLastSummary[c.DownloadSummary](logger, tempFile.Name(), "test-source")
@@ -52,7 +52,7 @@ func TestGetLastSummary(t *testing.T) {
 	data, err := json.Marshal(summaries)
 	require.NoError(t, err)
 
-	err = os.WriteFile(tempFile.Name(), data, 0644)
+	err = os.WriteFile(tempFile.Name(), data, 0o644)
 	require.NoError(t, err)
 
 	summary, err = GetLastSummary[c.DownloadSummary](logger, tempFile.Name(), "test-source")
@@ -64,7 +64,7 @@ func TestGetLastSummary(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, c.DownloadSummary{}, summary)
 
-	err = os.WriteFile(tempFile.Name(), []byte("invalid json"), 0644)
+	err = os.WriteFile(tempFile.Name(), []byte("invalid json"), 0o644)
 	require.NoError(t, err)
 
 	summary, err = GetLastSummary[c.DownloadSummary](logger, tempFile.Name(), "test-source")
@@ -80,7 +80,7 @@ func TestGetLastSummary(t *testing.T) {
 	processedData, err := json.Marshal(processedSummaries)
 	require.NoError(t, err)
 
-	err = os.WriteFile(tempFile.Name(), processedData, 0644)
+	err = os.WriteFile(tempFile.Name(), processedData, 0o644)
 	require.NoError(t, err)
 
 	processedSummary, err := GetLastSummary[c.ProcessedSummary](logger, tempFile.Name(), "processed-source")
@@ -126,7 +126,7 @@ func TestGetSummaryFiles(t *testing.T) {
 	data, err := json.Marshal(summaries)
 	require.NoError(t, err)
 
-	err = os.WriteFile(tempFile.Name(), data, 0644)
+	err = os.WriteFile(tempFile.Name(), data, 0o644)
 	require.NoError(t, err)
 
 	files, err = GetSummaryFiles(
@@ -153,7 +153,7 @@ func TestGetSummaryFiles(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Len(t, files, 0)
 
-	err = os.WriteFile(tempFile.Name(), []byte("invalid json"), 0644)
+	err = os.WriteFile(tempFile.Name(), []byte("invalid json"), 0o644)
 	require.NoError(t, err)
 
 	files, err = GetSummaryFiles(

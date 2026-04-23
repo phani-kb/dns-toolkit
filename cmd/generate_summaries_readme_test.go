@@ -41,7 +41,7 @@ func TestGenerateSummariesReadme(t *testing.T) {
 	}()
 
 	summariesDir := filepath.Join(tempDir, "summaries")
-	require.NoError(t, os.MkdirAll(summariesDir, 0755))
+	require.NoError(t, os.MkdirAll(summariesDir, 0o755))
 
 	origOutputDir := constants.OutputDir
 	constants.OutputDir = tempDir
@@ -90,7 +90,7 @@ func TestCollectSummariesInfo(t *testing.T) {
 	assert.NotEmpty(t, info.LastGenerated)
 
 	summariesDir := filepath.Join(tempDir, "summaries")
-	require.NoError(t, os.MkdirAll(summariesDir, 0755))
+	require.NoError(t, os.MkdirAll(summariesDir, 0o755))
 	constants.OutputDir = tempDir
 
 	createTestSummaryFilesForSummariesReadme(t, summariesDir)
@@ -115,7 +115,7 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 	}()
 
 	summariesDir := filepath.Join(tempDir, "summaries")
-	require.NoError(t, os.MkdirAll(summariesDir, 0755))
+	require.NoError(t, os.MkdirAll(summariesDir, 0o755))
 
 	origOutputDir := constants.OutputDir
 	constants.OutputDir = tempDir
@@ -163,7 +163,7 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectStats: true,
 			expectedText: []string{
@@ -196,7 +196,7 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectStats: true,
 			expectedText: []string{
@@ -229,7 +229,7 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectStats: true,
 			expectedText: []string{
@@ -262,7 +262,7 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectStats: true,
 			expectedText: []string{
@@ -297,7 +297,7 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectStats: true,
 			expectedText: []string{
@@ -332,7 +332,7 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectStats: true,
 			expectedText: []string{
@@ -365,7 +365,7 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectStats: true,
 			expectedText: []string{
@@ -384,7 +384,7 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 			name:     "unknown file type",
 			filename: "unknown_summary.json",
 			createFile: func(path string) error {
-				return os.WriteFile(path, []byte("{}"), 0644)
+				return os.WriteFile(path, []byte("{}"), 0o644)
 			},
 			expectStats: false,
 		},
@@ -392,7 +392,7 @@ func TestGetDetailedStatsForSummaryType(t *testing.T) {
 			name:     "invalid JSON",
 			filename: "download_summary.json",
 			createFile: func(path string) error {
-				return os.WriteFile(path, []byte("invalid json"), 0644)
+				return os.WriteFile(path, []byte("invalid json"), 0o644)
 			},
 			expectStats: false,
 		},
@@ -451,7 +451,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectedUpdates: func(stats *OverallSummaryStats) bool {
 				return stats.TotalDownloads == 3 && stats.TotalSources == 2
@@ -469,7 +469,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectedUpdates: func(stats *OverallSummaryStats) bool {
 				return stats.TotalProcessed == 2
@@ -487,7 +487,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectedUpdates: func(stats *OverallSummaryStats) bool {
 				return stats.TotalConsolidated == 2
@@ -507,7 +507,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectedUpdates: func(stats *OverallSummaryStats) bool {
 				return stats.TotalGroups == 2
@@ -527,7 +527,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectedUpdates: func(stats *OverallSummaryStats) bool {
 				return stats.TotalCategories == 2
@@ -545,7 +545,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectedUpdates: func(stats *OverallSummaryStats) bool {
 				return stats.TotalTopLists == 2
@@ -563,7 +563,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectedUpdates: func(stats *OverallSummaryStats) bool {
 				return stats.TotalOverlapAnalyzed == 2
@@ -573,7 +573,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 			name:     "unknown file type",
 			filename: "unknown.json",
 			createFile: func(path string) error {
-				return os.WriteFile(path, []byte("{}"), 0644)
+				return os.WriteFile(path, []byte("{}"), 0o644)
 			},
 			expectNoChange: true,
 		},
@@ -581,7 +581,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 			name:     "invalid JSON",
 			filename: "download_summary.json",
 			createFile: func(path string) error {
-				return os.WriteFile(path, []byte("invalid json"), 0644)
+				return os.WriteFile(path, []byte("invalid json"), 0o644)
 			},
 			expectNoChange: true,
 		},
@@ -647,7 +647,7 @@ func createTestSummaryFilesForSummariesReadme(t *testing.T, summariesDir string)
 	content, err := json.Marshal(downloadSummaries)
 	require.NoError(t, err)
 	summaryFile := filepath.Join(summariesDir, "download_summary.json")
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	processedSummaries := []c.ProcessedSummary{
 		{
@@ -662,7 +662,7 @@ func createTestSummaryFilesForSummariesReadme(t *testing.T, summariesDir string)
 	content, err = json.Marshal(processedSummaries)
 	require.NoError(t, err)
 	summaryFile = filepath.Join(summariesDir, "processed_summary.json")
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	consolidatedSummaries := []c.ConsolidatedSummary{
 		{
@@ -676,7 +676,7 @@ func createTestSummaryFilesForSummariesReadme(t *testing.T, summariesDir string)
 	content, err = json.Marshal(consolidatedSummaries)
 	require.NoError(t, err)
 	summaryFile = filepath.Join(summariesDir, "consolidated_summary.json")
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	consolidatedGroupsSummaries := []c.ConsolidatedSummary{
 		{
@@ -690,7 +690,7 @@ func createTestSummaryFilesForSummariesReadme(t *testing.T, summariesDir string)
 	content, err = json.Marshal(consolidatedGroupsSummaries)
 	require.NoError(t, err)
 	summaryFile = filepath.Join(summariesDir, "consolidated_groups_summary.json")
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	consolidatedCategoriesSummaries := []c.ConsolidatedSummary{
 		{
@@ -704,7 +704,7 @@ func createTestSummaryFilesForSummariesReadme(t *testing.T, summariesDir string)
 	content, err = json.Marshal(consolidatedCategoriesSummaries)
 	require.NoError(t, err)
 	summaryFile = filepath.Join(summariesDir, "consolidated_categories_summary.json")
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	topSummaries := []c.TopSummary{
 		{
@@ -717,7 +717,7 @@ func createTestSummaryFilesForSummariesReadme(t *testing.T, summariesDir string)
 	content, err = json.Marshal(topSummaries)
 	require.NoError(t, err)
 	summaryFile = filepath.Join(summariesDir, "top_summary.json")
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	overlapSummaries := []c.OverlapSummary{
 		{
@@ -730,5 +730,5 @@ func createTestSummaryFilesForSummariesReadme(t *testing.T, summariesDir string)
 	content, err = json.Marshal(overlapSummaries)
 	require.NoError(t, err)
 	summaryFile = filepath.Join(summariesDir, "overlap_summary.json")
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 }
