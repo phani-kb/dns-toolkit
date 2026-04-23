@@ -71,7 +71,7 @@ func loadTemplates() (*template.Template, []byte, error) {
 	configsDir := "configs"
 
 	// In test mode, resolve relative paths to project root
-	if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
+	if os.Getenv("DNS_TOOLKIT_TEST_MODE") == constants.BooleanTrue {
 		if projectRoot, err := u.FindProjectRoot(""); err == nil {
 			configsDir = filepath.Join(projectRoot, "configs")
 		}

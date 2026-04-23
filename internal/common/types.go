@@ -309,7 +309,7 @@ func (ps *ProcessedSummary) GetName() string {
 // ConsolidatedSummary represents information about consolidated files that combine
 // multiple source files of the same type into a single deduplicated file.
 //
-//nolint:lll
+// nolint:lll
 type ConsolidatedSummary struct {
 	Type                      string   `json:"type"`                            // Type of entries (domain, ipv4, etc.)
 	Filepath                  string   `json:"filepath"`                        // Path to the consolidated file
@@ -363,7 +363,7 @@ func (css *ConsolidatedGroupsSummary) GetName() string {
 
 // ConsolidatedCategoriesSummary represents consolidated summaries grouped by category.
 //
-//nolint:lll
+// nolint:lll
 type ConsolidatedCategoriesSummary struct {
 	Category                  string                `json:"category"`                    // Category name (ads, malware, privacy, etc)
 	LastConsolidatedTimestamp string                `json:"last_consolidated_timestamp"` // When consolidation was completed
