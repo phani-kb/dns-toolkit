@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/phani-kb/dns-toolkit/internal/config"
+	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/multilog"
 )
 
@@ -18,8 +19,7 @@ var (
 // GetConfigPath returns the path to the configuration file.
 func GetConfigPath() (string, error) {
 	configPath := filepath.Join("configs", "config.yml")
-	const testModeTrue = "true"
-	inTestMode := os.Getenv("DNS_TOOLKIT_TEST_MODE") == testModeTrue
+	inTestMode := os.Getenv("DNS_TOOLKIT_TEST_MODE") == constants.BooleanTrue
 	if inTestMode {
 		configPath = os.Getenv("DNS_TOOLKIT_TEST_CONFIG_PATH")
 		if configPath == "" {

@@ -7,16 +7,18 @@ import (
 
 const (
 	AppName        = "dns-toolkit"
-	AppVersion     = "1.0.0"
+	AppVersion     = "2.0.0"
 	AppDescription = "A toolkit for DNS data processing and analysis."
 	GitHubRawURL   = "https://raw.githubusercontent.com/phani-kb/dns-toolkit/output"
 	GitHubRepoURL  = "https://github.com/phani-kb/dns-toolkit"
 )
 
 const (
-	DataConfigDir     = "data/config"
-	SourcesSchemaFile = "sources_schema.json"
-	DefaultDBPath     = "data/dns-toolkit.db"
+	DataConfigDir       = "data/config"
+	SourcesSchemaFile   = "sources_schema.json"
+	DefaultDBPath       = "data/dns-toolkit.db"
+	TablePrefix         = "dnstk_"
+	SchemaMetadataTable = "_" + TablePrefix + "schema_metadata"
 )
 
 const (
@@ -591,3 +593,5 @@ var OverrideThresholds = map[string]int{
 	"allowlist": 3,
 	"blocklist": 2,
 }
+
+var BooleanTrue = "true"

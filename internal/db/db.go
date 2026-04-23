@@ -2,13 +2,15 @@
 package db
 
 import (
+	"context"
 	"database/sql"
+	"errors"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 
-	_ "modernc.org/sqlite" // Pure-Go SQLite driver
+	"github.com/phani-kb/multilog"
+	_ "modernc.org/sqlite"
 )
 
 type DB struct {
@@ -20,10 +22,36 @@ type DB struct {
 // Open creates or opens a SQLite database at the given path.
 // If forceRecreate is true, the schema is dropped and rebuilt unconditionally.
 // The schema is also rebuilt automatically whenever schema.sql changes.
-func Open(dbPath string, forceRecreate ...bool) (*DB, error) {
-	dir := filepath.Dir(dbPath)
-	if err := os.MkdirAll(dir, 0o755); err != nil {
-		return nil, fmt.Errorf("creating database directory: %w", err)
+func Open(ctx context.Context, logger *multilog.Logger, dbPath string, forceRecreate bool) (*DB, error) {
+	if forceRecreate {
+		if err := removeDBFiles(dbPath); err != nil {
+			return nil, fmt.Errorf("resetting database files: %w", err)
+		}
+	}
+
+	db, err := openConn(dbPath)
+	if err != nil {
+		return nil, err
+	}
+
+	recreated, err := db.EnsureSchema(ctx, logger, forceRecreate)
+	if err != nil {
+		return nil, closeOnError(db, "ensuring schema", err)
+	}
+	db.schemaRecreated = recreated
+
+	return db, nil
+}
+
+// OpenInspect opens the database for read-only inspection without running
+// EnsureSchema, so it never modifies or recreates the schema.
+func OpenInspect(dbPath string) (*DB, error) {
+	return openConn(dbPath)
+}
+
+func openConn(dbPath string) (*DB, error) {
+	if err := os.MkdirAll(filepath.Dir(dbPath), 0o755); err != nil {
+		return nil, fmt.Errorf("creating db dir: %w", err)
 	}
 
 	conn, err := sql.Open("sqlite", dbPath)
@@ -40,13 +68,6 @@ func Open(dbPath string, forceRecreate ...bool) (*DB, error) {
 	if err = db.applyPragmas(); err != nil {
 		return nil, closeOnError(conn, "applying pragmas", err)
 	}
-
-	force := len(forceRecreate) > 0 && forceRecreate[0]
-	recreated, err := db.EnsureSchema(force)
-	if err != nil {
-		return nil, closeOnError(conn, "ensuring schema", err)
-	}
-	db.schemaRecreated = recreated
 
 	return db, nil
 }
@@ -94,15 +115,15 @@ func (db *DB) Vacuum() error {
 }
 
 // InTransaction executes fn within a database transaction.
-func (db *DB) InTransaction(fn func(tx *sql.Tx) error) error {
-	tx, err := db.conn.Begin()
+func (db *DB) InTransaction(ctx context.Context, fn func(tx *sql.Tx) error) error {
+	tx, err := db.conn.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("beginning transaction: %w", err)
 	}
 
 	if err := fn(tx); err != nil {
 		if rbErr := tx.Rollback(); rbErr != nil {
-			return fmt.Errorf("rollback failed: %w (original error: %v)", rbErr, err)
+			return fmt.Errorf("rollback failed: %w", errors.Join(err, rbErr))
 		}
 		return err
 	}
@@ -110,21 +131,11 @@ func (db *DB) InTransaction(fn func(tx *sql.Tx) error) error {
 	return tx.Commit()
 }
 
-// closeOnError closes c and returns a combined error wrapping both the original
-// operation error and any error from closing.
-func closeOnError(c io.Closer, op string, opErr error) error {
-	if closeErr := c.Close(); closeErr != nil {
-		return fmt.Errorf("%s: %w; closing connection: %v", op, opErr, closeErr)
-	}
-	return fmt.Errorf("%s: %w", op, opErr)
-}
-
 // CloseLogError closes the DB and logs any error.
-func (db *DB) CloseLogError(logger interface{ Warnf(string, ...interface{}) }) {
-	if db.conn == nil {
-		return
-	}
-	if err := db.conn.Close(); err != nil {
-		logger.Warnf("Error closing database: %v", err)
+func (db *DB) CloseLogError(logger *multilog.Logger) {
+	if db.conn != nil {
+		if err := db.conn.Close(); err != nil {
+			logger.Warnf("Error closing database: %v", err)
+		}
 	}
 }
