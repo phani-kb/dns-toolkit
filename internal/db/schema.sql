@@ -21,45 +21,77 @@ create table if not exists dnstk_sources (
   unique (name, source_file)
 ) strict;
 
--- source_types: processor type per source (e.g., domain, ipv4, adguard)
+-- type_names: global registry of source processor type strings
+create table if not exists dnstk_type_names (
+  id integer primary key,
+  name text not null unique
+) strict;
+
+-- list_type_names: global registry of list type strings
+create table if not exists dnstk_list_type_names (
+  id integer primary key,
+  name text not null unique check (name in ('blocklist', 'allowlist'))
+) strict;
+
+-- group_names: global registry of size group strings
+create table if not exists dnstk_group_names (
+  id integer primary key,
+  name text not null unique
+) strict;
+
+-- category_names: global registry of category strings
+create table if not exists dnstk_category_names (
+  id integer primary key,
+  name text not null unique
+) strict;
+
+-- source_types: which type names each source uses, with per-source disabled flag
 create table if not exists dnstk_source_types (
   id integer primary key,
   source_id integer not null references dnstk_sources (id) on delete cascade,
-  type_name text not null,
+  type_name_id integer not null references dnstk_type_names (id),
   notes text,
   disabled integer not null default 0 check (disabled in (0, 1)),
-  unique (source_id, type_name)
+  unique (source_id, type_name_id)
 ) strict;
 
 create index if not exists idx_source_types_source_id on dnstk_source_types (source_id);
+create index if not exists idx_source_types_type_name_id on dnstk_source_types (type_name_id);
 
--- source_list_types: blocklist/allowlist per source type
+-- source_list_types: which list type names each source type uses
 create table if not exists dnstk_source_list_types (
   id integer primary key,
   source_type_id integer not null references dnstk_source_types (id) on delete cascade,
-  list_type_name text not null check (list_type_name in ('blocklist', 'allowlist')),
-  notes text,
+  list_type_name_id integer not null references dnstk_list_type_names (id),
   disabled integer not null default 0 check (disabled in (0, 1)),
   must_consider integer not null default 0 check (must_consider in (0, 1)),
-  unique (source_type_id, list_type_name)
+  unique (source_type_id, list_type_name_id)
 ) strict;
 
 create index if not exists idx_source_list_types_type_id on dnstk_source_list_types (source_type_id);
+create index if not exists idx_source_list_types_list_type_name_id on dnstk_source_list_types (list_type_name_id);
 
--- source_list_type_groups: size group membership for a list type
+-- source_list_type_notes: optional per-source-list-type notes (only inserted when non-empty)
+create table if not exists dnstk_source_list_type_notes (
+  source_list_type_id integer primary key references dnstk_source_list_types (id) on delete cascade,
+  notes text not null
+) strict;
+
+-- source_list_type_groups: which group names a list type belongs to
 create table if not exists dnstk_source_list_type_groups (
   source_list_type_id integer not null references dnstk_source_list_types (id) on delete cascade,
-  group_name text not null,
-  primary key (source_list_type_id, group_name)
+  group_name_id integer not null references dnstk_group_names (id),
+  primary key (source_list_type_id, group_name_id)
 ) strict, without rowid;
 
 create index if not exists idx_source_list_type_groups_list_type_id on dnstk_source_list_type_groups (source_list_type_id);
+create index if not exists idx_source_list_type_groups_group_name_id on dnstk_source_list_type_groups (group_name_id);
 
--- source_categories: category tags per source
+-- source_categories: category membership per source, referencing global category_names
 create table if not exists dnstk_source_categories (
   source_id integer not null references dnstk_sources (id) on delete cascade,
-  category text not null,
-  primary key (source_id, category)
+  category_name_id integer not null references dnstk_category_names (id),
+  primary key (source_id, category_name_id)
 ) strict, without rowid;
 
 create index if not exists idx_source_categories_source_id on dnstk_source_categories (source_id);
@@ -132,7 +164,6 @@ create table if not exists dnstk_entries (
 ) strict;
 
 create index if not exists idx_entries_lookup on dnstk_entries (entry, generic_source_type, list_type);
-
 create index if not exists idx_entries_source on dnstk_entries (source_id, generic_source_type);
 
 create index if not exists idx_entries_source_type_list on dnstk_entries (source_id, actual_source_type, list_type);

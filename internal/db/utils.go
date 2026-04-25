@@ -38,3 +38,11 @@ func (db *DB) tableExists(tableName string) (bool, error) {
 	}
 	return true, nil
 }
+
+// boolToInt converts a boolean to 0 or 1 for SQLite storage.
+func boolToInt(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
+}
