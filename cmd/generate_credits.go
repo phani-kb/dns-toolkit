@@ -20,7 +20,7 @@ var generateCreditsCmd = &cobra.Command{
 	Short: "Generate and update source credits in README.md",
 	Long:  "Update the CREDITS section in README.md with a collapsible table for each source file.",
 	Run: func(cmd *cobra.Command, args []string) {
-		if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
+		if os.Getenv("DNS_TOOLKIT_TEST_MODE") == constants.BooleanTrue {
 			Logger.Debugf("Skipping generate credits command in test mode")
 			return
 		}

@@ -7,15 +7,18 @@ import (
 
 const (
 	AppName        = "dns-toolkit"
-	AppVersion     = "1.0.0"
+	AppVersion     = "2.0.0"
 	AppDescription = "A toolkit for DNS data processing and analysis."
 	GitHubRawURL   = "https://raw.githubusercontent.com/phani-kb/dns-toolkit/output"
 	GitHubRepoURL  = "https://github.com/phani-kb/dns-toolkit"
 )
 
 const (
-	DataConfigDir     = "data/config"
-	SourcesSchemaFile = "sources_schema.json"
+	DataConfigDir       = "data/config"
+	SourcesSchemaFile   = "sources_schema.json"
+	DefaultDBPath       = "data/dns-toolkit.db"
+	TablePrefix         = "dnstk_"
+	SchemaMetadataTable = "_" + TablePrefix + "schema_metadata"
 )
 
 const (
@@ -590,3 +593,29 @@ var OverrideThresholds = map[string]int{
 	"allowlist": 3,
 	"blocklist": 2,
 }
+
+var BooleanTrue = "true"
+
+// Database table names
+const (
+	TableSources              = TablePrefix + "sources"
+	TableTypeNames            = TablePrefix + "type_names"
+	TableListTypeNames        = TablePrefix + "list_type_names"
+	TableGroupNames           = TablePrefix + "group_names"
+	TableCategoryNames        = TablePrefix + "category_names"
+	TableSourceTypes          = TablePrefix + "source_types"
+	TableSourceListTypes      = TablePrefix + "source_list_types"
+	TableSourceListTypeNotes  = TablePrefix + "source_list_type_notes"
+	TableSourceListTypeGroups = TablePrefix + "source_list_type_groups"
+	TableSourceCategories     = TablePrefix + "source_categories"
+	TableSourceCountries      = TablePrefix + "source_countries"
+	TableSourceContent        = TablePrefix + "source_content"
+	TableSourceFiles          = TablePrefix + "source_files"
+	TableDownloads            = TablePrefix + "downloads"
+	TableEntries              = TablePrefix + "entries"
+	TableEntryGroups          = TablePrefix + "entry_groups"
+	TableEntryCategories      = TablePrefix + "entry_categories"
+	TableConsolidatedEntries  = TablePrefix + "consolidated_entries"
+	TableOverlapResults       = TablePrefix + "overlap_results"
+	TableTopEntries           = TablePrefix + "top_entries"
+)
