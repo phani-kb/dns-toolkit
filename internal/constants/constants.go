@@ -595,3 +595,27 @@ var OverrideThresholds = map[string]int{
 }
 
 var BooleanTrue = "true"
+
+// Database table names
+const (
+	TableSources              = TablePrefix + "sources"
+	TableTypeNames            = TablePrefix + "type_names"
+	TableListTypeNames        = TablePrefix + "list_type_names"
+	TableGroupNames           = TablePrefix + "group_names"
+	TableCategoryNames        = TablePrefix + "category_names"
+	TableSourceTypes          = TablePrefix + "source_types"
+	TableSourceListTypes      = TablePrefix + "source_list_types"
+	TableSourceListTypeNotes  = TablePrefix + "source_list_type_notes"
+	TableSourceListTypeGroups = TablePrefix + "source_list_type_groups"
+	TableSourceCategories     = TablePrefix + "source_categories"
+	TableSourceCountries      = TablePrefix + "source_countries"
+	TableSourceContent        = TablePrefix + "source_content"
+	TableSourceFiles          = TablePrefix + "source_files"
+	TableDownloads            = TablePrefix + "downloads"
+	TableEntries              = TablePrefix + "entries"
+	TableEntryGroups          = TablePrefix + "entry_groups"
+	TableEntryCategories      = TablePrefix + "entry_categories"
+	TableConsolidatedEntries  = TablePrefix + "consolidated_entries"
+	TableOverlapResults       = TablePrefix + "overlap_results"
+	TableTopEntries           = TablePrefix + "top_entries"
+)
