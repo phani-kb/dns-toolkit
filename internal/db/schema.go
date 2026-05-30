@@ -63,7 +63,6 @@ func (db *DB) storedSchemaChecksum() (string, error) {
 	return checksum, nil
 }
 
-// recreateSchema drops all user tables and rebuilds from schema.sql.
 func (db *DB) recreateSchema(ctx context.Context, logger *multilog.Logger, checksum string) error {
 	// to avoid cascade issues
 	if _, err := db.conn.Exec("pragma foreign_keys=off"); err != nil {
@@ -118,7 +117,6 @@ func (db *DB) recreateSchema(ctx context.Context, logger *multilog.Logger, check
 	return nil
 }
 
-// listUserTables returns all non-internal table names in the database.
 func (db *DB) listUserTables(logger *multilog.Logger) ([]string, error) {
 	q := fmt.Sprintf("SELECT name FROM sqlite_master WHERE type='table' "+
 		"AND (name like '%s%%' OR name like '_%s%%') ORDER BY name", constants.TablePrefix, constants.TablePrefix)
@@ -144,12 +142,10 @@ func (db *DB) listUserTables(logger *multilog.Logger) ([]string, error) {
 	return tables, rows.Err()
 }
 
-// SchemaRecreated returns whether the schema was rebuilt on the last call.
 func (db *DB) SchemaRecreated() bool {
 	return db.schemaRecreated
 }
 
-// StoredChecksum returns the schema checksum stored in the database, or empty if none.
 func (db *DB) StoredChecksum(logger *multilog.Logger) string {
 	cs, err := db.storedSchemaChecksum()
 	if err != nil {
@@ -159,7 +155,6 @@ func (db *DB) StoredChecksum(logger *multilog.Logger) string {
 	return cs
 }
 
-// TableRowCounts returns a map of table name to row count for all user tables.
 func (db *DB) TableRowCounts(logger *multilog.Logger) (map[string]int64, error) {
 	tables, err := db.listUserTables(logger)
 	if err != nil {

@@ -616,7 +616,7 @@ func TestProcessSourceFile(t *testing.T) {
 		},
 	}
 
-	processed := processSourceFile(context.Background(), logger, summary, tempDir)
+	processed := processSourceFileAndPersist(context.Background(), logger, summary, tempDir, 0, nil)
 	if len(processed) == 0 {
 		t.Fatal("Expected at least one processed summary")
 	}

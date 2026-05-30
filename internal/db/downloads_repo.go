@@ -2,6 +2,7 @@ package db
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -121,7 +122,7 @@ func (r *DownloadsRepo) GetDownloadChecksum(sourceID int64) string {
 }
 
 // IsDownloadUnchanged checks if a download's checksum matches the stored value.
-// Returns true if the source hasn't changed (can reuse persisted entries).
+// Returns true if the source hasn't changed.
 func (r *DownloadsRepo) IsDownloadUnchanged(sourceID int64, newChecksum string) bool {
 	stored := r.GetDownloadChecksum(sourceID)
 	return stored != "" && stored == newChecksum
@@ -132,7 +133,7 @@ func (r *DownloadsRepo) IsDownloadUnchanged(sourceID int64, newChecksum string) 
 func (r *DownloadsRepo) GetDownloadSummaryBySourceName(sourceName, downloadDir string) ([]c.DownloadSummary, error) {
 	row, err := r.getDownloadSummaryRowByName(sourceName)
 	if err != nil {
-		if err == sql.ErrNoRows {
+		if errors.Is(err, sql.ErrNoRows) {
 			return []c.DownloadSummary{}, nil
 		}
 		return nil, err

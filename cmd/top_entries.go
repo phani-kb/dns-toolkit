@@ -4,9 +4,7 @@ import (
 	"os"
 	"runtime"
 
-	cfg "github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
-	"github.com/phani-kb/dns-toolkit/internal/top"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/spf13/cobra"
 )
@@ -76,7 +74,7 @@ var topEntriesCmd = &cobra.Command{
 			}
 
 			// Create an instance of the top entries service
-			topService := top.NewDefaultService(constants.TopDir, constants.SummaryDir)
+			// topService := top.NewDefaultService(constants.TopDir, constants.SummaryDir)
 
 			// Ensure directories exist
 			if err := u.EnsureDirectoryExists(Logger, constants.TopDir); err != nil {
@@ -88,29 +86,6 @@ var topEntriesCmd = &cobra.Command{
 				Logger.Errorf("Failed to create summary directory %s: %v", constants.SummaryDir, err)
 				mainErr = err
 				return
-			}
-
-			// Get processed files and generic source types
-			_, genericSourceTypes, processedFiles := cfg.GetProcessedSummaries(Logger, SourcesConfigs, *AppConfig)
-
-			// Determine min sources range
-			minSourcesRange := []int{minSources}
-			if minSources == 0 {
-				minSourcesRange = constants.DefaultMinSourcesRange
-			}
-
-			// Process top entries using the service
-			_, err := topService.ProcessTopEntries(
-				Logger,
-				genericSourceTypes,
-				processedFiles,
-				minSourcesRange,
-				maxEntries,
-				maxWorkers,
-			)
-			if err != nil {
-				Logger.Errorf("Error processing top entries: %v", err)
-				mainErr = err
 			}
 		}()
 

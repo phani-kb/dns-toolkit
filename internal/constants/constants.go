@@ -16,7 +16,9 @@ const (
 const (
 	DataConfigDir       = "data/config"
 	SourcesSchemaFile   = "sources_schema.json"
-	DefaultDBPath       = "data/dns-toolkit.db"
+	DefaultDBFile       = "dns-toolkit.db"
+	DefaultDBPath       = "data" + "/" + DefaultDBFile
+	DefaultTestDBPath   = "testdata" + "/" + DefaultDBFile
 	TablePrefix         = "dnstk_"
 	SchemaMetadataTable = "_" + TablePrefix + "schema_metadata"
 )
@@ -430,7 +432,6 @@ const (
 	MaxPreallocEntries            = 10_000_000
 	MinPreallocEntries            = 10_000
 	DefaultBlockProfileRate       = 1000
-	MinFilesForParallelProcessing = 10
 	MaxEntryLength                = 255
 	MinOverlapPercent             = 0.0
 	IPResolveInterval             = 100 * time.Millisecond
