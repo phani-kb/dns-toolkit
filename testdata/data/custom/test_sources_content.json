@@ -23,6 +23,7 @@
     {
       "name": "with-url-per-category",
       "url_per_category": "http://example.com/cat.txt",
+      "categories": "malware",
       "types": [
         {
           "name": "domain"
@@ -34,6 +35,7 @@
       "content_per_category": [
         "cat.com"
       ],
+      "categories": "malware",
       "types": [
         {
           "name": "domain"

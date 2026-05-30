@@ -158,6 +158,22 @@
           "then": {
             "required": ["files"]
           }
+        },
+        {
+          "if": {
+            "required": ["url_per_category"]
+          },
+          "then": {
+            "required": ["categories"]
+          }
+        },
+        {
+          "if": {
+            "required": ["content_per_category"]
+          },
+          "then": {
+            "required": ["categories"]
+          }
         }
       ]
     },

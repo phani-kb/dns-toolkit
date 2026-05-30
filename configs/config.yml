@@ -4,6 +4,7 @@ application:
   description: A toolkit for DNS data processing and analysis.
 dns_toolkit:
   database:
+    type: sqlite
     path: data/dns-toolkit.db
   folders:
     download: data/download

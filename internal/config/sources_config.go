@@ -98,6 +98,10 @@ func (s *Source) ValidateWithConfig(appConfig *AppConfig) error {
 		)
 	}
 
+	if (hasURLPerCategory || hasContentPerCategory) && len(s.Categories) == 0 {
+		return fmt.Errorf("categories is required when using url_per_category or content_per_category")
+	}
+
 	if hasURL {
 		for _, ext := range constants.ArchiveExtensions {
 			if strings.HasSuffix(s.URL, ext) {

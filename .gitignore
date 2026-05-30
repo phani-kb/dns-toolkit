@@ -67,7 +67,9 @@ testdata/data/allowlist_*.txt
 # profiling files
 testdata/**/*.prof
 testdata/*.md
-testdata/*.db
 testdata/*.txt
 testdata/**/*.txt
 testdata/download/
+testdata/*.db
+testdata/*.db-wal
+testdata/*.db-shm
