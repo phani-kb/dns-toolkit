@@ -23,6 +23,7 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo "  gsr - summaries README"
     echo "  gs  - stats README"
     echo "  gc  - credits README"
+    echo "  gsum - generate summaries from DB (download_summary.json + processed_summary.json)"
     echo "  cp  - copy summaries"
     echo ""
     echo "Environment variables:"
@@ -71,7 +72,7 @@ fi
 if [ "$#" -gt 0 ]; then
     IFS=',' read -ra steps <<< "$1"
 else
-    steps=("ga" "d" "p" "c" "cg" "cc" "t" "o" "op" "gr" "gor" "gsr" "gs" "gc" "cp") # ga,d,p,c,cg,cc,t,o,op,gr,gor,gsr,gs,gc,cp
+    steps=("ga" "d" "p" "c" "cg" "cc" "t" "o" "op" "gsum" "gr" "gor" "gsr" "gs" "gc" "cp") # ga,d,p,c,cg,cc,t,o,op,gsum,gr,gor,gsr,gs,gc,cp
 fi
 
 for step in "${steps[@]}"; do
@@ -125,28 +126,32 @@ for step in "${steps[@]}"; do
             echo "Step 9: Generating output files..."
             ./bin/dns-toolkit generate output
             ;;
+        gsum)
+            echo "Step 10: Generating summary JSON files from database..."
+            ./bin/dns-toolkit generate summaries
+            ;;
         gr)
-            echo "Step 10: Generating output README..."
+            echo "Step 11: Generating output README..."
             ./bin/dns-toolkit generate output-readme
             ;;
         gor)
-            echo "Step 11: Generating overlap README..."
+            echo "Step 12: Generating overlap README..."
             ./bin/dns-toolkit generate overlap-readme
             ;;
         gsr)
-            echo "Step 12: Generating summaries README..."
+            echo "Step 13: Generating summaries README..."
             ./bin/dns-toolkit generate summaries-readme
             ;;
         gs)
-            echo "Step 13: Generating stats README..."
+            echo "Step 14: Generating stats README..."
             ./bin/dns-toolkit generate stats-readme
             ;;
         gc)
-            echo "Step 14: Generating credits README..."
+            echo "Step 15: Generating credits README..."
             ./bin/dns-toolkit generate credits
             ;;
         cp)
-            echo "Step 15: Copy summary files to archive..."
+            echo "Step 16: Copy summary files to archive..."
             cp data/output/summaries/* data/archive/
             ;;
         *)

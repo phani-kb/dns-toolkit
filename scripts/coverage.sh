@@ -22,6 +22,8 @@ PROJECT_ROOT=$(pwd)
 export DNS_TOOLKIT_TEST_MODE=true
 export DNS_TOOLKIT_TEST_CONFIG_PATH="${PROJECT_ROOT}/testdata/config.yml"
 
+find "${PROJECT_ROOT}/testdata" -type f -name "*.db" -delete
+
 PACKAGES=$(go list ./... | grep -v "/mocks" | grep -v "constants")
 if ! go test -coverprofile=coverage/coverage.out -covermode=atomic $PACKAGES; then
     echo -e "${RED}Tests failed! See output above for details.${NC}"

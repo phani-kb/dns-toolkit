@@ -514,29 +514,6 @@ type EntryCountPair struct {
 	Count int    `json:"count"` // Number of sources containing this entry
 }
 
-// EntryHeap is a min-heap of EntryCountPair elements
-type EntryHeap []EntryCountPair
-
-func (h *EntryHeap) Len() int { return len(*h) }
-
-func (h *EntryHeap) Less(i, j int) bool { return (*h)[i].Count < (*h)[j].Count } // Min-heap based on Count
-
-func (h *EntryHeap) Swap(i, j int) { (*h)[i], (*h)[j] = (*h)[j], (*h)[i] }
-
-func (h *EntryHeap) Push(x interface{}) {
-	if ecp, ok := x.(EntryCountPair); ok {
-		*h = append(*h, ecp)
-	}
-}
-
-func (h *EntryHeap) Pop() interface{} {
-	old := *h
-	n := len(old)
-	x := old[n-1]
-	*h = old[0 : n-1]
-	return x
-}
-
 // lessFuncByName is a generic helper function for sorting objects by name.
 // It takes a function to extract the name from the object.
 func lessFuncByName[T any](i, j T, getName func(T) string) bool {
