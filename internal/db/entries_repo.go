@@ -172,13 +172,14 @@ func (r *EntriesRepo) SearchEntries(
 	if err != nil {
 		return nil, fmt.Errorf("searching entries: %w", err)
 	}
-	defer rows.Close()
+	defer rows.Close() // nolint: errcheck
 
 	var results []SearchResult
 	for rows.Next() {
 		var res SearchResult
 		var validInt int
-		if err := rows.Scan(&res.SourceName, &res.GenericSourceType, &res.ActualSourceType, &res.ListType, &validInt); err != nil {
+		if err := rows.Scan(&res.SourceName, &res.GenericSourceType, &res.ActualSourceType,
+			&res.ListType, &validInt); err != nil {
 			return nil, fmt.Errorf("scanning entry row: %w", err)
 		}
 		res.Valid = validInt == 1
@@ -215,13 +216,14 @@ func (r *EntriesRepo) SearchConsolidatedEntries(
 	if err != nil {
 		return nil, fmt.Errorf("searching consolidated entries: %w", err)
 	}
-	defer rows.Close()
+	defer rows.Close() // nolint: errcheck
 
 	var results []SearchResult
 	for rows.Next() {
 		var res SearchResult
 		var validInt int
-		if err := rows.Scan(&res.SourceName, &res.GenericSourceType, &res.ActualSourceType, &res.ListType, &validInt); err != nil {
+		if err := rows.Scan(&res.SourceName, &res.GenericSourceType, &res.ActualSourceType,
+			&res.ListType, &validInt); err != nil {
 			return nil, fmt.Errorf("scanning consolidated row: %w", err)
 		}
 		res.Valid = validInt == 1
