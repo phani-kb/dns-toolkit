@@ -286,6 +286,8 @@
     {
       "name": "Firehol_BitcoinNodes_1d",
       "categories": "cryptocurrency",
+      "disabled": true,
+      "notes": "Site unresponsive, download fails.",
       "types": [
         {
           "name": "ipv4"
