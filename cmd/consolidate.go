@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -8,7 +9,6 @@ import (
 	"sync"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
-	cfg "github.com/phani-kb/dns-toolkit/internal/config"
 	con "github.com/phani-kb/dns-toolkit/internal/consolidators"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
@@ -47,12 +47,15 @@ var consolidateAllCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		processedSummaries, genericSourceTypes, processedFiles := cfg.GetProcessedSummariesForConsolidation(
+		processedSummaries, genericSourceTypes, processedFiles, loadErr := loadProcessedInputsForConsolidation(
+			context.Background(),
 			Logger,
-			SourcesConfigs,
-			*AppConfig,
 			"general",
 		)
+		if loadErr != nil {
+			Logger.Errorf("Failed to load processed summaries from database: %v", loadErr)
+			return
+		}
 		if len(processedSummaries) == 0 {
 			Logger.Errorf("No processed summaries found")
 			return

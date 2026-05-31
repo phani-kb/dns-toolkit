@@ -194,11 +194,20 @@ func consolidateGeneric(
 	if err != nil {
 		logger.Errorf("Error writing entry(s) to file %s: %v", consolidatedSummary.Filepath, err)
 	} else {
-		if calculateChecksum || AppConfig.DNSToolkit.FilesChecksum.Enabled {
+		shouldCalculateChecksum := calculateChecksum
+		if !shouldCalculateChecksum && AppConfig != nil {
+			shouldCalculateChecksum = AppConfig.DNSToolkit.FilesChecksum.Enabled
+		}
+
+		if shouldCalculateChecksum {
+			var algorithm string
+			if AppConfig != nil {
+				algorithm = AppConfig.DNSToolkit.FilesChecksum.Algorithm
+			}
 			consolidatedSummary.Checksum = u.CalculateChecksum(
 				logger,
 				consolidatedSummary.Filepath,
-				AppConfig.DNSToolkit.FilesChecksum.Algorithm,
+				algorithm,
 			)
 		}
 	}
