@@ -2,15 +2,13 @@ package cmd
 
 import (
 	"context"
-	"fmt"
-	"os"
-	"path/filepath"
 	"runtime"
 	"sync"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	con "github.com/phani-kb/dns-toolkit/internal/consolidators"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
+	"github.com/phani-kb/dns-toolkit/internal/db"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
 	"github.com/spf13/cobra"
@@ -38,17 +36,10 @@ var consolidateAllCmd = &cobra.Command{
 	Use:   "all",
 	Short: "Consolidate all processed files",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := u.EnsureDirectoryExists(Logger, constants.ConsolidatedDir); err != nil {
-			Logger.Errorf("Failed to create consolidated directory: %v", err)
-			os.Exit(1)
-		}
-		if err := u.EnsureDirectoryExists(Logger, constants.SummaryDir); err != nil {
-			Logger.Errorf("Failed to create summary directory: %v", err)
-			os.Exit(1)
-		}
+		ctx := context.Background()
 
 		processedSummaries, genericSourceTypes, processedFiles, loadErr := loadProcessedInputsForConsolidation(
-			context.Background(),
+			ctx,
 			Logger,
 			"general",
 		)
@@ -61,13 +52,23 @@ var consolidateAllCmd = &cobra.Command{
 			return
 		}
 
+		database, consolidatedRepo, dbErr := openConsolidatedRepo(ctx, Logger, "general")
+		if dbErr != nil {
+			Logger.Errorf("Failed to open consolidated repo: %v", dbErr)
+			return
+		}
+		defer database.CloseLogError(Logger)
+
 		var allConsolidatedSummaries []c.ConsolidatedSummary
 		var mu sync.Mutex
+		var persistMu sync.Mutex
 
 		allowByType, blockByType, _, _, _, _ := GetCachedResolutionSets(Logger, processedFiles)
 
 		allowlistEntriesByType := make(map[string]u.StringSet)
 		processAllowlists(
+			ctx,
+			consolidatedRepo,
 			genericSourceTypes,
 			processedFiles,
 			allowByType,
@@ -113,7 +114,7 @@ var consolidateAllCmd = &cobra.Command{
 				allowlistEntries := allowFilterByType[gst]
 				Logger.Debugf("Filtering %s blocklist with %d resolved allowlist entries", gst, allowlistEntries.Size())
 
-				_, blocklistSummary := consolidateFilesBasedOnSTLT(
+				blockEntries, blocklistSummary := consolidateFilesBasedOnSTLT(
 					Logger,
 					gst,
 					constants.ListTypeBlocklist,
@@ -129,8 +130,18 @@ var consolidateAllCmd = &cobra.Command{
 				)
 				mu.Unlock()
 
+				if blockEntries.Size() > 0 {
+					if err := persistConsolidatedEntries(
+						ctx, Logger, consolidatedRepo, &persistMu,
+						blockEntries, gst,
+						constants.ListTypeBlocklist, "general", "", "", true,
+					); err != nil {
+						Logger.Errorf("Failed to persist blocklist entries for %s: %v", gst, err)
+					}
+				}
+
 				if includeInvalid {
-					_, invalidBlocklistSummary := consolidateFilesBasedOnSTLT(
+					invalidEntries, invalidBlocklistSummary := consolidateFilesBasedOnSTLT(
 						Logger,
 						gst,
 						constants.ListTypeBlocklist,
@@ -145,6 +156,16 @@ var consolidateAllCmd = &cobra.Command{
 						IsConsolidatedSummaryValid,
 					)
 					mu.Unlock()
+
+					if invalidEntries.Size() > 0 {
+						if err := persistConsolidatedEntries(
+							ctx, Logger, consolidatedRepo, &persistMu,
+							invalidEntries, gst,
+							constants.ListTypeBlocklist, "general", "", "", false,
+						); err != nil {
+							Logger.Errorf("Failed to persist invalid blocklist entries for %s: %v", gst, err)
+						}
+					}
 				}
 			})
 		}
@@ -152,34 +173,20 @@ var consolidateAllCmd = &cobra.Command{
 		Logger.Debugf("Waiting for all blocklists to finish processing...")
 		workerPool.Wait()
 
-		summaryFile := filepath.Join(
-			constants.SummaryDir,
-			constants.DefaultSummaryFiles["consolidated"],
-		)
-		summariesCount, err := u.SaveSummaries(
-			Logger,
-			allConsolidatedSummaries,
-			summaryFile,
-			c.ConsolidatedSummaryLessFunc,
-		)
-		if err != nil {
-			Logger.Errorf("Error saving consolidated summaries to %s: %v", summaryFile, err)
-		} else {
-			if summariesCount > 0 {
-				Logger.Infof("Saved consolidated summaries to %s", summaryFile)
-			}
-
-			if generateConflictsReport {
-				manager := NewConsolidationManager(Logger)
-				if err := manager.GenerateConflictReport(processedFiles); err != nil {
-					Logger.Errorf("Failed to generate conflicts report: %v", err)
-				}
+		if generateConflictsReport {
+			manager := NewConsolidationManager(Logger)
+			if err := manager.GenerateConflictReport(processedFiles); err != nil {
+				Logger.Errorf("Failed to generate conflicts report: %v", err)
 			}
 		}
+
+		Logger.Infof("Consolidation complete")
 	},
 }
 
 func processAllowlists(
+	ctx context.Context,
+	consolidatedRepo *db.ConsolidatedRepo,
 	genericSourceTypes []string,
 	processedFiles []c.ProcessedFile,
 	_ map[string]u.StringSet,
@@ -265,37 +272,24 @@ func processAllowlists(
 		allowlistSummary.Count = finalAllowlist.Size()
 		allowlistSummary.IgnoredEntriesCount = removedByResolution
 
+		// persist allowlist entries to database
 		if finalAllowlist.Size() > 0 {
-			consolidator, exists := con.Consolidators.GetConsolidator(genericSourceType, constants.ListTypeAllowlist)
-			if exists {
-				consolidatedPath := filepath.Join(
-					constants.ConsolidatedDir,
-					allowlistSummary.GetFilename(),
-				)
-				if err := consolidator.SaveEntries(Logger, finalAllowlist, consolidatedPath); err != nil {
-					Logger.Errorf("Failed to write allowlist to %s: %v", consolidatedPath, err)
-				} else {
-					Logger.Infof("Wrote allowlist to %s (entries=%d)", consolidatedPath, finalAllowlist.Size())
-					allowlistSummary.Filepath = consolidatedPath
-
-					if calculateChecksum || AppConfig.DNSToolkit.FilesChecksum.Enabled {
-						allowlistSummary.Checksum = u.CalculateChecksum(
-							Logger,
-							consolidatedPath,
-							AppConfig.DNSToolkit.FilesChecksum.Algorithm,
-						)
-					}
-				}
+			if err := persistConsolidatedEntries(
+				ctx, Logger, consolidatedRepo, nil,
+				finalAllowlist, genericSourceType,
+				constants.ListTypeAllowlist, "general", "", "", true,
+			); err != nil {
+				Logger.Errorf("Failed to persist allowlist entries for %s: %v", genericSourceType, err)
 			}
 		} else {
-			Logger.Debugf("Skipping write for empty allowlist: %s", genericSourceType)
+			Logger.Debugf("Skipping persist for empty allowlist: %s", genericSourceType)
 		}
 
 		allowlistEntriesByType[genericSourceType] = finalAllowlist
 		appendSummary(allConsolidatedSummaries, allowlistSummary, IsConsolidatedSummaryValid)
 
 		if includeInvalid {
-			_, invalidAllowlistSummary := consolidateFilesBasedOnSTLT(
+			invalidEntries, invalidAllowlistSummary := consolidateFilesBasedOnSTLT(
 				Logger,
 				genericSourceType,
 				constants.ListTypeAllowlist,
@@ -308,6 +302,15 @@ func processAllowlists(
 				invalidAllowlistSummary,
 				IsConsolidatedSummaryValid,
 			)
+			if invalidEntries.Size() > 0 {
+				if err := persistConsolidatedEntries(
+					ctx, Logger, consolidatedRepo, nil,
+					invalidEntries, genericSourceType,
+					constants.ListTypeAllowlist, "general", "", "", false,
+				); err != nil {
+					Logger.Errorf("Failed to persist invalid allowlist entries for %s: %v", genericSourceType, err)
+				}
+			}
 		}
 	}
 	Logger.Debugf("Finished processing allowlists")
@@ -377,52 +380,11 @@ func consolidateFilesBasedOnSTLT(
 
 	if len(ignoredEntries) > 0 {
 		logger.Infof("Ignored %s %s %d entry(s)", listType, genericSourceType, len(ignoredEntries))
-		ignoredFilePath := filepath.Join(
-			constants.ConsolidatedDir,
-			consolidatedSummary.GetIgnoredFilename(),
-		)
-
-		// annotate ignored entries with a reason
-		reason := "filtered by provided filter set"
-		switch listType {
-		case constants.ListTypeBlocklist:
-			reason = "filtered by resolved allowlist (conflict resolution)"
-		case constants.ListTypeAllowlist:
-			reason = "filtered by resolved blocklist (conflict resolution)"
-		}
-
-		annotated := make([]string, 0, len(ignoredEntries))
-		for entry := range ignoredEntries {
-			annotated = append(annotated, fmt.Sprintf("%s # ignored: %s", entry, reason))
-		}
-
-		if err := u.WriteEntriesToFile(Logger, ignoredFilePath, annotated); err != nil {
-			logger.Errorf("Error writing ignored entry(s) to file %s: %v", ignoredFilePath, err)
-		} else {
-			consolidatedSummary.IgnoredFilepath = ignoredFilePath
-		}
 	}
 
 	if len(allEntries) <= 0 {
 		logger.Infof("No entry(s) to consolidate for %s %s", listType, genericSourceType)
 		return u.NewStringSet([]string{}), c.ConsolidatedSummary{}
-	}
-
-	consolidatedSummary.Filepath = filepath.Join(
-		constants.ConsolidatedDir,
-		consolidatedSummary.GetFilename(),
-	)
-	err := consolidator.SaveEntries(logger, allEntries, consolidatedSummary.Filepath)
-	if err != nil {
-		logger.Errorf("Error writing entry(s) to file %s: %v", consolidatedSummary.Filepath, err)
-	} else {
-		if calculateChecksum || AppConfig.DNSToolkit.FilesChecksum.Enabled {
-			consolidatedSummary.Checksum = u.CalculateChecksum(
-				logger,
-				consolidatedSummary.Filepath,
-				AppConfig.DNSToolkit.FilesChecksum.Algorithm,
-			)
-		}
 	}
 
 	logger.Debugf("Finished consolidation for %s %s", listType, genericSourceType)

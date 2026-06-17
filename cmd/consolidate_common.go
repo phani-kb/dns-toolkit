@@ -1,13 +1,15 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
-	"path/filepath"
 	"strings"
+	"sync"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	con "github.com/phani-kb/dns-toolkit/internal/consolidators"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
+	"github.com/phani-kb/dns-toolkit/internal/db"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
 )
@@ -142,74 +144,14 @@ func consolidateGeneric(
 	}
 
 	if len(ignoredEntries) > 0 {
-		filenamePrefix := fmt.Sprintf("%s_%s_%s", params.Identifier, params.GenericSourceType, params.ListType)
-		ignoredFilePath := filepath.Join(
-			params.OutputDir,
-			filenamePrefix+"_ignored.txt",
+		logger.Infof(
+			"Ignored %d entry(s) for %s %s in %s %s",
+			len(ignoredEntries),
+			params.ListType,
+			params.GenericSourceType,
+			params.IdentifierField,
+			params.Identifier,
 		)
-
-		// annotate ignored entries with a reason
-		reason := "filtered by provided filter set"
-		switch params.ListType {
-		case constants.ListTypeBlocklist:
-			reason = "filtered by consolidated allowlist"
-		case constants.ListTypeAllowlist:
-			reason = "filtered by local blocklist"
-		}
-
-		annotated := make([]string, 0, len(ignoredEntries))
-		for entry := range ignoredEntries {
-			annotated = append(annotated, fmt.Sprintf("%s # ignored: %s", entry, reason))
-		}
-
-		if err := u.WriteEntriesToFile(logger, ignoredFilePath, annotated); err != nil {
-			logger.Errorf("Error writing ignored entry(s) to file %s: %v", ignoredFilePath, err)
-		} else {
-			consolidatedSummary.IgnoredFilepath = ignoredFilePath
-		}
-	}
-
-	// Use identifier-specific filename
-	filenamePrefix := fmt.Sprintf("%s_%s_%s", params.Identifier, params.GenericSourceType, params.ListType)
-	consolidatedFilePath := filepath.Join(params.OutputDir, filenamePrefix+".txt")
-	consolidatedSummary.Filepath = consolidatedFilePath
-
-	resolvedBefore := 0
-	if allEntries != nil {
-		resolvedBefore = allEntries.Size()
-	}
-
-	resolvedAfter := resolvedBefore
-
-	logger.Debugf(
-		"Writing %s for %s_%s: original=%d final=%d",
-		params.ListType,
-		params.Identifier,
-		params.GenericSourceType,
-		calculateOriginalCount(fileInfos),
-		resolvedAfter,
-	)
-
-	err := consolidator.SaveEntries(logger, allEntries, consolidatedSummary.Filepath)
-	if err != nil {
-		logger.Errorf("Error writing entry(s) to file %s: %v", consolidatedSummary.Filepath, err)
-	} else {
-		shouldCalculateChecksum := calculateChecksum
-		if !shouldCalculateChecksum && AppConfig != nil {
-			shouldCalculateChecksum = AppConfig.DNSToolkit.FilesChecksum.Enabled
-		}
-
-		if shouldCalculateChecksum {
-			var algorithm string
-			if AppConfig != nil {
-				algorithm = AppConfig.DNSToolkit.FilesChecksum.Algorithm
-			}
-			consolidatedSummary.Checksum = u.CalculateChecksum(
-				logger,
-				consolidatedSummary.Filepath,
-				algorithm,
-			)
-		}
 	}
 
 	logger.Debugf(
@@ -227,6 +169,9 @@ type ProcessingConfig struct {
 	GetFilesFunc       func([]c.ProcessedFile, string) []c.ProcessedFile
 	ConsolidateFunc    func(*multilog.Logger, string, string, string, u.StringSet, []c.ProcessedFile) (u.StringSet, c.ConsolidatedSummary) // nolint:lll
 	AllowFilterByType  map[string]u.StringSet
+	ConsolidatedRepo   *db.ConsolidatedRepo
+	DBCtx              context.Context
+	PersistMu          *sync.Mutex
 	Identifier         string
 	IdentifierField    string
 	ProcessedFiles     []c.ProcessedFile
@@ -281,12 +226,32 @@ func processIdentifierConsolidation(
 			)
 			allowlistEntriesByType[gst] = entries
 
-			// Set the appropriate field based on identifier type
+			// set the appropriate field based on identifier type
 			switch config.IdentifierField {
 			case "Group":
 				allowlistSummary.Group = config.Identifier
 			case "Category":
 				allowlistSummary.Category = config.Identifier
+			}
+
+			// persist allowlist entries to DB
+			if config.ConsolidatedRepo != nil && entries.Size() > 0 {
+				consolidationType := strings.ToLower(config.IdentifierField)
+				groupName, category := "", ""
+				switch config.IdentifierField {
+				case "Group":
+					groupName = config.Identifier
+				case "Category":
+					category = config.Identifier
+				}
+				if err := persistConsolidatedEntries(
+					config.DBCtx, logger, config.ConsolidatedRepo, config.PersistMu,
+					entries, gst,
+					constants.ListTypeAllowlist, consolidationType, groupName, category, true,
+				); err != nil {
+					logger.Errorf("Failed to persist %s allowlist entries for %s %s: %v",
+						config.IdentifierField, config.Identifier, gst, err)
+				}
 			}
 
 			consolidatedSummariesByIdentifier[config.Identifier] = append(
@@ -298,7 +263,7 @@ func processIdentifierConsolidation(
 		}
 	}
 
-	// Then process blocklists using the allowlists from above
+	// process blocklists using the allowlists from above
 	for _, gst := range config.GenericSourceTypes {
 		var blocklistFiles []c.ProcessedFile
 		for _, file := range identifierFiles {
@@ -320,7 +285,7 @@ func processIdentifierConsolidation(
 				allowlistEntries = u.NewStringSet([]string{})
 			}
 
-			_, blocklistSummary := config.ConsolidateFunc(
+			blockEntries, blocklistSummary := config.ConsolidateFunc(
 				logger,
 				gst,
 				constants.ListTypeBlocklist,
@@ -335,6 +300,26 @@ func processIdentifierConsolidation(
 				blocklistSummary.Group = config.Identifier
 			case "Category":
 				blocklistSummary.Category = config.Identifier
+			}
+
+			// persist blocklist entries to DB
+			if config.ConsolidatedRepo != nil && blockEntries.Size() > 0 {
+				consolidationType := strings.ToLower(config.IdentifierField)
+				groupName, category := "", ""
+				switch config.IdentifierField {
+				case "Group":
+					groupName = config.Identifier
+				case "Category":
+					category = config.Identifier
+				}
+				if err := persistConsolidatedEntries(
+					config.DBCtx, logger, config.ConsolidatedRepo, config.PersistMu,
+					blockEntries, gst,
+					constants.ListTypeBlocklist, consolidationType, groupName, category, true,
+				); err != nil {
+					logger.Errorf("Failed to persist %s blocklist entries for %s %s: %v",
+						config.IdentifierField, config.Identifier, gst, err)
+				}
 			}
 
 			consolidatedSummariesByIdentifier[config.Identifier] = append(

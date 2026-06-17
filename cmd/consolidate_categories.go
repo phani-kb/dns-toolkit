@@ -1,12 +1,12 @@
 package cmd
 
 import (
-	"os"
-	"path/filepath"
+	"context"
+	"sync"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
-	cfg "github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
+	"github.com/phani-kb/dns-toolkit/internal/db"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
 	"github.com/spf13/cobra"
@@ -17,128 +17,49 @@ var consolidateCategoriesCmd = &cobra.Command{
 	Short: "Generate category-based consolidated lists (ads, malware, privacy, etc)",
 	Run: func(cmd *cobra.Command, args []string) {
 		Logger.Infof("Generating category-based consolidated lists...")
+		ctx := context.Background()
 
-		if err := u.EnsureDirectoryExists(Logger, constants.ConsolidatedCategoriesDir); err != nil {
-			Logger.Errorf("Failed to create consolidated categories directory: %v", err)
-			os.Exit(1)
-		}
-		if err := u.EnsureDirectoryExists(Logger, constants.SummaryDir); err != nil {
-			Logger.Errorf("Failed to create summary directory: %v", err)
-			os.Exit(1)
-		}
-
-		processedSummaries, genericSourceTypes, processedFiles := cfg.GetProcessedSummariesForConsolidation(
+		processedSummaries, genericSourceTypes, processedFiles, loadErr := loadProcessedInputsForConsolidation(
+			ctx,
 			Logger,
-			SourcesConfigs,
-			*AppConfig,
 			"categories",
 		)
+		if loadErr != nil {
+			Logger.Errorf("Failed to load processed summaries from database: %v", loadErr)
+			return
+		}
 		if len(processedSummaries) == 0 {
 			Logger.Errorf("No processed summaries found")
 			return
 		}
 
+		database, consolidatedRepo, dbErr := openConsolidatedRepo(ctx, Logger, "category")
+		if dbErr != nil {
+			Logger.Errorf("Failed to open consolidated repo: %v", dbErr)
+			return
+		}
+		defer database.CloseLogError(Logger)
+
+		var persistMu sync.Mutex
+
 		// Get unique categories from all processed files
 		categories := getUniqueCategories(processedFiles)
 		Logger.Infof("Found %d unique categories: %v", len(categories), categories)
 
-		// Maps to store consolidated summaries by category
-		consolidatedSummariesByCategory := make(map[string][]c.ConsolidatedSummary)
-		for _, category := range categories {
-			consolidatedSummariesByCategory[category] = []c.ConsolidatedSummary{}
-		}
-
 		// Process each category and create consolidated lists
 		for _, category := range categories {
-			categoryResults := processCategoryConsolidation(
+			processCategoryConsolidation(
 				Logger,
 				category,
 				processedFiles,
 				genericSourceTypes,
+				consolidatedRepo,
+				ctx,
+				&persistMu,
 			)
-			for identifier, summaries := range categoryResults {
-				consolidatedSummariesByCategory[identifier] = append(
-					consolidatedSummariesByCategory[identifier],
-					summaries...,
-				)
-			}
 		}
 
-		// Create consolidated categories summaries
-		var consolidatedCategoriesSummaries []c.ConsolidatedCategoriesSummary
-		timestamp := u.GetTimestamp()
-		for _, category := range categories {
-			summaries := consolidatedSummariesByCategory[category]
-			if len(summaries) > 0 {
-				consolidatedCategoriesSummary := c.ConsolidatedCategoriesSummary{
-					Category:                  category,
-					ConsolidatedSummaries:     summaries,
-					LastConsolidatedTimestamp: timestamp,
-				}
-				consolidatedCategoriesSummaries = append(
-					consolidatedCategoriesSummaries,
-					consolidatedCategoriesSummary,
-				)
-			}
-		}
-
-		// Save all consolidated summaries to the regular consolidated summary file if not skipped
-		if !skipConsolidatedSummary {
-			var allConsolidatedSummaries []c.ConsolidatedSummary
-			for _, summariesByCategory := range consolidatedSummariesByCategory {
-				allConsolidatedSummaries = append(allConsolidatedSummaries, summariesByCategory...)
-			}
-			if len(allConsolidatedSummaries) > 0 {
-				summaryFile := filepath.Join(
-					constants.SummaryDir,
-					constants.DefaultSummaryFiles["consolidated_categories"],
-				)
-				summariesCount, err := u.SaveSummaries(
-					Logger,
-					allConsolidatedSummaries,
-					summaryFile,
-					c.ConsolidatedSummaryLessFunc,
-				)
-				if err != nil {
-					Logger.Errorf("Error saving consolidated summaries to %s: %v", summaryFile, err)
-				} else {
-					if summariesCount > 0 {
-						Logger.Infof("Saved consolidated summaries to %s", summaryFile)
-					}
-				}
-			}
-		} else {
-			Logger.Infof("Skipping regular consolidated summary file as requested")
-		}
-
-		// Save grouped consolidated categories summaries to the new summary file
-		if len(consolidatedCategoriesSummaries) > 0 {
-			categoriesSummaryFile := filepath.Join(
-				constants.SummaryDir,
-				constants.DefaultSummaryFiles["consolidated_categories"],
-			)
-			summariesCount, err := u.SaveSummaries(
-				Logger,
-				consolidatedCategoriesSummaries,
-				categoriesSummaryFile,
-				c.ConsolidatedCategoriesSummaryLessFunc,
-			)
-			if err != nil {
-				Logger.Errorf(
-					"Error saving consolidated categories summaries to %s: %v",
-					categoriesSummaryFile,
-					err,
-				)
-			} else {
-				if summariesCount > 0 {
-					Logger.Infof(
-						"Successfully saved %d category summaries to %s",
-						len(consolidatedCategoriesSummaries),
-						categoriesSummaryFile,
-					)
-				}
-			}
-		}
+		Logger.Infof("Categories consolidation complete")
 	},
 }
 
@@ -184,8 +105,10 @@ func processCategoryConsolidation(
 	category string,
 	processedFiles []c.ProcessedFile,
 	genericSourceTypes []string,
+	consolidatedRepo *db.ConsolidatedRepo,
+	ctx context.Context,
+	persistMu *sync.Mutex,
 ) map[string][]c.ConsolidatedSummary {
-	// allowByType, _, _, _, _, _ := GetCachedResolutionSets(logger, processedFiles)
 	config := ProcessingConfig{
 		Identifier:         category,
 		IdentifierField:    "Category",
@@ -194,6 +117,9 @@ func processCategoryConsolidation(
 		GetFilesFunc:       getFilesForCategory,
 		ConsolidateFunc:    consolidateByCategory,
 		AllowFilterByType:  nil, // no cross-category filtering
+		ConsolidatedRepo:   consolidatedRepo,
+		DBCtx:              ctx,
+		PersistMu:          persistMu,
 	}
 
 	return processConsolidationWithTransform(logger, config)
