@@ -1,12 +1,12 @@
 package cmd
 
 import (
-	"os"
-	"path/filepath"
+	"context"
+	"sync"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
-	cfg "github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
+	"github.com/phani-kb/dns-toolkit/internal/db"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
 	"github.com/spf13/cobra"
@@ -17,127 +17,46 @@ var consolidateGroupsCmd = &cobra.Command{
 	Short: "Generate different sized consolidated lists (mini, lite, normal, big)",
 	Run: func(cmd *cobra.Command, args []string) {
 		Logger.Infof("Generating sized consolidated lists...")
+		ctx := context.Background()
 
-		if err := u.EnsureDirectoryExists(Logger, constants.ConsolidatedGroupsDir); err != nil {
-			Logger.Errorf("Failed to create consolidated groups directory: %v", err)
-			os.Exit(1)
-		}
-		if err := u.EnsureDirectoryExists(Logger, constants.SummaryDir); err != nil {
-			Logger.Errorf("Failed to create summary directory: %v", err)
-			os.Exit(1)
-		}
-
-		processedSummaries, genericSourceTypes, processedFiles := cfg.GetProcessedSummariesForConsolidation(
+		processedSummaries, genericSourceTypes, processedFiles, loadErr := loadProcessedInputsForConsolidation(
+			ctx,
 			Logger,
-			SourcesConfigs,
-			*AppConfig,
 			"groups",
 		)
+		if loadErr != nil {
+			Logger.Errorf("Failed to load processed summaries from database: %v", loadErr)
+			return
+		}
 
 		if len(processedSummaries) == 0 {
 			Logger.Errorf("No processed summaries found")
 			return
 		}
 
-		// Maps to store consolidated summaries by group
-		consolidatedSummariesByGroup := make(map[string][]c.ConsolidatedSummary)
-		for _, group := range constants.SizeGroups {
-			consolidatedSummariesByGroup[group] = []c.ConsolidatedSummary{}
+		database, consolidatedRepo, dbErr := openConsolidatedRepo(ctx, Logger, "group")
+		if dbErr != nil {
+			Logger.Errorf("Failed to open consolidated repo: %v", dbErr)
+			return
 		}
+		defer database.CloseLogError(Logger)
+
+		var persistMu sync.Mutex
 
 		// Process each size group and create consolidated lists
 		for _, group := range constants.SizeGroups {
-			groupResults := processGroupConsolidationWithAllow(
+			processGroupConsolidationWithAllow(
 				Logger,
 				group,
 				processedFiles,
 				genericSourceTypes,
+				consolidatedRepo,
+				ctx,
+				&persistMu,
 			)
-			for identifier, summaries := range groupResults {
-				consolidatedSummariesByGroup[identifier] = append(
-					consolidatedSummariesByGroup[identifier],
-					summaries...,
-				)
-			}
 		}
 
-		// Create consolidated groups summaries
-		var consolidatedGroupsSummaries []c.ConsolidatedGroupsSummary
-		timestamp := u.GetTimestamp()
-
-		for _, group := range constants.SizeGroups {
-			summaries := consolidatedSummariesByGroup[group]
-			if len(summaries) > 0 {
-				consolidatedGroupsSummary := c.ConsolidatedGroupsSummary{
-					Group:                     group,
-					ConsolidatedSummaries:     summaries,
-					LastConsolidatedTimestamp: timestamp,
-				}
-				consolidatedGroupsSummaries = append(
-					consolidatedGroupsSummaries,
-					consolidatedGroupsSummary,
-				)
-			}
-		}
-
-		// Save all consolidated summaries to the regular consolidated summary file if not skipped
-		if !skipConsolidatedSummary {
-			var allConsolidatedSummaries []c.ConsolidatedSummary
-			for _, summariesByGroup := range consolidatedSummariesByGroup {
-				allConsolidatedSummaries = append(allConsolidatedSummaries, summariesByGroup...)
-			}
-
-			if len(allConsolidatedSummaries) > 0 {
-				summaryFile := filepath.Join(
-					constants.SummaryDir,
-					constants.DefaultSummaryFiles["consolidated_groups"],
-				)
-				summariesCount, err := u.SaveSummaries(
-					Logger,
-					allConsolidatedSummaries,
-					summaryFile,
-					c.ConsolidatedSummaryLessFunc,
-				)
-				if err != nil {
-					Logger.Errorf("Error saving consolidated summaries to %s: %v", summaryFile, err)
-				} else {
-					if summariesCount > 0 {
-						Logger.Infof("Saved consolidated summaries to %s", summaryFile)
-					}
-				}
-			}
-		} else {
-			Logger.Infof("Skipping regular consolidated summary file as requested")
-		}
-
-		// Save grouped consolidated groups summaries to the new summary file
-		if len(consolidatedGroupsSummaries) > 0 {
-			GroupsSummaryFile := filepath.Join(
-				constants.SummaryDir,
-				constants.DefaultSummaryFiles["consolidated_groups"],
-			)
-			summariesCount, err := u.SaveSummaries(
-				Logger,
-				consolidatedGroupsSummaries,
-				GroupsSummaryFile,
-				c.ConsolidatedGroupsSummaryLessFunc,
-			)
-			if err != nil {
-				Logger.Errorf(
-					"Error saving consolidated groups summaries to %s: %v",
-					GroupsSummaryFile,
-					err,
-				)
-			} else {
-				if summariesCount > 0 {
-					Logger.Infof(
-						"Successfully saved %d size group summaries to %s",
-						len(consolidatedGroupsSummaries),
-						GroupsSummaryFile,
-					)
-				}
-			}
-		}
+		Logger.Infof("Groups consolidation complete")
 	},
 }
 
@@ -160,6 +79,9 @@ func processGroupConsolidationWithAllow(
 	group string,
 	processedFiles []c.ProcessedFile,
 	genericSourceTypes []string,
+	consolidatedRepo *db.ConsolidatedRepo,
+	ctx context.Context,
+	persistMu *sync.Mutex,
 ) map[string][]c.ConsolidatedSummary {
 	allowByType, _, _, _, _, _ := GetCachedResolutionSets(logger, processedFiles)
 	config := ProcessingConfig{
@@ -170,6 +92,9 @@ func processGroupConsolidationWithAllow(
 		GetFilesFunc:       getFilesForGroup,
 		ConsolidateFunc:    consolidateByGroup,
 		AllowFilterByType:  allowByType,
+		ConsolidatedRepo:   consolidatedRepo,
+		DBCtx:              ctx,
+		PersistMu:          persistMu,
 	}
 
 	return processConsolidationWithTransform(logger, config)
