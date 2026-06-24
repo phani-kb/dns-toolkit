@@ -232,6 +232,137 @@ func (r *EntriesRepo) SearchConsolidatedEntries(
 	return results, rows.Err()
 }
 
+type ConflictCountRow struct {
+	Entry             string
+	GenericSourceType string
+	BlockCount        int
+	AllowCount        int
+	BlockSources      string // comma-separated source names
+	AllowSources      string // comma-separated source names
+}
+
+type AllEntryCountRow struct {
+	Entry             string
+	GenericSourceType string
+	BlockCount        int
+	AllowCount        int
+}
+
+func (r *EntriesRepo) GetConflictCounts(_ context.Context) ([]ConflictCountRow, error) {
+	query := `
+		SELECT
+			e.entry,
+			e.generic_source_type,
+			COUNT(DISTINCT CASE WHEN e.list_type = 'blocklist' THEN s.name END) AS block_count,
+			COUNT(DISTINCT CASE WHEN e.list_type = 'allowlist' THEN s.name END) AS allow_count,
+			GROUP_CONCAT(DISTINCT CASE WHEN e.list_type = 'blocklist' THEN s.name END) AS block_sources,
+			GROUP_CONCAT(DISTINCT CASE WHEN e.list_type = 'allowlist' THEN s.name END) AS allow_sources
+		FROM ` + constants.TableEntries + ` e
+		JOIN ` + constants.TableSources + ` s ON s.id = e.source_id
+		WHERE e.valid = 1
+			AND s.disabled = 0
+			AND s.skip_general_consolidation = 0
+		GROUP BY e.entry, e.generic_source_type
+		HAVING block_count > 0 AND allow_count > 0
+		ORDER BY e.entry
+	`
+
+	rows, err := r.db.conn.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("querying conflict counts: %w", err)
+	}
+	defer rows.Close() // nolint: errcheck
+
+	var results []ConflictCountRow
+	for rows.Next() {
+		var row ConflictCountRow
+		if err := rows.Scan(
+			&row.Entry,
+			&row.GenericSourceType,
+			&row.BlockCount,
+			&row.AllowCount,
+			&row.BlockSources,
+			&row.AllowSources,
+		); err != nil {
+			return nil, fmt.Errorf("scanning conflict count row: %w", err)
+		}
+		results = append(results, row)
+	}
+	return results, rows.Err()
+}
+
+func (r *EntriesRepo) GetAllEntryCounts(_ context.Context) ([]AllEntryCountRow, error) {
+	query := `
+		SELECT
+			e.entry,
+			e.generic_source_type,
+			COUNT(DISTINCT CASE WHEN e.list_type = 'blocklist' THEN s.name END) AS block_count,
+			COUNT(DISTINCT CASE WHEN e.list_type = 'allowlist' THEN s.name END) AS allow_count
+		FROM ` + constants.TableEntries + ` e
+		JOIN ` + constants.TableSources + ` s ON s.id = e.source_id
+		WHERE e.valid = 1
+			AND s.disabled = 0
+			AND s.skip_general_consolidation = 0
+		GROUP BY e.entry, e.generic_source_type
+		ORDER BY e.entry
+	`
+
+	rows, err := r.db.conn.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("querying all entry counts: %w", err)
+	}
+	defer rows.Close() // nolint: errcheck
+
+	var results []AllEntryCountRow
+	for rows.Next() {
+		var row AllEntryCountRow
+		if err := rows.Scan(
+			&row.Entry,
+			&row.GenericSourceType,
+			&row.BlockCount,
+			&row.AllowCount,
+		); err != nil {
+			return nil, fmt.Errorf("scanning entry count row: %w", err)
+		}
+		results = append(results, row)
+	}
+	return results, rows.Err()
+}
+
+func (r *EntriesRepo) GetSourcesForEntry(_ context.Context, entry, genericSourceType string) (blockSources, allowSources []string, err error) {
+	query := `
+		SELECT s.name, e.list_type
+		FROM ` + constants.TableEntries + ` e
+		JOIN ` + constants.TableSources + ` s ON s.id = e.source_id
+		WHERE e.entry = ?
+			AND e.generic_source_type = ?
+			AND e.valid = 1
+			AND s.disabled = 0
+			AND s.skip_general_consolidation = 0
+		ORDER BY s.name
+	`
+
+	rows, err2 := r.db.conn.Query(query, entry, genericSourceType)
+	if err2 != nil {
+		return nil, nil, fmt.Errorf("querying sources for entry: %w", err2)
+	}
+	defer rows.Close() // nolint: errcheck
+
+	for rows.Next() {
+		var name, listType string
+		if err2 := rows.Scan(&name, &listType); err2 != nil {
+			return nil, nil, fmt.Errorf("scanning source row: %w", err2)
+		}
+		switch listType {
+		case "blocklist":
+			blockSources = append(blockSources, name)
+		case "allowlist":
+			allowSources = append(allowSources, name)
+		}
+	}
+	return blockSources, allowSources, rows.Err()
+}
+
 // escapeLike escapes special LIKE characters in s.
 func escapeLike(s string) string {
 	s = strings.ReplaceAll(s, `\`, `\\`)
@@ -295,4 +426,263 @@ func dedupeEntryCategoryRows(rows []EntryCategoryRow) []EntryCategoryRow {
 	}
 
 	return result
+}
+
+// ConsolidationEntry represents an entry for consolidation with its metadata.
+type ConsolidationEntry struct {
+	Entry             string
+	GenericSourceType string
+	ActualSourceType  string
+	ListType          string
+	MustConsider      bool
+	SourceName        string
+}
+
+// GetEntriesByCategory returns all valid entries for sources that have the given category.
+func (r *EntriesRepo) GetEntriesByCategory(
+	_ context.Context,
+	category string,
+	genericSourceType string,
+	listType string,
+) ([]ConsolidationEntry, error) {
+	query := `
+		SELECT DISTINCT
+			e.entry,
+			e.generic_source_type,
+			e.actual_source_type,
+			e.list_type,
+			e.must_consider,
+			s.name
+		FROM ` + constants.TableEntries + ` e
+		JOIN ` + constants.TableSources + ` s ON s.id = e.source_id
+		JOIN ` + constants.TableEntryCategories + ` c ON c.source_id = e.source_id
+			AND c.source_type = e.generic_source_type
+			AND c.list_type = e.list_type
+		WHERE c.category = ?
+			AND e.generic_source_type = ?
+			AND e.list_type = ?
+			AND e.valid = 1
+			AND s.disabled = 0
+			AND s.skip_categories_consolidation = 0
+		ORDER BY e.entry
+	`
+
+	rows, err := r.db.conn.Query(query, category, genericSourceType, listType)
+	if err != nil {
+		return nil, fmt.Errorf("querying entries by category: %w", err)
+	}
+	defer rows.Close() // nolint: errcheck
+
+	var results []ConsolidationEntry
+	for rows.Next() {
+		var entry ConsolidationEntry
+		var mustConsiderInt int
+		if err := rows.Scan(
+			&entry.Entry,
+			&entry.GenericSourceType,
+			&entry.ActualSourceType,
+			&entry.ListType,
+			&mustConsiderInt,
+			&entry.SourceName,
+		); err != nil {
+			return nil, fmt.Errorf("scanning entry row: %w", err)
+		}
+		entry.MustConsider = mustConsiderInt == 1
+		results = append(results, entry)
+	}
+	return results, rows.Err()
+}
+
+// GetEntriesByGroup returns all valid entries for sources that have the given group.
+func (r *EntriesRepo) GetEntriesByGroup(
+	_ context.Context,
+	groupName string,
+	genericSourceType string,
+	listType string,
+) ([]ConsolidationEntry, error) {
+	query := `
+		SELECT DISTINCT
+			e.entry,
+			e.generic_source_type,
+			e.actual_source_type,
+			e.list_type,
+			e.must_consider,
+			s.name
+		FROM ` + constants.TableEntries + ` e
+		JOIN ` + constants.TableSources + ` s ON s.id = e.source_id
+		JOIN ` + constants.TableEntryGroups + ` g ON g.source_id = e.source_id
+			AND g.source_type = e.generic_source_type
+			AND g.list_type = e.list_type
+		WHERE g.group_name = ?
+			AND e.generic_source_type = ?
+			AND e.list_type = ?
+			AND e.valid = 1
+			AND s.disabled = 0
+			AND s.skip_groups_consolidation = 0
+		ORDER BY e.entry
+	`
+
+	rows, err := r.db.conn.Query(query, groupName, genericSourceType, listType)
+	if err != nil {
+		return nil, fmt.Errorf("querying entries by group: %w", err)
+	}
+	defer rows.Close() // nolint: errcheck
+
+	var results []ConsolidationEntry
+	for rows.Next() {
+		var entry ConsolidationEntry
+		var mustConsiderInt int
+		if err := rows.Scan(
+			&entry.Entry,
+			&entry.GenericSourceType,
+			&entry.ActualSourceType,
+			&entry.ListType,
+			&mustConsiderInt,
+			&entry.SourceName,
+		); err != nil {
+			return nil, fmt.Errorf("scanning entry row: %w", err)
+		}
+		entry.MustConsider = mustConsiderInt == 1
+		results = append(results, entry)
+	}
+	return results, rows.Err()
+}
+
+// GetEntriesForGeneralConsolidation returns all valid entries for general consolidation
+// (not filtered by group or category).
+func (r *EntriesRepo) GetEntriesForGeneralConsolidation(
+	_ context.Context,
+	genericSourceType string,
+	listType string,
+) ([]ConsolidationEntry, error) {
+	query := `
+		SELECT DISTINCT
+			e.entry,
+			e.generic_source_type,
+			e.actual_source_type,
+			e.list_type,
+			e.must_consider,
+			s.name
+		FROM ` + constants.TableEntries + ` e
+		JOIN ` + constants.TableSources + ` s ON s.id = e.source_id
+		WHERE e.generic_source_type = ?
+			AND e.list_type = ?
+			AND e.valid = 1
+			AND s.disabled = 0
+			AND s.skip_general_consolidation = 0
+		ORDER BY e.entry
+	`
+
+	rows, err := r.db.conn.Query(query, genericSourceType, listType)
+	if err != nil {
+		return nil, fmt.Errorf("querying entries for general consolidation: %w", err)
+	}
+	defer rows.Close() // nolint: errcheck
+
+	var results []ConsolidationEntry
+	for rows.Next() {
+		var entry ConsolidationEntry
+		var mustConsiderInt int
+		if err := rows.Scan(
+			&entry.Entry,
+			&entry.GenericSourceType,
+			&entry.ActualSourceType,
+			&entry.ListType,
+			&mustConsiderInt,
+			&entry.SourceName,
+		); err != nil {
+			return nil, fmt.Errorf("scanning entry row: %w", err)
+		}
+		entry.MustConsider = mustConsiderInt == 1
+		results = append(results, entry)
+	}
+	return results, rows.Err()
+}
+
+// GetUniqueCategoriesFromDB returns unique categories from entry_categories table
+// for enabled sources not skipping categories consolidation.
+func (r *EntriesRepo) GetUniqueCategoriesFromDB(_ context.Context) ([]string, error) {
+	query := `
+		SELECT DISTINCT c.category
+		FROM ` + constants.TableEntryCategories + ` c
+		JOIN ` + constants.TableSources + ` s ON s.id = c.source_id
+		WHERE s.disabled = 0
+			AND s.skip_categories_consolidation = 0
+			AND c.category != ''
+		ORDER BY c.category COLLATE NOCASE
+	`
+
+	rows, err := r.db.conn.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("querying unique categories: %w", err)
+	}
+	defer rows.Close() // nolint: errcheck
+
+	var categories []string
+	for rows.Next() {
+		var cat string
+		if err := rows.Scan(&cat); err != nil {
+			return nil, fmt.Errorf("scanning category: %w", err)
+		}
+		categories = append(categories, cat)
+	}
+	return categories, rows.Err()
+}
+
+// GetUniqueGroupsFromDB returns unique groups from entry_groups table
+// for enabled sources not skipping groups consolidation.
+func (r *EntriesRepo) GetUniqueGroupsFromDB(_ context.Context) ([]string, error) {
+	query := `
+		SELECT DISTINCT g.group_name
+		FROM ` + constants.TableEntryGroups + ` g
+		JOIN ` + constants.TableSources + ` s ON s.id = g.source_id
+		WHERE s.disabled = 0
+			AND s.skip_groups_consolidation = 0
+			AND g.group_name != ''
+		ORDER BY g.group_name COLLATE NOCASE
+	`
+
+	rows, err := r.db.conn.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("querying unique groups: %w", err)
+	}
+	defer rows.Close() // nolint: errcheck
+
+	var groups []string
+	for rows.Next() {
+		var group string
+		if err := rows.Scan(&group); err != nil {
+			return nil, fmt.Errorf("scanning group: %w", err)
+		}
+		groups = append(groups, group)
+	}
+	return groups, rows.Err()
+}
+
+// GetGenericSourceTypesFromDB returns unique generic source types from entries.
+func (r *EntriesRepo) GetGenericSourceTypesFromDB(_ context.Context) ([]string, error) {
+	query := `
+		SELECT DISTINCT e.generic_source_type
+		FROM ` + constants.TableEntries + ` e
+		JOIN ` + constants.TableSources + ` s ON s.id = e.source_id
+		WHERE s.disabled = 0
+			AND e.valid = 1
+		ORDER BY e.generic_source_type COLLATE NOCASE
+	`
+
+	rows, err := r.db.conn.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("querying generic source types: %w", err)
+	}
+	defer rows.Close() // nolint: errcheck
+
+	var types []string
+	for rows.Next() {
+		var gst string
+		if err := rows.Scan(&gst); err != nil {
+			return nil, fmt.Errorf("scanning source type: %w", err)
+		}
+		types = append(types, gst)
+	}
+	return types, rows.Err()
 }

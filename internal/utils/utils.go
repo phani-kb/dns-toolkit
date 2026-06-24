@@ -1525,3 +1525,8 @@ func GetFilesInDir(logger *multilog.Logger, dir string, patterns []string) ([]st
 	}
 	return files, nil
 }
+
+// NewTestLogger creates a simple logger for test mode without requiring a config file.
+func NewTestLogger() *multilog.Logger {
+	return multilog.NewLogger()
+}
