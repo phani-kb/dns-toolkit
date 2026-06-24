@@ -63,7 +63,11 @@ var consolidateAllCmd = &cobra.Command{
 		var mu sync.Mutex
 		var persistMu sync.Mutex
 
-		allowByType, blockByType, _, _, _, _ := GetCachedResolutionSets(Logger, processedFiles)
+		allowByType, blockByType, _, _, _, _, resErr := GetCachedResolutionSets(Logger, database, processedFiles)
+		if resErr != nil {
+			Logger.Errorf("Failed to build resolution sets: %v", resErr)
+			return
+		}
 
 		allowlistEntriesByType := make(map[string]u.StringSet)
 		processAllowlists(
@@ -174,7 +178,7 @@ var consolidateAllCmd = &cobra.Command{
 		workerPool.Wait()
 
 		if generateConflictsReport {
-			manager := NewConsolidationManager(Logger)
+			manager := NewConsolidationManager(Logger, database)
 			if err := manager.GenerateConflictReport(processedFiles); err != nil {
 				Logger.Errorf("Failed to generate conflicts report: %v", err)
 			}

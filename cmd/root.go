@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/phani-kb/dns-toolkit/internal/common"
+	"github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/spf13/cobra"
@@ -167,7 +168,25 @@ func Execute() {
 	}
 }
 
+func isTestMode() bool {
+	return os.Getenv("DNS_TOOLKIT_TEST_MODE") == constants.BooleanTrue
+}
+
 func init() {
+	if isTestMode() && os.Getenv("DNS_TOOLKIT_TEST_CONFIG_PATH") == "" {
+		Logger = utils.NewTestLogger()
+		AppConfig = &config.AppConfig{
+			Application: config.ApplicationConfig{
+				Name:        "dns-toolkit-test",
+				Version:     "0.0.0-test",
+				Description: "Test configuration",
+			},
+		}
+		cobra.OnInitialize(validateAndSetDirs)
+		registerCommands()
+		return
+	}
+
 	configPath, err := GetConfigPath()
 	if err != nil {
 		slog.Error("Failed to get config path", "error", err)
@@ -185,7 +204,10 @@ func init() {
 	}
 
 	cobra.OnInitialize(validateAndSetDirs)
+	registerCommands()
+}
 
+func registerCommands() {
 	rootCmd.AddCommand(versionCmd)
 	rootCmd.AddCommand(downloadCmd)
 	rootCmd.AddCommand(processCmd)
