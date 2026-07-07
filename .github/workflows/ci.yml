@@ -118,7 +118,7 @@ jobs:
       - name: Upload coverage
         uses: codecov/codecov-action@v5
         with:
-          file: ./coverage.out
+          files: ./coverage.out
           flags: unittests
           name: codecov-umbrella
           fail_ci_if_error: false
@@ -229,7 +229,7 @@ jobs:
         run: echo "date=$(date -u '+%Y-%m-%d')" >> $GITHUB_OUTPUT
 
       - name: Restore data cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v5
         id: cache-restore
         with:
           path: |
@@ -525,7 +525,7 @@ jobs:
 
       - name: Save data cache
         if: (env.PIPELINE_MODE == 'refresh-cache' || env.PIPELINE_MODE == 'full-pipeline') && (steps.count-files.outputs.download-count > 0)
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v5
         with:
           path: |
             data/download
