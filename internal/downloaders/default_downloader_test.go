@@ -33,7 +33,7 @@ func setupTestDir(t *testing.T) string {
 
 func createTestFile(t *testing.T, dir, filename, content string) string {
 	path := filepath.Join(dir, filename)
-	err := os.WriteFile(path, []byte(content), 0644)
+	err := os.WriteFile(path, []byte(content), 0o644)
 	if err != nil {
 		t.Fatalf("Failed to create test file: %v", err)
 	}
@@ -68,7 +68,7 @@ func TestDefaultDownloader_CopyLocalFile(t *testing.T) {
 	sourceURL := fmt.Sprintf("file://%s", sourcePath)
 
 	destDir := filepath.Join(testDir, "dest")
-	err := os.MkdirAll(destDir, 0755)
+	err := os.MkdirAll(destDir, 0o755)
 	assert.NoError(t, err)
 
 	d := newTestDownloader(1)
@@ -104,7 +104,7 @@ func TestDefaultDownloader_Download_LocalFile(t *testing.T) {
 	sourceURL := fmt.Sprintf("file://%s", sourcePath)
 
 	destDir := filepath.Join(testDir, "dest")
-	err := os.MkdirAll(destDir, 0755)
+	err := os.MkdirAll(destDir, 0o755)
 	assert.NoError(t, err)
 
 	d := newTestDownloader(3)
@@ -147,7 +147,7 @@ func TestDefaultDownloader_Download_RemoteFile(t *testing.T) {
 	defer server.Close()
 
 	destDir := filepath.Join(testDir, "dest")
-	err := os.MkdirAll(destDir, 0755)
+	err := os.MkdirAll(destDir, 0o755)
 	assert.NoError(t, err)
 
 	d := newTestDownloader(3)
@@ -202,7 +202,7 @@ func TestDefaultDownloader_RetryLogic(t *testing.T) {
 	defer server.Close()
 
 	destDir := filepath.Join(testDir, "dest")
-	err := os.MkdirAll(destDir, 0755)
+	err := os.MkdirAll(destDir, 0o755)
 	assert.NoError(t, err)
 
 	d := newTestDownloader(2)
@@ -233,7 +233,7 @@ func TestCanSkipDownload(t *testing.T) {
 	}()
 
 	summaryDir := filepath.Join(testDir, "summary")
-	err := os.MkdirAll(summaryDir, 0755)
+	err := os.MkdirAll(summaryDir, 0o755)
 	require.NoError(t, err)
 
 	origSummaryDir := constants.SummaryDir
@@ -272,11 +272,11 @@ func TestCanSkipDownload(t *testing.T) {
 	require.NoError(t, err)
 
 	mockDir := filepath.Join(testDir, "mock")
-	err = os.MkdirAll(mockDir, 0755)
+	err = os.MkdirAll(mockDir, 0o755)
 	require.NoError(t, err)
 
 	mockFilePath := filepath.Join(mockDir, "test.txt")
-	err = os.WriteFile(mockFilePath, []byte("test content"), 0644)
+	err = os.WriteFile(mockFilePath, []byte("test content"), 0o644)
 	require.NoError(t, err)
 
 	file.Folder = mockDir
@@ -430,7 +430,7 @@ func TestDefaultDownloader_Download_HTTPError(t *testing.T) {
 	defer server.Close()
 
 	destDir := filepath.Join(testDir, "dest")
-	err := os.MkdirAll(destDir, 0755)
+	err := os.MkdirAll(destDir, 0o755)
 	assert.NoError(t, err)
 
 	d := newTestDownloader(1)
@@ -458,7 +458,7 @@ func TestDownloadEdgeCases_Merged(t *testing.T) {
 	}()
 
 	downloadDir := filepath.Join(testDir, "download")
-	err := os.MkdirAll(downloadDir, 0755)
+	err := os.MkdirAll(downloadDir, 0o755)
 	assert.NoError(t, err)
 	t.Run("MalformedURL", func(t *testing.T) {
 		t.Parallel()
@@ -643,7 +643,7 @@ func TestDownloaderConcurrency_Merged(t *testing.T) {
 	}()
 
 	downloadDir := filepath.Join(testDir, "download")
-	err := os.MkdirAll(downloadDir, 0755)
+	err := os.MkdirAll(downloadDir, 0o755)
 	assert.NoError(t, err)
 
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

@@ -65,7 +65,7 @@ func TestDomainTopDownloader_Download(t *testing.T) {
 	defer server.Close()
 
 	destDir := filepath.Join(testDir, "dest")
-	err := os.MkdirAll(destDir, 0755)
+	err := os.MkdirAll(destDir, 0o755)
 	require.NoError(t, err)
 
 	downloader := NewDomainTopDownloaderWithRetries(1)
@@ -183,7 +183,7 @@ func TestDomainTopDownloader_PostDownloadProcess(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Create test file
 			testFile := filepath.Join(testDir, fmt.Sprintf("test_%s.csv", strings.ReplaceAll(tt.name, " ", "_")))
-			err := os.WriteFile(testFile, []byte(tt.originalContent), 0644)
+			err := os.WriteFile(testFile, []byte(tt.originalContent), 0o644)
 			require.NoError(t, err)
 
 			// Create downloader and process
@@ -244,7 +244,7 @@ func TestDomainTopDownloader_PostDownloadProcess_FileErrors(t *testing.T) {
 
 		// Create readonly file
 		testFile := filepath.Join(testDir, "readonly.csv")
-		err := os.WriteFile(testFile, []byte("1,google.com\n2,youtube.com"), 0444)
+		err := os.WriteFile(testFile, []byte("1,google.com\n2,youtube.com"), 0o444)
 		require.NoError(t, err)
 
 		err = downloader.PostDownloadProcess(logger, testFile, 1)
@@ -315,7 +315,7 @@ func TestDomainTopDownloader_PostDownloadProcess_EdgeCases(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			testFile := filepath.Join(testDir, fmt.Sprintf("edge_%s.csv", strings.ReplaceAll(tt.name, " ", "_")))
-			err := os.WriteFile(testFile, []byte(tt.originalContent), 0644)
+			err := os.WriteFile(testFile, []byte(tt.originalContent), 0o644)
 			require.NoError(t, err)
 
 			downloader := NewDomainTopDownloaderWithRetries(1)
@@ -370,7 +370,7 @@ func TestDomainTopDownloader_Integration(t *testing.T) {
 	defer server.Close()
 
 	destDir := filepath.Join(testDir, "dest")
-	err := os.MkdirAll(destDir, 0755)
+	err := os.MkdirAll(destDir, 0o755)
 	require.NoError(t, err)
 
 	downloader := NewDomainTopDownloaderWithRetries(1)
@@ -431,7 +431,7 @@ func TestDomainTopDownloader_Download_HTTPError(t *testing.T) {
 	defer server.Close()
 
 	destDir := filepath.Join(testDir, "dest")
-	err := os.MkdirAll(destDir, 0755)
+	err := os.MkdirAll(destDir, 0o755)
 	require.NoError(t, err)
 
 	downloader := NewDomainTopDownloaderWithRetries(1)

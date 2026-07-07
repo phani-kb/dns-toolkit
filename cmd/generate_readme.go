@@ -35,7 +35,7 @@ var generateReadmeCmd = &cobra.Command{
 		readme := generateOutputBranchReadme()
 
 		readmePath := filepath.Join(constants.OutputDir, "README.md")
-		if err := os.WriteFile(readmePath, []byte(readme), 0644); err != nil {
+		if err := os.WriteFile(readmePath, []byte(readme), 0o644); err != nil {
 			Logger.Errorf("Failed to write README file: %v", err)
 			os.Exit(1)
 		}
@@ -128,7 +128,7 @@ func generateOutputBranchReadme() string {
 
 	sb.WriteString("# DNS Toolkit - Daily Processing Results\n\n")
 	sb.WriteString("This branch contains the daily processed and consolidated DNS blocklists and allowlists.\n\n")
-	sb.WriteString(fmt.Sprintf("**Last Updated:** %s\n\n", summary.LastRun))
+	fmt.Fprintf(&sb, "**Last Updated:** %s\n\n", summary.LastRun)
 
 	sb.WriteString("## Quick Start\n\n")
 	sb.WriteString("Add any of these URLs to your DNS filtering solution:\n\n")
@@ -155,7 +155,7 @@ func generateOutputBranchReadme() string {
 			sb.WriteString("<strong>🛑 Blocklists</strong>\n\n")
 			sb.WriteString("```\n")
 			for _, filename := range blocklistFiles {
-				sb.WriteString(fmt.Sprintf("%s/%s\n", constants.GitHubRawURL, filename))
+				fmt.Fprintf(&sb, "%s/%s\n", constants.GitHubRawURL, filename)
 			}
 			sb.WriteString("```\n\n")
 		}
@@ -164,7 +164,7 @@ func generateOutputBranchReadme() string {
 			sb.WriteString("<strong>✅ Allowlists</strong>\n\n")
 			sb.WriteString("```\n")
 			for _, filename := range allowlistFiles {
-				sb.WriteString(fmt.Sprintf("%s/%s\n", constants.GitHubRawURL, filename))
+				fmt.Fprintf(&sb, "%s/%s\n", constants.GitHubRawURL, filename)
 			}
 			sb.WriteString("```\n\n")
 		}
@@ -262,16 +262,12 @@ func generateOutputBranchReadme() string {
 	sb.WriteString("### Download Statistics\n\n")
 	sb.WriteString("| Metric | Count |\n")
 	sb.WriteString("|--------|-------|\n")
-	sb.WriteString(fmt.Sprintf("| Total Sources | %d |\n", summary.Download.TotalSources))
-	sb.WriteString(fmt.Sprintf("| Successful Downloads | %d |\n", summary.Download.SuccessCount))
-	sb.WriteString(fmt.Sprintf("| Failed Downloads | %d |\n", summary.Download.FailedCount))
-	sb.WriteString(
-		fmt.Sprintf(
-			"| Success Rate | %.1f%% |\n",
-			float64(summary.Download.SuccessCount)/float64(summary.Download.TotalSources)*100,
-		),
-	)
-	sb.WriteString(fmt.Sprintf("| Last Update | %s |\n", summary.Download.LastUpdateTime))
+	fmt.Fprintf(&sb, "| Total Sources | %d |\n", summary.Download.TotalSources)
+	fmt.Fprintf(&sb, "| Successful Downloads | %d |\n", summary.Download.SuccessCount)
+	fmt.Fprintf(&sb, "| Failed Downloads | %d |\n", summary.Download.FailedCount)
+	fmt.Fprintf(&sb, "| Success Rate | %.1f%% |\n",
+		float64(summary.Download.SuccessCount)/float64(summary.Download.TotalSources)*100)
+	fmt.Fprintf(&sb, "| Last Update | %s |\n", summary.Download.LastUpdateTime)
 	sb.WriteString("\n")
 
 	// Sources by Type (collapsible)
@@ -294,7 +290,7 @@ func generateOutputBranchReadme() string {
 
 		for _, sourceType := range sourceTypes {
 			count := summary.Download.SourcesByType[sourceType]
-			sb.WriteString(fmt.Sprintf("| %s | %d |\n", sourceType, count))
+			fmt.Fprintf(&sb, "| %s | %d |\n", sourceType, count)
 		}
 		sb.WriteString("\n")
 		sb.WriteString("</details>\n\n")
@@ -304,7 +300,7 @@ func generateOutputBranchReadme() string {
 	if len(summary.Download.ErrorSources) > 0 {
 		sb.WriteString("**Failed Sources:**\n")
 		for _, source := range summary.Download.ErrorSources {
-			sb.WriteString(fmt.Sprintf("- %s\n", source))
+			fmt.Fprintf(&sb, "- %s\n", source)
 		}
 		sb.WriteString("\n")
 	}
@@ -332,9 +328,9 @@ func generateOutputBranchReadme() string {
 		valid := summary.Processing.ValidFilesByType[sourceType]
 		invalid := summary.Processing.InvalidFilesByType[sourceType]
 		total := valid + invalid
-		sb.WriteString(fmt.Sprintf("| %s | %d | %d | %d |\n", sourceType, valid, invalid, total))
+		fmt.Fprintf(&sb, "| %s | %d | %d | %d |\n", sourceType, valid, invalid, total)
 	}
-	sb.WriteString(fmt.Sprintf("| **Last Update** | | | %s |\n", summary.Processing.LastUpdateTime))
+	fmt.Fprintf(&sb, "| **Last Update** | | | %s |\n", summary.Processing.LastUpdateTime)
 	sb.WriteString("\n")
 
 	// Consolidation Summary
@@ -344,15 +340,14 @@ func generateOutputBranchReadme() string {
 
 	for _, sourceType := range types {
 		if stats, exists := summary.Consolidate.FilesByType[sourceType]; exists {
-			sb.WriteString(fmt.Sprintf("| %s | %s | %s | %d |\n",
+			fmt.Fprintf(&sb, "| %s | %s | %s | %d |\n",
 				sourceType,
 				formatConsolidateCount(stats.Blocklist),
 				formatConsolidateCount(stats.Allowlist),
-				stats.Blocklist.FilesCount+stats.Allowlist.FilesCount,
-			))
+				stats.Blocklist.FilesCount+stats.Allowlist.FilesCount)
 		}
 	}
-	sb.WriteString(fmt.Sprintf("| **Last Update** | | | %s |\n", summary.Consolidate.LastUpdateTime))
+	fmt.Fprintf(&sb, "| **Last Update** | | | %s |\n", summary.Consolidate.LastUpdateTime)
 	sb.WriteString("\n")
 
 	// Groups Summary
@@ -369,9 +364,9 @@ func generateOutputBranchReadme() string {
 
 		for _, group := range groups {
 			count := summary.Groups.GroupSummary[group]
-			sb.WriteString(fmt.Sprintf("| %s | %s |\n", group, formatNumber(count)))
+			fmt.Fprintf(&sb, "| %s | %s |\n", group, formatNumber(count))
 		}
-		sb.WriteString(fmt.Sprintf("| **Last Update** | %s |\n", summary.Groups.LastUpdateTime))
+		fmt.Fprintf(&sb, "| **Last Update** | %s |\n", summary.Groups.LastUpdateTime)
 		sb.WriteString("\n")
 	}
 
@@ -389,9 +384,9 @@ func generateOutputBranchReadme() string {
 
 		for _, category := range categories {
 			count := summary.Categories.CategorySummary[category]
-			sb.WriteString(fmt.Sprintf("| %s | %s |\n", category, formatNumber(count)))
+			fmt.Fprintf(&sb, "| %s | %s |\n", category, formatNumber(count))
 		}
-		sb.WriteString(fmt.Sprintf("| **Last Update** | %s |\n", summary.Categories.LastUpdateTime))
+		fmt.Fprintf(&sb, "| **Last Update** | %s |\n", summary.Categories.LastUpdateTime)
 		sb.WriteString("\n")
 	}
 
@@ -400,8 +395,8 @@ func generateOutputBranchReadme() string {
 		sb.WriteString("### Overlap Analysis Summary\n\n")
 		sb.WriteString("| Metric | Count |\n")
 		sb.WriteString("|--------|-------|\n")
-		sb.WriteString(fmt.Sprintf("| Total Sources Analyzed | %d |\n", summary.Overlap.TotalAnalyzed))
-		sb.WriteString(fmt.Sprintf("| **Last Update** | %s |\n", summary.Overlap.LastUpdateTime))
+		fmt.Fprintf(&sb, "| Total Sources Analyzed | %d |\n", summary.Overlap.TotalAnalyzed)
+		fmt.Fprintf(&sb, "| **Last Update** | %s |\n", summary.Overlap.LastUpdateTime)
 		sb.WriteString("\n")
 		sb.WriteString("**[View Detailed Overlap Analysis →](overlap.md)**\n\n")
 	}
@@ -449,21 +444,19 @@ func generateOutputBranchReadme() string {
 				entry.detail.MinSources,
 			)
 			minSourcesLink := fmt.Sprintf("[%d](%s)", entry.detail.MinSources, url)
-			sb.WriteString(fmt.Sprintf("| %s | %s | %s | %s | 1 |\n",
+			fmt.Fprintf(&sb, "| %s | %s | %s | %s | 1 |\n",
 				entry.sourceType,
 				entry.detail.ListType,
 				minSourcesLink,
-				formatNumber(entry.detail.Count)))
+				formatNumber(entry.detail.Count))
 		}
-		sb.WriteString(fmt.Sprintf("| **Last Update** | | | | %s |\n", summary.Top.LastUpdateTime))
+		fmt.Fprintf(&sb, "| **Last Update** | | | | %s |\n", summary.Top.LastUpdateTime)
 		sb.WriteString("\n")
 	}
 
 	sb.WriteString("## About\n\n")
-	sb.WriteString(fmt.Sprintf(
-		"These lists are automatically generated daily by the [DNS Toolkit](%s) ",
-		constants.GitHubRepoURL,
-	))
+	fmt.Fprintf(&sb, "These lists are automatically generated daily by the [DNS Toolkit](%s) ",
+		constants.GitHubRepoURL)
 	sb.WriteString("from multiple reputable sources.\n\n")
 
 	return sb.String()

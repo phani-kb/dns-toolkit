@@ -26,10 +26,10 @@ func setupTestDirs(t *testing.T) (string, string) {
 	overlapDir := filepath.Join(tmpDir, "overlap")
 	summaryDir := filepath.Join(tmpDir, "summary")
 
-	err := os.MkdirAll(overlapDir, 0755)
+	err := os.MkdirAll(overlapDir, 0o755)
 	require.NoError(t, err)
 
-	err = os.MkdirAll(summaryDir, 0755)
+	err = os.MkdirAll(summaryDir, 0o755)
 	require.NoError(t, err)
 
 	return overlapDir, summaryDir
@@ -38,21 +38,21 @@ func setupTestDirs(t *testing.T) (string, string) {
 // createTestFiles creates test files with content for testing overlap functions
 func createTestFiles(t *testing.T, baseDir string) ([]common.ProcessedFile, []string) {
 	processedDir := filepath.Join(baseDir, "processed")
-	err := os.MkdirAll(processedDir, 0755)
+	err := os.MkdirAll(processedDir, 0o755)
 	if err != nil {
 		t.Fatalf("Failed to create directory %s: %v", processedDir, err)
 	}
 
 	file1Path := filepath.Join(processedDir, "source1.txt")
 	file1Content := "example.com\nmalicious.org\nads.com\ntracker.net\n"
-	err = os.WriteFile(file1Path, []byte(file1Content), 0644)
+	err = os.WriteFile(file1Path, []byte(file1Content), 0o644)
 	if err != nil {
 		t.Fatalf("Failed to write file %s: %v", file1Path, err)
 	}
 
 	file2Path := filepath.Join(processedDir, "source2.txt")
 	file2Content := "example.com\nphishing.org\ntracker.net\nspam.com\n"
-	err = os.WriteFile(file2Path, []byte(file2Content), 0644)
+	err = os.WriteFile(file2Path, []byte(file2Content), 0o644)
 	if err != nil {
 		t.Fatalf("Failed to write file %s: %v", file2Path, err)
 	}
@@ -182,10 +182,10 @@ func TestOverlapService_SaveOverlap_ErrorCase(t *testing.T) {
 	// Create a non-writable directory to force an error
 	tmpDir := t.TempDir()
 	nonWritableDir := filepath.Join(tmpDir, "non-writable")
-	err := os.MkdirAll(nonWritableDir, 0755)
+	err := os.MkdirAll(nonWritableDir, 0o755)
 	require.NoError(t, err)
 
-	err = os.Chmod(nonWritableDir, 0000)
+	err = os.Chmod(nonWritableDir, 0o000)
 	require.NoError(t, err)
 
 	defer func(name string, mode os.FileMode) {
@@ -193,7 +193,7 @@ func TestOverlapService_SaveOverlap_ErrorCase(t *testing.T) {
 		if err != nil {
 			t.Errorf("Failed to restore permissions for %s: %v", name, err)
 		}
-	}(nonWritableDir, 0755)
+	}(nonWritableDir, 0o755)
 
 	service := overlap.NewDefaultService(nonWritableDir, "")
 	logger := createTestLogger(t)
@@ -455,10 +455,10 @@ func TestOverlapService_WriteCompactOverlapSummaries_ErrorCase(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	nonWritableDir := filepath.Join(tmpDir, "non_writable_summary")
-	err := os.MkdirAll(nonWritableDir, 0755)
+	err := os.MkdirAll(nonWritableDir, 0o755)
 	require.NoError(t, err)
 
-	err = os.Chmod(nonWritableDir, 0000)
+	err = os.Chmod(nonWritableDir, 0o000)
 	require.NoError(t, err)
 
 	defer func(name string, mode os.FileMode) {
@@ -466,10 +466,10 @@ func TestOverlapService_WriteCompactOverlapSummaries_ErrorCase(t *testing.T) {
 		if err != nil {
 			t.Errorf("Failed to restore permissions for %s: %v", name, err)
 		}
-	}(nonWritableDir, 0755)
+	}(nonWritableDir, 0o755)
 
 	overlapDir := filepath.Join(tmpDir, "overlap")
-	err = os.MkdirAll(overlapDir, 0755)
+	err = os.MkdirAll(overlapDir, 0o755)
 	require.NoError(t, err)
 
 	service := overlap.NewDefaultService(overlapDir, nonWritableDir)

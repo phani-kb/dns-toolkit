@@ -30,7 +30,7 @@ var (
 // prepareDirectories creates necessary output directories
 func prepareDirectories() error {
 	// Create an output directory
-	if err := os.MkdirAll(constants.OutputDir, 0755); err != nil {
+	if err := os.MkdirAll(constants.OutputDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create output directory: %w", err)
 	}
 
@@ -41,25 +41,25 @@ func prepareDirectories() error {
 		}
 
 		dir := filepath.Join(dirName)
-		if err := os.MkdirAll(dir, 0755); err != nil {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
 			return fmt.Errorf("failed to create directory for summary type %s: %w", summaryType, err)
 		}
 	}
 
 	// Create an ignored directory if the flag is set
 	if includeIgnored {
-		if err := os.MkdirAll(constants.OutputIgnoredDir, 0755); err != nil {
+		if err := os.MkdirAll(constants.OutputIgnoredDir, 0o755); err != nil {
 			return fmt.Errorf("failed to create ignored directory: %w", err)
 		}
 	}
 
 	// Create a summaries directory
-	if err := os.MkdirAll(constants.OutputSummariesDir, 0755); err != nil {
+	if err := os.MkdirAll(constants.OutputSummariesDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create summaries directory: %w", err)
 	}
 
 	// Create an archive directory
-	if err := os.MkdirAll(constants.ArchiveDir, 0755); err != nil {
+	if err := os.MkdirAll(constants.ArchiveDir, 0o755); err != nil {
 		return fmt.Errorf("failed to create archive directory: %w", err)
 	}
 
@@ -357,7 +357,7 @@ func createOutputFromFile(
 		string(dataContent))
 
 	// Write an output file
-	if err := os.WriteFile(outputPath, []byte(output), 0644); err != nil {
+	if err := os.WriteFile(outputPath, []byte(output), 0o644); err != nil {
 		return fmt.Errorf("failed to write output file: %w", err)
 	}
 
@@ -702,7 +702,7 @@ func copySummaryFile(srcPath, dstPath string) error {
 	if err != nil {
 		return fmt.Errorf("failed to read summary file: %w", err)
 	}
-	if err := os.WriteFile(dstPath, input, 0644); err != nil {
+	if err := os.WriteFile(dstPath, input, 0o644); err != nil {
 		return fmt.Errorf("failed to write summary file: %w", err)
 	}
 	return nil

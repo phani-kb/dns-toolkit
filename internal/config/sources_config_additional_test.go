@@ -47,15 +47,15 @@ func TestResolveFilePath(t *testing.T) {
 	require.NoError(t, err)
 
 	goModFile := filepath.Join(tempDir, "go.mod")
-	err = os.WriteFile(goModFile, []byte("module test"), 0644)
+	err = os.WriteFile(goModFile, []byte("module test"), 0o644)
 	require.NoError(t, err)
 
 	testdataDir := filepath.Join(tempDir, "testdata")
-	err = os.MkdirAll(testdataDir, 0755)
+	err = os.MkdirAll(testdataDir, 0o755)
 	require.NoError(t, err)
 
 	testFile := filepath.Join(testdataDir, "testfile.json")
-	err = os.WriteFile(testFile, []byte("{}"), 0644)
+	err = os.WriteFile(testFile, []byte("{}"), 0o644)
 	require.NoError(t, err)
 
 	originalWd, err := os.Getwd()

@@ -119,10 +119,10 @@ func setup(t *testing.T) (*multilog.Logger, string, string) {
 	topDir := filepath.Join(testDir, "top")
 	summaryDir := filepath.Join(testDir, "summary")
 
-	err = os.MkdirAll(topDir, 0755)
+	err = os.MkdirAll(topDir, 0o755)
 	require.NoError(t, err)
 
-	err = os.MkdirAll(summaryDir, 0755)
+	err = os.MkdirAll(summaryDir, 0o755)
 	require.NoError(t, err)
 
 	return logger, topDir, summaryDir

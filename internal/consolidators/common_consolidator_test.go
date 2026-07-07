@@ -180,7 +180,7 @@ func TestCommonConsolidatorConsolidate(t *testing.T) {
 
 			for _, file := range tt.files {
 				filePath := filepath.Join(tempDir, file.name)
-				require.NoError(t, os.WriteFile(filePath, []byte(file.content), 0644))
+				require.NoError(t, os.WriteFile(filePath, []byte(file.content), 0o644))
 
 				sourceType := file.sourceType
 				if sourceType == "" {
@@ -524,8 +524,8 @@ func TestCommonConsolidatorSaveEntriesErrorCases(t *testing.T) {
 
 	if runtime.GOOS != "windows" { // Skip on Windows
 		readOnlyDir := t.TempDir()
-		require.NoError(t, os.Chmod(readOnlyDir, 0444)) // Read-only
-		defer os.Chmod(readOnlyDir, 0755)               // Restore permissions for cleanup
+		require.NoError(t, os.Chmod(readOnlyDir, 0o444)) // Read-only
+		defer os.Chmod(readOnlyDir, 0o755)               // Restore permissions for cleanup
 
 		invalidPath := filepath.Join(readOnlyDir, "output.txt")
 		_ = cc.SaveEntries(logger, entrySet, invalidPath)

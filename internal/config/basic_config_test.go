@@ -10,7 +10,7 @@ import (
 
 func createTestConfigFiles(t *testing.T) string {
 	testDir := filepath.Join("testdata")
-	if err := os.MkdirAll(testDir, 0755); err != nil {
+	if err := os.MkdirAll(testDir, 0o755); err != nil {
 		t.Fatal(err)
 	}
 
@@ -25,7 +25,7 @@ func createTestConfigFiles(t *testing.T) string {
 		]
 	}`
 	validSourcesPath := filepath.Join(testDir, "valid_sources.json")
-	if err := os.WriteFile(validSourcesPath, []byte(validSourcesContent), 0644); err != nil {
+	if err := os.WriteFile(validSourcesPath, []byte(validSourcesContent), 0o644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -44,7 +44,7 @@ multilog:
   level: info
 `
 	validConfigPath := filepath.Join(testDir, "valid_config.yaml")
-	if err := os.WriteFile(validConfigPath, []byte(validConfigContent), 0644); err != nil {
+	if err := os.WriteFile(validConfigPath, []byte(validConfigContent), 0o644); err != nil {
 		t.Fatal(err)
 	}
 
@@ -261,7 +261,7 @@ func TestBasicLoadAppConfig(t *testing.T) {
 
 	// Create an invalid config file for testing
 	invalidConfigPath := filepath.Join(testDir, "invalid_config.yaml")
-	if err := os.WriteFile(invalidConfigPath, []byte("invalid yaml"), 0644); err != nil {
+	if err := os.WriteFile(invalidConfigPath, []byte("invalid yaml"), 0o644); err != nil {
 		t.Fatal(err)
 	}
 

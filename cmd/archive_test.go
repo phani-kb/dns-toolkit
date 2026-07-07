@@ -137,7 +137,7 @@ func TestProcessSummaryFiles(t *testing.T) {
 	require.NoError(t, err)
 
 	downloadSummaryPath := filepath.Join(tmpDir, "download_summary.json")
-	err = os.WriteFile(downloadSummaryPath, downloadData, 0644)
+	err = os.WriteFile(downloadSummaryPath, downloadData, 0o644)
 	require.NoError(t, err)
 
 	processedSummary := []common.ProcessedSummary{
@@ -147,15 +147,15 @@ func TestProcessSummaryFiles(t *testing.T) {
 	require.NoError(t, err)
 
 	processedSummaryPath := filepath.Join(tmpDir, "processed_summary.json")
-	err = os.WriteFile(processedSummaryPath, processedData, 0644)
+	err = os.WriteFile(processedSummaryPath, processedData, 0o644)
 	require.NoError(t, err)
 
 	nonSummaryPath := filepath.Join(tmpDir, "other_file.txt")
-	err = os.WriteFile(nonSummaryPath, []byte("not a summary"), 0644)
+	err = os.WriteFile(nonSummaryPath, []byte("not a summary"), 0o644)
 	require.NoError(t, err)
 
 	subDir := filepath.Join(tmpDir, "subdir")
-	err = os.MkdirAll(subDir, 0755)
+	err = os.MkdirAll(subDir, 0o755)
 	require.NoError(t, err)
 
 	archiveSummary := &common.ArchiveSummary{
@@ -229,7 +229,7 @@ func TestAddFileToTar(t *testing.T) {
 
 	testContent := "test file content"
 	testFilePath := filepath.Join(tmpDir, "test.txt")
-	err := os.WriteFile(testFilePath, []byte(testContent), 0644)
+	err := os.WriteFile(testFilePath, []byte(testContent), 0o644)
 	require.NoError(t, err)
 
 	fileInfo, err := os.Stat(testFilePath)
@@ -270,7 +270,7 @@ func TestAddFileToTarDirectory(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	subDir := filepath.Join(tmpDir, "subdir")
-	err := os.MkdirAll(subDir, 0755)
+	err := os.MkdirAll(subDir, 0o755)
 	require.NoError(t, err)
 
 	dirInfo, err := os.Stat(subDir)
@@ -320,11 +320,11 @@ func TestRunArchiveIntegration(t *testing.T) {
 	}()
 
 	testDataDir := filepath.Join(tmpDir, "testdata")
-	err := os.MkdirAll(testDataDir, 0755)
+	err := os.MkdirAll(testDataDir, 0o755)
 	require.NoError(t, err)
 
 	testFile := filepath.Join(testDataDir, "test.txt")
-	err = os.WriteFile(testFile, []byte("test content"), 0644)
+	err = os.WriteFile(testFile, []byte("test content"), 0o644)
 	require.NoError(t, err)
 
 	originalAppConfig := AppConfig

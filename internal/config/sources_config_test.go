@@ -556,7 +556,7 @@ func TestLoadingSourcesWithDefaultValues(t *testing.T) {
 	}`
 
 	sourcesPath := filepath.Join(testDir, "sources_with_defaults.json")
-	err = os.WriteFile(sourcesPath, []byte(minimalSourceContent), 0644)
+	err = os.WriteFile(sourcesPath, []byte(minimalSourceContent), 0o644)
 	require.NoError(t, err)
 
 	logger := createTestLogger(t)
@@ -600,7 +600,7 @@ func TestGetDownloadFileWithExtensions(t *testing.T) {
 	}()
 
 	downloadDir := filepath.Join(testDir, "download")
-	err = os.MkdirAll(downloadDir, 0755)
+	err = os.MkdirAll(downloadDir, 0o755)
 	require.NoError(t, err)
 
 	logger := createTestLogger(t)
@@ -668,7 +668,7 @@ func TestGetDownloadFileDetailedCases(t *testing.T) {
 	}(testDir)
 
 	downloadDir := filepath.Join(testDir, "download")
-	err = os.MkdirAll(downloadDir, 0755)
+	err = os.MkdirAll(downloadDir, 0o755)
 	require.NoError(t, err)
 
 	logger := createTestLogger(t)
@@ -900,7 +900,7 @@ func TestLoadSourcesConfig_EmptyFile(t *testing.T) {
 	defer os.RemoveAll(tmpDir)
 
 	emptyFile := filepath.Join(tmpDir, "empty.json")
-	require.NoError(t, os.WriteFile(emptyFile, []byte("   \n\t"), 0644))
+	require.NoError(t, os.WriteFile(emptyFile, []byte("   \n\t"), 0o644))
 
 	cfg, err := LoadSourcesConfig(logger, emptyFile)
 	require.NoError(t, err)

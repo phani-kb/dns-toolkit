@@ -118,10 +118,10 @@ func TestAnalyzeProfiles(t *testing.T) {
 	cpuProfile := filepath.Join(tempDir, "cpu.prof")
 	memProfile := filepath.Join(tempDir, "mem.prof")
 
-	err = os.WriteFile(cpuProfile, []byte("fake cpu profile data"), 0644)
+	err = os.WriteFile(cpuProfile, []byte("fake cpu profile data"), 0o644)
 	require.NoError(t, err)
 
-	err = os.WriteFile(memProfile, []byte("fake memory profile data"), 0644)
+	err = os.WriteFile(memProfile, []byte("fake memory profile data"), 0o644)
 	require.NoError(t, err)
 
 	AnalyzeProfiles(logger, ProfileOptions{OutputDir: tempDir})

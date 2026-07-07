@@ -419,7 +419,7 @@ func saveToFile(logger *multilog.Logger, filePath string, entries []string) {
 	slices.Sort(sorted)
 
 	content := strings.Join(sorted, "\n") + "\n"
-	err := os.WriteFile(filePath, []byte(content), 0644)
+	err := os.WriteFile(filePath, []byte(content), 0o644)
 	if err != nil {
 		logger.Errorf("Error writing file: %v (path: %s)", err, filePath)
 	}
