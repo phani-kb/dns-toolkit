@@ -152,7 +152,7 @@ func TestUpdateReadmeWithStats(t *testing.T) {
 
 		content, err := os.ReadFile(testFile)
 		require.NoError(t, err)
-		err = os.WriteFile(tempFile, content, 0644)
+		err = os.WriteFile(tempFile, content, 0o644)
 		require.NoError(t, err)
 
 		stats := &SourceStats{
@@ -191,7 +191,7 @@ func TestUpdateReadmeWithStats(t *testing.T) {
 
 		content, err := os.ReadFile(testFile)
 		require.NoError(t, err)
-		err = os.WriteFile(tempFile, content, 0644)
+		err = os.WriteFile(tempFile, content, 0o644)
 		require.NoError(t, err)
 
 		stats := &SourceStats{
@@ -227,7 +227,7 @@ func TestUpdateReadmeWithStats(t *testing.T) {
 
 Some description here.
 `
-		err := os.WriteFile(tempFile, []byte(testContent), 0644)
+		err := os.WriteFile(tempFile, []byte(testContent), 0o644)
 		require.NoError(t, err)
 
 		stats := &SourceStats{
@@ -260,7 +260,7 @@ Old content here
 ## Installation
 Output information here.
 `
-		err := os.WriteFile(tempFile, []byte(testContent), 0644)
+		err := os.WriteFile(tempFile, []byte(testContent), 0o644)
 		require.NoError(t, err)
 
 		stats := &SourceStats{
@@ -302,7 +302,7 @@ Old content here
 ## Installation
 Output information here.
 `
-		err := os.WriteFile(tempFile, []byte(testContent), 0644)
+		err := os.WriteFile(tempFile, []byte(testContent), 0o644)
 		require.NoError(t, err)
 
 		stats := &SourceStats{
@@ -373,7 +373,7 @@ func TestGenerateStatsCommandRun(t *testing.T) {
 
 	content, err := os.ReadFile(testFile)
 	require.NoError(t, err)
-	err = os.WriteFile(tempFile, content, 0644)
+	err = os.WriteFile(tempFile, content, 0o644)
 	require.NoError(t, err)
 
 	originalDir, err := os.Getwd()
@@ -538,7 +538,7 @@ func TestUpdateReadmeWithBranchSizes(t *testing.T) {
 
 	content, err := os.ReadFile(testFile)
 	require.NoError(t, err)
-	err = os.WriteFile(tempFile, content, 0644)
+	err = os.WriteFile(tempFile, content, 0o644)
 	require.NoError(t, err)
 
 	// Patch getBranchSizeMBFunc to return fixed values for testing
