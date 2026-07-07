@@ -43,6 +43,9 @@ func TestResolveFilePath(t *testing.T) {
 		}
 	}()
 
+	tempDir, err = filepath.EvalSymlinks(tempDir)
+	require.NoError(t, err)
+
 	goModFile := filepath.Join(tempDir, "go.mod")
 	err = os.WriteFile(goModFile, []byte("module test"), 0644)
 	require.NoError(t, err)

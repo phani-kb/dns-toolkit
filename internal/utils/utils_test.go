@@ -1388,14 +1388,16 @@ func TestGetTestDataDir(t *testing.T) {
 	assert.Contains(t, result, "testdata")
 	assert.NotEmpty(t, result)
 
-	_, err := os.Stat(result)
-	if os.IsNotExist(err) {
-		err = os.MkdirAll(result, 0755)
-		assert.NoError(t, err)
+	if filepath.Dir(result) != "/" {
+		_, err := os.Stat(result)
+		if os.IsNotExist(err) {
+			err = os.MkdirAll(result, 0755)
+			assert.NoError(t, err)
 
-		defer func() {
-			_ = os.RemoveAll(result)
-		}()
+			defer func() {
+				_ = os.RemoveAll(result)
+			}()
+		}
 	}
 }
 
