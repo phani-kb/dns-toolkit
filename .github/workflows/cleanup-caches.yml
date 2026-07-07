@@ -29,7 +29,7 @@ jobs:
         cache_key_prefix: ['data-download-', 'codeql-dependencies-1-Linux-go']
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up GitHub CLI
         run: |
