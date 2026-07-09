@@ -1,10 +1,12 @@
 package cmd
 
 import (
+	"fmt"
 	"strings"
 	"sync"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
+	"github.com/phani-kb/dns-toolkit/internal/db"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
 )
@@ -29,15 +31,22 @@ func getProcessedFilesKey(processedFiles []c.ProcessedFile) string {
 	return strings.Join(parts, "|")
 }
 
-// GetCachedResolutionSets returns cached resolution sets
-func GetCachedResolutionSets(logger *multilog.Logger, processedFiles []c.ProcessedFile) (
+// GetCachedResolutionSets returns cached resolution sets, or builds them from the database if not cached.
+func GetCachedResolutionSets(logger *multilog.Logger, database *db.DB, processedFiles []c.ProcessedFile) (
 	map[string]u.StringSet,
 	map[string]u.StringSet,
 	[]ConflictDetail,
 	map[string]struct{},
 	map[string]struct{},
 	map[string]ConflictDetail,
+	error,
 ) {
+	if database == nil {
+		return nil, nil, nil, nil, nil, nil, fmt.Errorf(
+			"database is required for resolution",
+		)
+	}
+
 	key := getProcessedFilesKey(processedFiles)
 
 	resolutionCacheMu.Lock()
@@ -59,14 +68,19 @@ func GetCachedResolutionSets(logger *multilog.Logger, processedFiles []c.Process
 			resolutionCachedConflicts,
 			resolutionCachedManualAllow,
 			resolutionCachedManualBlock,
-			resolutionCachedDetails
+			resolutionCachedDetails,
+			nil
 	}
 
-	logger.Debugf("Cache miss - rebuilding resolution sets")
-	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap := BuildResolutionSets(
+	logger.Debugf("Cache miss - rebuilding resolution sets from database")
+
+	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap, err := BuildResolutionSetsFromDB( // nolint: lll
 		logger,
-		processedFiles,
+		database,
 	)
+	if err != nil {
+		return nil, nil, nil, nil, nil, nil, err
+	}
 
 	resolutionCacheKey = key
 	resolutionCachedAllow = allowByType
@@ -84,5 +98,5 @@ func GetCachedResolutionSets(logger *multilog.Logger, processedFiles []c.Process
 		len(resolutionCachedManualBlock),
 	)
 
-	return allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap
+	return allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap, nil
 }

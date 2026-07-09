@@ -398,7 +398,7 @@ func generateOutputBranchReadme() string {
 		_, _ = fmt.Fprintf(&sb, "| Total Sources Analyzed | %d |\n", summary.Overlap.TotalAnalyzed)
 		_, _ = fmt.Fprintf(&sb, "| **Last Update** | %s |\n", summary.Overlap.LastUpdateTime)
 		sb.WriteString("\n")
-		sb.WriteString("**[View Detailed Overlap Analysis →](overlap.md)**\n\n")
+		sb.WriteString("**[View Detailed Overlap Analysis ->](overlap.md)**\n\n")
 	}
 
 	// Top Entries Summary

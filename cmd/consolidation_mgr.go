@@ -24,8 +24,8 @@ func NewConsolidationManager(logger *multilog.Logger, database *db.DB) *Consolid
 func (cm *ConsolidationManager) GenerateConflictReport(processedFiles []c.ProcessedFile) error {
 	cm.logger.Infof("Building resolution sets for conflict report...")
 
-	// Build resolution sets for conflict analysis using DB
-	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap, err := GetCachedResolutionSets(
+	// build resolution sets for conflict analysis using DB
+	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap, err := GetCachedResolutionSets( // nolint: lll
 		cm.logger,
 		cm.database,
 		processedFiles,
