@@ -235,10 +235,10 @@ func (r *EntriesRepo) SearchConsolidatedEntries(
 type ConflictCountRow struct {
 	Entry             string
 	GenericSourceType string
-	BlockCount        int
-	AllowCount        int
 	BlockSources      string // comma-separated source names
 	AllowSources      string // comma-separated source names
+	BlockCount        int
+	AllowCount        int
 }
 
 type AllEntryCountRow struct {
@@ -329,7 +329,10 @@ func (r *EntriesRepo) GetAllEntryCounts(_ context.Context) ([]AllEntryCountRow, 
 	return results, rows.Err()
 }
 
-func (r *EntriesRepo) GetSourcesForEntry(_ context.Context, entry, genericSourceType string) (blockSources, allowSources []string, err error) {
+func (r *EntriesRepo) GetSourcesForEntry(
+	_ context.Context,
+	entry, genericSourceType string,
+) (blockSources, allowSources []string, err error) {
 	query := `
 		SELECT s.name, e.list_type
 		FROM ` + constants.TableEntries + ` e
@@ -434,8 +437,8 @@ type ConsolidationEntry struct {
 	GenericSourceType string
 	ActualSourceType  string
 	ListType          string
-	MustConsider      bool
 	SourceName        string
+	MustConsider      bool
 }
 
 // GetEntriesByCategory returns all valid entries for sources that have the given category.

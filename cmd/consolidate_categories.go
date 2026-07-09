@@ -4,7 +4,6 @@ import (
 	"context"
 	"sync"
 
-	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/dns-toolkit/internal/db"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
@@ -16,22 +15,8 @@ var consolidateCategoriesCmd = &cobra.Command{
 	Use:   "categories",
 	Short: "Generate category-based consolidated lists (ads, malware, privacy, etc)",
 	Run: func(cmd *cobra.Command, args []string) {
-		Logger.Infof("Generating category-based consolidated lists...")
+		Logger.Infof("Generating category-based consolidated lists (DB-based)...")
 		ctx := context.Background()
-
-		processedSummaries, genericSourceTypes, processedFiles, loadErr := loadProcessedInputsForConsolidation(
-			ctx,
-			Logger,
-			"categories",
-		)
-		if loadErr != nil {
-			Logger.Errorf("Failed to load processed summaries from database: %v", loadErr)
-			return
-		}
-		if len(processedSummaries) == 0 {
-			Logger.Errorf("No processed summaries found")
-			return
-		}
 
 		database, consolidatedRepo, dbErr := openConsolidatedRepo(ctx, Logger, "category")
 		if dbErr != nil {
@@ -40,21 +25,37 @@ var consolidateCategoriesCmd = &cobra.Command{
 		}
 		defer database.CloseLogError(Logger)
 
+		entriesRepo := db.NewEntriesRepo(database)
+
+		categories, catErr := entriesRepo.GetUniqueCategoriesFromDB(ctx)
+		if catErr != nil {
+			Logger.Errorf("Failed to get categories from database: %v", catErr)
+			return
+		}
+		if len(categories) == 0 {
+			Logger.Errorf("No categories found in database")
+			return
+		}
+
+		genericSourceTypes, typesErr := entriesRepo.GetGenericSourceTypesFromDB(ctx)
+		if typesErr != nil {
+			Logger.Errorf("Failed to get source types from database: %v", typesErr)
+			return
+		}
+
+		Logger.Infof("Found %d unique categories: %v", len(categories), categories)
+		Logger.Infof("Found %d generic source types: %v", len(genericSourceTypes), genericSourceTypes)
+
 		var persistMu sync.Mutex
 
-		// Get unique categories from all processed files
-		categories := getUniqueCategories(processedFiles)
-		Logger.Infof("Found %d unique categories: %v", len(categories), categories)
-
-		// Process each category and create consolidated lists
 		for _, category := range categories {
-			processCategoryConsolidation(
+			processCategoryConsolidationFromDB(
+				ctx,
 				Logger,
 				category,
-				processedFiles,
 				genericSourceTypes,
+				entriesRepo,
 				consolidatedRepo,
-				ctx,
 				&persistMu,
 			)
 		}
@@ -63,82 +64,140 @@ var consolidateCategoriesCmd = &cobra.Command{
 	},
 }
 
-// getUniqueCategories returns a slice of unique categories from all processed files
-func getUniqueCategories(processedFiles []c.ProcessedFile) []string {
-	categoriesSet := make(map[string]struct{})
-	for _, file := range processedFiles {
-		for _, category := range file.Categories {
-			if category != "" {
-				categoriesSet[category] = struct{}{}
-			}
-		}
-	}
-
-	// Convert the map to a slice
-	categories := make([]string, 0, len(categoriesSet))
-	for category := range categoriesSet {
-		categories = append(categories, category)
-	}
-
-	u.SortCaseInsensitiveStrings(categories)
-
-	return categories
-}
-
-// getFilesForCategory filters processed files by category
-func getFilesForCategory(processedFiles []c.ProcessedFile, category string) []c.ProcessedFile {
-	var categoryFiles []c.ProcessedFile
-	for _, file := range processedFiles {
-		for _, fileCategory := range file.Categories {
-			if fileCategory == category && file.Valid {
-				categoryFiles = append(categoryFiles, file)
-				break
-			}
-		}
-	}
-	return categoryFiles
-}
-
-// processCategoryConsolidation processes consolidation for a specific category
-func processCategoryConsolidation(
+// processCategoryConsolidationFromDB processes consolidation for a specific category using DB entries
+func processCategoryConsolidationFromDB(
+	ctx context.Context,
 	logger *multilog.Logger,
 	category string,
-	processedFiles []c.ProcessedFile,
 	genericSourceTypes []string,
+	entriesRepo *db.EntriesRepo,
 	consolidatedRepo *db.ConsolidatedRepo,
-	ctx context.Context,
 	persistMu *sync.Mutex,
-) map[string][]c.ConsolidatedSummary {
-	config := ProcessingConfig{
-		Identifier:         category,
-		IdentifierField:    "Category",
-		ProcessedFiles:     processedFiles,
-		GenericSourceTypes: genericSourceTypes,
-		GetFilesFunc:       getFilesForCategory,
-		ConsolidateFunc:    consolidateByCategory,
-		AllowFilterByType:  nil, // no cross-category filtering
-		ConsolidatedRepo:   consolidatedRepo,
-		DBCtx:              ctx,
-		PersistMu:          persistMu,
+) {
+	logger.Infof("Processing category: %s", category)
+
+	// process allowlists first
+	allowlistEntriesByType := make(map[string]u.StringSet)
+	for _, gst := range genericSourceTypes {
+		allowEntries, err := entriesRepo.GetEntriesByCategory(ctx, category, gst, constants.ListTypeAllowlist)
+		if err != nil {
+			logger.Errorf("Failed to get allowlist entries for category %s, type %s: %v", category, gst, err)
+			continue
+		}
+
+		if len(allowEntries) > 0 {
+			entrySet := u.NewStringSet([]string{})
+			sourceNames := make(map[string]struct{})
+			for _, e := range allowEntries {
+				entrySet.AddWithConsider(e.Entry, e.MustConsider)
+				sourceNames[e.SourceName] = struct{}{}
+			}
+			allowlistEntriesByType[gst] = entrySet
+
+			logger.Infof(
+				"%s allowlist [Category %s]: %d sources, %d entries",
+				gst,
+				category,
+				len(sourceNames),
+				entrySet.Size(),
+			)
+
+			// persist allowlist entries
+			if err := persistConsolidatedEntries(
+				ctx, logger, consolidatedRepo, persistMu,
+				entrySet, gst,
+				constants.ListTypeAllowlist, "category", "", category, true,
+			); err != nil {
+				logger.Errorf("Failed to persist allowlist entries for category %s, type %s: %v", category, gst, err)
+			}
+		} else {
+			allowlistEntriesByType[gst] = u.NewStringSet([]string{})
+		}
 	}
 
-	return processConsolidationWithTransform(logger, config)
+	// process blocklists, filtering with allowlist entries
+	for _, gst := range genericSourceTypes {
+		blockEntries, err := entriesRepo.GetEntriesByCategory(ctx, category, gst, constants.ListTypeBlocklist)
+		if err != nil {
+			logger.Errorf("Failed to get blocklist entries for category %s, type %s: %v", category, gst, err)
+			continue
+		}
+
+		if len(blockEntries) == 0 {
+			continue
+		}
+
+		// Build entry set and track sources
+		entrySet := u.NewStringSet([]string{})
+		sourceNames := make(map[string]struct{})
+		for _, e := range blockEntries {
+			entrySet.AddWithConsider(e.Entry, e.MustConsider)
+			sourceNames[e.SourceName] = struct{}{}
+		}
+
+		originalCount := entrySet.Size()
+
+		// Filter with allowlist entries
+		allowlistEntries := allowlistEntriesByType[gst]
+		filteredSet, ignoredSet := filterEntriesWithAllowlist(entrySet, allowlistEntries)
+
+		if filteredSet.Size() > 0 {
+			if ignoredSet.Size() > 0 {
+				logger.Infof(
+					"%s blocklist [Category %s]: %d sources, %d total -> %d final (%d filtered)",
+					gst,
+					category,
+					len(sourceNames),
+					originalCount,
+					filteredSet.Size(),
+					ignoredSet.Size(),
+				)
+			} else {
+				logger.Infof(
+					"%s blocklist [Category %s]: %d sources, %d total -> %d final",
+					gst,
+					category,
+					len(sourceNames),
+					originalCount,
+					filteredSet.Size(),
+				)
+			}
+
+			// Persist blocklist entries
+			if err := persistConsolidatedEntries(
+				ctx, logger, consolidatedRepo, persistMu,
+				filteredSet, gst,
+				constants.ListTypeBlocklist, "category", "", category, true,
+			); err != nil {
+				logger.Errorf("Failed to persist blocklist entries for category %s, type %s: %v", category, gst, err)
+			}
+		}
+	}
 }
 
-// consolidateByCategory consolidates files for a specific category
-func consolidateByCategory(
-	logger *multilog.Logger,
-	genericSourceType, listType, category string,
-	entriesToIgnore u.StringSet,
-	processedFiles []c.ProcessedFile,
-) (u.StringSet, c.ConsolidatedSummary) {
-	params := ConsolidationParams{
-		GenericSourceType: genericSourceType,
-		ListType:          listType,
-		Identifier:        category,
-		OutputDir:         constants.ConsolidatedCategoriesDir,
-		IdentifierField:   "Category",
+// filterEntriesWithAllowlist filters blocklist entries using allowlist entries
+func filterEntriesWithAllowlist(blockSet, allowSet u.StringSet) (u.StringSet, u.StringSet) {
+	filteredSet := u.NewStringSet([]string{})
+	ignoredSet := u.NewStringSet([]string{})
+
+	for entry := range blockSet {
+		mustConsiderBlock, _ := blockSet.Get(entry)
+		mustConsiderAllow, existsInAllow := allowSet.Get(entry)
+
+		if existsInAllow {
+			// entry is in allowlist
+			if mustConsiderBlock && !mustConsiderAllow {
+				// block entry has higher priority
+				filteredSet.AddWithConsider(entry, mustConsiderBlock)
+			} else {
+				// allow entry wins, ignore from blocklist
+				ignoredSet.Add(entry)
+			}
+		} else {
+			// entry not in allowlist, keep it
+			filteredSet.AddWithConsider(entry, mustConsiderBlock)
+		}
 	}
 
-	return consolidateGeneric(logger, params, entriesToIgnore, processedFiles)
+	return filteredSet, ignoredSet
 }
