@@ -211,3 +211,21 @@ func TestDetermineSummaryTypeFromPath(t *testing.T) {
 		})
 	}
 }
+
+func TestGetFoldersToArchive(t *testing.T) {
+	logger := multilog.NewLogger()
+	folders := map[string]string{
+		"download": "/tmp/download",
+	}
+	result := GetFoldersToArchive(logger, folders)
+	assert.Len(t, result, 1)
+}
+
+func TestGetFoldersToArchiveUnknown(t *testing.T) {
+	logger := multilog.NewLogger()
+	folders := map[string]string{
+		"unknown": "/tmp/unknown",
+	}
+	result := GetFoldersToArchive(logger, folders)
+	assert.Len(t, result, 0)
+}

@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
-	con "github.com/phani-kb/dns-toolkit/internal/consolidators"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/dns-toolkit/internal/db"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
@@ -36,21 +35,8 @@ var consolidateAllCmd = &cobra.Command{
 	Use:   "all",
 	Short: "Consolidate all processed files",
 	Run: func(cmd *cobra.Command, args []string) {
+		Logger.Infof("Consolidating all processed entries (DB-based)...")
 		ctx := context.Background()
-
-		processedSummaries, genericSourceTypes, processedFiles, loadErr := loadProcessedInputsForConsolidation(
-			ctx,
-			Logger,
-			"general",
-		)
-		if loadErr != nil {
-			Logger.Errorf("Failed to load processed summaries from database: %v", loadErr)
-			return
-		}
-		if len(processedSummaries) == 0 {
-			Logger.Errorf("No processed summaries found")
-			return
-		}
 
 		database, consolidatedRepo, dbErr := openConsolidatedRepo(ctx, Logger, "general")
 		if dbErr != nil {
@@ -59,29 +45,49 @@ var consolidateAllCmd = &cobra.Command{
 		}
 		defer database.CloseLogError(Logger)
 
+		entriesRepo := db.NewEntriesRepo(database)
+
+		// get generic source types
+		genericSourceTypes, typesErr := entriesRepo.GetGenericSourceTypesFromDB(ctx)
+		if typesErr != nil {
+			Logger.Errorf("Failed to get source types from database: %v", typesErr)
+			return
+		}
+		if len(genericSourceTypes) == 0 {
+			Logger.Errorf("No source types found in database")
+			return
+		}
+
+		Logger.Infof("Found %d generic source types: %v", len(genericSourceTypes), genericSourceTypes)
+
+		// build resolution sets for conflict resolution
+		allowByType, blockByType, _, _, _, _, resErr := GetCachedResolutionSets(Logger, database, nil)
+		if resErr != nil {
+			Logger.Warnf("Failed to build resolution sets (continuing without): %v", resErr)
+			allowByType = make(map[string]u.StringSet)
+			blockByType = make(map[string]u.StringSet)
+		}
+
 		var allConsolidatedSummaries []c.ConsolidatedSummary
 		var mu sync.Mutex
 		var persistMu sync.Mutex
 
-		allowByType, blockByType, _, _, _, _, resErr := GetCachedResolutionSets(Logger, database, processedFiles)
-		if resErr != nil {
-			Logger.Errorf("Failed to build resolution sets: %v", resErr)
-			return
-		}
-
+		// Phase 1: Process allowlists
+		Logger.Infof("Processing allowlists...")
 		allowlistEntriesByType := make(map[string]u.StringSet)
-		processAllowlists(
+		processAllowlistsFromDB(
 			ctx,
+			Logger,
+			entriesRepo,
 			consolidatedRepo,
 			genericSourceTypes,
-			processedFiles,
-			allowByType,
 			blockByType,
 			allowlistEntriesByType,
 			&allConsolidatedSummaries,
+			&persistMu,
 		)
 
-		// use resolved allow sets for filtering blocklists
+		// build allowlist filter for blocklists
 		allowFilterByType := make(map[string]u.StringSet)
 		for _, gst := range genericSourceTypes {
 			if aset, ok := allowByType[gst]; ok && aset != nil && aset.Size() > 0 {
@@ -93,14 +99,8 @@ var consolidateAllCmd = &cobra.Command{
 			}
 		}
 
-		// Second phase: Process all blocklists in parallel, now that we have all allowlist entries
+		// phase 2: Process blocklists in parallel
 		Logger.Infof("Processing blocklists...")
-		blocklistTypes := make([]string, len(genericSourceTypes))
-		copy(
-			blocklistTypes,
-			genericSourceTypes,
-		) // Make a copy to prevent loop variable capture issues
-
 		maxWorkers := runtime.GOMAXPROCS(0)
 		if AppConfig != nil && AppConfig.DNSToolkit.MaxWorkers > 0 {
 			maxWorkers = AppConfig.DNSToolkit.MaxWorkers
@@ -109,65 +109,119 @@ var consolidateAllCmd = &cobra.Command{
 		Logger.Infof("Using worker pool with %d worker(s) for consolidation", maxWorkers)
 		workerPool := c.NewDTWorkerPool(maxWorkers)
 
-		for i := range blocklistTypes {
-			genericSourceType := blocklistTypes[i] // Local variable for this iteration
+		for i := range genericSourceTypes {
+			gst := genericSourceTypes[i]
 			workerPool.Submit(func() {
-				gst := genericSourceType
 				Logger.Debugf("Processing blocklist for generic source type: %s", gst)
 
 				allowlistEntries := allowFilterByType[gst]
 				Logger.Debugf("Filtering %s blocklist with %d resolved allowlist entries", gst, allowlistEntries.Size())
 
-				blockEntries, blocklistSummary := consolidateFilesBasedOnSTLT(
-					Logger,
+				// get blocklist entries from DB
+				blockEntries, err := entriesRepo.GetEntriesForGeneralConsolidation(
+					ctx,
 					gst,
 					constants.ListTypeBlocklist,
-					true,
-					allowlistEntries,
-					processedFiles,
 				)
-				mu.Lock()
-				appendSummary(
-					&allConsolidatedSummaries,
-					blocklistSummary,
-					IsConsolidatedSummaryValid,
-				)
-				mu.Unlock()
+				if err != nil {
+					Logger.Errorf("Failed to get blocklist entries for %s: %v", gst, err)
+					return
+				}
 
-				if blockEntries.Size() > 0 {
+				if len(blockEntries) == 0 {
+					return
+				}
+
+				// build entry set and source count
+				entrySet := u.NewStringSet([]string{})
+				sourceNames := make(map[string]struct{})
+				for _, e := range blockEntries {
+					entrySet.AddWithConsider(e.Entry, e.MustConsider)
+					sourceNames[e.SourceName] = struct{}{}
+				}
+
+				originalCount := entrySet.Size()
+
+				// filter with allowlist entries
+				filteredSet, ignoredSet := filterEntriesWithAllowlist(entrySet, allowlistEntries)
+
+				if filteredSet.Size() > 0 {
+					if ignoredSet.Size() > 0 {
+						Logger.Infof(
+							"%s blocklist: %d sources, %d total → %d final (%d filtered)",
+							gst, len(sourceNames), originalCount, filteredSet.Size(), ignoredSet.Size(),
+						)
+					} else {
+						Logger.Infof(
+							"%s blocklist: %d sources, %d total → %d final",
+							gst, len(sourceNames), originalCount, filteredSet.Size(),
+						)
+					}
+
+					summary := c.ConsolidatedSummary{
+						Type:                      gst,
+						FilesCount:                len(sourceNames),
+						Valid:                     true,
+						Count:                     filteredSet.Size(),
+						OriginalCount:             originalCount,
+						IgnoredEntriesCount:       ignoredSet.Size(),
+						ListType:                  constants.ListTypeBlocklist,
+						LastConsolidatedTimestamp: u.GetTimestamp(),
+					}
+
+					mu.Lock()
+					appendSummary(&allConsolidatedSummaries, summary, IsConsolidatedSummaryValid)
+					mu.Unlock()
+
 					if err := persistConsolidatedEntries(
 						ctx, Logger, consolidatedRepo, &persistMu,
-						blockEntries, gst,
+						filteredSet, gst,
 						constants.ListTypeBlocklist, "general", "", "", true,
 					); err != nil {
 						Logger.Errorf("Failed to persist blocklist entries for %s: %v", gst, err)
 					}
 				}
 
+				// handle invalid entries if requested
 				if includeInvalid {
-					invalidEntries, invalidBlocklistSummary := consolidateFilesBasedOnSTLT(
-						Logger,
+					invalidEntries, invErr := entriesRepo.GetInvalidEntriesForGeneralConsolidation(
+						ctx,
 						gst,
 						constants.ListTypeBlocklist,
-						false,
-						allowlistEntries,
-						processedFiles,
 					)
-					mu.Lock()
-					appendSummary(
-						&allConsolidatedSummaries,
-						invalidBlocklistSummary,
-						IsConsolidatedSummaryValid,
-					)
-					mu.Unlock()
+					if invErr != nil {
+						Logger.Errorf("Failed to get invalid blocklist entries for %s: %v", gst, invErr)
+						return
+					}
 
-					if invalidEntries.Size() > 0 {
-						if err := persistConsolidatedEntries(
-							ctx, Logger, consolidatedRepo, &persistMu,
-							invalidEntries, gst,
-							constants.ListTypeBlocklist, "general", "", "", false,
-						); err != nil {
-							Logger.Errorf("Failed to persist invalid blocklist entries for %s: %v", gst, err)
+					if len(invalidEntries) > 0 {
+						invalidSet := u.NewStringSet([]string{})
+						for _, e := range invalidEntries {
+							invalidSet.AddWithConsider(e.Entry, e.MustConsider)
+						}
+
+						invalidFiltered, _ := filterEntriesWithAllowlist(invalidSet, allowlistEntries)
+						if invalidFiltered.Size() > 0 {
+							invalidSummary := c.ConsolidatedSummary{
+								Type:                      gst,
+								Valid:                     false,
+								Count:                     invalidFiltered.Size(),
+								OriginalCount:             invalidSet.Size(),
+								ListType:                  constants.ListTypeBlocklist,
+								LastConsolidatedTimestamp: u.GetTimestamp(),
+							}
+
+							mu.Lock()
+							appendSummary(&allConsolidatedSummaries, invalidSummary, IsConsolidatedSummaryValid)
+							mu.Unlock()
+
+							if err := persistConsolidatedEntries(
+								ctx, Logger, consolidatedRepo, &persistMu,
+								invalidFiltered, gst,
+								constants.ListTypeBlocklist, "general", "", "", false,
+							); err != nil {
+								Logger.Errorf("Failed to persist invalid blocklist entries for %s: %v", gst, err)
+							}
 						}
 					}
 				}
@@ -179,7 +233,7 @@ var consolidateAllCmd = &cobra.Command{
 
 		if generateConflictsReport {
 			manager := NewConsolidationManager(Logger, database)
-			if err := manager.GenerateConflictReport(processedFiles); err != nil {
+			if err := manager.GenerateConflictReport(nil); err != nil {
 				Logger.Errorf("Failed to generate conflicts report: %v", err)
 			}
 		}
@@ -188,211 +242,147 @@ var consolidateAllCmd = &cobra.Command{
 	},
 }
 
-func processAllowlists(
+// processAllowlistsFromDB processes allowlists directly from DB entries
+func processAllowlistsFromDB(
 	ctx context.Context,
+	logger *multilog.Logger,
+	entriesRepo *db.EntriesRepo,
 	consolidatedRepo *db.ConsolidatedRepo,
 	genericSourceTypes []string,
-	processedFiles []c.ProcessedFile,
-	_ map[string]u.StringSet,
 	resolvedBlockByType map[string]u.StringSet,
 	allowlistEntriesByType map[string]u.StringSet,
 	allConsolidatedSummaries *[]c.ConsolidatedSummary,
+	persistMu *sync.Mutex,
 ) {
-	Logger.Infof("Processing allowlists...")
-	for _, genericSourceType := range genericSourceTypes {
-		// consolidate all allowlist source files (no filtering)
-		entries, allowlistSummary := consolidateFilesBasedOnSTLT(
-			Logger,
-			genericSourceType,
-			constants.ListTypeAllowlist,
-			true,
-			u.NewStringSet([]string{}), // no filtering during initial consolidation
-			processedFiles,
-		)
+	for _, gst := range genericSourceTypes {
+		// get all allowlist entries
+		allowEntries, err := entriesRepo.GetEntriesForGeneralConsolidation(ctx, gst, constants.ListTypeAllowlist)
+		if err != nil {
+			logger.Errorf("Failed to get allowlist entries for %s: %v", gst, err)
+			allowlistEntriesByType[gst] = u.NewStringSet([]string{})
+			continue
+		}
 
+		if len(allowEntries) == 0 {
+			allowlistEntriesByType[gst] = u.NewStringSet([]string{})
+			continue
+		}
+
+		// build entry set, tracking must_consider and source names
+		entrySet := u.NewStringSet([]string{})
+		mustConsiderSet := u.NewStringSet([]string{})
+		sourceNames := make(map[string]struct{})
+		for _, e := range allowEntries {
+			entrySet.AddWithConsider(e.Entry, e.MustConsider)
+			if e.MustConsider {
+				mustConsiderSet.AddWithConsider(e.Entry, true)
+			}
+			sourceNames[e.SourceName] = struct{}{}
+		}
+
+		// get resolved blocklist for filtering
 		var resolvedBlocklist u.StringSet
-		if bset, ok := resolvedBlockByType[genericSourceType]; ok && bset != nil {
+		if bset, ok := resolvedBlockByType[gst]; ok && bset != nil {
 			resolvedBlocklist = bset
-			Logger.Infof("Resolved blocklist for %s: %d entries", genericSourceType, bset.Size())
+			logger.Infof("Resolved blocklist for %s: %d entries", gst, bset.Size())
 		} else {
 			resolvedBlocklist = u.NewStringSet([]string{})
 		}
 
-		mustConsiderSet := u.NewStringSet([]string{})
-		for _, pf := range processedFiles {
-			if pf.GenericSourceType == genericSourceType &&
-				pf.ListType == constants.ListTypeAllowlist &&
-				pf.MustConsider {
-				fileEntries, _, err := u.ReadEntriesFromFile(Logger, pf.Filepath)
-				if err != nil {
-					Logger.Warnf(
-						"Unable to read must-consider source file %s: %v",
-						pf.Filepath,
-						err,
-					)
-					continue
-				}
-				mustConsiderSet.AddAll(fileEntries, true)
-			}
-		}
-
+		// filter: remove entries that are in resolved blocklist (unless must_consider)
 		finalAllowlist := u.NewStringSet([]string{})
 		removedByResolution := 0
 
-		for entry := range entries {
-			mustConsider, _ := entries.Get(entry)
+		for entry := range entrySet {
+			mustConsider, _ := entrySet.Get(entry)
 			inResolvedBlock := resolvedBlocklist.Contains(entry)
 			isMustConsider := mustConsiderSet.Contains(entry)
 
 			if isMustConsider {
-				// always include must-consider entries
 				finalAllowlist.AddWithConsider(entry, true)
 			} else if !inResolvedBlock {
-				// include if not in resolved blocklist
 				finalAllowlist.AddWithConsider(entry, mustConsider)
 			} else {
-				// resolved as a blocklist entry, exclude it
 				removedByResolution++
 			}
 		}
 
-		// add must-consider entries
+		// ensure must-consider entries are included
 		for entry := range mustConsiderSet {
 			if !finalAllowlist.Contains(entry) {
 				finalAllowlist.AddWithConsider(entry, true)
 			}
 		}
 
-		Logger.Infof(
+		logger.Infof(
 			"Final allowlist for %s: consolidated=%d removed_by_resolution=%d must_consider=%d final=%d",
-			genericSourceType,
-			entries.Size(),
-			removedByResolution,
-			mustConsiderSet.Size(),
-			finalAllowlist.Size(),
+			gst, entrySet.Size(), removedByResolution, mustConsiderSet.Size(), finalAllowlist.Size(),
 		)
 
-		// update summary with final counts
-		allowlistSummary.Count = finalAllowlist.Size()
-		allowlistSummary.IgnoredEntriesCount = removedByResolution
-
-		// persist allowlist entries to database
-		if finalAllowlist.Size() > 0 {
-			if err := persistConsolidatedEntries(
-				ctx, Logger, consolidatedRepo, nil,
-				finalAllowlist, genericSourceType,
-				constants.ListTypeAllowlist, "general", "", "", true,
-			); err != nil {
-				Logger.Errorf("Failed to persist allowlist entries for %s: %v", genericSourceType, err)
-			}
-		} else {
-			Logger.Debugf("Skipping persist for empty allowlist: %s", genericSourceType)
+		allowlistSummary := c.ConsolidatedSummary{
+			Type:                      gst,
+			FilesCount:                len(sourceNames),
+			Valid:                     true,
+			Count:                     finalAllowlist.Size(),
+			OriginalCount:             entrySet.Size(),
+			IgnoredEntriesCount:       removedByResolution,
+			ListType:                  constants.ListTypeAllowlist,
+			LastConsolidatedTimestamp: u.GetTimestamp(),
 		}
 
-		allowlistEntriesByType[genericSourceType] = finalAllowlist
+		// persist allowlist entries
+		if finalAllowlist.Size() > 0 {
+			if err := persistConsolidatedEntries(
+				ctx, logger, consolidatedRepo, persistMu,
+				finalAllowlist, gst,
+				constants.ListTypeAllowlist, "general", "", "", true,
+			); err != nil {
+				logger.Errorf("Failed to persist allowlist entries for %s: %v", gst, err)
+			}
+		}
+
+		allowlistEntriesByType[gst] = finalAllowlist
 		appendSummary(allConsolidatedSummaries, allowlistSummary, IsConsolidatedSummaryValid)
 
+		// handle invalid allowlist entries
 		if includeInvalid {
-			invalidEntries, invalidAllowlistSummary := consolidateFilesBasedOnSTLT(
-				Logger,
-				genericSourceType,
+			invalidEntries, invErr := entriesRepo.GetInvalidEntriesForGeneralConsolidation(
+				ctx,
+				gst,
 				constants.ListTypeAllowlist,
-				false,
-				u.NewStringSet([]string{}),
-				processedFiles,
 			)
-			appendSummary(
-				allConsolidatedSummaries,
-				invalidAllowlistSummary,
-				IsConsolidatedSummaryValid,
-			)
-			if invalidEntries.Size() > 0 {
+			if invErr != nil {
+				logger.Errorf("Failed to get invalid allowlist entries for %s: %v", gst, invErr)
+				continue
+			}
+
+			if len(invalidEntries) > 0 {
+				invalidSet := u.NewStringSet([]string{})
+				for _, e := range invalidEntries {
+					invalidSet.AddWithConsider(e.Entry, e.MustConsider)
+				}
+
+				invalidSummary := c.ConsolidatedSummary{
+					Type:                      gst,
+					Valid:                     false,
+					Count:                     invalidSet.Size(),
+					OriginalCount:             invalidSet.Size(),
+					ListType:                  constants.ListTypeAllowlist,
+					LastConsolidatedTimestamp: u.GetTimestamp(),
+				}
+				appendSummary(allConsolidatedSummaries, invalidSummary, IsConsolidatedSummaryValid)
+
 				if err := persistConsolidatedEntries(
-					ctx, Logger, consolidatedRepo, nil,
-					invalidEntries, genericSourceType,
+					ctx, logger, consolidatedRepo, persistMu,
+					invalidSet, gst,
 					constants.ListTypeAllowlist, "general", "", "", false,
 				); err != nil {
-					Logger.Errorf("Failed to persist invalid allowlist entries for %s: %v", genericSourceType, err)
+					logger.Errorf("Failed to persist invalid allowlist entries for %s: %v", gst, err)
 				}
 			}
 		}
 	}
-	Logger.Debugf("Finished processing allowlists")
-}
-
-// calculateOriginalCount sums the Count from all file infos
-func calculateOriginalCount(fileInfos []c.FileInfo) int {
-	total := 0
-	for _, fi := range fileInfos {
-		total += fi.Count
-	}
-	return total
-}
-
-func consolidateFilesBasedOnSTLT(
-	logger *multilog.Logger,
-	genericSourceType, listType string,
-	valid bool,
-	entriesToIgnore u.StringSet,
-	allProcessedFiles []c.ProcessedFile,
-) (u.StringSet, c.ConsolidatedSummary) {
-	logger.Debugf("Starting consolidation for %s %s", listType, genericSourceType)
-
-	processedFiles := make([]c.ProcessedFile, 0)
-	for _, processedFile := range allProcessedFiles {
-		if valid == processedFile.Valid {
-			processedFiles = append(processedFiles, processedFile)
-		}
-	}
-	logger.Debugf("Processed files count: %d", len(processedFiles))
-	consolidator, exists := con.Consolidators.GetConsolidator(genericSourceType, listType)
-	if !exists {
-		Logger.Warnf(
-			"No consolidator found for generic source type: %s, list type: %s",
-			genericSourceType,
-			listType,
-		)
-		return u.NewStringSet([]string{}), c.ConsolidatedSummary{}
-	}
-	consolidatedEntries, fileInfos := consolidator.Consolidate(Logger, processedFiles)
-	consolidatedFileStrings := getFileStrings(fileInfos)
-	if len(consolidatedEntries) > 0 {
-		logger.Infof(
-			"Consolidated %s %s %d entry(s)",
-			listType,
-			genericSourceType,
-			len(consolidatedEntries),
-		)
-	}
-	allEntries, ignoredEntries := consolidator.FilterEntries(
-		logger,
-		consolidatedEntries,
-		entriesToIgnore,
-	)
-
-	consolidatedSummary := c.ConsolidatedSummary{
-		Type:                      genericSourceType,
-		FilesCount:                len(fileInfos),
-		Files:                     consolidatedFileStrings,
-		Valid:                     valid,
-		Count:                     len(allEntries),
-		OriginalCount:             calculateOriginalCount(fileInfos),
-		IgnoredEntriesCount:       len(ignoredEntries),
-		ListType:                  listType,
-		LastConsolidatedTimestamp: u.GetTimestamp(),
-	}
-
-	if len(ignoredEntries) > 0 {
-		logger.Infof("Ignored %s %s %d entry(s)", listType, genericSourceType, len(ignoredEntries))
-	}
-
-	if len(allEntries) <= 0 {
-		logger.Infof("No entry(s) to consolidate for %s %s", listType, genericSourceType)
-		return u.NewStringSet([]string{}), c.ConsolidatedSummary{}
-	}
-
-	logger.Debugf("Finished consolidation for %s %s", listType, genericSourceType)
-	return allEntries, consolidatedSummary
+	logger.Debugf("Finished processing allowlists")
 }
 
 func IsConsolidatedSummaryValid(summary c.ConsolidatedSummary) bool {
