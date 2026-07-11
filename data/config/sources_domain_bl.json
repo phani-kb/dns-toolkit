@@ -588,6 +588,21 @@
       "website": "https://github.com/DandelionSprout/adfilt"
     },
     {
+      "name": "DoH_VPN_Proxy_Bypass",
+      "categories": "proxy",
+      "frequency": "weekly",
+      "notes": "No easy way to distinguish between DoH and VPN proxy bypass domains",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "adguard"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/doh-vpn-proxy-bypass.txt",
+      "website": "https://github.com/hagezi/dns-blocklists"
+    },
+    {
       "name": "Easy Privacy",
       "categories": "privacy, trackers",
       "license": "CC BY-SA 3.0",
