@@ -602,6 +602,56 @@ func (r *EntriesRepo) GetEntriesForGeneralConsolidation(
 	return results, rows.Err()
 }
 
+// GetInvalidEntriesForGeneralConsolidation returns all invalid entries for general consolidation.
+func (r *EntriesRepo) GetInvalidEntriesForGeneralConsolidation(
+	_ context.Context,
+	genericSourceType string,
+	listType string,
+) ([]ConsolidationEntry, error) {
+	query := `
+		SELECT DISTINCT
+			e.entry,
+			e.generic_source_type,
+			e.actual_source_type,
+			e.list_type,
+			e.must_consider,
+			s.name
+		FROM ` + constants.TableEntries + ` e
+		JOIN ` + constants.TableSources + ` s ON s.id = e.source_id
+		WHERE e.generic_source_type = ?
+			AND e.list_type = ?
+			AND e.valid = 0
+			AND s.disabled = 0
+			AND s.skip_general_consolidation = 0
+		ORDER BY e.entry
+	`
+
+	rows, err := r.db.conn.Query(query, genericSourceType, listType)
+	if err != nil {
+		return nil, fmt.Errorf("querying invalid entries for general consolidation: %w", err)
+	}
+	defer rows.Close() // nolint: errcheck
+
+	var results []ConsolidationEntry
+	for rows.Next() {
+		var entry ConsolidationEntry
+		var mustConsiderInt int
+		if err := rows.Scan(
+			&entry.Entry,
+			&entry.GenericSourceType,
+			&entry.ActualSourceType,
+			&entry.ListType,
+			&mustConsiderInt,
+			&entry.SourceName,
+		); err != nil {
+			return nil, fmt.Errorf("scanning invalid entry row: %w", err)
+		}
+		entry.MustConsider = mustConsiderInt == 1
+		results = append(results, entry)
+	}
+	return results, rows.Err()
+}
+
 // GetUniqueCategoriesFromDB returns unique categories from entry_categories table
 // for enabled sources not skipping categories consolidation.
 func (r *EntriesRepo) GetUniqueCategoriesFromDB(_ context.Context) ([]string, error) {
