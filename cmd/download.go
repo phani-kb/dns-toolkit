@@ -28,12 +28,7 @@ var downloadCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()
 
-		dbPath := getDBPath()
-		database, err := db.Open(ctx, Logger, dbPath, false)
-		if err != nil {
-			Logger.Errorf("Failed to open database(%v): %v", dbPath, err)
-			os.Exit(1)
-		}
+		database := openDB(ctx)
 		defer database.CloseLogError(Logger)
 
 		forceFlag, getBoolErr := cmd.Flags().GetBool("force")
