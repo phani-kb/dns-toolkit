@@ -59,9 +59,9 @@ const (
 	ReasonEqualCounts       = "equal_counts"
 )
 
-// BuildResolutionSetsFromDB performs count-based resolution using DB queries.
+// BuildResolutionSets performs count-based resolution using DB queries.
 // It only loads conflicting entries.
-func BuildResolutionSetsFromDB(
+func BuildResolutionSets(
 	logger *multilog.Logger,
 	database *db.DB,
 ) (
@@ -174,7 +174,7 @@ func BuildResolutionSetsFromDB(
 	)
 
 	// apply manual overrides
-	applyManualOverridesFromDB(logger, result)
+	applyManualOverrides(logger, result)
 
 	// filter out manually overridden entries from conflicts
 	result.Conflicts = filterConflictsAfterOverrides(result)
@@ -206,8 +206,8 @@ func filterConflictsAfterOverrides(result *ResolutionResult) []ConflictDetail {
 	return filteredConflicts
 }
 
-// applyManualOverridesFromDB applies manual overrides.
-func applyManualOverridesFromDB(logger *multilog.Logger, result *ResolutionResult) {
+// applyManualOverrides applies manual overrides.
+func applyManualOverrides(logger *multilog.Logger, result *ResolutionResult) {
 	manualAllowToBlockByType, manualBlockToAllowByType := readCustomOverrides(logger)
 
 	result.ManualOverride.AllowToBlock = make(map[string]struct{})

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/db"
 	"github.com/phani-kb/multilog"
 )
@@ -21,14 +20,13 @@ func NewConsolidationManager(logger *multilog.Logger, database *db.DB) *Consolid
 }
 
 // GenerateConflictReport generates conflict report for general consolidation
-func (cm *ConsolidationManager) GenerateConflictReport(processedFiles []c.ProcessedFile) error {
+func (cm *ConsolidationManager) GenerateConflictReport() error {
 	cm.logger.Infof("Building resolution sets for conflict report...")
 
 	// build resolution sets for conflict analysis using DB
-	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap, err := GetCachedResolutionSets( // nolint: lll
+	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap, err := GetResolutionSets(
 		cm.logger,
 		cm.database,
-		processedFiles,
 	)
 	if err != nil {
 		return err

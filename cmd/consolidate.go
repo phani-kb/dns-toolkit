@@ -61,7 +61,7 @@ var consolidateAllCmd = &cobra.Command{
 		Logger.Infof("Found %d generic source types: %v", len(genericSourceTypes), genericSourceTypes)
 
 		// build resolution sets for conflict resolution
-		allowByType, blockByType, _, _, _, _, resErr := GetCachedResolutionSets(Logger, database, nil)
+		allowByType, blockByType, _, _, _, _, resErr := GetResolutionSets(Logger, database)
 		if resErr != nil {
 			Logger.Warnf("Failed to build resolution sets (continuing without): %v", resErr)
 			allowByType = make(map[string]u.StringSet)
@@ -233,7 +233,7 @@ var consolidateAllCmd = &cobra.Command{
 
 		if generateConflictsReport {
 			manager := NewConsolidationManager(Logger, database)
-			if err := manager.GenerateConflictReport(nil); err != nil {
+			if err := manager.GenerateConflictReport(); err != nil {
 				Logger.Errorf("Failed to generate conflicts report: %v", err)
 			}
 		}

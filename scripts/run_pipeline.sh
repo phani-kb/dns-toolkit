@@ -120,7 +120,7 @@ for step in "${steps[@]}"; do
             ;;
         o)
             echo "Step 8: Finding overlaps..."
-            ./bin/dns-toolkit overlap #--cpu-profile --mem-profile
+            ./bin/dns-toolkit overlap
             ;;
         op)
             echo "Step 9: Generating output files..."
