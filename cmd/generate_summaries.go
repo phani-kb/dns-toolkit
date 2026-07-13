@@ -14,7 +14,7 @@ import (
 
 var generateSummariesCmd = &cobra.Command{
 	Use:   "summaries",
-	Short: "Generate all summary files from database for publishing",
+	Short: "Generate all summary files for publishing",
 	Long: "Generates download_summary.json and processed_summary.json from the " +
 		"database and saves them to the output summaries directory for publishing " +
 		"to summaries branch.",
@@ -26,12 +26,7 @@ var generateSummariesCmd = &cobra.Command{
 			os.Exit(1)
 		}
 
-		dbPath := getDBPath()
-		database, err := db.Open(ctx, Logger, dbPath, false)
-		if err != nil {
-			Logger.Errorf("Failed to open database: %v", err)
-			os.Exit(1)
-		}
+		database := openDB(ctx)
 		defer database.CloseLogError(Logger)
 
 		summaryCount := 0
@@ -39,7 +34,7 @@ var generateSummariesCmd = &cobra.Command{
 		downloadsRepo := db.NewDownloadsRepo(database)
 		downloadSummaries, downloadErr := downloadsRepo.ListDownloadSummaries(constants.DownloadDir)
 		if downloadErr != nil {
-			Logger.Errorf("Failed to load download summaries from database: %v", downloadErr)
+			Logger.Errorf("Failed to load download summaries: %v", downloadErr)
 		} else {
 			downloadSummaryFile := filepath.Join(constants.OutputSummariesDir,
 				constants.DefaultSummaryFiles["download"])
@@ -56,7 +51,7 @@ var generateSummariesCmd = &cobra.Command{
 		processedRepo := db.NewProcessedRepo(database)
 		processedSummaries, processedErr := processedRepo.ListProcessedSummaries(constants.ProcessedDir)
 		if processedErr != nil {
-			Logger.Errorf("Failed to load processed summaries from database: %v", processedErr)
+			Logger.Errorf("Failed to load processed summaries: %v", processedErr)
 		} else {
 			processedSummaryFile := filepath.Join(constants.OutputSummariesDir,
 				constants.DefaultSummaryFiles["processed"])
