@@ -6,7 +6,6 @@ import (
 	"sync"
 	"testing"
 
-	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	idb "github.com/phani-kb/dns-toolkit/internal/db"
@@ -140,15 +139,8 @@ func TestGenerateConflictReport(t *testing.T) {
 	require.NoError(t, err)
 	defer database.Close() // nolint: errcheck
 
-	resolutionCacheMu.Lock()
-	resolutionCacheKey = ""
-	resolutionCachedAllow = nil
-	resolutionCacheMu.Unlock()
-
 	manager := NewConsolidationManager(logger, database)
 
-	// empty processed files
-	processedFiles := []c.ProcessedFile{}
-	err = manager.GenerateConflictReport(processedFiles)
+	err = manager.GenerateConflictReport()
 	assert.NoError(t, err)
 }
