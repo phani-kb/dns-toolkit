@@ -4,24 +4,13 @@ import (
 	"fmt"
 
 	"github.com/phani-kb/dns-toolkit/internal/db"
-	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
 )
 
-// GetResolutionSets builds resolution sets from the database.
-func GetResolutionSets(logger *multilog.Logger, database *db.DB) (
-	map[string]u.StringSet,
-	map[string]u.StringSet,
-	[]ConflictDetail,
-	map[string]struct{},
-	map[string]struct{},
-	map[string]ConflictDetail,
-	error,
-) {
+// GetResolutionSets builds resolution sets and returns a ResolutionResult.
+func GetResolutionSets(logger *multilog.Logger, database *db.DB) (*ResolutionResult, error) {
 	if database == nil {
-		return nil, nil, nil, nil, nil, nil, fmt.Errorf(
-			"database is required for resolution",
-		)
+		return nil, fmt.Errorf("database is required for resolution")
 	}
 
 	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap, err := BuildResolutionSets(
@@ -29,8 +18,17 @@ func GetResolutionSets(logger *multilog.Logger, database *db.DB) (
 		database,
 	)
 	if err != nil {
-		return nil, nil, nil, nil, nil, nil, err
+		return nil, err
 	}
 
-	return allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap, nil
+	result := &ResolutionResult{
+		AllowByType: allowByType,
+		BlockByType: blockByType,
+		Conflicts:   conflicts,
+		DetailsMap:  detailsMap,
+	}
+	result.ManualOverride.AllowToBlock = manualAllowToBlock
+	result.ManualOverride.BlockToAllow = manualBlockToAllow
+
+	return result, nil
 }

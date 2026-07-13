@@ -35,7 +35,7 @@ var consolidateAllCmd = &cobra.Command{
 	Use:   "all",
 	Short: "Consolidate all processed files",
 	Run: func(cmd *cobra.Command, args []string) {
-		Logger.Infof("Consolidating all processed entries (DB-based)...")
+		Logger.Infof("Consolidating all processed entries...")
 		ctx := context.Background()
 
 		database, consolidatedRepo, dbErr := openConsolidatedRepo(ctx, Logger, "general")
@@ -48,9 +48,9 @@ var consolidateAllCmd = &cobra.Command{
 		entriesRepo := db.NewEntriesRepo(database)
 
 		// get generic source types
-		genericSourceTypes, typesErr := entriesRepo.GetGenericSourceTypesFromDB(ctx)
+		genericSourceTypes, typesErr := entriesRepo.GetGenericSourceTypes(ctx)
 		if typesErr != nil {
-			Logger.Errorf("Failed to get source types from database: %v", typesErr)
+			Logger.Errorf("Failed to get source types: %v", typesErr)
 			return
 		}
 		if len(genericSourceTypes) == 0 {
@@ -61,11 +61,15 @@ var consolidateAllCmd = &cobra.Command{
 		Logger.Infof("Found %d generic source types: %v", len(genericSourceTypes), genericSourceTypes)
 
 		// build resolution sets for conflict resolution
-		allowByType, blockByType, _, _, _, _, resErr := GetResolutionSets(Logger, database)
+		resResult, resErr := GetResolutionSets(Logger, database)
+		var allowByType, blockByType map[string]u.StringSet
 		if resErr != nil {
 			Logger.Warnf("Failed to build resolution sets (continuing without): %v", resErr)
 			allowByType = make(map[string]u.StringSet)
 			blockByType = make(map[string]u.StringSet)
+		} else {
+			allowByType = resResult.AllowByType
+			blockByType = resResult.BlockByType
 		}
 
 		var allConsolidatedSummaries []c.ConsolidatedSummary
@@ -75,7 +79,7 @@ var consolidateAllCmd = &cobra.Command{
 		// Phase 1: Process allowlists
 		Logger.Infof("Processing allowlists...")
 		allowlistEntriesByType := make(map[string]u.StringSet)
-		processAllowlistsFromDB(
+		processAllowlists(
 			ctx,
 			Logger,
 			entriesRepo,
@@ -233,7 +237,7 @@ var consolidateAllCmd = &cobra.Command{
 
 		if generateConflictsReport {
 			manager := NewConsolidationManager(Logger, database)
-			if err := manager.GenerateConflictReport(); err != nil {
+			if err := manager.GenerateConflictReportFromResult(resResult); err != nil {
 				Logger.Errorf("Failed to generate conflicts report: %v", err)
 			}
 		}
@@ -242,8 +246,8 @@ var consolidateAllCmd = &cobra.Command{
 	},
 }
 
-// processAllowlistsFromDB processes allowlists directly from DB entries
-func processAllowlistsFromDB(
+// processAllowlists processes allowlists directly from DB entries
+func processAllowlists(
 	ctx context.Context,
 	logger *multilog.Logger,
 	entriesRepo *db.EntriesRepo,

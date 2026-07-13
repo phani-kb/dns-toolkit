@@ -109,7 +109,7 @@ func TestConsolidateCategoriesCommand(t *testing.T) {
 	assert.NotNil(t, consolidateCategoriesCmd.Run)
 }
 
-func TestProcessCategoryConsolidationFromDB_EmptyDatabase(t *testing.T) {
+func TestProcessCategoryConsolidation_EmptyDatabase(t *testing.T) {
 	logger := multilog.NewLogger()
 	con.InitForTesting()
 
@@ -123,7 +123,7 @@ func TestProcessCategoryConsolidationFromDB_EmptyDatabase(t *testing.T) {
 	consolidatedRepo := idb.NewConsolidatedRepo(database)
 	var persistMu sync.Mutex
 
-	processCategoryConsolidationFromDB(
+	processCategoryConsolidation(
 		ctx,
 		logger,
 		"ads",

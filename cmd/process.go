@@ -9,7 +9,6 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
-	"sync"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	cfg "github.com/phani-kb/dns-toolkit/internal/config"
@@ -64,7 +63,6 @@ func processAllSources(ctx context.Context, logger *multilog.Logger, processedDi
 
 	sourcesRepo := idb.NewSourcesRepo(database)
 	entriesRepo := idb.NewEntriesRepo(database)
-	var persistMu sync.Mutex
 
 	// Create a worker pool for controlled concurrency
 	maxWorkers := AppConfig.DNSToolkit.MaxWorkers
@@ -110,7 +108,6 @@ func processAllSources(ctx context.Context, logger *multilog.Logger, processedDi
 				processedDir,
 				sourceIDLocal,
 				entriesRepo,
-				&persistMu,
 			)
 		})
 	}
@@ -125,7 +122,6 @@ func processSourceFileAndPersist(
 	processedDir string,
 	sourceID int64,
 	entriesRepo *idb.EntriesRepo,
-	persistMu *sync.Mutex,
 ) []c.ProcessedSummary {
 	processedSummaries := make([]c.ProcessedSummary, 0)
 	content, err := os.ReadFile(summary.Filepath)
@@ -254,10 +250,6 @@ func processSourceFileAndPersist(
 	}
 
 	if entriesRepo != nil && sourceID > 0 {
-		if persistMu != nil {
-			persistMu.Lock()
-			defer persistMu.Unlock()
-		}
 		if err := entriesRepo.ReplaceSourceData(ctx, sourceID, entryRows, groupRows, categoryRows); err != nil {
 			logger.Errorf("Persisting processed entries failed for %s: %v", summary.Name, err)
 		}

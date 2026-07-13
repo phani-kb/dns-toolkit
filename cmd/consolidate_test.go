@@ -120,7 +120,7 @@ func TestGenerateFileName(t *testing.T) {
 	}
 }
 
-func TestProcessAllowlistsFromDB_EmptyDatabase(t *testing.T) {
+func TestProcessAllowlists_EmptyDatabase(t *testing.T) {
 	ctx := context.Background()
 	logger := multilog.NewLogger()
 	dbPath := filepath.Join(t.TempDir(), "test_consolidate.db")
@@ -137,7 +137,7 @@ func TestProcessAllowlistsFromDB_EmptyDatabase(t *testing.T) {
 	resolvedBlockByType := make(map[string]u.StringSet)
 	var persistMu sync.Mutex
 
-	processAllowlistsFromDB(
+	processAllowlists(
 		ctx,
 		logger,
 		entriesRepo,
@@ -153,7 +153,7 @@ func TestProcessAllowlistsFromDB_EmptyDatabase(t *testing.T) {
 	assert.Equal(t, 0, allowlistEntriesByType["domain"].Size())
 }
 
-func TestProcessAllowlistsFromDB_WithEntries(t *testing.T) {
+func TestProcessAllowlists_WithEntries(t *testing.T) {
 	ctx := context.Background()
 	logger := multilog.NewLogger()
 	dbPath := filepath.Join(t.TempDir(), "test_consolidate.db")
@@ -184,7 +184,7 @@ func TestProcessAllowlistsFromDB_WithEntries(t *testing.T) {
 	}
 	var persistMu sync.Mutex
 
-	processAllowlistsFromDB(
+	processAllowlists(
 		ctx,
 		logger,
 		entriesRepo,
@@ -203,7 +203,7 @@ func TestProcessAllowlistsFromDB_WithEntries(t *testing.T) {
 	assert.False(t, domainEntries.Contains("allow1.com"))
 }
 
-func TestProcessAllowlistsFromDB_MustConsiderOverridesResolution(t *testing.T) {
+func TestProcessAllowlists_MustConsiderOverridesResolution(t *testing.T) {
 	ctx := context.Background()
 	logger := multilog.NewLogger()
 	dbPath := filepath.Join(t.TempDir(), "test_consolidate.db")
@@ -232,7 +232,7 @@ func TestProcessAllowlistsFromDB_MustConsiderOverridesResolution(t *testing.T) {
 	}
 	var persistMu sync.Mutex
 
-	processAllowlistsFromDB(
+	processAllowlists(
 		ctx,
 		logger,
 		entriesRepo,

@@ -19,27 +19,24 @@ func NewConsolidationManager(logger *multilog.Logger, database *db.DB) *Consolid
 	}
 }
 
-// GenerateConflictReport generates conflict report for general consolidation
+// GenerateConflictReport generates conflict report by using resolution sets
 func (cm *ConsolidationManager) GenerateConflictReport() error {
 	cm.logger.Infof("Building resolution sets for conflict report...")
 
-	// build resolution sets for conflict analysis using DB
-	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap, err := GetResolutionSets(
-		cm.logger,
-		cm.database,
-	)
+	result, err := GetResolutionSets(cm.logger, cm.database)
 	if err != nil {
 		return err
 	}
 
-	result := &ResolutionResult{
-		AllowByType: allowByType,
-		BlockByType: blockByType,
-		Conflicts:   conflicts,
-		DetailsMap:  detailsMap,
+	return cm.GenerateConflictReportFromResult(result)
+}
+
+// GenerateConflictReportFromResult generates conflict report by using resolution sets
+func (cm *ConsolidationManager) GenerateConflictReportFromResult(result *ResolutionResult) error {
+	if result == nil {
+		cm.logger.Warnf("No resolution result provided, skipping conflict report")
+		return nil
 	}
-	result.ManualOverride.AllowToBlock = manualAllowToBlock
-	result.ManualOverride.BlockToAllow = manualBlockToAllow
 
 	overridesPath, err := writeOverrideSummary(cm.logger, result)
 	if err != nil {
