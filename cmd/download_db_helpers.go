@@ -39,7 +39,7 @@ func loadDownloadSummaries(ctx context.Context, logger *multilog.Logger) ([]c.Do
 	downloadsRepo := db.NewDownloadsRepo(database)
 	summaries, listErr := downloadsRepo.ListDownloadSummaries(constants.DownloadDir)
 	if listErr != nil {
-		return nil, fmt.Errorf("loading download summaries from database: %w", listErr)
+		return nil, fmt.Errorf("loading download summaries: %w", listErr)
 	}
 
 	return summaries, nil
@@ -57,7 +57,7 @@ func loadPreviousDownloadSummary(
 
 	summaries, err := downloadsRepo.GetDownloadSummaryBySourceName(sourceName, constants.DownloadDir)
 	if err != nil {
-		return nil, fmt.Errorf("loading previous download summary for %s from database: %w", sourceName, err)
+		return nil, fmt.Errorf("loading previous download summary for %s: %w", sourceName, err)
 	}
 	if len(summaries) == 0 {
 		return nil, nil

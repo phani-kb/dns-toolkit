@@ -652,9 +652,9 @@ func (r *EntriesRepo) GetInvalidEntriesForGeneralConsolidation(
 	return results, rows.Err()
 }
 
-// GetUniqueCategoriesFromDB returns unique categories from entry_categories table
+// GetUniqueCategories returns unique categories from entry_categories table
 // for enabled sources not skipping categories consolidation.
-func (r *EntriesRepo) GetUniqueCategoriesFromDB(_ context.Context) ([]string, error) {
+func (r *EntriesRepo) GetUniqueCategories(_ context.Context) ([]string, error) {
 	query := `
 		SELECT DISTINCT c.category
 		FROM ` + constants.TableEntryCategories + ` c
@@ -682,9 +682,9 @@ func (r *EntriesRepo) GetUniqueCategoriesFromDB(_ context.Context) ([]string, er
 	return categories, rows.Err()
 }
 
-// GetUniqueGroupsFromDB returns unique groups from entry_groups table
+// GetUniqueGroups returns unique groups from entry_groups table
 // for enabled sources not skipping groups consolidation.
-func (r *EntriesRepo) GetUniqueGroupsFromDB(_ context.Context) ([]string, error) {
+func (r *EntriesRepo) GetUniqueGroups(_ context.Context) ([]string, error) {
 	query := `
 		SELECT DISTINCT g.group_name
 		FROM ` + constants.TableEntryGroups + ` g
@@ -712,8 +712,8 @@ func (r *EntriesRepo) GetUniqueGroupsFromDB(_ context.Context) ([]string, error)
 	return groups, rows.Err()
 }
 
-// GetGenericSourceTypesFromDB returns unique generic source types from entries.
-func (r *EntriesRepo) GetGenericSourceTypesFromDB(_ context.Context) ([]string, error) {
+// GetGenericSourceTypes returns unique generic source types from entries.
+func (r *EntriesRepo) GetGenericSourceTypes(_ context.Context) ([]string, error) {
 	query := `
 		SELECT DISTINCT e.generic_source_type
 		FROM ` + constants.TableEntries + ` e

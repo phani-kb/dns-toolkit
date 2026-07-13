@@ -28,9 +28,9 @@ var consolidateGroupsCmd = &cobra.Command{
 		entriesRepo := db.NewEntriesRepo(database)
 
 		// get unique groups directly from DB
-		groups, groupsErr := entriesRepo.GetUniqueGroupsFromDB(ctx)
+		groups, groupsErr := entriesRepo.GetUniqueGroups(ctx)
 		if groupsErr != nil {
-			Logger.Errorf("Failed to get groups from database: %v", groupsErr)
+			Logger.Errorf("Failed to get groups: %v", groupsErr)
 			return
 		}
 		if len(groups) == 0 {
@@ -39,9 +39,9 @@ var consolidateGroupsCmd = &cobra.Command{
 		}
 
 		// get generic source types from DB
-		genericSourceTypes, typesErr := entriesRepo.GetGenericSourceTypesFromDB(ctx)
+		genericSourceTypes, typesErr := entriesRepo.GetGenericSourceTypes(ctx)
 		if typesErr != nil {
-			Logger.Errorf("Failed to get source types from database: %v", typesErr)
+			Logger.Errorf("Failed to get source types: %v", typesErr)
 			return
 		}
 
@@ -52,7 +52,7 @@ var consolidateGroupsCmd = &cobra.Command{
 
 		// Process each size group and create consolidated lists
 		for _, group := range groups {
-			processGroupConsolidationFromDB(
+			processGroupConsolidation(
 				ctx,
 				Logger,
 				group,
@@ -67,8 +67,8 @@ var consolidateGroupsCmd = &cobra.Command{
 	},
 }
 
-// processGroupConsolidationFromDB processes consolidation for a specific group using DB entries
-func processGroupConsolidationFromDB(
+// processGroupConsolidation processes consolidation for a specific group using DB entries
+func processGroupConsolidation(
 	ctx context.Context,
 	logger *multilog.Logger,
 	group string,

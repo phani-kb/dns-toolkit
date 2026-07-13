@@ -15,7 +15,7 @@ var consolidateCategoriesCmd = &cobra.Command{
 	Use:   "categories",
 	Short: "Generate category-based consolidated lists (ads, malware, privacy, etc)",
 	Run: func(cmd *cobra.Command, args []string) {
-		Logger.Infof("Generating category-based consolidated lists (DB-based)...")
+		Logger.Infof("Generating category-based consolidated lists...")
 		ctx := context.Background()
 
 		database, consolidatedRepo, dbErr := openConsolidatedRepo(ctx, Logger, "category")
@@ -27,9 +27,9 @@ var consolidateCategoriesCmd = &cobra.Command{
 
 		entriesRepo := db.NewEntriesRepo(database)
 
-		categories, catErr := entriesRepo.GetUniqueCategoriesFromDB(ctx)
+		categories, catErr := entriesRepo.GetUniqueCategories(ctx)
 		if catErr != nil {
-			Logger.Errorf("Failed to get categories from database: %v", catErr)
+			Logger.Errorf("Failed to get categories: %v", catErr)
 			return
 		}
 		if len(categories) == 0 {
@@ -37,9 +37,9 @@ var consolidateCategoriesCmd = &cobra.Command{
 			return
 		}
 
-		genericSourceTypes, typesErr := entriesRepo.GetGenericSourceTypesFromDB(ctx)
+		genericSourceTypes, typesErr := entriesRepo.GetGenericSourceTypes(ctx)
 		if typesErr != nil {
-			Logger.Errorf("Failed to get source types from database: %v", typesErr)
+			Logger.Errorf("Failed to get source types: %v", typesErr)
 			return
 		}
 
@@ -49,7 +49,7 @@ var consolidateCategoriesCmd = &cobra.Command{
 		var persistMu sync.Mutex
 
 		for _, category := range categories {
-			processCategoryConsolidationFromDB(
+			processCategoryConsolidation(
 				ctx,
 				Logger,
 				category,
@@ -64,8 +64,8 @@ var consolidateCategoriesCmd = &cobra.Command{
 	},
 }
 
-// processCategoryConsolidationFromDB processes consolidation for a specific category using DB entries
-func processCategoryConsolidationFromDB(
+// processCategoryConsolidation processes consolidation for a specific category using DB entries
+func processCategoryConsolidation(
 	ctx context.Context,
 	logger *multilog.Logger,
 	category string,

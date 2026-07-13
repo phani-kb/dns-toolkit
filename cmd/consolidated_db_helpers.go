@@ -73,7 +73,7 @@ func openConsolidatedRepo(
 		database.CloseLogError(logger)
 		return nil, nil, fmt.Errorf("clearing %s consolidated entries: %w", consolidationType, clearErr)
 	}
-	logger.Infof("Cleared existing %s consolidated entries from database", consolidationType)
+	logger.Infof("Cleared existing %s consolidated entries", consolidationType)
 
 	return database, repo, nil
 }
