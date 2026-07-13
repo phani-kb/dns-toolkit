@@ -125,19 +125,6 @@ func InitForTesting() {
 	validateAndSetDirs()
 }
 
-// AddProfilingFlags adds profiling flags to the provided command
-func AddProfilingFlags(
-	cmd *cobra.Command,
-	cpuProfileVar, memProfileVar, goroutineProfileVar, blockProfileVar *bool,
-	profileDirVar *string,
-) {
-	cmd.Flags().BoolVar(cpuProfileVar, "cpu-profile", false, "Enable CPU profiling")
-	cmd.Flags().BoolVar(memProfileVar, "mem-profile", false, "Enable memory profiling")
-	cmd.Flags().BoolVar(goroutineProfileVar, "goroutine-profile", false, "Enable goroutine profiling")
-	cmd.Flags().BoolVar(blockProfileVar, "block-profile", false, "Enable block profiling")
-	cmd.Flags().StringVar(profileDirVar, "profile-dir", "", "Directory to store profile files")
-}
-
 var rootCmd = &cobra.Command{
 	Use:   "dns-toolkit",
 	Short: "DNS Toolkit",
