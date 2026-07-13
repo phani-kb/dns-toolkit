@@ -1,111 +1,23 @@
 package cmd
 
 import (
-	"os"
-	"runtime"
-
-	"github.com/phani-kb/dns-toolkit/internal/constants"
-	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/spf13/cobra"
 )
 
 var (
-	minSources       int
-	maxEntries       int
-	cpuProfile       bool
-	memProfile       bool
-	goroutineProfile bool
-	blockProfile     bool
-	profileDir       string
-	maxWorkers       int
+	minSources int
+	maxEntries int
 )
 
 var topEntriesCmd = &cobra.Command{
 	Use:   "top",
 	Short: "Find top entry(s) in each generic source type",
 	Run: func(cmd *cobra.Command, args []string) {
-		Logger.Infof("Profiling configuration: CPU=%v, Memory=%v, Goroutine=%v, Block=%v",
-			cpuProfile, memProfile, goroutineProfile, blockProfile)
-
-		maxWorkers = AppConfig.DNSToolkit.MaxWorkers
-		if maxWorkers <= 0 {
-			maxWorkers = runtime.GOMAXPROCS(0)
-		}
-		Logger.Infof("Using %d worker(s) for top entry(s) processing", maxWorkers)
-
-		if profileDir != "" {
-			if err := os.MkdirAll(profileDir, 0o755); err != nil {
-				Logger.Errorf("Failed to create profile directory %s: %v", profileDir, err)
-				profileDir = ""
-			} else {
-				Logger.Infof("Using profile directory: %s", profileDir)
-			}
-		}
-		if profileDir == "" {
-			profileDir = AppConfig.DNSToolkit.Folders.Profiles
-			if err := os.MkdirAll(profileDir, 0o755); err != nil {
-				Logger.Errorf(
-					"Failed to create default profile directory %s: %v. Profiling might fail.",
-					profileDir,
-					err,
-				)
-			}
-		}
-
-		stopProfiling := u.StartProfiling(Logger, u.ProfileOptions{
-			CPUProfile:       cpuProfile,
-			MemProfile:       memProfile,
-			GoroutineProfile: goroutineProfile,
-			BlockProfile:     blockProfile,
-			ProfileNameBase:  "top",
-			OutputDir:        profileDir,
-			BlockProfileRate: 1000,
-		})
-
-		profilingEnabled := cpuProfile || memProfile || goroutineProfile || blockProfile
-
-		var mainErr error
-		func() {
-			defer stopProfiling()
-
-			if maxEntries < 1 {
-				Logger.Errorf("Error: maxEntries must be at least 1, got %d", maxEntries)
-				return
-			}
-
-			// Create an instance of the top entries service
-			// topService := top.NewDefaultService(constants.TopDir, constants.SummaryDir)
-
-			// Ensure directories exist
-			if err := u.EnsureDirectoryExists(Logger, constants.TopDir); err != nil {
-				Logger.Errorf("Failed to create top entry(s) directory %s: %v", constants.TopDir, err)
-				mainErr = err
-				return
-			}
-			if err := u.EnsureDirectoryExists(Logger, constants.SummaryDir); err != nil {
-				Logger.Errorf("Failed to create summary directory %s: %v", constants.SummaryDir, err)
-				mainErr = err
-				return
-			}
-		}()
-
-		if mainErr != nil {
-			Logger.Errorf("Top entry(s) processing finished with error: %v", mainErr)
-		}
-
-		if profilingEnabled {
-			Logger.Infof("Analyzing collected profiles...")
-			u.AnalyzeProfiles(Logger, u.ProfileOptions{
-				ProfileNameBase: "top",
-				OutputDir:       profileDir,
-			})
-		}
+		Logger.Infof("TODO DB-based processing")
 	},
 }
 
 func init() {
 	topEntriesCmd.Flags().IntVarP(&minSources, "min-sources", "m", 0, "Minimum sources (3-12)")
 	topEntriesCmd.Flags().IntVarP(&maxEntries, "max-entries", "x", int(^uint(0)>>1), "Max entries")
-
-	AddProfilingFlags(topEntriesCmd, &cpuProfile, &memProfile, &goroutineProfile, &blockProfile, &profileDir)
 }
