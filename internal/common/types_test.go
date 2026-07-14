@@ -411,13 +411,9 @@ func TestTopSummary_GetName(t *testing.T) {
 func TestTopSummary_MarshalJSON(t *testing.T) {
 	ts := TopSummary{
 		GenericSourceType: "domain",
-		TopEntries: []EntryCountPair{
-			{Entry: "example.com", Count: 5},
-			{Entry: "test.com", Count: 3},
-		},
-		Count:    100,
-		Filepath: "/path/to/file",
-		ListType: "blocklist",
+		Count:             100,
+		Filepath:          "/path/to/file",
+		ListType:          "blocklist",
 	}
 
 	data, err := json.Marshal(ts)
@@ -461,7 +457,6 @@ func TestTopSummaryMarshalJSON(t *testing.T) {
 				MinSources:        3,
 				Count:             1000,
 				Filepath:          "/test/path.txt",
-				TopEntries:        []EntryCountPair{{Entry: "example.com", Count: 5}},
 			},
 			wantErr: false,
 		},
@@ -487,7 +482,7 @@ func TestTopSummaryMarshalJSON(t *testing.T) {
 				assert.Equal(t, tt.summary.GenericSourceType, unmarshaled.GenericSourceType)
 				assert.Equal(t, tt.summary.ListType, unmarshaled.ListType)
 				assert.Equal(t, tt.summary.MinSources, unmarshaled.MinSources)
-				assert.Equal(t, len(tt.summary.TopEntries), unmarshaled.Count)
+				assert.Equal(t, tt.summary.Count, unmarshaled.Count)
 				assert.Equal(t, tt.summary.Filepath, unmarshaled.Filepath)
 			}
 		})

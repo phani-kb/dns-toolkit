@@ -495,8 +495,7 @@ func (ts *TopSummary) GetName() string {
 	return ts.GenericSourceType
 }
 
-// MarshalJSON implements custom JSON marshaling for TopSummary to include
-// the count of TopEntries in the JSON output.
+// MarshalJSON implements custom JSON marshaling for TopSummary.
 func (ts *TopSummary) MarshalJSON() ([]byte, error) {
 	type Alias TopSummary
 	return json.Marshal(&struct {
@@ -504,7 +503,7 @@ func (ts *TopSummary) MarshalJSON() ([]byte, error) {
 		Count int `json:"count"`
 	}{
 		Alias: (Alias)(*ts),
-		Count: len(ts.TopEntries),
+		Count: ts.Count,
 	})
 }
 
