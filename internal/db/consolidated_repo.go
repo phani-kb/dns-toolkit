@@ -195,9 +195,35 @@ func (r *ConsolidatedRepo) GetConsolidatedCount(genericSourceType, listType,
 }
 
 func (r *ConsolidatedRepo) ClearConsolidated(consolidationType string) error {
+	if _, err := r.db.conn.Exec("DROP INDEX IF EXISTS idx_consolidated_lookup"); err != nil {
+		return fmt.Errorf("dropping idx_consolidated_lookup: %w", err)
+	}
+	if _, err := r.db.conn.Exec("DROP INDEX IF EXISTS idx_consolidated_type"); err != nil {
+		return fmt.Errorf("dropping idx_consolidated_type: %w", err)
+	}
+
 	_, err := r.db.conn.Exec("DELETE FROM "+constants.TableConsolidatedEntries+
 		" WHERE consolidation_type = ?", consolidationType)
-	return err
+	if err != nil {
+		return err
+	}
+
+	if _, err := r.db.conn.Exec(
+		`CREATE INDEX IF NOT EXISTS idx_consolidated_lookup ON ` +
+			constants.TableConsolidatedEntries +
+			` (entry, generic_source_type, list_type, consolidation_type)`,
+	); err != nil {
+		return fmt.Errorf("recreating idx_consolidated_lookup: %w", err)
+	}
+	if _, err := r.db.conn.Exec(
+		`CREATE INDEX IF NOT EXISTS idx_consolidated_type ON ` +
+			constants.TableConsolidatedEntries +
+			` (consolidation_type, generic_source_type, list_type)`,
+	); err != nil {
+		return fmt.Errorf("recreating idx_consolidated_type: %w", err)
+	}
+
+	return nil
 }
 
 func (r *ConsolidatedRepo) ClearAllConsolidated() error {

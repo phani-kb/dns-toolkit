@@ -29,7 +29,7 @@ func TestProcessGroupConsolidationFromDB_EmptyDatabase(t *testing.T) {
 	consolidatedRepo := idb.NewConsolidatedRepo(database)
 	var persistMu sync.Mutex
 
-	processGroupConsolidationFromDB(
+	processGroupConsolidation(
 		ctx,
 		logger,
 		constants.GroupMini,
