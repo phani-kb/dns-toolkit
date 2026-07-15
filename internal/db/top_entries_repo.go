@@ -9,17 +9,14 @@ import (
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 )
 
-// TopEntriesRepo handles top entries operations on the database.
 type TopEntriesRepo struct {
 	db *DB
 }
 
-// NewTopEntriesRepo creates a new TopEntriesRepo.
 func NewTopEntriesRepo(db *DB) *TopEntriesRepo {
 	return &TopEntriesRepo{db: db}
 }
 
-// TopEntryRow represents a single top entry result from the database.
 type TopEntryRow struct {
 	Entry       string
 	SourceCount int
