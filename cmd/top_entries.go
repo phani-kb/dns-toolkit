@@ -45,7 +45,7 @@ var topEntriesCmd = &cobra.Command{
 			return
 		}
 
-		listTypes := []string{constants.ListTypeBlocklist, constants.ListTypeAllowlist}
+		listTypes := []string{constants.ListTypeBlocklist, constants.ListTypeAllowlist} // TODO: get list from db
 
 		Logger.Infof("Processing top entries: min_sources=%d, max_entries=%d", minSources, maxEntries)
 
