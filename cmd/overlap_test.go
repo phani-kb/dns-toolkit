@@ -63,7 +63,7 @@ func TestComputeOverlapForType_WithOverlap(t *testing.T) {
 
 	results, err := overlapRepo.ListOverlapResults(ctx)
 	require.NoError(t, err)
-	assert.Len(t, results, 2) // bidirectional: A→B and B→A
+	assert.Len(t, results, 2) // both ways A to B and B to A
 
 	var abResult *idb.OverlapResultRow
 	for i := range results {
