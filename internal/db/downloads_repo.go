@@ -147,25 +147,26 @@ func (r *DownloadsRepo) GetDownloadSummaryBySourceName(sourceName, downloadDir s
 	return summaries, nil
 }
 
-// ListDownloadSummaries reconstructs download summaries from persisted source and download metadata.
+var downloadSummaryBaseQuery = `
+	SELECT s.id, s.name,
+		COALESCE(NULLIF(d.url, ''), s.url),
+		COALESCE(d.filepath, ''),
+		COALESCE(NULLIF(d.frequency, ''), s.frequency),
+		COALESCE(d.checksum, ''),
+		COALESCE(d.error, ''),
+		COALESCE(d.last_download_timestamp, ''),
+		COALESCE(d.last_checked_timestamp, ''),
+		d.type_count,
+		d.count_to_consider,
+		d.skip_general_consolidation,
+		d.skip_groups_consolidation,
+		d.skip_categories_consolidation
+	FROM ` + constants.TableDownloads + ` d
+	INNER JOIN ` + constants.TableSources + ` s ON s.id = d.source_id`
+
+// ListDownloadSummaries returns all persisted download summaries.
 func (r *DownloadsRepo) ListDownloadSummaries(downloadDir string) ([]c.DownloadSummary, error) {
-	rows, err := r.db.conn.Query(`
-		SELECT s.id, s.name,
-			COALESCE(NULLIF(d.url, ''), s.url),
-			COALESCE(d.filepath, ''),
-			COALESCE(NULLIF(d.frequency, ''), s.frequency),
-			COALESCE(d.checksum, ''),
-			COALESCE(d.error, ''),
-			COALESCE(d.last_download_timestamp, ''),
-			COALESCE(d.last_checked_timestamp, ''),
-			d.type_count,
-			d.count_to_consider,
-			d.skip_general_consolidation,
-			d.skip_groups_consolidation,
-			d.skip_categories_consolidation
-		FROM ` + constants.TableDownloads + ` d
-		INNER JOIN ` + constants.TableSources + ` s ON s.id = d.source_id
-		ORDER BY s.name`)
+	rows, err := r.db.conn.Query(downloadSummaryBaseQuery + " ORDER BY s.name")
 	if err != nil {
 		return nil, fmt.Errorf("querying download summaries: %w", err)
 	}
@@ -223,25 +224,10 @@ func scanDownloadSummaryRow(scanner interface{ Scan(dest ...any) error }) (downl
 }
 
 func (r *DownloadsRepo) getDownloadSummaryRowByName(sourceName string) (downloadSummaryRow, error) {
-	row := r.db.conn.QueryRow(`
-		SELECT s.id, s.name,
-			COALESCE(NULLIF(d.url, ''), s.url),
-			COALESCE(d.filepath, ''),
-			COALESCE(NULLIF(d.frequency, ''), s.frequency),
-			COALESCE(d.checksum, ''),
-			COALESCE(d.error, ''),
-			COALESCE(d.last_download_timestamp, ''),
-			COALESCE(d.last_checked_timestamp, ''),
-			d.type_count,
-			d.count_to_consider,
-			d.skip_general_consolidation,
-			d.skip_groups_consolidation,
-			d.skip_categories_consolidation
-		FROM `+constants.TableDownloads+` d
-		INNER JOIN `+constants.TableSources+` s ON s.id = d.source_id
-		WHERE s.name = ?
-		ORDER BY s.id
-		LIMIT 1`, sourceName)
+	row := r.db.conn.QueryRow(
+		downloadSummaryBaseQuery+" WHERE s.name = ? ORDER BY s.id LIMIT 1",
+		sourceName,
+	)
 
 	return scanDownloadSummaryRow(row)
 }

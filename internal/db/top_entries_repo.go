@@ -69,6 +69,68 @@ func (r *TopEntriesRepo) GetTopEntries(
 	return results, rows.Err()
 }
 
+type TopEntryGroup struct {
+	GenericSourceType string
+	ListType          string
+	MinSources        int
+	Count             int
+}
+
+// ListTopEntryGroups returns all distinct groups with counts.
+func (r *TopEntriesRepo) ListTopEntryGroups(_ context.Context) ([]TopEntryGroup, error) {
+	query := `
+		SELECT generic_source_type, list_type, min_sources, COUNT(*) AS count
+		FROM ` + constants.TableTopEntries + `
+		GROUP BY generic_source_type, list_type, min_sources
+		ORDER BY generic_source_type, list_type, min_sources
+	`
+
+	rows, err := r.db.conn.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("querying top entry groups: %w", err)
+	}
+	defer rows.Close() // nolint: errcheck
+
+	var results []TopEntryGroup
+	for rows.Next() {
+		var g TopEntryGroup
+		if err := rows.Scan(&g.GenericSourceType, &g.ListType, &g.MinSources, &g.Count); err != nil {
+			return nil, fmt.Errorf("scanning top entry group: %w", err)
+		}
+		results = append(results, g)
+	}
+	return results, rows.Err()
+}
+
+// GetTopEntriesList returns just the entry strings for a given group.
+func (r *TopEntriesRepo) GetTopEntriesList(
+	_ context.Context,
+	genericSourceType, listType string,
+	minSources int,
+) ([]string, error) {
+	query := `
+		SELECT entry FROM ` + constants.TableTopEntries + `
+		WHERE generic_source_type = ? AND list_type = ? AND min_sources = ?
+		ORDER BY source_count DESC, entry ASC
+	`
+
+	rows, err := r.db.conn.Query(query, genericSourceType, listType, minSources)
+	if err != nil {
+		return nil, fmt.Errorf("querying top entries list: %w", err)
+	}
+	defer rows.Close() // nolint: errcheck
+
+	var entries []string
+	for rows.Next() {
+		var entry string
+		if err := rows.Scan(&entry); err != nil {
+			return nil, fmt.Errorf("scanning top entry: %w", err)
+		}
+		entries = append(entries, entry)
+	}
+	return entries, rows.Err()
+}
+
 // PersistTopEntries stores the computed top entries in dnstk_top_entries.
 func (r *TopEntriesRepo) PersistTopEntries(
 	ctx context.Context,

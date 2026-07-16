@@ -68,7 +68,7 @@ func (lt *ListType) Validate() error {
 }
 
 // nolint:lll
-// DownloadSummary represents information about a downloaded DNS blocklist file.
+// DownloadSummary represents information about a downloaded file.
 // It contains metadata about the source, content types, and download status.
 type DownloadSummary struct {
 	Name                        string       `json:"name"`                                    // Name of the source
@@ -127,7 +127,6 @@ func (ds *DownloadSummary) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	// Initialize Types as an empty slice if it's nil
 	if ds.Types == nil {
 		ds.Types = []SourceType{}
 	}

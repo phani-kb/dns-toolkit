@@ -15,8 +15,8 @@ import (
 var generateSummariesCmd = &cobra.Command{
 	Use:   "summaries",
 	Short: "Generate all summary files for publishing",
-	Long: "Generates download_summary.json and processed_summary.json from the " +
-		"database and saves them to the output summaries directory for publishing " +
+	Long: "Generates download_summary.json and processed_summary.json " +
+		"and saves them to the output summaries directory for publishing " +
 		"to summaries branch.",
 	Run: func(cmd *cobra.Command, args []string) {
 		ctx := context.Background()

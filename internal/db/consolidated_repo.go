@@ -231,6 +231,87 @@ func (r *ConsolidatedRepo) ClearAllConsolidated() error {
 	return err
 }
 
+type ConsolidatedGroup struct {
+	GenericSourceType string
+	ListType          string
+	ConsolidationType string
+	GroupName         string
+	Category          string
+	Valid             bool
+	Count             int
+}
+
+// ListConsolidatedGroups returns all distinct groups and categories for a given consolidation type.
+func (r *ConsolidatedRepo) ListConsolidatedGroups(consolidationType string) ([]ConsolidatedGroup, error) {
+	query := `
+		SELECT generic_source_type, list_type, consolidation_type,
+			COALESCE(group_name, '') AS group_name,
+			COALESCE(category, '') AS category,
+			valid, COUNT(*) AS count
+		FROM ` + constants.TableConsolidatedEntries + `
+		WHERE consolidation_type = ?
+		GROUP BY generic_source_type, list_type, consolidation_type, group_name, category, valid
+		ORDER BY generic_source_type, list_type, group_name, category
+	`
+
+	rows, err := r.db.conn.Query(query, consolidationType)
+	if err != nil {
+		return nil, fmt.Errorf("querying consolidated groups: %w", err)
+	}
+	defer rows.Close() // nolint: errcheck
+
+	var results []ConsolidatedGroup
+	for rows.Next() {
+		var g ConsolidatedGroup
+		var validInt int
+		if err := rows.Scan(
+			&g.GenericSourceType, &g.ListType, &g.ConsolidationType,
+			&g.GroupName, &g.Category, &validInt, &g.Count,
+		); err != nil {
+			return nil, fmt.Errorf("scanning consolidated group: %w", err)
+		}
+		g.Valid = validInt == 1
+		results = append(results, g)
+	}
+	return results, rows.Err()
+}
+
+// GetConsolidatedEntriesByGroup returns entries filtered by group or category.
+func (r *ConsolidatedRepo) GetConsolidatedEntriesByGroup(
+	genericSourceType, listType, consolidationType, groupName, category string, valid bool,
+) ([]string, error) {
+	query := `SELECT entry FROM ` + constants.TableConsolidatedEntries + `
+		WHERE generic_source_type = ? AND list_type = ? AND consolidation_type = ? AND valid = ?`
+	args := []any{genericSourceType, listType, consolidationType, boolToInt(valid)}
+
+	if groupName != "" {
+		query += " AND group_name = ?"
+		args = append(args, groupName)
+	}
+	if category != "" {
+		query += " AND category = ?"
+		args = append(args, category)
+	}
+
+	query += " ORDER BY entry"
+
+	rows, err := r.db.conn.Query(query, args...)
+	if err != nil {
+		return nil, fmt.Errorf("querying consolidated entries by group: %w", err)
+	}
+	defer rows.Close() // nolint: errcheck
+
+	var entries []string
+	for rows.Next() {
+		var entry string
+		if err := rows.Scan(&entry); err != nil {
+			return nil, fmt.Errorf("scanning entry: %w", err)
+		}
+		entries = append(entries, entry)
+	}
+	return entries, rows.Err()
+}
+
 type ConsolidatedEntryRow struct {
 	Entry             string
 	GenericSourceType string

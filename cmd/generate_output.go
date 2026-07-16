@@ -2,30 +2,22 @@ package cmd
 
 import (
 	"bytes"
-	"encoding/json"
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
-	"sort"
-	"strconv"
 	"strings"
 	"text/template"
 	"time"
 
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
-
 	"github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
+	"github.com/phani-kb/dns-toolkit/internal/db"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/spf13/cobra"
 )
 
-var (
-	includeIgnored bool
-	deleteFolders  bool
-)
+var includeIgnored bool
 
 // prepareDirectories creates necessary output directories
 func prepareDirectories() error {
@@ -70,7 +62,6 @@ func prepareDirectories() error {
 func loadTemplates() (*template.Template, []byte, error) {
 	configsDir := "configs"
 
-	// In test mode, resolve relative paths to project root
 	if os.Getenv("DNS_TOOLKIT_TEST_MODE") == constants.BooleanTrue {
 		if projectRoot, err := u.FindProjectRoot(""); err == nil {
 			configsDir = filepath.Join(projectRoot, "configs")
@@ -102,382 +93,6 @@ func loadTemplates() (*template.Template, []byte, error) {
 	return tmpl, staticTemplate, nil
 }
 
-// parseFileInfoFromString parses a FileInfo string back to FileInfo struct
-func parseFileInfoFromString(fileStr string) (common.FileInfo, error) {
-	// Format: "name [sourceType] [filepath] [count] [must consider]"
-	re := regexp.MustCompile(`^(.+?) \[(.+?)\] \[(.+?)\] \[(\d+)\]( \[must consider\])?$`)
-	matches := re.FindStringSubmatch(fileStr)
-
-	if len(matches) < 5 {
-		return common.FileInfo{}, fmt.Errorf("invalid file info string format: %s", fileStr)
-	}
-
-	name := matches[1]
-	sourceType := matches[2]
-	fp := matches[3]
-	count, err := strconv.Atoi(matches[4])
-	if err != nil {
-		return common.FileInfo{}, fmt.Errorf("invalid count in file info string: %s", matches[4])
-	}
-	mustConsider := len(matches) > 5 && matches[5] != ""
-
-	return common.FileInfo{
-		Name:         name,
-		SourceType:   sourceType,
-		Filepath:     fp,
-		Count:        count,
-		MustConsider: mustConsider,
-	}, nil
-}
-
-// parseFilesFromConsolidatedSummary parses Files array from ConsolidatedSummary to FileInfo objects
-func parseFilesFromConsolidatedSummary(summary common.ConsolidatedSummary) []common.FileInfo {
-	var fileInfos []common.FileInfo
-	for _, fileStr := range summary.Files {
-		fileInfo, err := parseFileInfoFromString(fileStr)
-		if err != nil {
-			Logger.Error("Failed to parse file info string", "string", fileStr, "error", err)
-			continue
-		}
-		fileInfos = append(fileInfos, fileInfo)
-	}
-	return fileInfos
-}
-
-// generateFilesList generates a string representation of files involved in consolidation
-func generateFilesList(
-	_ string,
-	listType string,
-	_ string,
-	filesInvolved []common.FileInfo,
-) string {
-	if len(filesInvolved) == 0 {
-		return ""
-	}
-
-	var lines []string
-	lines = append(lines, fmt.Sprintf(
-		"# This %s list was consolidated from %d source file(s):",
-		listType,
-		len(filesInvolved),
-	))
-
-	sort.Slice(
-		filesInvolved,
-		func(i, j int) bool { return u.CaseInsensitiveLess(filesInvolved[i].Name, filesInvolved[j].Name) },
-	)
-
-	maxNameLen := 0
-	maxSourceTypeLen := 0
-	maxCountLen := 0
-	for _, fileInfo := range filesInvolved {
-		if len(fileInfo.Name) > maxNameLen {
-			maxNameLen = len(fileInfo.Name)
-		}
-		if len(fileInfo.SourceType) > maxSourceTypeLen {
-			maxSourceTypeLen = len(fileInfo.SourceType)
-		}
-		countLen := len(fmt.Sprintf("%d", fileInfo.Count))
-		if countLen > maxCountLen {
-			maxCountLen = countLen
-		}
-	}
-
-	for _, fileInfo := range filesInvolved {
-		mustConsiderText := ""
-		if fileInfo.MustConsider {
-			mustConsiderText = " [must consider]"
-		}
-		lines = append(
-			lines,
-			fmt.Sprintf(
-				"#   - %-*s %-*s: %-*d%s",
-				maxNameLen, fileInfo.Name,
-				maxSourceTypeLen, fileInfo.SourceType,
-				maxCountLen, fileInfo.Count,
-				mustConsiderText,
-			),
-		)
-	}
-
-	return strings.Join(lines, "\n")
-}
-
-// processFilesForSummaryType extracts files information from summary data
-func processFilesForSummaryType(
-	summaryType string,
-	summaryData []byte,
-) (map[string]string, map[string]int, map[string][]common.FileInfo, map[string]int, map[string]int) {
-	typeFiles := make(map[string]string)
-	fileEntriesCount := make(map[string]int)
-	filesInvolved := make(map[string][]common.FileInfo)
-	ignoredFilesCount := make(map[string]int)
-	originalCounts := make(map[string]int)
-
-	switch summaryType {
-	case constants.SummaryTypeConsolidated:
-		var summaries []common.ConsolidatedSummary
-		if err := json.Unmarshal(summaryData, &summaries); err != nil {
-			Logger.Error("Failed to unmarshal consolidated summary", "error", err)
-			return typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount, originalCounts
-		}
-		files := u.GetFilesFromSummaries(summaries, constants.SummaryTypeConsolidated)
-		for key, value := range files {
-			typeFiles[key] = value.ListType
-			fileEntriesCount[key] = value.Count
-
-			if value.IgnoredEntriesCount > 0 && value.IgnoredFilepath != "" {
-				ignoredFilesCount[key] = value.IgnoredEntriesCount
-			}
-
-			filesInvolved[key] = parseFilesFromConsolidatedSummary(value)
-			if value.OriginalCount > 0 {
-				originalCounts[key] = value.OriginalCount
-			}
-
-		}
-
-	case constants.SummaryTypeConsolidatedGroups:
-		var summaries []common.ConsolidatedSummary
-		if err := json.Unmarshal(summaryData, &summaries); err != nil {
-			Logger.Error("Failed to unmarshal consolidated groups summary", "error", err)
-			return typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount, originalCounts
-		}
-		files := u.GetFilesFromSummaries(summaries, constants.SummaryTypeConsolidatedGroups)
-		for key, value := range files {
-			typeFiles[key] = value.ListType
-			fileEntriesCount[key] = value.Count
-			if value.IgnoredEntriesCount > 0 && value.IgnoredFilepath != "" {
-				ignoredFilesCount[key] = value.IgnoredEntriesCount
-			}
-
-			filesInvolved[key] = parseFilesFromConsolidatedSummary(value)
-			if value.OriginalCount > 0 {
-				originalCounts[key] = value.OriginalCount
-			}
-		}
-
-	case constants.SummaryTypeConsolidatedCategories:
-		var summaries []common.ConsolidatedSummary
-		if err := json.Unmarshal(summaryData, &summaries); err != nil {
-			Logger.Error("Failed to unmarshal consolidated categories summary", "error", err)
-			return typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount, originalCounts
-		}
-		files := u.GetFilesFromSummaries(summaries, constants.SummaryTypeConsolidatedCategories)
-		for key, value := range files {
-			typeFiles[key] = value.ListType
-			fileEntriesCount[key] = value.Count
-			if value.IgnoredEntriesCount > 0 && value.IgnoredFilepath != "" {
-				ignoredFilesCount[key] = value.IgnoredEntriesCount
-			}
-			filesInvolved[key] = parseFilesFromConsolidatedSummary(value)
-			if value.OriginalCount > 0 {
-				originalCounts[key] = value.OriginalCount
-			}
-		}
-
-	case constants.SummaryTypeTop:
-		var topSummaries []common.TopSummary
-		if err := json.Unmarshal(summaryData, &topSummaries); err != nil {
-			Logger.Error("Failed to unmarshal top summary", "error", err)
-			return typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount, originalCounts
-		}
-		files := u.GetFilesFromSummaries(topSummaries, constants.SummaryTypeTop)
-		for key, value := range files {
-			typeFiles[key] = value.ListType
-			fileEntriesCount[key] = value.Count
-		}
-
-	default:
-		Logger.Error("Unknown summary type", "type", summaryType)
-	}
-
-	return typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount, originalCounts
-}
-
-// createOutputFromFile creates an output file with template headers
-func createOutputFromFile(
-	tmpl *template.Template,
-	staticTemplate []byte,
-	filePath string,
-	fileName string,
-	description string,
-	count int,
-	originalCount int,
-	filteredCount int,
-	outputPath string,
-	files string,
-) error {
-	// Get last updated time
-	lastUpdated := time.Now().Format(constants.TimestampFormat)
-	if info, err := os.Stat(filePath); err == nil {
-		lastUpdated = info.ModTime().Format(constants.TimestampFormat)
-	} else {
-		Logger.Error("Getting file info error", "error", err)
-	}
-
-	// Execute dynamic template
-	var dynamicOutput bytes.Buffer
-
-	// duplicates: originalCount - count - filteredCount
-	duplicates := 0
-	if originalCount > (count + filteredCount) {
-		duplicates = originalCount - count - filteredCount
-	}
-
-	err := tmpl.Execute(&dynamicOutput, common.TemplateData{
-		AppName:        AppConfig.Application.Name,
-		AppVersion:     AppConfig.Application.Version,
-		AppDescription: AppConfig.Application.Description,
-		FileName:       fileName,
-		LastUpdated:    lastUpdated,
-		Description:    description,
-		Count:          count,
-		OriginalCount:  originalCount,
-		Removed:        duplicates,
-		Duplicates:     duplicates,
-		Filtered:       filteredCount,
-		Files:          files,
-	})
-	if err != nil {
-		return fmt.Errorf("failed to execute dynamic template: %w", err)
-	}
-
-	// Read file content
-	dataContent, err := os.ReadFile(filePath)
-	if err != nil {
-		return fmt.Errorf("failed to read file: %w", err)
-	}
-
-	// Combine templates and data
-	output := fmt.Sprintf("%s\n%s\n%s\n%s",
-		dynamicOutput.String(),
-		string(staticTemplate),
-		constants.ContentSeparator,
-		string(dataContent))
-
-	// Write an output file
-	if err := os.WriteFile(outputPath, []byte(output), 0o644); err != nil {
-		return fmt.Errorf("failed to write output file: %w", err)
-	}
-
-	return nil
-}
-
-// processRegularFiles processes and generates output for regular files
-func processRegularFiles(
-	tmpl *template.Template,
-	staticTemplate []byte,
-	summaryType string,
-	typeFiles map[string]string,
-	fileCount map[string]int,
-	filesInvolved map[string][]common.FileInfo,
-	originalCounts map[string]int,
-	ignoredFilesCount map[string]int,
-) {
-	for filePath, listType := range typeFiles {
-		fileName := filepath.Base(filePath)
-		format := constants.SummaryTypesMap[summaryType]
-		description := generateDescription(summaryType, fileName, format, listType)
-
-		var files string
-		if summaryType != constants.SummaryTypeTop {
-			files = generateFilesList(filePath, listType, summaryType, filesInvolved[filePath])
-		}
-
-		outDir := constants.SummaryTypesOutputDirMap[summaryType]
-		outputFilePath := filepath.Join(outDir, fileName)
-
-		originalCount := 0
-		if oc, ok := originalCounts[filePath]; ok && oc > 0 {
-			originalCount = oc
-		} else {
-			for _, fi := range filesInvolved[filePath] {
-				originalCount += fi.Count
-			}
-		}
-
-		filteredCount := 0
-		if fc, ok := ignoredFilesCount[filePath]; ok {
-			filteredCount = fc
-		}
-
-		err := createOutputFromFile(
-			tmpl,
-			staticTemplate,
-			filePath,
-			fileName,
-			description,
-			fileCount[filePath],
-			originalCount,
-			filteredCount,
-			outputFilePath,
-			files,
-		)
-		if err != nil {
-			Logger.Error("Failed to create output file", "error", err)
-			continue
-		}
-
-		Logger.Debug("Successfully generated output file", "path", outputFilePath, "from", filePath)
-	}
-}
-
-// processIgnoredFiles processes and generates output for ignored files
-func processIgnoredFiles(
-	tmpl *template.Template,
-	staticTemplate []byte,
-	summaryType string,
-	ignoredFilesCount map[string]int,
-) {
-	if !includeIgnored || len(ignoredFilesCount) == 0 {
-		return
-	}
-
-	Logger.Info("Processing ignored files", "count", len(ignoredFilesCount))
-
-	for ignoredFilePath, ignoredCount := range ignoredFilesCount {
-		if _, err := os.Stat(ignoredFilePath); os.IsNotExist(err) {
-			Logger.Error("Ignored file does not exist", "file", ignoredFilePath)
-			continue
-		}
-
-		ignoredFileName := filepath.Base(ignoredFilePath)
-		ignoredOutputPath := filepath.Join(constants.OutputIgnoredDir, ignoredFileName)
-		ignoredDescription := generateDescription(
-			summaryType,
-			ignoredFileName,
-			constants.SummaryTypesMap[summaryType],
-			"Ignored",
-		)
-
-		err := createOutputFromFile(
-			tmpl,
-			staticTemplate,
-			ignoredFilePath,
-			ignoredFileName,
-			ignoredDescription,
-			ignoredCount,
-			0,
-			0,
-			ignoredOutputPath,
-			"", // No files list for ignored files
-		)
-		if err != nil {
-			Logger.Error("Failed to create ignored output file", "error", err)
-			continue
-		}
-
-		Logger.Debug(
-			"Successfully generated ignored output file",
-			"path",
-			ignoredOutputPath,
-			"from",
-			ignoredFilePath,
-		)
-	}
-}
-
 var generateCmd = &cobra.Command{
 	Use:   "generate",
 	Short: "Generate different types of outputs",
@@ -487,280 +102,207 @@ var generateCmd = &cobra.Command{
 var generateOutputCmd = &cobra.Command{
 	Use:   "output",
 	Short: "Generate output files with templates prefixed to them",
-	Long:  "Generate output files with static and dynamic templates prefixed to the summary types defined in SummaryTypesWithTemplateMap", // nolint:lll
+	Long:  "Generate output files with static and dynamic templates prefixed",
 	Run: func(cmd *cobra.Command, args []string) {
 		if os.Getenv("DNS_TOOLKIT_TEST_MODE") == "true" {
 			return
 		}
 
-		Logger.Info("Starting generate prefixes command...")
+		Logger.Info("Starting generate output command...")
+		ctx := context.Background()
 
 		if err := u.EnsureDirectoryExists(Logger, constants.OutputDir); err != nil {
 			Logger.Errorf("Failed to create output directory: %v", err)
 			os.Exit(1)
 		}
 
-		// Prepare directories
 		if err := prepareDirectories(); err != nil {
 			Logger.Error("Failed to prepare directories", "error", err)
 			return
 		}
 
-		// Load templates
 		tmpl, staticTemplate, err := loadTemplates()
 		if err != nil {
 			Logger.Error("Failed to load templates", "error", err)
 			return
 		}
 
-		processedSummaryFiles := make(map[string]string)
-		// Process each summary type
-		for summaryType, summaryFile := range constants.SummaryTypesWithTemplateMap {
-			summaryFilePath := filepath.Join(constants.SummaryDir, summaryFile)
-			Logger.Info("Processing summary type", "type", summaryType, "file", summaryFilePath)
+		database := openDB(ctx)
+		defer database.CloseLogError(Logger)
 
-			if _, err := os.Stat(summaryFilePath); os.IsNotExist(err) {
-				Logger.Error("Summary file does not exist", "file", summaryFilePath)
-				continue
-			}
+		consolidatedRepo := db.NewConsolidatedRepo(database)
+		topRepo := db.NewTopEntriesRepo(database)
 
-			summaryData, err := os.ReadFile(summaryFilePath)
-			if err != nil {
-				Logger.Error("Failed to read summary file", "error", err)
-				continue
-			}
+		totalFiles := 0
 
-			// Process files based on a summary type
-			typeFiles, fileEntriesCount, filesInvolved, ignoredFilesCount, originalCounts := processFilesForSummaryType(
-				summaryType,
-				summaryData,
-			)
-			Logger.Info("Extracted files from summary", "count", len(typeFiles))
-
-			// Process regular files
-			processRegularFiles(
-				tmpl,
-				staticTemplate,
-				summaryType,
-				typeFiles,
-				fileEntriesCount,
-				filesInvolved,
-				originalCounts,
-				ignoredFilesCount,
-			)
-
-			// Process ignored files
-			processIgnoredFiles(tmpl, staticTemplate, summaryType, ignoredFilesCount)
-
-			processedSummaryFiles[summaryType] = summaryFilePath
+		consolidationTypes := []struct {
+			name      string
+			outputDir string
+		}{
+			{"general", constants.OutputDir},
+			{"group", constants.OutputGroupsDir},
+			{"category", constants.OutputCategoriesDir},
 		}
 
-		Logger.Info("Processed summary files", "count", len(processedSummaryFiles))
+		for _, ct := range consolidationTypes {
+			groups, gErr := consolidatedRepo.ListConsolidatedGroups(ct.name)
+			if gErr != nil {
+				Logger.Errorf("Failed to list consolidated groups for %s: %v", ct.name, gErr)
+				continue
+			}
 
-		// Copy summary files to the output directory without timestamps
-		Logger.Info("Copying summary files to output directory without timestamps...")
-		copySummaryFiles(processedSummaryFiles, constants.OutputSummariesDir)
+			if err := u.EnsureDirectoryExists(Logger, ct.outputDir); err != nil {
+				Logger.Errorf("Failed to create output directory %s: %v", ct.outputDir, err)
+				continue
+			}
 
-		// Archive summary files with timestamps
-		Logger.Info("Archiving summary files with timestamps...")
-		archiveSummaryFiles(processedSummaryFiles)
+			for _, group := range groups {
+				if !group.Valid {
+					continue // skip invalid entries for output
+				}
 
-		deleteFilesAndFoldersAfterGeneration()
+				entries, eErr := consolidatedRepo.GetConsolidatedEntriesByGroup(
+					group.GenericSourceType, group.ListType, ct.name,
+					group.GroupName, group.Category, group.Valid,
+				)
+				if eErr != nil {
+					Logger.Errorf("Failed to get entries for %s/%s: %v",
+						group.GenericSourceType, group.ListType, eErr)
+					continue
+				}
 
-		Logger.Info("Finished generate prefixes command.")
-	},
-}
+				if len(entries) == 0 {
+					continue
+				}
 
-// generateDescription creates a human-readable description
-func generateDescription(_, fileName string, format string, listType string) string {
-	var description string
+				fileName := buildOutputFileName(ct.name, group)
+				outputPath := filepath.Join(ct.outputDir, fileName)
+				description := buildOutputDescription(ct.name, group)
 
-	entryType := "General"
-	if strings.Contains(fileName, "ipv4") {
-		entryType = "IPv4"
-	} else if strings.Contains(fileName, "domain") {
-		entryType = "Domain"
-	} else if strings.Contains(fileName, "ipv6") {
-		entryType = "IPv6"
-	} else if strings.Contains(fileName, "adguard") {
-		entryType = "AdGuard"
-	} else if strings.Contains(fileName, "cidr") {
-		entryType = "CIDR"
-	}
+				content := strings.Join(entries, "\n") + "\n"
 
-	// check if the fileName has the suffix "_ignored"
-	if strings.HasSuffix(fileName, "_ignored") {
-		entryType = "Ignored " + entryType
-	}
+				if err := writeOutputFile(
+					tmpl, staticTemplate, fileName, description,
+					group.Count, content, outputPath,
+				); err != nil {
+					Logger.Errorf("Failed to write output file %s: %v", outputPath, err)
+					continue
+				}
 
-	var minSourcesInfo string
-	if strings.Contains(fileName, "top") {
-		// Look for the "min" pattern in the filename
-		if strings.Contains(fileName, "min") {
-			parts := strings.Split(fileName, "_")
-			for _, part := range parts {
-				if strings.HasPrefix(part, "min") {
-					minSuffix := strings.TrimPrefix(part, "min")
-					// Remove file extension if present
-					minSuffix = strings.TrimSuffix(minSuffix, filepath.Ext(minSuffix))
-					if minSuffix != "" {
-						minSourcesInfo = fmt.Sprintf(" (minimum %s sources)", minSuffix)
-						break
+				totalFiles++
+			}
+		}
+
+		topGroups, tErr := topRepo.ListTopEntryGroups(ctx)
+		if tErr != nil {
+			Logger.Errorf("Failed to list top entry groups: %v", tErr)
+		} else if len(topGroups) > 0 {
+			if err := u.EnsureDirectoryExists(Logger, constants.OutputTopDir); err != nil {
+				Logger.Errorf("Failed to create top output directory: %v", err)
+			} else {
+				for _, tg := range topGroups {
+					entries, eErr := topRepo.GetTopEntriesList(ctx, tg.GenericSourceType, tg.ListType, tg.MinSources)
+					if eErr != nil {
+						Logger.Errorf("Failed to get top entries for %s/%s min%d: %v",
+							tg.GenericSourceType, tg.ListType, tg.MinSources, eErr)
+						continue
 					}
+					if len(entries) == 0 {
+						continue
+					}
+
+					fileName := fmt.Sprintf("top_%s_%s_min%d.txt", tg.GenericSourceType, tg.ListType, tg.MinSources)
+					outputPath := filepath.Join(constants.OutputTopDir, fileName)
+					description := fmt.Sprintf("Top %s %s (min %d sources)", tg.GenericSourceType, tg.ListType, tg.MinSources)
+
+					content := strings.Join(entries, "\n") + "\n"
+
+					if err := writeOutputFile(
+						tmpl, staticTemplate, fileName, description,
+						tg.Count, content, outputPath,
+					); err != nil {
+						Logger.Errorf("Failed to write top output file %s: %v", outputPath, err)
+						continue
+					}
+
+					totalFiles++
 				}
 			}
 		}
-	}
 
-	if listType == "" {
-		listType = "unknown"
-	}
-
-	format = strings.ReplaceAll(format, "_", " ")
-	format = cases.Title(language.English).String(format)
-
-	description = fmt.Sprintf("%s %s %s%s", format, entryType, listType, minSourcesInfo)
-
-	return description
+		Logger.Infof("Generated %d output files", totalFiles)
+	},
 }
 
-// copySummaryFiles copies summary files to the output directory without timestamps
-func copySummaryFiles(processedFiles map[string]string, outputDir string) {
-	for summaryType, summaryFile := range constants.SummaryTypesOutputSummaryFileMap {
-		if constants.SummaryTypesOutputSummaryFileToSkipMap[summaryType] {
-			continue
+// buildOutputFileName generates the output filename for a consolidated group.
+func buildOutputFileName(consolidationType string, group db.ConsolidatedGroup) string {
+	base := group.GenericSourceType + "_" + group.ListType
+	switch consolidationType {
+	case "group":
+		if group.GroupName != "" {
+			base = group.GroupName + "_" + base
 		}
-		summaryFilePath := processedFiles[summaryType]
-		if summaryFilePath == "" {
-			summaryFilePath = filepath.Join(constants.SummaryDir, summaryFile)
-		}
-		// Check if the summary file exists
-		if _, err := os.Stat(summaryFilePath); os.IsNotExist(err) {
-			Logger.Error("Summary file does not exist", "file", summaryFilePath)
-			continue
-		}
-
-		summaryFileNameNoTimestamp := filepath.Base(summaryFile)
-		destFilePathNoTimestamp := filepath.Join(outputDir, summaryFileNameNoTimestamp)
-
-		Logger.Debug("Copying summary file without timestamp",
-			"source", summaryFilePath,
-			"destination", destFilePathNoTimestamp)
-
-		if err := copySummaryFile(summaryFilePath, destFilePathNoTimestamp); err != nil {
-			Logger.Error("Failed to copy summary file to output directory", "error", err)
-		} else {
-			Logger.Info("Successfully copied summary file to output directory",
-				"file", destFilePathNoTimestamp)
+	case "category":
+		if group.Category != "" {
+			base = group.Category + "_" + base
 		}
 	}
+	return base + ".txt"
 }
 
-// archiveSummaryFiles copies summary files to the archive directory with timestamps
-func archiveSummaryFiles(processedFiles map[string]string) {
-	for summaryType, summaryFile := range constants.SummaryTypesOutputSummaryFileMap {
-		if constants.SummaryTypesOutputSummaryFileToSkipMap[summaryType] {
-			continue
+// buildOutputDescription generates a human-readable description for the output file.
+func buildOutputDescription(consolidationType string, group db.ConsolidatedGroup) string {
+	desc := fmt.Sprintf("%s %s", group.GenericSourceType, group.ListType)
+	switch consolidationType {
+	case "group":
+		if group.GroupName != "" {
+			desc = fmt.Sprintf("%s [%s]", desc, group.GroupName)
 		}
-		summaryFilePath := processedFiles[summaryType]
-		if summaryFilePath == "" {
-			summaryFilePath = filepath.Join(constants.SummaryDir, summaryFile)
-		}
-		// Check if the summary file exists
-		if _, err := os.Stat(summaryFilePath); os.IsNotExist(err) {
-			Logger.Error("Summary file does not exist for archiving", "file", summaryFilePath)
-			continue
-		}
-
-		// Get file modification time for archive copy
-		modTimestamp, err := u.GetFileLastModifiedTime(Logger, summaryFilePath)
-		if err != nil {
-			Logger.Error("Failed to get file last modified time", "error", err)
-			// use the current date
-			modTimestamp = time.Now().Format(constants.TimestampFormat)
-		}
-
-		summaryFileNameNoTimestamp := filepath.Base(summaryFile)
-		archiveFileName := strings.TrimSuffix(summaryFileNameNoTimestamp, filepath.Ext(summaryFileNameNoTimestamp))
-		archiveFileName = fmt.Sprintf("%s_%s.json", archiveFileName, modTimestamp)
-		archiveFilePath := filepath.Join(constants.ArchiveDir, archiveFileName)
-
-		Logger.Debug("Copying summary file with timestamp to archive",
-			"source", summaryFilePath,
-			"destination", archiveFilePath)
-
-		if err := copySummaryFile(summaryFilePath, archiveFilePath); err != nil {
-			Logger.Error("Failed to copy summary file to archive directory", "error", err)
-		} else {
-			Logger.Info("Successfully archived summary file", "file", archiveFilePath)
+	case "category":
+		if group.Category != "" {
+			desc = fmt.Sprintf("%s [%s]", desc, group.Category)
 		}
 	}
+	return desc
 }
 
-func copySummaryFile(srcPath, dstPath string) error {
-	input, err := os.ReadFile(srcPath)
+// writeOutputFile writes an output file with template headers prepended to the content.
+func writeOutputFile(
+	tmpl *template.Template,
+	staticTemplate []byte,
+	fileName, description string,
+	count int,
+	content string,
+	outputPath string,
+) error {
+	var dynamicOutput bytes.Buffer
+	err := tmpl.Execute(&dynamicOutput, common.TemplateData{
+		AppName:        AppConfig.Application.Name,
+		AppVersion:     AppConfig.Application.Version,
+		AppDescription: AppConfig.Application.Description,
+		FileName:       fileName,
+		LastUpdated:    time.Now().Format(constants.TimestampFormat),
+		Description:    description,
+		Count:          count,
+	})
 	if err != nil {
-		return fmt.Errorf("failed to read summary file: %w", err)
+		return fmt.Errorf("executing dynamic template: %w", err)
 	}
-	if err := os.WriteFile(dstPath, input, 0o644); err != nil {
-		return fmt.Errorf("failed to write summary file: %w", err)
+
+	output := fmt.Sprintf("%s\n%s\n%s\n%s",
+		dynamicOutput.String(),
+		string(staticTemplate),
+		constants.ContentSeparator,
+		content,
+	)
+
+	if err := os.WriteFile(outputPath, []byte(output), 0o644); err != nil {
+		return fmt.Errorf("writing output file: %w", err)
 	}
+
 	return nil
-}
-
-func deleteFilesAndFoldersAfterGeneration() {
-	if !deleteFolders {
-		return
-	}
-
-	Logger.Info("Deleting folders after output generation...")
-
-	for summaryType, shouldDelete := range constants.SummaryTypesToDeleteAfterOutputGenerationMap {
-		if shouldDelete {
-			// get the summary file path
-			filePath := filepath.Join(constants.SummaryDir, constants.SummaryTypesOutputSummaryFileMap[summaryType])
-			Logger.Info("Deleting file", "file", filePath)
-			// Check if a file exists
-			if _, err := os.Stat(filePath); os.IsNotExist(err) {
-				Logger.Debug("File does not exist, skipping", "file", filePath)
-				continue
-			}
-			// Delete the file
-			if err := os.Remove(filePath); err != nil {
-				Logger.Error("Failed to delete file", "file", filePath, "error", err)
-				continue
-			}
-
-			Logger.Info("Successfully deleted file", "file", filePath)
-
-			folderPath := constants.SummaryTypesDirMap[summaryType]
-
-			Logger.Info("Deleting folder", "folder", folderPath)
-
-			// Check if the folder exists
-			if _, err := os.Stat(folderPath); os.IsNotExist(err) {
-				Logger.Debug("Folder does not exist, skipping", "folder", folderPath)
-				continue
-			}
-			// Delete the folder
-			if err := os.RemoveAll(folderPath); err != nil {
-				Logger.Error("Failed to delete folder", "folder", folderPath, "error", err)
-				continue
-			}
-
-			Logger.Info("Successfully deleted folder", "folder", folderPath)
-		}
-	}
 }
 
 func init() {
 	generateCmd.AddCommand(generateOutputCmd)
-
-	// Add the includeIgnored flag
-	generateOutputCmd.Flags().BoolVarP(&includeIgnored, "include-ignored", "i", false,
-		"Include ignored files in the output by copying to the ignored subfolder")
-
-	// Add the deleteFolders flag
-	generateOutputCmd.Flags().BoolVarP(&deleteFolders, "delete-folders", "d", false,
-		"Delete source folders after output generation")
 }
