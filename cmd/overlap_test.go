@@ -29,7 +29,7 @@ func TestComputeOverlapForType_NoSources(t *testing.T) {
 	defer database.Close() // nolint: errcheck
 
 	overlapRepo := idb.NewOverlapRepo(database)
-	count := computeOverlapForType(ctx, logger, overlapRepo, "domain", "blocklist")
+	count := computeOverlapForGenericType(ctx, logger, overlapRepo, "domain")
 	assert.Equal(t, 0, count)
 }
 
@@ -58,7 +58,7 @@ func TestComputeOverlapForType_WithOverlap(t *testing.T) {
 	require.NoError(t, err)
 
 	overlapRepo := idb.NewOverlapRepo(database)
-	count := computeOverlapForType(ctx, logger, overlapRepo, "domain", "blocklist")
+	count := computeOverlapForGenericType(ctx, logger, overlapRepo, "domain")
 	assert.Equal(t, 1, count) // 1 pair with overlap
 
 	results, err := overlapRepo.ListOverlapResults(ctx)
@@ -99,7 +99,7 @@ func TestComputeOverlapForType_SingleSource(t *testing.T) {
 	require.NoError(t, err)
 
 	overlapRepo := idb.NewOverlapRepo(database)
-	count := computeOverlapForType(ctx, logger, overlapRepo, "domain", "blocklist")
+	count := computeOverlapForGenericType(ctx, logger, overlapRepo, "domain")
 	assert.Equal(t, 0, count)
 }
 
