@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"sync"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	cfg "github.com/phani-kb/dns-toolkit/internal/config"
@@ -69,6 +70,8 @@ func processAllSources(ctx context.Context, logger *multilog.Logger, processedDi
 	logger.Infof("Using worker pool with %d worker(s) for processing", maxWorkers)
 	workerPool := c.NewDTWorkerPool(maxWorkers)
 
+	var dbMu sync.Mutex
+
 	for _, summary := range downloadSummaries {
 		if summary.Error != "" {
 			logger.Warnf("Skipping processing for %s: %s", summary.Name, summary.Error)
@@ -108,6 +111,7 @@ func processAllSources(ctx context.Context, logger *multilog.Logger, processedDi
 				processedDir,
 				sourceIDLocal,
 				entriesRepo,
+				&dbMu,
 			)
 		})
 	}
@@ -122,6 +126,7 @@ func processSourceFileAndPersist(
 	processedDir string,
 	sourceID int64,
 	entriesRepo *idb.EntriesRepo,
+	dbMu *sync.Mutex,
 ) []c.ProcessedSummary {
 	processedSummaries := make([]c.ProcessedSummary, 0)
 	content, err := os.ReadFile(summary.Filepath)
@@ -250,7 +255,14 @@ func processSourceFileAndPersist(
 	}
 
 	if entriesRepo != nil && sourceID > 0 {
-		if err := entriesRepo.ReplaceSourceData(ctx, sourceID, entryRows, groupRows, categoryRows); err != nil {
+		if dbMu != nil {
+			dbMu.Lock()
+		}
+		err := entriesRepo.ReplaceSourceData(ctx, sourceID, entryRows, groupRows, categoryRows)
+		if dbMu != nil {
+			dbMu.Unlock()
+		}
+		if err != nil {
 			logger.Errorf("Persisting processed entries failed for %s: %v", summary.Name, err)
 		}
 	}

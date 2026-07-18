@@ -21,14 +21,17 @@ func NewProcessedRepo(db *DB) *ProcessedRepo {
 }
 
 type processedAggregateRow struct {
-	Name              string
-	GenericSourceType string
-	ActualSourceType  string
-	ListType          string
-	SourceID          int64
-	EntryCount        int
-	Valid             bool
-	MustConsider      bool
+	Name                        string
+	GenericSourceType           string
+	ActualSourceType            string
+	ListType                    string
+	SourceID                    int64
+	EntryCount                  int
+	Valid                       bool
+	MustConsider                bool
+	SkipGeneralConsolidation    bool
+	SkipGroupsConsolidation     bool
+	SkipCategoriesConsolidation bool
 }
 
 // ListProcessedSummaries reconstructs processed summaries from persisted entries metadata.
@@ -40,9 +43,13 @@ func (r *ProcessedRepo) ListProcessedSummaries(processedDir string) ([]c.Process
 			e.list_type,
 			e.valid,
 			MAX(e.must_consider) as must_consider,
-			COUNT(*) as entry_count
+			COUNT(*) as entry_count,
+			s.skip_general_consolidation,
+			s.skip_groups_consolidation,
+			s.skip_categories_consolidation
 		FROM ` + constants.TableEntries + ` e
 		INNER JOIN ` + constants.TableSources + ` s ON s.id = e.source_id
+		WHERE s.disabled = 0
 		GROUP BY s.id, s.name, e.generic_source_type, e.actual_source_type, e.list_type, e.valid
 		ORDER BY s.name, e.actual_source_type, e.list_type, e.valid DESC`)
 	if err != nil {
@@ -94,11 +101,14 @@ func (r *ProcessedRepo) ListProcessedSummaries(processedDir string) ([]c.Process
 				agg.ListType,
 				agg.Valid,
 			),
-			NumberOfEntries: agg.EntryCount,
-			MustConsider:    agg.MustConsider,
-			Valid:           agg.Valid,
-			Groups:          groups,
-			Categories:      categories,
+			NumberOfEntries:             agg.EntryCount,
+			MustConsider:                agg.MustConsider,
+			Valid:                       agg.Valid,
+			Groups:                      groups,
+			Categories:                  categories,
+			SkipGeneralConsolidation:    agg.SkipGeneralConsolidation,
+			SkipGroupsConsolidation:     agg.SkipGroupsConsolidation,
+			SkipCategoriesConsolidation: agg.SkipCategoriesConsolidation,
 		}
 
 		if agg.Valid {
@@ -133,7 +143,7 @@ func (r *ProcessedRepo) ListProcessedSummaries(processedDir string) ([]c.Process
 
 func scanProcessedAggregateRow(scanner interface{ Scan(dest ...any) error }) (processedAggregateRow, error) {
 	row := processedAggregateRow{}
-	var validInt, mustConsiderInt int
+	var validInt, mustConsiderInt, skipGeneral, skipGroups, skipCategories int
 	err := scanner.Scan(
 		&row.SourceID,
 		&row.Name,
@@ -143,6 +153,9 @@ func scanProcessedAggregateRow(scanner interface{ Scan(dest ...any) error }) (pr
 		&validInt,
 		&mustConsiderInt,
 		&row.EntryCount,
+		&skipGeneral,
+		&skipGroups,
+		&skipCategories,
 	)
 	if err != nil {
 		return processedAggregateRow{}, fmt.Errorf("scanning processed aggregate row: %w", err)
@@ -150,6 +163,9 @@ func scanProcessedAggregateRow(scanner interface{ Scan(dest ...any) error }) (pr
 
 	row.Valid = validInt == 1
 	row.MustConsider = mustConsiderInt == 1
+	row.SkipGeneralConsolidation = skipGeneral == 1
+	row.SkipGroupsConsolidation = skipGroups == 1
+	row.SkipCategoriesConsolidation = skipCategories == 1
 
 	return row, nil
 }
@@ -159,7 +175,7 @@ func (r *ProcessedRepo) getSourceTypes(sourceID int64) ([]c.SourceType, error) {
 		SELECT st.id, tn.name, COALESCE(st.notes, ''), st.disabled
 		FROM `+constants.TableSourceTypes+` st
 		INNER JOIN `+constants.TableTypeNames+` tn ON tn.id = st.type_name_id
-		WHERE st.source_id = ?
+		WHERE st.source_id = ? AND st.disabled = 0
 		ORDER BY st.id`, sourceID)
 	if err != nil {
 		return nil, fmt.Errorf("querying source types for %d: %w", sourceID, err)
@@ -197,7 +213,7 @@ func (r *ProcessedRepo) getSourceListTypes(sourceTypeID int64) ([]c.ListType, er
 		FROM `+constants.TableSourceListTypes+` slt
 		INNER JOIN `+constants.TableListTypeNames+` ltn ON ltn.id = slt.list_type_name_id
 		LEFT JOIN `+constants.TableSourceListTypeNotes+` sltn ON sltn.source_list_type_id = slt.id
-		WHERE slt.source_type_id = ?
+		WHERE slt.source_type_id = ? AND slt.disabled = 0
 		ORDER BY slt.id`, sourceTypeID)
 	if err != nil {
 		return nil, fmt.Errorf("querying source list types for %d: %w", sourceTypeID, err)

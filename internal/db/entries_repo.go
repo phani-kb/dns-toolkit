@@ -449,7 +449,7 @@ func (r *EntriesRepo) GetEntriesByCategory(
 	listType string,
 ) ([]ConsolidationEntry, error) {
 	query := `
-		SELECT DISTINCT
+		SELECT
 			e.entry,
 			e.generic_source_type,
 			e.actual_source_type,
@@ -458,16 +458,16 @@ func (r *EntriesRepo) GetEntriesByCategory(
 			s.name
 		FROM ` + constants.TableEntries + ` e
 		JOIN ` + constants.TableSources + ` s ON s.id = e.source_id
-		JOIN ` + constants.TableEntryCategories + ` c ON c.source_id = e.source_id
+		JOIN ` + constants.TableEntryCategories + ` c
+			ON c.source_id = e.source_id
 			AND c.source_type = e.generic_source_type
 			AND c.list_type = e.list_type
-		WHERE c.category = ?
-			AND e.generic_source_type = ?
+			AND c.category = ?
+		WHERE e.generic_source_type = ?
 			AND e.list_type = ?
 			AND e.valid = 1
 			AND s.disabled = 0
 			AND s.skip_categories_consolidation = 0
-		ORDER BY e.entry
 	`
 
 	rows, err := r.db.conn.Query(query, category, genericSourceType, listType)

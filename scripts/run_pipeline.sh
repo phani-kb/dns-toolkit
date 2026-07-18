@@ -23,7 +23,7 @@ if [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
     echo "  gsr - summaries README"
     echo "  gs  - stats README"
     echo "  gc  - credits README"
-    echo "  gsum - generate summaries from DB (download_summary.json + processed_summary.json)"
+    echo "  gsum - generate summaries"
     echo "  cp  - copy summaries"
     echo ""
     echo "Environment variables:"

@@ -39,7 +39,6 @@ func (r *TopEntriesRepo) GetTopEntries(
 			AND e.list_type = ?
 			AND e.valid = 1
 			AND s.disabled = 0
-			AND s.skip_general_consolidation = 0
 		GROUP BY e.entry
 		HAVING source_count >= ?
 		ORDER BY source_count DESC, e.entry ASC

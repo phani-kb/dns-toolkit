@@ -195,10 +195,10 @@ func (r *ConsolidatedRepo) GetConsolidatedCount(genericSourceType, listType,
 }
 
 func (r *ConsolidatedRepo) ClearConsolidated(consolidationType string) error {
-	if _, err := r.db.conn.Exec("DROP INDEX IF EXISTS idx_consolidated_lookup"); err != nil {
+	if _, err := r.db.conn.Exec("drop index if exists idx_consolidated_lookup"); err != nil {
 		return fmt.Errorf("dropping idx_consolidated_lookup: %w", err)
 	}
-	if _, err := r.db.conn.Exec("DROP INDEX IF EXISTS idx_consolidated_type"); err != nil {
+	if _, err := r.db.conn.Exec("drop index if exists idx_consolidated_type"); err != nil {
 		return fmt.Errorf("dropping idx_consolidated_type: %w", err)
 	}
 
@@ -328,46 +328,47 @@ func (r *ConsolidatedRepo) BulkInsertEntries(ctx context.Context, rows []Consoli
 		return 0, nil
 	}
 
+	const batchSize = constants.BulkInsertBatchSize
 	var inserted int64
-	err := r.db.InTransaction(ctx, func(tx *sql.Tx) (retErr error) {
-		stmt, prepErr := tx.Prepare(`
-			INSERT INTO ` + constants.TableConsolidatedEntries + `
-			(entry, generic_source_type, list_type, consolidation_type, group_name, category, valid, source_count)
-			VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
-		if prepErr != nil {
-			return fmt.Errorf("preparing consolidated insert: %w", prepErr)
-		}
-		defer func() {
-			if closeErr := stmt.Close(); closeErr != nil && retErr == nil {
-				retErr = closeErr
-			}
-		}()
 
-		for _, row := range rows {
-			var groupName, category *string
-			if row.GroupName != "" {
-				groupName = &row.GroupName
+	err := r.db.InTransaction(ctx, func(tx *sql.Tx) error {
+		for i := 0; i < len(rows); i += batchSize {
+			end := i + batchSize
+			if end > len(rows) {
+				end = len(rows)
 			}
-			if row.Category != "" {
-				category = &row.Category
+			batch := rows[i:end]
+
+			query := `INSERT INTO ` + constants.TableConsolidatedEntries +
+				` (entry, generic_source_type, list_type, consolidation_type, group_name, category, valid, source_count) VALUES `
+			args := make([]interface{}, 0, len(batch)*8)
+			for j, row := range batch {
+				if j > 0 {
+					query += ","
+				}
+				query += "(?,?,?,?,?,?,?,?)"
+
+				var groupName, category *string
+				if row.GroupName != "" {
+					groupName = &row.GroupName
+				}
+				if row.Category != "" {
+					category = &row.Category
+				}
+				sourceCount := row.SourceCount
+				if sourceCount <= 0 {
+					sourceCount = 1
+				}
+				args = append(args, row.Entry, row.GenericSourceType, row.ListType,
+					row.ConsolidationType, groupName, category, boolToInt(row.Valid), sourceCount)
 			}
-			sourceCount := row.SourceCount
-			if sourceCount <= 0 {
-				sourceCount = 1
+
+			result, execErr := tx.ExecContext(ctx, query, args...)
+			if execErr != nil {
+				return fmt.Errorf("batch insert consolidated entries: %w", execErr)
 			}
-			if _, execErr := stmt.Exec(
-				row.Entry,
-				row.GenericSourceType,
-				row.ListType,
-				row.ConsolidationType,
-				groupName,
-				category,
-				boolToInt(row.Valid),
-				sourceCount,
-			); execErr != nil {
-				return fmt.Errorf("inserting consolidated entry %q: %w", row.Entry, execErr)
-			}
-			inserted++
+			affected, _ := result.RowsAffected() // nolint: errcheck
+			inserted += affected
 		}
 		return nil
 	})

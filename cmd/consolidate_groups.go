@@ -27,7 +27,7 @@ var consolidateGroupsCmd = &cobra.Command{
 
 		entriesRepo := db.NewEntriesRepo(database)
 
-		// get unique groups directly from DB
+		// get unique groups
 		groups, groupsErr := entriesRepo.GetUniqueGroups(ctx)
 		if groupsErr != nil {
 			Logger.Errorf("Failed to get groups: %v", groupsErr)
@@ -38,7 +38,7 @@ var consolidateGroupsCmd = &cobra.Command{
 			return
 		}
 
-		// get generic source types from DB
+		// get generic source types
 		genericSourceTypes, typesErr := entriesRepo.GetGenericSourceTypes(ctx)
 		if typesErr != nil {
 			Logger.Errorf("Failed to get source types: %v", typesErr)
