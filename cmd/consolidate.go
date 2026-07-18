@@ -121,7 +121,7 @@ var consolidateAllCmd = &cobra.Command{
 				allowlistEntries := allowFilterByType[gst]
 				Logger.Debugf("Filtering %s blocklist with %d resolved allowlist entries", gst, allowlistEntries.Size())
 
-				// get blocklist entries from DB
+				// get blocklist entries
 				blockEntries, err := entriesRepo.GetEntriesForGeneralConsolidation(
 					ctx,
 					gst,
@@ -152,12 +152,12 @@ var consolidateAllCmd = &cobra.Command{
 				if filteredSet.Size() > 0 {
 					if ignoredSet.Size() > 0 {
 						Logger.Infof(
-							"%s blocklist: %d sources, %d total → %d final (%d filtered)",
+							"%s blocklist: %d sources, %d total -> %d final (%d filtered)",
 							gst, len(sourceNames), originalCount, filteredSet.Size(), ignoredSet.Size(),
 						)
 					} else {
 						Logger.Infof(
-							"%s blocklist: %d sources, %d total → %d final",
+							"%s blocklist: %d sources, %d total -> %d final",
 							gst, len(sourceNames), originalCount, filteredSet.Size(),
 						)
 					}
@@ -246,7 +246,7 @@ var consolidateAllCmd = &cobra.Command{
 	},
 }
 
-// processAllowlists processes allowlists directly from DB entries
+// processAllowlists processes allowlists
 func processAllowlists(
 	ctx context.Context,
 	logger *multilog.Logger,

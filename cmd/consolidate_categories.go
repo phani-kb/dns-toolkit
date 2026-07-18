@@ -47,18 +47,27 @@ var consolidateCategoriesCmd = &cobra.Command{
 		Logger.Infof("Found %d generic source types: %v", len(genericSourceTypes), genericSourceTypes)
 
 		var persistMu sync.Mutex
+		var wg sync.WaitGroup
+		semaphore := make(chan struct{}, 4) // limit concurrency to 4 workers
 
 		for _, category := range categories {
-			processCategoryConsolidation(
-				ctx,
-				Logger,
-				category,
-				genericSourceTypes,
-				entriesRepo,
-				consolidatedRepo,
-				&persistMu,
-			)
+			wg.Add(1)
+			go func(cat string) {
+				defer wg.Done()
+				semaphore <- struct{}{}
+				defer func() { <-semaphore }()
+				processCategoryConsolidation(
+					ctx,
+					Logger,
+					cat,
+					genericSourceTypes,
+					entriesRepo,
+					consolidatedRepo,
+					&persistMu,
+				)
+			}(category)
 		}
+		wg.Wait()
 
 		Logger.Infof("Categories consolidation complete")
 	},

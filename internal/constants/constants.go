@@ -620,3 +620,5 @@ const (
 	TableOverlapResults       = TablePrefix + "overlap_results"
 	TableTopEntries           = TablePrefix + "top_entries"
 )
+
+const BulkInsertBatchSize = 500

@@ -167,6 +167,7 @@ create index if not exists idx_entries_lookup on dnstk_entries (entry, generic_s
 create index if not exists idx_entries_source on dnstk_entries (source_id, generic_source_type);
 
 create index if not exists idx_entries_source_type_list on dnstk_entries (source_id, actual_source_type, list_type);
+create index if not exists idx_entries_generic_type_list_valid on dnstk_entries (generic_source_type, list_type, valid, source_id);
 
 -- entry_groups: group membership for processed file batches
 create table if not exists dnstk_entry_groups (
@@ -191,6 +192,7 @@ create table if not exists dnstk_entry_categories (
 ) strict;
 
 create index if not exists idx_entry_categories_source_id on dnstk_entry_categories (source_id);
+create index if not exists idx_entry_categories_lookup on dnstk_entry_categories (source_id, source_type, list_type, category);
 
 -- consolidated_entries: deduplicated results after consolidation
 create table if not exists dnstk_consolidated_entries (
