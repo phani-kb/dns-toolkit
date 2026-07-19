@@ -58,7 +58,7 @@ func (r *DownloadsRepo) UpsertDownload(d DownloadRow) error {
 	lastDownloadTimestamp := normalizeDownloadTimestampValue(d.LastDownloadTimestamp)
 	lastCheckedTimestamp := normalizeDownloadTimestampValue(d.LastCheckedTimestamp)
 
-	_, err := r.db.conn.Exec(`
+	_, err := r.db.writeConn.Exec(`
 		INSERT INTO `+constants.TableDownloads+` (source_id, url, filepath, frequency, checksum, error,
 			last_download_timestamp, last_checked_timestamp, type_count, count_to_consider,
 			skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation)
@@ -89,7 +89,7 @@ func (r *DownloadsRepo) UpsertDownload(d DownloadRow) error {
 
 // GetDownloadBySourceID retrieves a download record by source ID.
 func (r *DownloadsRepo) GetDownloadBySourceID(sourceID int64) (*DownloadRow, error) {
-	row := r.db.conn.QueryRow(`
+	row := r.db.readConn.QueryRow(`
 		SELECT source_id, url, filepath, frequency, checksum, error,
 			last_download_timestamp, last_checked_timestamp, type_count, count_to_consider,
 			skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation
@@ -112,7 +112,7 @@ func (r *DownloadsRepo) GetDownloadBySourceID(sourceID int64) (*DownloadRow, err
 // GetDownloadChecksum returns the stored checksum for a source, or empty if not found.
 func (r *DownloadsRepo) GetDownloadChecksum(sourceID int64) string {
 	var checksum string
-	err := r.db.conn.QueryRow(
+	err := r.db.readConn.QueryRow(
 		"SELECT COALESCE(checksum, '') FROM "+constants.TableDownloads+" WHERE source_id = ?",
 		sourceID).Scan(&checksum)
 	if err != nil {
@@ -166,7 +166,7 @@ var downloadSummaryBaseQuery = `
 
 // ListDownloadSummaries returns all persisted download summaries.
 func (r *DownloadsRepo) ListDownloadSummaries(downloadDir string) ([]c.DownloadSummary, error) {
-	rows, err := r.db.conn.Query(downloadSummaryBaseQuery + " ORDER BY s.name")
+	rows, err := r.db.readConn.Query(downloadSummaryBaseQuery + " ORDER BY s.name")
 	if err != nil {
 		return nil, fmt.Errorf("querying download summaries: %w", err)
 	}
@@ -224,7 +224,7 @@ func scanDownloadSummaryRow(scanner interface{ Scan(dest ...any) error }) (downl
 }
 
 func (r *DownloadsRepo) getDownloadSummaryRowByName(sourceName string) (downloadSummaryRow, error) {
-	row := r.db.conn.QueryRow(
+	row := r.db.readConn.QueryRow(
 		downloadSummaryBaseQuery+" WHERE s.name = ? ORDER BY s.id LIMIT 1",
 		sourceName,
 	)
@@ -290,7 +290,7 @@ func (r *DownloadsRepo) buildDownloadSummaries(
 }
 
 func (r *DownloadsRepo) getSourceCategories(sourceID int64) ([]string, error) {
-	rows, err := r.db.conn.Query(`
+	rows, err := r.db.readConn.Query(`
 		SELECT cn.name
 		FROM `+constants.TableSourceCategories+` sc
 		INNER JOIN `+constants.TableCategoryNames+` cn ON cn.id = sc.category_name_id
@@ -320,7 +320,7 @@ func (r *DownloadsRepo) getSourceCategories(sourceID int64) ([]string, error) {
 }
 
 func (r *DownloadsRepo) getSourceFiles(sourceID int64) ([]string, error) {
-	rows, err := r.db.conn.Query(
+	rows, err := r.db.readConn.Query(
 		"SELECT filename FROM "+constants.TableSourceFiles+" WHERE source_id = ? ORDER BY filename",
 		sourceID,
 	)
@@ -346,7 +346,7 @@ func (r *DownloadsRepo) getSourceFiles(sourceID int64) ([]string, error) {
 }
 
 func (r *DownloadsRepo) getSourceTypes(sourceID int64) ([]c.SourceType, error) {
-	rows, err := r.db.conn.Query(`
+	rows, err := r.db.readConn.Query(`
 		SELECT st.id, tn.name, COALESCE(st.notes, ''), st.disabled
 		FROM `+constants.TableSourceTypes+` st
 		INNER JOIN `+constants.TableTypeNames+` tn ON tn.id = st.type_name_id
@@ -383,7 +383,7 @@ func (r *DownloadsRepo) getSourceTypes(sourceID int64) ([]c.SourceType, error) {
 }
 
 func (r *DownloadsRepo) getSourceListTypes(sourceTypeID int64) ([]c.ListType, error) {
-	rows, err := r.db.conn.Query(`
+	rows, err := r.db.readConn.Query(`
 		SELECT slt.id, ltn.name, COALESCE(sltn.notes, ''), slt.disabled, slt.must_consider
 		FROM `+constants.TableSourceListTypes+` slt
 		INNER JOIN `+constants.TableListTypeNames+` ltn ON ltn.id = slt.list_type_name_id
@@ -422,7 +422,7 @@ func (r *DownloadsRepo) getSourceListTypes(sourceTypeID int64) ([]c.ListType, er
 }
 
 func (r *DownloadsRepo) getSourceListTypeGroups(sourceListTypeID int64) ([]string, error) {
-	rows, err := r.db.conn.Query(`
+	rows, err := r.db.readConn.Query(`
 		SELECT gn.name
 		FROM `+constants.TableSourceListTypeGroups+` sltg
 		INNER JOIN `+constants.TableGroupNames+` gn ON gn.id = sltg.group_name_id

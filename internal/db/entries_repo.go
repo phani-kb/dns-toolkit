@@ -168,7 +168,7 @@ func (r *EntriesRepo) SearchEntries(
 
 	sb.WriteString(" ORDER BY s.name, e.generic_source_type")
 
-	rows, err := r.db.conn.Query(sb.String(), args...)
+	rows, err := r.db.readConn.Query(sb.String(), args...)
 	if err != nil {
 		return nil, fmt.Errorf("searching entries: %w", err)
 	}
@@ -212,7 +212,7 @@ func (r *EntriesRepo) SearchConsolidatedEntries(
 
 	sb.WriteString(" ORDER BY consolidation_type, generic_source_type")
 
-	rows, err := r.db.conn.Query(sb.String(), args...)
+	rows, err := r.db.readConn.Query(sb.String(), args...)
 	if err != nil {
 		return nil, fmt.Errorf("searching consolidated entries: %w", err)
 	}
@@ -267,7 +267,7 @@ func (r *EntriesRepo) GetConflictCounts(_ context.Context) ([]ConflictCountRow, 
 		ORDER BY e.entry
 	`
 
-	rows, err := r.db.conn.Query(query)
+	rows, err := r.db.readConn.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("querying conflict counts: %w", err)
 	}
@@ -307,7 +307,7 @@ func (r *EntriesRepo) GetAllEntryCounts(_ context.Context) ([]AllEntryCountRow, 
 		ORDER BY e.entry
 	`
 
-	rows, err := r.db.conn.Query(query)
+	rows, err := r.db.readConn.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("querying all entry counts: %w", err)
 	}
@@ -345,7 +345,7 @@ func (r *EntriesRepo) GetSourcesForEntry(
 		ORDER BY s.name
 	`
 
-	rows, err2 := r.db.conn.Query(query, entry, genericSourceType)
+	rows, err2 := r.db.readConn.Query(query, entry, genericSourceType)
 	if err2 != nil {
 		return nil, nil, fmt.Errorf("querying sources for entry: %w", err2)
 	}
@@ -470,7 +470,7 @@ func (r *EntriesRepo) GetEntriesByCategory(
 			AND s.skip_categories_consolidation = 0
 	`
 
-	rows, err := r.db.conn.Query(query, category, genericSourceType, listType)
+	rows, err := r.db.readConn.Query(query, category, genericSourceType, listType)
 	if err != nil {
 		return nil, fmt.Errorf("querying entries by category: %w", err)
 	}
@@ -525,7 +525,7 @@ func (r *EntriesRepo) GetEntriesByGroup(
 		ORDER BY e.entry
 	`
 
-	rows, err := r.db.conn.Query(query, groupName, genericSourceType, listType)
+	rows, err := r.db.readConn.Query(query, groupName, genericSourceType, listType)
 	if err != nil {
 		return nil, fmt.Errorf("querying entries by group: %w", err)
 	}
@@ -576,7 +576,7 @@ func (r *EntriesRepo) GetEntriesForGeneralConsolidation(
 		ORDER BY e.entry
 	`
 
-	rows, err := r.db.conn.Query(query, genericSourceType, listType)
+	rows, err := r.db.readConn.Query(query, genericSourceType, listType)
 	if err != nil {
 		return nil, fmt.Errorf("querying entries for general consolidation: %w", err)
 	}
@@ -626,7 +626,7 @@ func (r *EntriesRepo) GetInvalidEntriesForGeneralConsolidation(
 		ORDER BY e.entry
 	`
 
-	rows, err := r.db.conn.Query(query, genericSourceType, listType)
+	rows, err := r.db.readConn.Query(query, genericSourceType, listType)
 	if err != nil {
 		return nil, fmt.Errorf("querying invalid entries for general consolidation: %w", err)
 	}
@@ -665,7 +665,7 @@ func (r *EntriesRepo) GetUniqueCategories(_ context.Context) ([]string, error) {
 		ORDER BY c.category COLLATE NOCASE
 	`
 
-	rows, err := r.db.conn.Query(query)
+	rows, err := r.db.readConn.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("querying unique categories: %w", err)
 	}
@@ -695,7 +695,7 @@ func (r *EntriesRepo) GetUniqueGroups(_ context.Context) ([]string, error) {
 		ORDER BY g.group_name COLLATE NOCASE
 	`
 
-	rows, err := r.db.conn.Query(query)
+	rows, err := r.db.readConn.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("querying unique groups: %w", err)
 	}
@@ -723,7 +723,7 @@ func (r *EntriesRepo) GetGenericSourceTypes(_ context.Context) ([]string, error)
 		ORDER BY e.generic_source_type COLLATE NOCASE
 	`
 
-	rows, err := r.db.conn.Query(query)
+	rows, err := r.db.readConn.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("querying generic source types: %w", err)
 	}

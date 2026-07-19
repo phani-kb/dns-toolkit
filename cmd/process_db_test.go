@@ -109,15 +109,15 @@ func TestProcessAllSourcesUsesDatabaseDownloadSummaries(t *testing.T) {
 	assert.NotEmpty(t, processedSummaries[0].ValidFiles)
 
 	var entryCount, validCount, invalidCount int
-	require.NoError(t, database.Conn().QueryRow(
+	require.NoError(t, database.ReadConn().QueryRow(
 		"SELECT COUNT(*) FROM "+constants.TableEntries+" WHERE source_id = ?",
 		sourceID,
 	).Scan(&entryCount))
-	require.NoError(t, database.Conn().QueryRow(
+	require.NoError(t, database.ReadConn().QueryRow(
 		"SELECT COUNT(*) FROM "+constants.TableEntries+" WHERE source_id = ? AND valid = 1",
 		sourceID,
 	).Scan(&validCount))
-	require.NoError(t, database.Conn().QueryRow(
+	require.NoError(t, database.ReadConn().QueryRow(
 		"SELECT COUNT(*) FROM "+constants.TableEntries+" WHERE source_id = ? AND valid = 0",
 		sourceID,
 	).Scan(&invalidCount))
@@ -127,7 +127,7 @@ func TestProcessAllSourcesUsesDatabaseDownloadSummaries(t *testing.T) {
 	assert.Equal(t, 1, invalidCount)
 
 	var categoryCount int
-	require.NoError(t, database.Conn().QueryRow(
+	require.NoError(t, database.ReadConn().QueryRow(
 		"SELECT COUNT(*) FROM "+constants.TableEntryCategories+" WHERE source_id = ?",
 		sourceID,
 	).Scan(&categoryCount))

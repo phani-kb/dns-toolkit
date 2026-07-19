@@ -36,7 +36,7 @@ type processedAggregateRow struct {
 
 // ListProcessedSummaries reconstructs processed summaries from persisted entries metadata.
 func (r *ProcessedRepo) ListProcessedSummaries(processedDir string) ([]c.ProcessedSummary, error) {
-	rows, err := r.db.conn.Query(`
+	rows, err := r.db.readConn.Query(`
 		SELECT s.id, s.name,
 			e.generic_source_type,
 			e.actual_source_type,
@@ -171,7 +171,7 @@ func scanProcessedAggregateRow(scanner interface{ Scan(dest ...any) error }) (pr
 }
 
 func (r *ProcessedRepo) getSourceTypes(sourceID int64) ([]c.SourceType, error) {
-	rows, err := r.db.conn.Query(`
+	rows, err := r.db.readConn.Query(`
 		SELECT st.id, tn.name, COALESCE(st.notes, ''), st.disabled
 		FROM `+constants.TableSourceTypes+` st
 		INNER JOIN `+constants.TableTypeNames+` tn ON tn.id = st.type_name_id
@@ -208,7 +208,7 @@ func (r *ProcessedRepo) getSourceTypes(sourceID int64) ([]c.SourceType, error) {
 }
 
 func (r *ProcessedRepo) getSourceListTypes(sourceTypeID int64) ([]c.ListType, error) {
-	rows, err := r.db.conn.Query(`
+	rows, err := r.db.readConn.Query(`
 		SELECT slt.id, ltn.name, COALESCE(sltn.notes, ''), slt.disabled, slt.must_consider
 		FROM `+constants.TableSourceListTypes+` slt
 		INNER JOIN `+constants.TableListTypeNames+` ltn ON ltn.id = slt.list_type_name_id
@@ -247,7 +247,7 @@ func (r *ProcessedRepo) getSourceListTypes(sourceTypeID int64) ([]c.ListType, er
 }
 
 func (r *ProcessedRepo) getSourceListTypeGroups(sourceListTypeID int64) ([]string, error) {
-	rows, err := r.db.conn.Query(`
+	rows, err := r.db.readConn.Query(`
 		SELECT gn.name
 		FROM `+constants.TableSourceListTypeGroups+` sltg
 		INNER JOIN `+constants.TableGroupNames+` gn ON gn.id = sltg.group_name_id
@@ -277,7 +277,7 @@ func (r *ProcessedRepo) getSourceListTypeGroups(sourceListTypeID int64) ([]strin
 func (r *ProcessedRepo) getEntryGroups(sourceID int64, sourceType, listType string) ([]string, error) {
 	query := "SELECT group_name FROM " + constants.TableEntryGroups +
 		" WHERE source_id = ? AND source_type = ? AND list_type = ? ORDER BY group_name"
-	rows, err := r.db.conn.Query(query, sourceID, sourceType, listType)
+	rows, err := r.db.readConn.Query(query, sourceID, sourceType, listType)
 	if err != nil {
 		return nil, fmt.Errorf("querying entry groups for source %d: %w", sourceID, err)
 	}
@@ -301,7 +301,7 @@ func (r *ProcessedRepo) getEntryGroups(sourceID int64, sourceType, listType stri
 func (r *ProcessedRepo) getEntryCategories(sourceID int64, sourceType, listType string) ([]string, error) {
 	query := "SELECT category FROM " + constants.TableEntryCategories +
 		" WHERE source_id = ? AND source_type = ? AND list_type = ? ORDER BY category"
-	rows, err := r.db.conn.Query(query, sourceID, sourceType, listType)
+	rows, err := r.db.readConn.Query(query, sourceID, sourceType, listType)
 	if err != nil {
 		return nil, fmt.Errorf("querying entry categories for source %d: %w", sourceID, err)
 	}

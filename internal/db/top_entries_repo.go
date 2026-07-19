@@ -51,7 +51,7 @@ func (r *TopEntriesRepo) GetTopEntries(
 		args = append(args, maxEntries)
 	}
 
-	rows, err := r.db.conn.Query(query, args...)
+	rows, err := r.db.readConn.Query(query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("querying top entries: %w", err)
 	}
@@ -84,7 +84,7 @@ func (r *TopEntriesRepo) ListTopEntryGroups(_ context.Context) ([]TopEntryGroup,
 		ORDER BY generic_source_type, list_type, min_sources
 	`
 
-	rows, err := r.db.conn.Query(query)
+	rows, err := r.db.readConn.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("querying top entry groups: %w", err)
 	}
@@ -113,7 +113,7 @@ func (r *TopEntriesRepo) GetTopEntriesList(
 		ORDER BY source_count DESC, entry ASC
 	`
 
-	rows, err := r.db.conn.Query(query, genericSourceType, listType, minSources)
+	rows, err := r.db.readConn.Query(query, genericSourceType, listType, minSources)
 	if err != nil {
 		return nil, fmt.Errorf("querying top entries list: %w", err)
 	}
@@ -173,6 +173,6 @@ func (r *TopEntriesRepo) PersistTopEntries(
 
 // ClearAllTopEntries removes all rows from the top entries table.
 func (r *TopEntriesRepo) ClearAllTopEntries() error {
-	_, err := r.db.conn.Exec("DELETE FROM " + constants.TableTopEntries)
+	_, err := r.db.writeConn.Exec("DELETE FROM " + constants.TableTopEntries)
 	return err
 }

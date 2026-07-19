@@ -161,11 +161,11 @@ func TestProcessAllowlists_WithEntries(t *testing.T) {
 	require.NoError(t, err)
 	defer database.Close() // nolint: errcheck
 
-	_, err = database.Conn().
+	_, err = database.WriteConn().
 		Exec(`insert into dnstk_sources (name, disabled, skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation) values ('test-source', 0, 0, 0, 0)`)
 	require.NoError(t, err)
 
-	_, err = database.Conn().
+	_, err = database.WriteConn().
 		Exec(`insert into dnstk_entries (source_id, entry, generic_source_type, actual_source_type, list_type, valid, must_consider)
 		values (1, 'allow1.com', 'domain', 'domain', 'allowlist', 1, 0),
 		       (1, 'allow2.com', 'domain', 'domain', 'allowlist', 1, 0),
@@ -211,11 +211,11 @@ func TestProcessAllowlists_MustConsiderOverridesResolution(t *testing.T) {
 	require.NoError(t, err)
 	defer database.Close() // nolint: errcheck
 
-	_, err = database.Conn().
+	_, err = database.WriteConn().
 		Exec(`insert into dnstk_sources (name, disabled, skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation) values ('test-source', 0, 0, 0, 0)`)
 	require.NoError(t, err)
 
-	_, err = database.Conn().
+	_, err = database.WriteConn().
 		Exec(`insert into dnstk_entries (source_id, entry, generic_source_type, actual_source_type, list_type, valid, must_consider)
 		values (1, 'important.com', 'domain', 'domain', 'allowlist', 1, 1)`)
 	require.NoError(t, err)

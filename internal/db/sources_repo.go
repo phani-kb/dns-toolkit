@@ -58,7 +58,7 @@ type SourceRow struct {
 }
 
 func (r *SourcesRepo) GetSourceByName(name string) (*SourceRow, error) {
-	row := r.db.conn.QueryRow(`
+	row := r.db.readConn.QueryRow(`
 		SELECT id, name, url, url_per_category, url_per_group, frequency, license, website, notes,
 			type_count, count_to_consider, disabled, skip_general_consolidation, skip_groups_consolidation,
 			skip_categories_consolidation, source_file, definition_checksum
@@ -82,7 +82,7 @@ func (r *SourcesRepo) GetSourceByName(name string) (*SourceRow, error) {
 // UpsertSource inserts a source or updates it if it exists by name.
 // Returns the source ID.
 func (r *SourcesRepo) UpsertSource(s *SourceRow) (int64, error) {
-	result, err := r.db.conn.Exec(`
+	result, err := r.db.writeConn.Exec(`
 		INSERT INTO `+constants.TableSources+` (name, url, url_per_category, url_per_group, frequency,
 			license, website, notes, type_count, count_to_consider, disabled,
 			skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation,
@@ -501,7 +501,7 @@ func (r *SourcesRepo) ImportSourcesFromConfig(
 // GetSourceIDByName returns the source ID for a given name, or 0 if not found.
 func (r *SourcesRepo) GetSourceIDByName(name string) (int64, error) {
 	var id int64
-	err := r.db.conn.QueryRow("SELECT id FROM "+constants.TableSources+" WHERE name = ?", name).Scan(&id)
+	err := r.db.readConn.QueryRow("SELECT id FROM "+constants.TableSources+" WHERE name = ?", name).Scan(&id)
 	if err == sql.ErrNoRows {
 		return 0, nil
 	}
@@ -510,7 +510,7 @@ func (r *SourcesRepo) GetSourceIDByName(name string) (int64, error) {
 
 // GetEnabledSources returns all enabled sources.
 func (r *SourcesRepo) GetEnabledSources() ([]SourceRow, error) {
-	rows, err := r.db.conn.Query(`
+	rows, err := r.db.readConn.Query(`
 		SELECT id, name, url, frequency, disabled, source_file,
 			skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation
 		FROM ` + constants.TableSources + ` WHERE disabled = 0
@@ -543,12 +543,12 @@ func (r *SourcesRepo) GetEnabledSources() ([]SourceRow, error) {
 
 func (r *SourcesRepo) GetSourceCount() (int, error) {
 	var count int
-	err := r.db.conn.QueryRow("SELECT COUNT(*) FROM " + constants.TableSources).Scan(&count)
+	err := r.db.readConn.QueryRow("SELECT COUNT(*) FROM " + constants.TableSources).Scan(&count)
 	return count, err
 }
 
 func (r *SourcesRepo) ClearAllSources() error {
-	_, err := r.db.conn.Exec("DELETE FROM " + constants.TableSources)
+	_, err := r.db.writeConn.Exec("DELETE FROM " + constants.TableSources)
 	return err
 }
 

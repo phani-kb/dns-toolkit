@@ -42,12 +42,12 @@ func TestComputeOverlapForType_WithOverlap(t *testing.T) {
 	defer database.Close() // nolint: errcheck
 
 	// 2 sources
-	_, err = database.Conn().Exec(`
+	_, err = database.WriteConn().Exec(`
 		INSERT INTO dnstk_sources (name, disabled, skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation)
 		VALUES ('source-a', 0, 0, 0, 0), ('source-b', 0, 0, 0, 0)`)
 	require.NoError(t, err)
 
-	_, err = database.Conn().Exec(`
+	_, err = database.WriteConn().Exec(`
 		INSERT INTO dnstk_entries (source_id, entry, generic_source_type, actual_source_type, list_type, valid, must_consider)
 		VALUES
 			(1, 'shared.com', 'domain', 'domain', 'blocklist', 1, 0),
@@ -88,12 +88,12 @@ func TestComputeOverlapForType_SingleSource(t *testing.T) {
 	defer database.Close() // nolint: errcheck
 
 	// 1 source
-	_, err = database.Conn().Exec(`
+	_, err = database.WriteConn().Exec(`
 		INSERT INTO dnstk_sources (name, disabled, skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation)
 		VALUES ('only-source', 0, 0, 0, 0)`)
 	require.NoError(t, err)
 
-	_, err = database.Conn().Exec(`
+	_, err = database.WriteConn().Exec(`
 		INSERT INTO dnstk_entries (source_id, entry, generic_source_type, actual_source_type, list_type, valid, must_consider)
 		VALUES (1, 'test.com', 'domain', 'domain', 'blocklist', 1, 0)`)
 	require.NoError(t, err)

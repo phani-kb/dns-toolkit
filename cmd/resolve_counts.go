@@ -166,7 +166,7 @@ func BuildResolutionSets(
 
 	result.Conflicts = conflicts
 	logger.Infof(
-		"resolveByCounts (from DB): allowWins=%d, blockWins=%d, equalCounts=%d, conflicts=%d",
+		"resolveByCounts: allowWins=%d, blockWins=%d, equalCounts=%d, conflicts=%d",
 		allowWins,
 		blockWins,
 		equalCounts,

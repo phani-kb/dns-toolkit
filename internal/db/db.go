@@ -8,13 +8,23 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
+	"strings"
 
 	"github.com/phani-kb/multilog"
 	_ "modernc.org/sqlite"
 )
 
+const dsnPragmas = "_pragma=journal_mode(WAL)" +
+	"&_pragma=synchronous(NORMAL)" +
+	"&_pragma=busy_timeout(5000)" +
+	"&_pragma=cache_size(-64000)" +
+	"&_pragma=foreign_keys(ON)" +
+	"&_pragma=temp_store(MEMORY)"
+
 type DB struct {
-	conn            *sql.DB
+	readConn        *sql.DB
+	writeConn       *sql.DB
 	path            string
 	schemaRecreated bool
 }
@@ -49,40 +59,74 @@ func OpenInspect(dbPath string) (*DB, error) {
 	return openConn(dbPath)
 }
 
+func buildDataSource(dbPath string) string {
+	sep := "?"
+	if strings.Contains(dbPath, "?") {
+		sep = "&"
+	}
+	return dbPath + sep + dsnPragmas
+}
+
 func openConn(dbPath string) (*DB, error) {
 	if err := os.MkdirAll(filepath.Dir(dbPath), 0o755); err != nil {
 		return nil, fmt.Errorf("creating db dir: %w", err)
 	}
 
-	conn, err := sql.Open("sqlite", dbPath)
+	dsn := buildDataSource(dbPath)
+
+	writeConn, err := sql.Open("sqlite", dsn)
 	if err != nil {
-		return nil, fmt.Errorf("opening database: %w", err)
+		return nil, fmt.Errorf("opening write connection: %w", err)
+	}
+	writeConn.SetMaxOpenConns(1)
+	writeConn.SetMaxIdleConns(1)
+	writeConn.SetConnMaxLifetime(0)
+
+	if err = writeConn.Ping(); err != nil {
+		return nil, closeOnError(writeConn, "pinging write database", err)
 	}
 
-	if err = conn.Ping(); err != nil {
-		return nil, closeOnError(conn, "pinging database", err)
+	readConn, err := sql.Open("sqlite", dsn)
+	if err != nil {
+		return nil, closeOnError(writeConn, "opening read connection", err)
+	}
+	readMax := max(3, runtime.GOMAXPROCS(0))
+	readConn.SetMaxOpenConns(readMax)
+	readConn.SetMaxIdleConns(readMax)
+	readConn.SetConnMaxLifetime(0)
+
+	if err = readConn.Ping(); err != nil {
+		_ = writeConn.Close() // nolint: errcheck
+		return nil, closeOnError(readConn, "pinging read database", err)
 	}
 
-	db := &DB{conn: conn, path: dbPath}
-
-	if err = db.applyPragmas(); err != nil {
-		return nil, closeOnError(conn, "applying pragmas", err)
-	}
-
-	return db, nil
+	return &DB{readConn: readConn, writeConn: writeConn, path: dbPath}, nil
 }
 
 // Close closes the database connection.
 func (db *DB) Close() error {
-	if db.conn != nil {
-		return db.conn.Close()
+	var errs []error
+	if db.readConn != nil {
+		if err := db.readConn.Close(); err != nil {
+			errs = append(errs, err)
+		}
 	}
-	return nil
+	if db.writeConn != nil {
+		if err := db.writeConn.Close(); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return errors.Join(errs...)
 }
 
-// Conn returns the underlying sql.DB connection for advanced queries.
-func (db *DB) Conn() *sql.DB {
-	return db.conn
+// ReadConn returns the multi-connection read pool.
+func (db *DB) ReadConn() *sql.DB {
+	return db.readConn
+}
+
+// WriteConn returns the single-connection write pool.
+func (db *DB) WriteConn() *sql.DB {
+	return db.writeConn
 }
 
 // Path returns the database file path.
@@ -90,33 +134,15 @@ func (db *DB) Path() string {
 	return db.path
 }
 
-// applyPragmas sets SQLite performance tuning parameters.
-func (db *DB) applyPragmas() error {
-	pragmas := []string{
-		"PRAGMA journal_mode=WAL",
-		"PRAGMA synchronous=NORMAL",
-		"PRAGMA cache_size=-64000",
-		"PRAGMA foreign_keys=ON",
-		"PRAGMA busy_timeout=5000",
-		"PRAGMA temp_store=MEMORY",
-	}
-	for _, pragma := range pragmas {
-		if _, err := db.conn.Exec(pragma); err != nil {
-			return fmt.Errorf("executing %s: %w", pragma, err)
-		}
-	}
-	return nil
-}
-
 // Vacuum reclaims unused space in the database file.
 func (db *DB) Vacuum() error {
-	_, err := db.conn.Exec("VACUUM")
+	_, err := db.writeConn.Exec("vacuum")
 	return err
 }
 
-// InTransaction executes fn within a database transaction.
+// InTransaction executes fn within a write transaction on the single-writer pool.
 func (db *DB) InTransaction(ctx context.Context, fn func(tx *sql.Tx) error) error {
-	tx, err := db.conn.BeginTx(ctx, nil)
+	tx, err := db.writeConn.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("beginning transaction: %w", err)
 	}
@@ -131,10 +157,25 @@ func (db *DB) InTransaction(ctx context.Context, fn func(tx *sql.Tx) error) erro
 	return tx.Commit()
 }
 
+// InReadTransaction executes fn within a read-only transaction on the read pool.
+func (db *DB) InReadTransaction(ctx context.Context, fn func(tx *sql.Tx) error) error {
+	tx, err := db.readConn.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})
+	if err != nil {
+		return fmt.Errorf("beginning read transaction: %w", err)
+	}
+
+	if err := fn(tx); err != nil {
+		_ = tx.Rollback() // nolint: errcheck
+		return err
+	}
+
+	return tx.Commit()
+}
+
 // CloseLogError closes the DB and logs any error.
 func (db *DB) CloseLogError(logger *multilog.Logger) {
-	if db.conn != nil {
-		if err := db.conn.Close(); err != nil {
+	if db.Close() != nil {
+		if err := db.Close(); err != nil {
 			logger.Warnf("Error closing database: %v", err)
 		}
 	}

@@ -48,12 +48,12 @@ func TestLoadPreviousDownloadSummary_WithFilepathFilter(t *testing.T) {
 	require.NoError(t, err)
 	defer database.Close() // nolint: errcheck
 
-	_, err = database.Conn().Exec(
+	_, err = database.WriteConn().Exec(
 		`insert into dnstk_sources (name, disabled, skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation) values ('test-source', 0, 0, 0, 0)`,
 	)
 	require.NoError(t, err)
 
-	_, err = database.Conn().Exec(
+	_, err = database.WriteConn().Exec(
 		`insert into dnstk_downloads (source_id, url, filepath, checksum) values (1, 'https://example.com/list.txt', '/tmp/download/test.txt', 'abc123')`,
 	)
 	require.NoError(t, err)
