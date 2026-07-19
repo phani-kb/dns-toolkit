@@ -18,7 +18,7 @@ func NewConsolidatedRepo(db *DB) *ConsolidatedRepo {
 }
 
 func (r *ConsolidatedRepo) ConsolidateGeneral(genericSourceType, listType string, valid bool) (int64, error) {
-	result, err := r.db.conn.Exec(`
+	result, err := r.db.writeConn.Exec(`
 		INSERT INTO `+constants.TableConsolidatedEntries+` (entry, generic_source_type, list_type,
 			consolidation_type, valid, source_count)
 		SELECT e.entry, e.generic_source_type, e.list_type, 'general', ?,
@@ -42,7 +42,7 @@ func (r *ConsolidatedRepo) ConsolidateByGroup(
 	genericSourceType, listType, groupName string,
 	valid bool,
 ) (int64, error) {
-	result, err := r.db.conn.Exec(`
+	result, err := r.db.writeConn.Exec(`
 		INSERT INTO `+constants.TableConsolidatedEntries+` (entry, generic_source_type, list_type,
 			consolidation_type, group_name, valid, source_count)
 		SELECT e.entry, e.generic_source_type, e.list_type, 'group', ?, ?,
@@ -70,7 +70,7 @@ func (r *ConsolidatedRepo) ConsolidateByCategory(
 	genericSourceType, listType, category string,
 	valid bool,
 ) (int64, error) {
-	result, err := r.db.conn.Exec(`
+	result, err := r.db.writeConn.Exec(`
 		INSERT INTO `+constants.TableConsolidatedEntries+` (entry, generic_source_type, list_type,
 			consolidation_type, category, valid, source_count)
 		SELECT e.entry, e.generic_source_type, e.list_type, 'category', ?, ?,
@@ -98,7 +98,7 @@ func (r *ConsolidatedRepo) ConsolidateByCountry(
 	genericSourceType, listType, countryCode string,
 	valid bool,
 ) (int64, error) {
-	result, err := r.db.conn.Exec(`
+	result, err := r.db.writeConn.Exec(`
 		INSERT INTO `+constants.TableConsolidatedEntries+` (entry, generic_source_type, list_type,
 			consolidation_type, category, valid, source_count)
 		SELECT e.entry, e.generic_source_type, e.list_type, 'category', ?, ?,
@@ -137,7 +137,7 @@ func (r *ConsolidatedRepo) FilterConsolidatedEntries(genericSourceType, consolid
 		args = append(args, category)
 	}
 
-	result, err := r.db.conn.Exec(fmt.Sprintf(`
+	result, err := r.db.writeConn.Exec(fmt.Sprintf(`
 		DELETE FROM `+constants.TableConsolidatedEntries+`
 		WHERE id IN (
 			SELECT ce.id FROM `+constants.TableConsolidatedEntries+` ce
@@ -162,7 +162,7 @@ func (r *ConsolidatedRepo) FilterConsolidatedEntries(genericSourceType, consolid
 func (r *ConsolidatedRepo) GetConsolidatedEntries(genericSourceType, listType,
 	consolidationType string, valid bool,
 ) ([]string, error) {
-	rows, err := r.db.conn.Query(`
+	rows, err := r.db.readConn.Query(`
 		SELECT entry FROM `+constants.TableConsolidatedEntries+`
 		WHERE generic_source_type = ? AND list_type = ? AND consolidation_type = ? AND valid = ?
 		ORDER BY entry`,
@@ -187,7 +187,7 @@ func (r *ConsolidatedRepo) GetConsolidatedCount(genericSourceType, listType,
 	consolidationType string, valid bool,
 ) (int64, error) {
 	var count int64
-	err := r.db.conn.QueryRow(`
+	err := r.db.readConn.QueryRow(`
 		SELECT COUNT(*) FROM `+constants.TableConsolidatedEntries+`
 		WHERE generic_source_type = ? AND list_type = ? AND consolidation_type = ? AND valid = ?`,
 		genericSourceType, listType, consolidationType, boolToInt(valid)).Scan(&count)
@@ -195,27 +195,27 @@ func (r *ConsolidatedRepo) GetConsolidatedCount(genericSourceType, listType,
 }
 
 func (r *ConsolidatedRepo) ClearConsolidated(consolidationType string) error {
-	if _, err := r.db.conn.Exec("drop index if exists idx_consolidated_lookup"); err != nil {
+	if _, err := r.db.writeConn.Exec("drop index if exists idx_consolidated_lookup"); err != nil {
 		return fmt.Errorf("dropping idx_consolidated_lookup: %w", err)
 	}
-	if _, err := r.db.conn.Exec("drop index if exists idx_consolidated_type"); err != nil {
+	if _, err := r.db.writeConn.Exec("drop index if exists idx_consolidated_type"); err != nil {
 		return fmt.Errorf("dropping idx_consolidated_type: %w", err)
 	}
 
-	_, err := r.db.conn.Exec("DELETE FROM "+constants.TableConsolidatedEntries+
+	_, err := r.db.writeConn.Exec("DELETE FROM "+constants.TableConsolidatedEntries+
 		" WHERE consolidation_type = ?", consolidationType)
 	if err != nil {
 		return err
 	}
 
-	if _, err := r.db.conn.Exec(
+	if _, err := r.db.writeConn.Exec(
 		`CREATE INDEX IF NOT EXISTS idx_consolidated_lookup ON ` +
 			constants.TableConsolidatedEntries +
 			` (entry, generic_source_type, list_type, consolidation_type)`,
 	); err != nil {
 		return fmt.Errorf("recreating idx_consolidated_lookup: %w", err)
 	}
-	if _, err := r.db.conn.Exec(
+	if _, err := r.db.writeConn.Exec(
 		`CREATE INDEX IF NOT EXISTS idx_consolidated_type ON ` +
 			constants.TableConsolidatedEntries +
 			` (consolidation_type, generic_source_type, list_type)`,
@@ -227,7 +227,7 @@ func (r *ConsolidatedRepo) ClearConsolidated(consolidationType string) error {
 }
 
 func (r *ConsolidatedRepo) ClearAllConsolidated() error {
-	_, err := r.db.conn.Exec("DELETE FROM " + constants.TableConsolidatedEntries)
+	_, err := r.db.writeConn.Exec("DELETE FROM " + constants.TableConsolidatedEntries)
 	return err
 }
 
@@ -254,7 +254,7 @@ func (r *ConsolidatedRepo) ListConsolidatedGroups(consolidationType string) ([]C
 		ORDER BY generic_source_type, list_type, group_name, category
 	`
 
-	rows, err := r.db.conn.Query(query, consolidationType)
+	rows, err := r.db.readConn.Query(query, consolidationType)
 	if err != nil {
 		return nil, fmt.Errorf("querying consolidated groups: %w", err)
 	}
@@ -295,7 +295,7 @@ func (r *ConsolidatedRepo) GetConsolidatedEntriesByGroup(
 
 	query += " ORDER BY entry"
 
-	rows, err := r.db.conn.Query(query, args...)
+	rows, err := r.db.readConn.Query(query, args...)
 	if err != nil {
 		return nil, fmt.Errorf("querying consolidated entries by group: %w", err)
 	}

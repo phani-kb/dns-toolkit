@@ -68,7 +68,8 @@ func TestClose(t *testing.T) {
 	err = database.Close()
 	assert.NoError(t, err)
 
-	database.conn = nil
+	database.readConn = nil
+	database.writeConn = nil
 	err = database.Close()
 	assert.NoError(t, err)
 }
@@ -82,7 +83,7 @@ func TestConn(t *testing.T) {
 	require.NoError(t, err)
 	defer database.Close() // nolint: errcheck
 
-	conn := database.Conn()
+	conn := database.ReadConn()
 	assert.NotNil(t, conn)
 
 	err = conn.Ping()
@@ -110,15 +111,15 @@ func TestVacuum(t *testing.T) {
 	require.NoError(t, err)
 	defer database.Close() // nolint: errcheck
 
-	_, err = database.conn.Exec("CREATE TABLE IF NOT EXISTS test_table (id INTEGER PRIMARY KEY, data TEXT)")
+	_, err = database.writeConn.Exec("CREATE TABLE IF NOT EXISTS test_table (id INTEGER PRIMARY KEY, data TEXT)")
 	require.NoError(t, err)
 
 	for i := 0; i < 100; i++ {
-		_, err = database.conn.Exec("INSERT INTO test_table (data) VALUES (?)", "test data")
+		_, err = database.writeConn.Exec("INSERT INTO test_table (data) VALUES (?)", "test data")
 		require.NoError(t, err)
 	}
 
-	_, err = database.conn.Exec("DELETE FROM test_table")
+	_, err = database.writeConn.Exec("DELETE FROM test_table")
 	require.NoError(t, err)
 
 	err = database.Vacuum()
@@ -139,7 +140,7 @@ func TestOpenInspect(t *testing.T) {
 	require.NotNil(t, db2)
 	defer db2.Close() // nolint: errcheck
 
-	assert.NotNil(t, db2.Conn())
+	assert.NotNil(t, db2.ReadConn())
 }
 
 func TestInTransaction(t *testing.T) {
@@ -151,7 +152,7 @@ func TestInTransaction(t *testing.T) {
 	require.NoError(t, err)
 	defer database.Close() // nolint: errcheck
 
-	_, err = database.conn.Exec("CREATE TABLE IF NOT EXISTS tx_test (id INTEGER PRIMARY KEY, val TEXT)")
+	_, err = database.writeConn.Exec("CREATE TABLE IF NOT EXISTS tx_test (id INTEGER PRIMARY KEY, val TEXT)")
 	require.NoError(t, err)
 
 	err = database.InTransaction(ctx, func(tx *sql.Tx) error {
@@ -161,7 +162,7 @@ func TestInTransaction(t *testing.T) {
 	assert.NoError(t, err)
 
 	var count int
-	err = database.conn.QueryRow("SELECT COUNT(*) FROM tx_test").Scan(&count)
+	err = database.readConn.QueryRow("SELECT COUNT(*) FROM tx_test").Scan(&count)
 	require.NoError(t, err)
 	assert.Equal(t, 1, count)
 
@@ -174,7 +175,7 @@ func TestInTransaction(t *testing.T) {
 	})
 	assert.Error(t, err)
 
-	err = database.conn.QueryRow("SELECT COUNT(*) FROM tx_test").Scan(&count)
+	err = database.readConn.QueryRow("SELECT COUNT(*) FROM tx_test").Scan(&count)
 	require.NoError(t, err)
 	assert.Equal(t, 1, count)
 }
@@ -192,6 +193,7 @@ func TestCloseLogError(t *testing.T) {
 	// 2nd call
 	database.CloseLogError(logger)
 
-	database.conn = nil
+	database.readConn = nil
+	database.writeConn = nil
 	database.CloseLogError(logger)
 }

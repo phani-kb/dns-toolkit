@@ -59,7 +59,7 @@ func TestTopEntriesRepo_GetTopEntries_WithData(t *testing.T) {
 
 	// 3 sources
 	for i := 1; i <= 3; i++ {
-		_, err = database.Conn().Exec(
+		_, err = database.WriteConn().Exec(
 			`INSERT INTO dnstk_sources (name, disabled, skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation) VALUES (?, 0, 0, 0, 0)`,
 			"source"+string(rune('0'+i)),
 		)
@@ -67,7 +67,7 @@ func TestTopEntriesRepo_GetTopEntries_WithData(t *testing.T) {
 	}
 
 	// common.com in all 3, two.com in 2, one.com in 1
-	_, err = database.Conn().
+	_, err = database.WriteConn().
 		Exec(`INSERT INTO dnstk_entries (source_id, entry, generic_source_type, actual_source_type, list_type, valid, must_consider)
 		VALUES (1, 'common.com', 'domain', 'domain', 'blocklist', 1, 0),
 		       (2, 'common.com', 'domain', 'domain', 'blocklist', 1, 0),
@@ -117,14 +117,14 @@ func TestTopEntriesRepo_PersistTopEntries(t *testing.T) {
 	assert.NoError(t, err)
 
 	var count int
-	err = database.Conn().QueryRow("SELECT COUNT(*) FROM dnstk_top_entries").Scan(&count)
+	err = database.ReadConn().QueryRow("SELECT COUNT(*) FROM dnstk_top_entries").Scan(&count)
 	require.NoError(t, err)
 	assert.Equal(t, 2, count)
 
 	err = repo.PersistTopEntries(ctx, "domain", "blocklist", 3, entries[:1])
 	assert.NoError(t, err)
 
-	err = database.Conn().QueryRow("SELECT COUNT(*) FROM dnstk_top_entries").Scan(&count)
+	err = database.ReadConn().QueryRow("SELECT COUNT(*) FROM dnstk_top_entries").Scan(&count)
 	require.NoError(t, err)
 	assert.Equal(t, 1, count)
 }

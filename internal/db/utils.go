@@ -26,10 +26,10 @@ func closeOnError(c io.Closer, op string, opErr error) error {
 }
 
 func (db *DB) tableExists(tableName string) (bool, error) {
-	const q = "SELECT 1 FROM sqlite_master WHERE type='table' AND name = ? LIMIT 1"
+	const q = "select 1 from sqlite_master where type='table' and name = ? limit 1"
 
 	var exists int
-	err := db.conn.QueryRow(q, tableName).Scan(&exists)
+	err := db.readConn.QueryRow(q, tableName).Scan(&exists)
 	if errors.Is(err, sql.ErrNoRows) {
 		return false, nil
 	}

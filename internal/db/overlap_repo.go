@@ -61,7 +61,7 @@ func (r *OverlapRepo) GetSourceEntryCounts(
 		ORDER BY s.name
 	`
 
-	rows, err := r.db.conn.Query(query, genericSourceType, listType)
+	rows, err := r.db.readConn.Query(query, genericSourceType, listType)
 	if err != nil {
 		return nil, fmt.Errorf("querying source entry counts: %w", err)
 	}
@@ -96,7 +96,7 @@ func (r *OverlapRepo) GetSourceEntryCountsAllListTypes(
 		ORDER BY s.name, e.list_type
 	`
 
-	rows, err := r.db.conn.Query(query, genericSourceType)
+	rows, err := r.db.readConn.Query(query, genericSourceType)
 	if err != nil {
 		return nil, fmt.Errorf("querying source entry counts all list types: %w", err)
 	}
@@ -138,7 +138,7 @@ func (r *OverlapRepo) ComputePairOverlap(
 	`
 
 	var count int
-	if err := r.db.conn.QueryRow(query, sourceID, targetID, genericSourceType, listType).Scan(&count); err != nil {
+	if err := r.db.readConn.QueryRow(query, sourceID, targetID, genericSourceType, listType).Scan(&count); err != nil {
 		return 0, fmt.Errorf("computing pair overlap: %w", err)
 	}
 	return count, nil
@@ -169,7 +169,7 @@ func (r *OverlapRepo) ComputeAllPairOverlaps(
 			AND s.disabled = 0
 	`
 
-	rows, err := r.db.conn.Query(query, genericSourceType, listType)
+	rows, err := r.db.readConn.Query(query, genericSourceType, listType)
 	if err != nil {
 		return nil, fmt.Errorf("loading entries for overlap: %w", err)
 	}
@@ -234,7 +234,7 @@ func (r *OverlapRepo) ComputeAllPairOverlapsAcrossListTypes(
 			AND s.disabled = 0
 	`
 
-	rows, err := r.db.conn.Query(query, genericSourceType)
+	rows, err := r.db.readConn.Query(query, genericSourceType)
 	if err != nil {
 		return nil, fmt.Errorf("loading entries for overlap: %w", err)
 	}
@@ -324,7 +324,7 @@ func (r *OverlapRepo) PersistOverlapResults(ctx context.Context, results []Overl
 
 // ClearOverlapResults removes all rows from the overlap results table.
 func (r *OverlapRepo) ClearOverlapResults() error {
-	_, err := r.db.conn.Exec("DELETE FROM " + constants.TableOverlapResults)
+	_, err := r.db.writeConn.Exec("DELETE FROM " + constants.TableOverlapResults)
 	return err
 }
 
@@ -338,7 +338,7 @@ func (r *OverlapRepo) ListOverlapResults(_ context.Context) ([]OverlapResultRow,
 		ORDER BY generic_source_type, source_name, target_name
 	`
 
-	rows, err := r.db.conn.Query(query)
+	rows, err := r.db.readConn.Query(query)
 	if err != nil {
 		return nil, fmt.Errorf("querying overlap results: %w", err)
 	}

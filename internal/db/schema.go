@@ -57,7 +57,7 @@ func (db *DB) storedSchemaChecksum() (string, error) {
 
 	var checksum string
 	q := fmt.Sprintf("SELECT checksum FROM %s LIMIT 1", constants.SchemaMetadataTable)
-	if err := db.conn.QueryRow(q).Scan(&checksum); err != nil {
+	if err := db.readConn.QueryRow(q).Scan(&checksum); err != nil {
 		return "", err
 	}
 	return checksum, nil
@@ -65,7 +65,7 @@ func (db *DB) storedSchemaChecksum() (string, error) {
 
 func (db *DB) recreateSchema(ctx context.Context, logger *multilog.Logger, checksum string) error {
 	// to avoid cascade issues
-	if _, err := db.conn.Exec("pragma foreign_keys=off"); err != nil {
+	if _, err := db.writeConn.Exec("pragma foreign_keys=off"); err != nil {
 		return fmt.Errorf("disabling foreign keys: %w", err)
 	}
 
@@ -74,7 +74,7 @@ func (db *DB) recreateSchema(ctx context.Context, logger *multilog.Logger, check
 		return fmt.Errorf("listing tables: %w", err)
 	}
 
-	tx, err := db.conn.BeginTx(ctx, nil)
+	tx, err := db.writeConn.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("beginning drop transaction: %w", err)
 	}
@@ -93,11 +93,11 @@ func (db *DB) recreateSchema(ctx context.Context, logger *multilog.Logger, check
 		return fmt.Errorf("committing drops: %w", err)
 	}
 
-	if _, err := db.conn.Exec("pragma foreign_keys=on"); err != nil {
+	if _, err := db.writeConn.Exec("pragma foreign_keys=on"); err != nil {
 		return fmt.Errorf("re-enabling foreign keys: %w", err)
 	}
 
-	if _, err := db.conn.Exec(schemaSQL); err != nil {
+	if _, err := db.writeConn.Exec(schemaSQL); err != nil {
 		return fmt.Errorf("executing schema.sql: %w", err)
 	}
 
@@ -110,7 +110,7 @@ func (db *DB) recreateSchema(ctx context.Context, logger *multilog.Logger, check
 	  INSERT INTO %s (checksum) VALUES (?);
 	 `, constants.SchemaMetadataTable, constants.SchemaMetadataTable, constants.SchemaMetadataTable)
 
-	if _, err := db.conn.Exec(q, checksum); err != nil {
+	if _, err := db.writeConn.Exec(q, checksum); err != nil {
 		return fmt.Errorf("storing schema checksum: %w", err)
 	}
 
@@ -120,7 +120,7 @@ func (db *DB) recreateSchema(ctx context.Context, logger *multilog.Logger, check
 func (db *DB) listUserTables(logger *multilog.Logger) ([]string, error) {
 	q := fmt.Sprintf("SELECT name FROM sqlite_master WHERE type='table' "+
 		"AND (name like '%s%%' OR name like '_%s%%') ORDER BY name", constants.TablePrefix, constants.TablePrefix)
-	rows, err := db.conn.Query(q)
+	rows, err := db.readConn.Query(q)
 	if err != nil {
 		return nil, err
 	}
@@ -165,7 +165,7 @@ func (db *DB) TableRowCounts(logger *multilog.Logger) (map[string]int64, error) 
 	for _, t := range tables {
 		var count int64
 		q := "SELECT COUNT(*) FROM " + t
-		err := db.conn.QueryRow(q).Scan(&count)
+		err := db.readConn.QueryRow(q).Scan(&count)
 		if err != nil {
 			counts[t] = -1
 			continue
