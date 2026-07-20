@@ -157,6 +157,37 @@ func (db *DB) InTransaction(ctx context.Context, fn func(tx *sql.Tx) error) erro
 	return tx.Commit()
 }
 
+// InBulkWriteTransaction executes fn within a write transaction without foreign-key checks
+func (db *DB) InBulkWriteTransaction(ctx context.Context, fn func(tx *sql.Tx) error) error {
+	if _, err := db.writeConn.ExecContext(ctx, "pragma foreign_keys=off"); err != nil {
+		return fmt.Errorf("disabling foreign keys: %w", err)
+	}
+	txErr := db.InTransaction(ctx, fn)
+	if _, err := db.writeConn.ExecContext(ctx, "pragma foreign_keys=on"); err != nil {
+		return fmt.Errorf("re-enabling foreign keys: %w (tx error: %v)", err, txErr)
+	}
+	return txErr
+}
+
+// DropAndRecreateTable drops a table and all its indexes, then recreates it
+func (db *DB) DropAndRecreateTable(ctx context.Context, tableName string) error {
+	if _, err := db.writeConn.ExecContext(ctx, "pragma foreign_keys=off"); err != nil {
+		return fmt.Errorf("disabling foreign keys: %w", err)
+	}
+	if _, err := db.writeConn.ExecContext(ctx, "DROP TABLE IF EXISTS "+tableName); err != nil {
+		_, _ = db.writeConn.ExecContext(ctx, "pragma foreign_keys=on") // nolint: errcheck
+		return fmt.Errorf("dropping table %s: %w", tableName, err)
+	}
+	if _, err := db.writeConn.ExecContext(ctx, schemaSQL); err != nil {
+		_, _ = db.writeConn.ExecContext(ctx, "pragma foreign_keys=on") // nolint: errcheck
+		return fmt.Errorf("recreating schema after dropping %s: %w", tableName, err)
+	}
+	if _, err := db.writeConn.ExecContext(ctx, "pragma foreign_keys=on"); err != nil {
+		return fmt.Errorf("re-enabling foreign keys: %w", err)
+	}
+	return nil
+}
+
 // InReadTransaction executes fn within a read-only transaction on the read pool.
 func (db *DB) InReadTransaction(ctx context.Context, fn func(tx *sql.Tx) error) error {
 	tx, err := db.readConn.BeginTx(ctx, &sql.TxOptions{ReadOnly: true})

@@ -213,6 +213,31 @@ func TestIsDomain(t *testing.T) {
 	}
 }
 
+func TestLooksLikeIPAddressCandidate(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		input    string
+		expected bool
+	}{
+		{input: "", expected: false},
+		{input: "example.com", expected: false},
+		{input: "sub.domain.net", expected: false},
+		{input: "192.168.1.1", expected: true},
+		{input: "10.0.0.1", expected: true},
+		{input: "2001:db8::1", expected: true},
+		{input: "fe80::1", expected: true},
+		{input: "123.abc.45.67", expected: false},
+		{input: "abc:def::1", expected: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			assert.Equal(t, tt.expected, looksLikeIPAddressCandidate(tt.input))
+		})
+	}
+}
+
 func TestWriteEntriesToFile(t *testing.T) {
 	t.Parallel()
 

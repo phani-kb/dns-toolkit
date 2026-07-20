@@ -61,20 +61,51 @@ func (r *EntriesRepo) ReplaceSourceData(
 			return fmt.Errorf("clearing entries for source %d: %w", sourceID, err)
 		}
 
-		entriesStmt, err := tx.Prepare(`
-			INSERT OR IGNORE INTO ` + constants.TableEntries + `
-			(source_id, entry, generic_source_type, actual_source_type, list_type, valid, must_consider)
-			VALUES (?, ?, ?, ?, ?, ?, ?)`)
-		if err != nil {
-			return fmt.Errorf("preparing entries insert: %w", err)
+		if err := insertEntryRowsBatch(ctx, tx, sourceID, dedupeEntryRows(entries)); err != nil {
+			return fmt.Errorf("inserting entries for source %d: %w", sourceID, err)
 		}
-		defer func() { _ = entriesStmt.Close() }() // nolint: errcheck
 
-		for _, row := range dedupeEntryRows(entries) {
+		if err := insertEntryGroupRowsBatch(ctx, tx, sourceID, dedupeEntryGroupRows(groups)); err != nil {
+			return fmt.Errorf("inserting entry groups for source %d: %w", sourceID, err)
+		}
+
+		if err := insertEntryCategoryRowsBatch(ctx, tx, sourceID, dedupeEntryCategoryRows(categories)); err != nil {
+			return fmt.Errorf("inserting entry categories for source %d: %w", sourceID, err)
+		}
+
+		return nil
+	})
+}
+
+func insertEntryRowsBatch(ctx context.Context, tx *sql.Tx, sourceID int64, rows []EntryRow) error {
+	if len(rows) == 0 {
+		return nil
+	}
+
+	const cols = 7
+	batchSize := constants.BulkInsertBatchSize
+	for i := 0; i < len(rows); i += batchSize {
+		end := min(i+batchSize, len(rows))
+		batch := rows[i:end]
+
+		var query strings.Builder
+		query.WriteString("INSERT OR IGNORE INTO ")
+		query.WriteString(constants.TableEntries)
+		query.WriteString(
+			" (source_id, entry, generic_source_type, actual_source_type, list_type, valid, must_consider) VALUES ",
+		)
+
+		args := make([]any, 0, len(batch)*cols)
+		added := 0
+		for _, row := range batch {
 			if row.Entry == "" || row.GenericSourceType == "" || row.ActualSourceType == "" || row.ListType == "" {
 				continue
 			}
-			if _, rowErr := entriesStmt.Exec(
+			if added > 0 {
+				query.WriteByte(',')
+			}
+			query.WriteString("(?, ?, ?, ?, ?, ?, ?)")
+			args = append(args,
 				sourceID,
 				row.Entry,
 				row.GenericSourceType,
@@ -82,49 +113,90 @@ func (r *EntriesRepo) ReplaceSourceData(
 				row.ListType,
 				boolToInt(row.Valid),
 				boolToInt(row.MustConsider),
-			); rowErr != nil {
-				return fmt.Errorf("inserting entry for source %d: %w", sourceID, rowErr)
-			}
+			)
+			added++
 		}
 
-		groupsStmt, err := tx.Prepare(`
-			INSERT OR IGNORE INTO ` + constants.TableEntryGroups + `
-			(source_id, source_type, list_type, group_name)
-			VALUES (?, ?, ?, ?)`)
-		if err != nil {
-			return fmt.Errorf("preparing entry groups insert: %w", err)
-		}
-		defer func() { _ = groupsStmt.Close() }() // nolint: errcheck
-
-		for _, row := range dedupeEntryGroupRows(groups) {
-			if row.SourceType == "" || row.ListType == "" || row.GroupName == "" {
-				continue
-			}
-			if _, rowErr := groupsStmt.Exec(sourceID, row.SourceType, row.ListType, row.GroupName); rowErr != nil {
-				return fmt.Errorf("inserting entry group for source %d: %w", sourceID, rowErr)
-			}
+		if added == 0 {
+			continue
 		}
 
-		categoriesStmt, err := tx.Prepare(`
-			INSERT OR IGNORE INTO ` + constants.TableEntryCategories + `
-			(source_id, source_type, list_type, category)
-			VALUES (?, ?, ?, ?)`)
-		if err != nil {
-			return fmt.Errorf("preparing entry categories insert: %w", err)
+		if _, err := tx.ExecContext(ctx, query.String(), args...); err != nil {
+			return err
 		}
-		defer func() { _ = categoriesStmt.Close() }() // nolint: errcheck
+	}
 
-		for _, row := range dedupeEntryCategoryRows(categories) {
-			if row.SourceType == "" || row.ListType == "" || row.Category == "" {
-				continue
-			}
-			if _, rowErr := categoriesStmt.Exec(sourceID, row.SourceType, row.ListType, row.Category); rowErr != nil {
-				return fmt.Errorf("inserting entry category for source %d: %w", sourceID, rowErr)
-			}
-		}
+	return nil
+}
 
+func insertFourColBatch(
+	ctx context.Context,
+	tx *sql.Tx,
+	sourceID int64,
+	table, columns string,
+	rows [][]string,
+) error {
+	if len(rows) == 0 {
 		return nil
-	})
+	}
+
+	const cols = 4
+	batchSize := constants.BulkInsertBatchSize
+	for i := 0; i < len(rows); i += batchSize {
+		end := min(i+batchSize, len(rows))
+		batch := rows[i:end]
+
+		var query strings.Builder
+		query.WriteString("INSERT OR IGNORE INTO ")
+		query.WriteString(table)
+		query.WriteString(" (")
+		query.WriteString(columns)
+		query.WriteString(") VALUES ")
+
+		args := make([]any, 0, len(batch)*cols)
+		added := 0
+		for _, row := range batch {
+			if row[0] == "" || row[1] == "" || row[2] == "" {
+				continue
+			}
+			if added > 0 {
+				query.WriteByte(',')
+			}
+			query.WriteString("(?, ?, ?, ?)")
+			args = append(args, sourceID, row[0], row[1], row[2])
+			added++
+		}
+
+		if added == 0 {
+			continue
+		}
+
+		if _, err := tx.ExecContext(ctx, query.String(), args...); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func insertEntryGroupRowsBatch(ctx context.Context, tx *sql.Tx, sourceID int64, rows []EntryGroupRow) error {
+	converted := make([][]string, len(rows))
+	for i, r := range rows {
+		converted[i] = []string{r.SourceType, r.ListType, r.GroupName}
+	}
+	return insertFourColBatch(ctx, tx, sourceID,
+		constants.TableEntryGroups, "source_id, source_type, list_type, group_name",
+		converted)
+}
+
+func insertEntryCategoryRowsBatch(ctx context.Context, tx *sql.Tx, sourceID int64, rows []EntryCategoryRow) error {
+	converted := make([][]string, len(rows))
+	for i, r := range rows {
+		converted[i] = []string{r.SourceType, r.ListType, r.Category}
+	}
+	return insertFourColBatch(ctx, tx, sourceID,
+		constants.TableEntryCategories, "source_id, source_type, list_type, category",
+		converted)
 }
 
 // SearchResult holds a single hit returned from a DB-backed search.
@@ -153,7 +225,7 @@ func (r *EntriesRepo) SearchEntries(
 		JOIN ` + constants.TableSources + ` s ON s.id = e.source_id
 		WHERE `)
 
-	args := []any{}
+	var args []any
 	if exactMatch {
 		sb.WriteString("e.entry = ?")
 		args = append(args, query)
@@ -201,7 +273,7 @@ func (r *EntriesRepo) SearchConsolidatedEntries(
 		FROM ` + constants.TableConsolidatedEntries + `
 		WHERE `)
 
-	args := []any{}
+	var args []any
 	if exactMatch {
 		sb.WriteString("entry = ?")
 		args = append(args, query)
@@ -246,6 +318,14 @@ type AllEntryCountRow struct {
 	GenericSourceType string
 	BlockCount        int
 	AllowCount        int
+}
+
+type entrySourceAggregateRow struct {
+	Entry             string
+	GenericSourceType string
+	ListType          string
+	SourcesCSV        string
+	SourceCount       int
 }
 
 func (r *EntriesRepo) GetConflictCounts(_ context.Context) ([]ConflictCountRow, error) {
@@ -366,6 +446,49 @@ func (r *EntriesRepo) GetSourcesForEntry(
 	return blockSources, allowSources, rows.Err()
 }
 
+// GetAllEntrySourceAggregates returns one row per (entry, generic_source_type, list_type)
+// with source counts and aggregated source names.
+func (r *EntriesRepo) GetAllEntrySourceAggregates(_ context.Context) ([]entrySourceAggregateRow, error) {
+	query := `
+		SELECT
+			e.entry,
+			e.generic_source_type,
+			e.list_type,
+			COUNT(DISTINCT s.name) AS source_count,
+			GROUP_CONCAT(DISTINCT s.name) AS sources
+		FROM ` + constants.TableEntries + ` e
+		JOIN ` + constants.TableSources + ` s ON s.id = e.source_id
+		WHERE e.valid = 1
+			AND s.disabled = 0
+			AND s.skip_general_consolidation = 0
+		GROUP BY e.entry, e.generic_source_type, e.list_type
+		ORDER BY e.entry
+	`
+
+	rows, err := r.db.readConn.Query(query)
+	if err != nil {
+		return nil, fmt.Errorf("querying entry source aggregates: %w", err)
+	}
+	defer rows.Close() // nolint: errcheck
+
+	var results []entrySourceAggregateRow
+	for rows.Next() {
+		var row entrySourceAggregateRow
+		if err := rows.Scan(
+			&row.Entry,
+			&row.GenericSourceType,
+			&row.ListType,
+			&row.SourceCount,
+			&row.SourcesCSV,
+		); err != nil {
+			return nil, fmt.Errorf("scanning entry source aggregate row: %w", err)
+		}
+		results = append(results, row)
+	}
+
+	return results, rows.Err()
+}
+
 // escapeLike escapes special LIKE characters in s.
 func escapeLike(s string) string {
 	s = strings.ReplaceAll(s, `\`, `\\`)
@@ -378,18 +501,17 @@ func dedupeEntryRows(rows []EntryRow) []EntryRow {
 	if len(rows) == 0 {
 		return nil
 	}
-
+	type key struct{ e, g, a, l string }
 	result := make([]EntryRow, 0, len(rows))
-	seen := make(map[string]struct{}, len(rows))
+	seen := make(map[key]struct{}, len(rows))
 	for _, row := range rows {
-		key := fmt.Sprintf("%s|%s|%s|%s", row.Entry, row.GenericSourceType, row.ActualSourceType, row.ListType)
-		if _, exists := seen[key]; exists {
+		k := key{row.Entry, row.GenericSourceType, row.ActualSourceType, row.ListType}
+		if _, ok := seen[k]; ok {
 			continue
 		}
-		seen[key] = struct{}{}
+		seen[k] = struct{}{}
 		result = append(result, row)
 	}
-
 	return result
 }
 
@@ -738,4 +860,60 @@ func (r *EntriesRepo) GetGenericSourceTypes(_ context.Context) ([]string, error)
 		types = append(types, gst)
 	}
 	return types, rows.Err()
+}
+
+var entrySecondaryIndexes = []struct{ name, ddl string }{
+	{
+		"idx_entries_lookup",
+		"CREATE INDEX IF NOT EXISTS idx_entries_lookup ON " +
+			constants.TableEntries +
+			" (entry, generic_source_type, list_type)",
+	},
+	{
+		"idx_entries_source",
+		"CREATE INDEX IF NOT EXISTS idx_entries_source ON " + constants.TableEntries + " (source_id, generic_source_type)",
+	},
+	{
+		"idx_entries_source_type_list",
+		"CREATE INDEX IF NOT EXISTS idx_entries_source_type_list ON " +
+			constants.TableEntries +
+			" (source_id, actual_source_type, list_type)",
+	},
+	{
+		"idx_entries_consolidation",
+		"CREATE INDEX IF NOT EXISTS idx_entries_consolidation ON " +
+			constants.TableEntries +
+			" (generic_source_type, list_type, valid, entry, source_id)",
+	},
+}
+
+func (r *EntriesRepo) DropSecondaryIndexes(ctx context.Context) error {
+	for _, idx := range entrySecondaryIndexes {
+		if _, err := r.db.writeConn.ExecContext(ctx, "DROP INDEX IF EXISTS "+idx.name); err != nil {
+			return fmt.Errorf("dropping %s: %w", idx.name, err)
+		}
+	}
+	return nil
+}
+
+func (r *EntriesRepo) RecreateSecondaryIndexes(ctx context.Context) error {
+	for _, idx := range entrySecondaryIndexes {
+		if _, err := r.db.writeConn.ExecContext(ctx, idx.ddl); err != nil {
+			return fmt.Errorf("creating %s: %w", idx.name, err)
+		}
+	}
+	return nil
+}
+
+// CountEntriesForSource returns how many entry rows already exist for a source.
+func (r *EntriesRepo) CountEntriesForSource(ctx context.Context, sourceID int64) (int64, error) {
+	var n int64
+	err := r.db.readConn.QueryRowContext(ctx,
+		"SELECT COUNT(1) FROM "+constants.TableEntries+" WHERE source_id = ?",
+		sourceID,
+	).Scan(&n)
+	if err != nil {
+		return 0, fmt.Errorf("counting entries for source %d: %w", sourceID, err)
+	}
+	return n, nil
 }

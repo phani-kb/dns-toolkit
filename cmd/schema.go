@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 	"sort"
 
 	"github.com/phani-kb/dns-toolkit/internal/constants"
@@ -112,10 +113,33 @@ A full re-download and reprocess will be needed after this.`,
 }
 
 func getDBPath() string {
+	testMode := isTestMode()
+
 	if AppConfig != nil && AppConfig.DNSToolkit.Database.Path != "" {
-		return AppConfig.DNSToolkit.Database.Path
+		dbPath := AppConfig.DNSToolkit.Database.Path
+		if testMode {
+			dbPath = remapDataDirForTests(dbPath)
+		}
+		if !filepath.IsAbs(dbPath) {
+			if projectRoot := resolveProjectRoot(); projectRoot != "" {
+				dbPath = filepath.Join(projectRoot, dbPath)
+			}
+		}
+		return dbPath
 	}
-	return constants.DefaultDBPath
+
+	if !testMode {
+		return constants.DefaultDBPath
+	}
+
+	dbPath := constants.DefaultTestDBPath
+	if !filepath.IsAbs(dbPath) {
+		if projectRoot := resolveProjectRoot(); projectRoot != "" {
+			dbPath = filepath.Join(projectRoot, dbPath)
+		}
+	}
+
+	return dbPath
 }
 
 func init() {

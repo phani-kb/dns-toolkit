@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
+	"slices"
 	"sort"
 	"strings"
 	"testing"
@@ -14,12 +16,13 @@ import (
 	"github.com/phani-kb/multilog"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
+	cfg "github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestCreateSummary(t *testing.T) {
 	tests := []struct {
-		expectedFields map[string]interface{}
+		expectedFields map[string]any
 		name           string
 		sourceName     string
 		sourceTypes    []c.SourceType
@@ -48,7 +51,7 @@ func TestCreateSummary(t *testing.T) {
 				},
 			},
 			invalidFiles: []c.ProcessedFile{},
-			expectedFields: map[string]interface{}{
+			expectedFields: map[string]any{
 				"source_name": "test-source",
 			},
 		},
@@ -65,7 +68,7 @@ func TestCreateSummary(t *testing.T) {
 			},
 			validFiles:   []c.ProcessedFile{},
 			invalidFiles: []c.ProcessedFile{},
-			expectedFields: map[string]interface{}{
+			expectedFields: map[string]any{
 				"source_name": "empty-source",
 			},
 		},
@@ -97,7 +100,7 @@ func TestCreateSummary(t *testing.T) {
 				},
 			},
 			invalidFiles: []c.ProcessedFile{},
-			expectedFields: map[string]interface{}{
+			expectedFields: map[string]any{
 				"source_name": "large-source",
 			},
 		},
@@ -321,11 +324,11 @@ func TestSaveToFile(t *testing.T) {
 			expectedContent: []string{"single.com"},
 		},
 		{
-			name:            "Save entries with duplicates (should be sorted and deduplicated)",
+			name:            "Save entries with duplicates",
 			entries:         []string{"zebra.com", "alpha.com", "beta.org", "alpha.com"},
 			filePath:        filepath.Join(tempDir, "sorted.txt"),
 			expectError:     false,
-			expectedContent: []string{"alpha.com", "beta.org", "zebra.com"}, // Sorted and deduplicated
+			expectedContent: []string{"zebra.com", "alpha.com", "beta.org", "alpha.com"},
 		},
 		{
 			name:     "Save to read-only directory",
@@ -764,10 +767,8 @@ func TestProcessAllSources(t *testing.T) {
 				ctx = cancelCtx
 			}
 
-			// Run the function
-			processAllSources(ctx, logger, processedDir)
+			processAllSources(ctx, logger, processedDir, false)
 
-			// Verify results
 			if !tt.expectError {
 				// For tests that expect processed summaries, check if at least one summary was created
 				if tt.expectedProcessed > 0 {
@@ -929,13 +930,7 @@ func TestExtractEntriesByTypeComprehensive(t *testing.T) {
 					len(tt.expectedValid), len(valid), valid, tt.expectedValid)
 			} else {
 				for _, expectedValid := range tt.expectedValid {
-					found := false
-					for _, v := range valid {
-						if v == expectedValid {
-							found = true
-							break
-						}
-					}
+					found := slices.Contains(valid, expectedValid)
 					if !found {
 						t.Errorf("Expected valid entry %s not found in %v", expectedValid, valid)
 					}
@@ -948,13 +943,7 @@ func TestExtractEntriesByTypeComprehensive(t *testing.T) {
 					len(tt.expectedInvalid), len(invalid), invalid, tt.expectedInvalid)
 			} else {
 				for _, expectedInvalid := range tt.expectedInvalid {
-					found := false
-					for _, inv := range invalid {
-						if inv == expectedInvalid {
-							found = true
-							break
-						}
-					}
+					found := slices.Contains(invalid, expectedInvalid)
 					if !found {
 						t.Errorf("Expected invalid entry %s not found in %v", expectedInvalid, invalid)
 					}
@@ -1286,8 +1275,7 @@ func TestProcessAllSourcesEdgeCases(t *testing.T) {
 			}
 
 			ctx := context.Background()
-			// This should not panic and should handle the edge cases gracefully
-			processAllSources(ctx, logger, processedDir)
+			processAllSources(ctx, logger, processedDir, false)
 
 			// Cleanup for next test
 			err := os.RemoveAll(filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"]))
@@ -1374,4 +1362,27 @@ func TestCreateSummaryWithDisabledListTypes(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetProcessMaxWorkers(t *testing.T) {
+	originalAppConfig := AppConfig
+	t.Cleanup(func() { AppConfig = originalAppConfig })
+
+	defaultWorkers := runtime.GOMAXPROCS(0)
+	t.Run("nil config uses gomaxprocs", func(t *testing.T) {
+		AppConfig = nil
+		assert.Equal(t, max(defaultWorkers, 1), getProcessMaxWorkers())
+	})
+
+	t.Run("configured workers", func(t *testing.T) {
+		AppConfig = &cfg.AppConfig{}
+		AppConfig.DNSToolkit.MaxWorkers = 2
+		assert.Equal(t, 2, getProcessMaxWorkers())
+	})
+
+	t.Run("non-positive configured workers fall back", func(t *testing.T) {
+		AppConfig = &cfg.AppConfig{}
+		AppConfig.DNSToolkit.MaxWorkers = 0
+		assert.Equal(t, max(defaultWorkers, 1), getProcessMaxWorkers())
+	})
 }

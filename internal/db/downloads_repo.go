@@ -28,6 +28,7 @@ type DownloadRow struct {
 	Error                       string
 	LastDownloadTimestamp       string
 	LastCheckedTimestamp        string
+	LastProcessedTimestamp      string
 	TypeCount                   int
 	CountToConsider             int
 	SourceID                    int64
@@ -40,6 +41,7 @@ type downloadSummaryRow struct {
 	Frequency                   string
 	Checksum                    string
 	LastCheckedTimestamp        string
+	LastProcessedTimestamp      string
 	URL                         string
 	Error                       string
 	Name                        string
@@ -57,12 +59,14 @@ type downloadSummaryRow struct {
 func (r *DownloadsRepo) UpsertDownload(d DownloadRow) error {
 	lastDownloadTimestamp := normalizeDownloadTimestampValue(d.LastDownloadTimestamp)
 	lastCheckedTimestamp := normalizeDownloadTimestampValue(d.LastCheckedTimestamp)
+	lastProcessedTimestamp := normalizeDownloadTimestampValue(d.LastProcessedTimestamp)
 
 	_, err := r.db.writeConn.Exec(`
 		INSERT INTO `+constants.TableDownloads+` (source_id, url, filepath, frequency, checksum, error,
-			last_download_timestamp, last_checked_timestamp, type_count, count_to_consider,
+			last_download_timestamp, last_checked_timestamp, last_processed_timestamp,
+			type_count, count_to_consider,
 			skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		ON CONFLICT(source_id) DO UPDATE SET
 			url = excluded.url,
 			filepath = excluded.filepath,
@@ -71,13 +75,15 @@ func (r *DownloadsRepo) UpsertDownload(d DownloadRow) error {
 			error = excluded.error,
 			last_download_timestamp = excluded.last_download_timestamp,
 			last_checked_timestamp = excluded.last_checked_timestamp,
+			last_processed_timestamp = excluded.last_processed_timestamp,
 			type_count = excluded.type_count,
 			count_to_consider = excluded.count_to_consider,
 			skip_general_consolidation = excluded.skip_general_consolidation,
 			skip_groups_consolidation = excluded.skip_groups_consolidation,
 			skip_categories_consolidation = excluded.skip_categories_consolidation`,
 		d.SourceID, d.URL, d.Filepath, d.Frequency, d.Checksum, d.Error,
-		lastDownloadTimestamp, lastCheckedTimestamp, d.TypeCount, d.CountToConsider,
+		lastDownloadTimestamp, lastCheckedTimestamp, lastProcessedTimestamp,
+		d.TypeCount, d.CountToConsider,
 		boolToInt(d.SkipGeneralConsolidation),
 		boolToInt(d.SkipGroupsConsolidation),
 		boolToInt(d.SkipCategoriesConsolidation))
@@ -91,14 +97,17 @@ func (r *DownloadsRepo) UpsertDownload(d DownloadRow) error {
 func (r *DownloadsRepo) GetDownloadBySourceID(sourceID int64) (*DownloadRow, error) {
 	row := r.db.readConn.QueryRow(`
 		SELECT source_id, url, filepath, frequency, checksum, error,
-			last_download_timestamp, last_checked_timestamp, type_count, count_to_consider,
+			COALESCE(last_download_timestamp, ''),
+			COALESCE(last_checked_timestamp, ''),
+			COALESCE(last_processed_timestamp, ''),
+			type_count, count_to_consider,
 			skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation
 		FROM `+constants.TableDownloads+` WHERE source_id = ?`, sourceID)
 
 	d := &DownloadRow{}
 	var skipGen, skipGrp, skipCat int
 	err := row.Scan(&d.SourceID, &d.URL, &d.Filepath, &d.Frequency,
-		&d.Checksum, &d.Error, &d.LastDownloadTimestamp, &d.LastCheckedTimestamp,
+		&d.Checksum, &d.Error, &d.LastDownloadTimestamp, &d.LastCheckedTimestamp, &d.LastProcessedTimestamp,
 		&d.TypeCount, &d.CountToConsider, &skipGen, &skipGrp, &skipCat)
 	if err != nil {
 		return nil, err
@@ -126,6 +135,41 @@ func (r *DownloadsRepo) GetDownloadChecksum(sourceID int64) string {
 func (r *DownloadsRepo) IsDownloadUnchanged(sourceID int64, newChecksum string) bool {
 	stored := r.GetDownloadChecksum(sourceID)
 	return stored != "" && stored == newChecksum
+}
+
+// GetLastProcessedChecksum returns the checksum that was last successfully processed for a source.
+func (r *DownloadsRepo) GetLastProcessedChecksum(sourceID int64) string {
+	var checksum string
+	err := r.db.readConn.QueryRow(
+		"SELECT COALESCE(last_processed_checksum, '') FROM "+constants.TableDownloads+" WHERE source_id = ?",
+		sourceID).Scan(&checksum)
+	if err != nil {
+		return ""
+	}
+	return checksum
+}
+
+// SetLastProcessedChecksum updates the last_processed_checksum after successful processing.
+func (r *DownloadsRepo) SetLastProcessedChecksum(sourceID int64, checksum string) error {
+	_, err := r.db.writeConn.Exec(
+		"UPDATE "+constants.TableDownloads+" SET last_processed_checksum = ? WHERE source_id = ?",
+		checksum, sourceID)
+	if err != nil {
+		return fmt.Errorf("setting last_processed_checksum for source %d: %w", sourceID, err)
+	}
+	return nil
+}
+
+// SetLastProcessedTimestamp updates the last_processed_timestamp after successful processing.
+func (r *DownloadsRepo) SetLastProcessedTimestamp(sourceID int64, ts string) error {
+	normalized := normalizeDownloadTimestampValue(ts)
+	_, err := r.db.writeConn.Exec(
+		"UPDATE "+constants.TableDownloads+" SET last_processed_timestamp = ? WHERE source_id = ?",
+		normalized, sourceID)
+	if err != nil {
+		return fmt.Errorf("setting last_processed_timestamp for source %d: %w", sourceID, err)
+	}
+	return nil
 }
 
 // GetDownloadSummaryBySourceName returns all persisted download summaries for a source name.
@@ -156,6 +200,7 @@ var downloadSummaryBaseQuery = `
 		COALESCE(d.error, ''),
 		COALESCE(d.last_download_timestamp, ''),
 		COALESCE(d.last_checked_timestamp, ''),
+		COALESCE(d.last_processed_timestamp, ''),
 		d.type_count,
 		d.count_to_consider,
 		d.skip_general_consolidation,
@@ -206,6 +251,7 @@ func scanDownloadSummaryRow(scanner interface{ Scan(dest ...any) error }) (downl
 		&row.Error,
 		&row.LastDownloadTimestamp,
 		&row.LastCheckedTimestamp,
+		&row.LastProcessedTimestamp,
 		&row.TypeCount,
 		&row.CountToConsider,
 		&skipGen,
@@ -260,6 +306,7 @@ func (r *DownloadsRepo) buildDownloadSummaries(
 		Error:                       row.Error,
 		LastDownloadTimestamp:       row.LastDownloadTimestamp,
 		LastCheckedTimestamp:        row.LastCheckedTimestamp,
+		LastProcessedTimestamp:      row.LastProcessedTimestamp,
 		Types:                       types,
 		Categories:                  categories,
 		TypeCount:                   row.TypeCount,

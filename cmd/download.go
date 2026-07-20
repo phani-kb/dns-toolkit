@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
 
@@ -84,8 +85,10 @@ var downloadCmd = &cobra.Command{
 		}
 		maxWorkers = max(maxWorkers, 1)
 		Logger.Infof("Using worker pool with %d worker(s) for downloads", maxWorkers)
-		limiter := createDownloadRateLimiter(maxWorkers)
-		workerPool := c.NewDTWorkerPoolWithLimiter(maxWorkers, limiter)
+		defaultInterval := getDefaultDownloadInterval()
+		defaultBurst := getDefaultDownloadBurst(maxWorkers)
+		defaultLimiter := createDownloadRateLimiter(maxWorkers, defaultInterval, defaultBurst)
+		workerPool := c.NewDTWorkerPool(maxWorkers)
 
 		// Stats to track a download process
 		var totalSources, successCount, failCount, downloadedCount int
@@ -100,6 +103,14 @@ var downloadCmd = &cobra.Command{
 				totalSources++
 				source := source // local copy for goroutine
 				workerPool.Submit(func() {
+					if !strings.HasPrefix(strings.TrimSpace(source.URL), "file://") {
+						if defaultLimiter != nil {
+							if err := defaultLimiter.Wait(context.Background()); err != nil {
+								Logger.Warnf("Rate limiter wait failed for source %s: %v", source.Name, err)
+							}
+						}
+					}
+
 					sourceID, sourceIDErr := sourcesRepo.GetSourceIDByName(source.Name)
 					if sourceIDErr != nil {
 						Logger.Warnf("Failed to get source ID for %s: %v", source.Name, sourceIDErr)
@@ -304,10 +315,9 @@ func init() {
 	downloadCmd.Flags().Bool("force", false, "Force re-download of all sources (ignores existing summaries)")
 }
 
-func createDownloadRateLimiter(maxWorkers int) *rate.Limiter {
+func createDownloadRateLimiter(maxWorkers int, interval time.Duration, burst int) *rate.Limiter {
 	maxWorkers = max(maxWorkers, 1)
 
-	interval := constants.DownloadInterval
 	perRequestInterval := interval
 	if maxWorkers > 1 {
 		perRequestInterval = interval / time.Duration(maxWorkers)
@@ -318,6 +328,25 @@ func createDownloadRateLimiter(maxWorkers int) *rate.Limiter {
 
 	limit := rate.Every(perRequestInterval)
 	b := max(maxWorkers, 1)
+	if burst > 0 {
+		b = burst
+	}
 
 	return rate.NewLimiter(limit, b)
+}
+
+func getDefaultDownloadInterval() time.Duration {
+	if AppConfig != nil && AppConfig.DNSToolkit.DownloadRateLimit.IntervalMs > 0 {
+		return time.Duration(AppConfig.DNSToolkit.DownloadRateLimit.IntervalMs) * time.Millisecond
+	}
+
+	return constants.DownloadInterval
+}
+
+func getDefaultDownloadBurst(maxWorkers int) int {
+	if AppConfig != nil && AppConfig.DNSToolkit.DownloadRateLimit.Burst > 0 {
+		return AppConfig.DNSToolkit.DownloadRateLimit.Burst
+	}
+
+	return max(maxWorkers, 1)
 }

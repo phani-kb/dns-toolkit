@@ -693,7 +693,9 @@
     {
       "name": "USOM-Blocklists-ips",
       "categories": "malicious, threat",
+      "disabled": true,
       "license": "BSD 3-Clause",
+      "notes": "No updates, empty list",
       "types": [
         {
           "name": "ipv4"

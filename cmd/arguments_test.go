@@ -120,4 +120,20 @@ func TestCommandFlags(t *testing.T) {
 		flags := cmd.Flags()
 		assert.NotNil(t, flags, "Command %s should have flags", cmd.Use)
 	}
+
+	processForceFlag := processCmd.Flags().Lookup("force")
+	assert.NotNil(t, processForceFlag, "process command should define --force flag")
+
+	forceVal, err := processCmd.Flags().GetBool("force")
+	assert.NoError(t, err)
+	assert.False(t, forceVal, "process --force should default to false")
+
+	err = processCmd.Flags().Set("force", "true")
+	assert.NoError(t, err)
+	forceVal, err = processCmd.Flags().GetBool("force")
+	assert.NoError(t, err)
+	assert.True(t, forceVal, "process --force should parse true")
+
+	err = processCmd.Flags().Set("force", "false")
+	assert.NoError(t, err)
 }

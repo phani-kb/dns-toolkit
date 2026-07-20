@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/phani-kb/dns-toolkit/internal/common"
@@ -26,98 +27,104 @@ var ignoreCmds = map[string]bool{
 	"version": true,
 }
 
+// dirMapping=config+default+constant
+type dirMapping struct {
+	configVal *string
+	target    *string
+	fallback  string
+}
+
 func validateAndSetDirs() {
 	if AppConfig == nil {
 		return
 	}
 
-	for key, defaultDir := range constants.Folders {
-		var dir string
-		switch key {
-		case "download":
-			dir = AppConfig.DNSToolkit.Folders.Download
-		case "processed":
-			dir = AppConfig.DNSToolkit.Folders.Processed
-		case "consolidated":
-			dir = AppConfig.DNSToolkit.Folders.Consolidated
-		case "summary":
-			dir = AppConfig.DNSToolkit.Folders.Summary
-		case "overlap":
-			dir = AppConfig.DNSToolkit.Folders.Overlap
-		case "top":
-			dir = AppConfig.DNSToolkit.Folders.Top
-		case "consolidated_groups":
-			dir = AppConfig.DNSToolkit.Folders.ConsolidatedGroups
-		case "consolidated_categories":
-			dir = AppConfig.DNSToolkit.Folders.ConsolidatedCategories
-		case "archive":
-			dir = AppConfig.DNSToolkit.Folders.Archive
-		case "output":
-			dir = AppConfig.DNSToolkit.Folders.Output
-		case "summaries":
-			dir = AppConfig.DNSToolkit.Folders.Summaries
-		case "backup":
-			dir = AppConfig.DNSToolkit.Folders.Backup
-		case "output_ignored", "output_groups", "output_categories", "output_top", "output_summaries":
-			continue
-		case "profiles":
-			dir = AppConfig.DNSToolkit.Folders.Profiles
-		}
+	projectRoot := resolveProjectRoot()
+	testMode := isTestContext()
 
+	folders := &AppConfig.DNSToolkit.Folders
+	mappings := []dirMapping{
+		{&folders.Download, &constants.DownloadDir, filepath.Join("data", "download")},
+		{&folders.Processed, &constants.ProcessedDir, filepath.Join("data", "processed")},
+		{&folders.Consolidated, &constants.ConsolidatedDir, filepath.Join("data", "consolidated")},
+		{&folders.ConsolidatedGroups, &constants.ConsolidatedGroupsDir, filepath.Join("data", "consolidated_groups")},
+		{
+			&folders.ConsolidatedCategories,
+			&constants.ConsolidatedCategoriesDir,
+			filepath.Join("data", "consolidated_categories"),
+		},
+		{&folders.Summary, &constants.SummaryDir, "data"},
+		{&folders.Overlap, &constants.OverlapDir, filepath.Join("data", "overlap")},
+		{&folders.Top, &constants.TopDir, filepath.Join("data", "top")},
+		{&folders.Archive, &constants.ArchiveDir, filepath.Join("data", "archive")},
+		{&folders.Backup, &constants.BackupDir, filepath.Join("data", "backup")},
+		{&folders.Output, &constants.OutputDir, filepath.Join("data", "output")},
+		{&folders.Profiles, &constants.ProfilesDir, filepath.Join("data", "profiles")},
+	}
+
+	for _, m := range mappings {
+		dir := *m.configVal
 		if dir == "" {
-			dir = defaultDir
+			dir = m.fallback
 		}
-
-		if !filepath.IsAbs(dir) {
-			if projectRoot, err := utils.FindProjectRoot(""); err == nil {
-				dir = filepath.Join(projectRoot, dir)
-			}
+		if testMode {
+			dir = remapDataDirForTests(dir)
 		}
-
-		switch key {
-		case "download":
-			constants.DownloadDir = dir
-		case "processed":
-			constants.ProcessedDir = dir
-		case "consolidated":
-			constants.ConsolidatedDir = dir
-		case "summary":
-			constants.SummaryDir = dir
-		case "overlap":
-			constants.OverlapDir = dir
-		case "top":
-			constants.TopDir = dir
-		case "consolidated_groups":
-			constants.ConsolidatedGroupsDir = dir
-		case "consolidated_categories":
-			constants.ConsolidatedCategoriesDir = dir
-		case "archive":
-			constants.ArchiveDir = dir
-		case "output":
-			constants.OutputDir = dir
-		case "output_ignored":
-			constants.OutputIgnoredDir = dir
-		case "output_groups":
-			constants.OutputGroupsDir = dir
-		case "output_categories":
-			constants.OutputCategoriesDir = dir
-		case "output_top":
-			constants.OutputTopDir = dir
-		case "output_summaries":
-			constants.OutputSummariesDir = dir
-		case "backup":
-			constants.BackupDir = dir
-		case "profiles":
-			constants.ProfilesDir = dir
+		if !filepath.IsAbs(dir) && projectRoot != "" {
+			dir = filepath.Join(projectRoot, dir)
 		}
+		*m.target = dir
 	}
 
 	// Update computed output subdirectories after OutputDir is set
-	constants.OutputGroupsDir = constants.OutputDir + "/groups"
-	constants.OutputCategoriesDir = constants.OutputDir + "/categories"
-	constants.OutputIgnoredDir = constants.OutputDir + "/ignored"
-	constants.OutputTopDir = constants.OutputDir + "/top"
-	constants.OutputSummariesDir = constants.OutputDir + "/summaries"
+	constants.OutputGroupsDir = filepath.Join(constants.OutputDir, "groups")
+	constants.OutputCategoriesDir = filepath.Join(constants.OutputDir, "categories")
+	constants.OutputIgnoredDir = filepath.Join(constants.OutputDir, "ignored")
+	constants.OutputTopDir = filepath.Join(constants.OutputDir, "top")
+	constants.OutputSummariesDir = filepath.Join(constants.OutputDir, "summaries")
+	constants.RefreshDerivedPaths()
+}
+
+func resolveProjectRoot() string {
+	if isTestContext() {
+		if configPath := os.Getenv("DNS_TOOLKIT_TEST_CONFIG_PATH"); configPath != "" {
+			if !filepath.IsAbs(configPath) {
+				if absPath, err := filepath.Abs(configPath); err == nil {
+					configPath = absPath
+				}
+			}
+
+			configDir := filepath.Dir(configPath)
+			if filepath.Base(configDir) == "testdata" {
+				return filepath.Dir(configDir)
+			}
+			return configDir
+		}
+	}
+
+	projectRoot, err := utils.FindProjectRoot("")
+	if err != nil {
+		return ""
+	}
+
+	return projectRoot
+}
+
+func remapDataDirForTests(dir string) string {
+	clean := filepath.Clean(dir)
+	dataRoot := "data"
+	dataPrefix := dataRoot + string(filepath.Separator)
+
+	if clean == dataRoot {
+		return "testdata"
+	}
+
+	if after, ok := strings.CutPrefix(clean, dataPrefix); ok {
+		trimmed := after
+		return filepath.Join("testdata", trimmed)
+	}
+
+	return dir
 }
 
 // InitForTesting initializes directories for testing when cobra.OnInitialize is not called
@@ -159,6 +166,23 @@ func isTestMode() bool {
 	return os.Getenv("DNS_TOOLKIT_TEST_MODE") == constants.BooleanTrue
 }
 
+func isTestContext() bool {
+	return isTestMode() || os.Getenv("DNS_TOOLKIT_TEST_CONFIG_PATH") != ""
+}
+
+func shouldValidateSourcesSchemaOnInit() bool {
+	if len(os.Args) <= 1 {
+		return false
+	}
+
+	switch os.Args[1] {
+	case validateSourcesCommandName:
+		return true
+	default:
+		return false
+	}
+}
+
 func init() {
 	if isTestMode() && os.Getenv("DNS_TOOLKIT_TEST_CONFIG_PATH") == "" {
 		Logger = utils.NewTestLogger()
@@ -184,7 +208,7 @@ func init() {
 
 	// Skip validation for help commands
 	if len(os.Args) <= 1 || (os.Args[1] != "help" && os.Args[1] != "--help" && os.Args[1] != "-h") {
-		if err := validateConfig(configPath); err != nil {
+		if err := validateConfigWithSchema(configPath, shouldValidateSourcesSchemaOnInit()); err != nil {
 			slog.Error("Config validation failed", "error", err)
 			os.Exit(1)
 		}

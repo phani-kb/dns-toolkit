@@ -7,9 +7,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"slices"
+	"runtime"
 	"strings"
-	"sync"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	cfg "github.com/phani-kb/dns-toolkit/internal/config"
@@ -27,6 +26,12 @@ var processCmd = &cobra.Command{
 	Use:   "process",
 	Short: "Process downloaded files",
 	Run: func(cmd *cobra.Command, args []string) {
+		forceProcess, getBoolErr := cmd.Flags().GetBool("force")
+		if getBoolErr != nil {
+			Logger.Warnf("Failed to parse --force flag (defaulting to false): %v", getBoolErr)
+			forceProcess = false
+		}
+
 		if err := u.EnsureDirectoryExists(Logger, constants.ProcessedDir); err != nil {
 			Logger.Errorf("Failed to create processed directory: %v", err)
 			os.Exit(1)
@@ -37,7 +42,7 @@ var processCmd = &cobra.Command{
 		}
 
 		ctx := context.Background()
-		processAllSources(ctx, Logger, constants.ProcessedDir)
+		processAllSources(ctx, Logger, constants.ProcessedDir, forceProcess)
 	},
 }
 
@@ -47,7 +52,13 @@ var processCmd = &cobra.Command{
 //   - ctx: Context for cancellation
 //   - logger: Logger for recording operations and errors
 //   - processedDir: Directory to save processed results
-func processAllSources(ctx context.Context, logger *multilog.Logger, processedDir string) {
+//   - forceProcess: If true, forces processing of all sources regardless of checksum
+func processAllSources(
+	ctx context.Context,
+	logger *multilog.Logger,
+	processedDir string,
+	forceProcess bool,
+) {
 	downloadSummaries, err := loadDownloadSummaries(ctx, logger)
 	if err != nil {
 		logger.Errorf("Loading download summaries error: %v", err)
@@ -64,21 +75,30 @@ func processAllSources(ctx context.Context, logger *multilog.Logger, processedDi
 
 	sourcesRepo := idb.NewSourcesRepo(database)
 	entriesRepo := idb.NewEntriesRepo(database)
+	downloadsRepo := idb.NewDownloadsRepo(database)
 
-	// Create a worker pool for controlled concurrency
-	maxWorkers := AppConfig.DNSToolkit.MaxWorkers
+	err = entriesRepo.DropSecondaryIndexes(ctx)
+	if err != nil {
+		logger.Errorf("Failed to drop secondary indexes: %v", err)
+		return
+	}
+
+	maxWorkers := getProcessMaxWorkers()
 	logger.Infof("Using worker pool with %d worker(s) for processing", maxWorkers)
 	workerPool := c.NewDTWorkerPool(maxWorkers)
 
-	var dbMu sync.Mutex
+	skippedCount := 0
+	excludedCount := 0
 
 	for _, summary := range downloadSummaries {
 		if summary.Error != "" {
 			logger.Warnf("Skipping processing for %s: %s", summary.Name, summary.Error)
+			excludedCount++
 			continue
 		}
 		if !cfg.IsEnabledSource(summary.Name, SourcesConfigs, *AppConfig) {
 			logger.Debugf("Skipping processing for %s: source is disabled", summary.Name)
+			excludedCount++
 			continue
 		}
 
@@ -92,16 +112,25 @@ func processAllSources(ctx context.Context, logger *multilog.Logger, processedDi
 			sourceID = 0
 		}
 
-		summary := summary // Create a local copy for goroutine
+		if !forceProcess && sourceID > 0 &&
+			canSkipProcessing(ctx, logger, downloadsRepo, entriesRepo, sourceID, summary) {
+			skippedCount++
+			logger.Infof("Skipping %s (unchanged, entries present)", summary.Name)
+			continue
+		}
+
+		if forceProcess && sourceID > 0 {
+			logger.Debugf("Force processing enabled for %s; ignoring checksum", summary.Name)
+		}
+
+		summary := summary
 		sourceIDLocal := sourceID
 		workerPool.Submit(func() {
-			// Check for context cancellation
 			select {
 			case <-ctx.Done():
 				logger.Warnf("Processing cancelled for %s: %v", summary.Name, ctx.Err())
 				return
 			default:
-				// Continue processing
 			}
 
 			_ = processSourceFileAndPersist(
@@ -111,12 +140,21 @@ func processAllSources(ctx context.Context, logger *multilog.Logger, processedDi
 				processedDir,
 				sourceIDLocal,
 				entriesRepo,
-				&dbMu,
+				downloadsRepo,
 			)
 		})
 	}
 
 	workerPool.Wait()
+
+	processedCount := len(downloadSummaries) - skippedCount - excludedCount
+	logger.Infof("Process: %d source(s), %d processed, %d skipped (unchanged), %d excluded (disabled/error)",
+		len(downloadSummaries), processedCount, skippedCount, excludedCount)
+
+	err = entriesRepo.RecreateSecondaryIndexes(ctx)
+	if err != nil {
+		logger.Errorf("Failed to recreate secondary indexes: %v", err)
+	}
 }
 
 func processSourceFileAndPersist(
@@ -126,7 +164,7 @@ func processSourceFileAndPersist(
 	processedDir string,
 	sourceID int64,
 	entriesRepo *idb.EntriesRepo,
-	dbMu *sync.Mutex,
+	downloadsRepo *idb.DownloadsRepo,
 ) []c.ProcessedSummary {
 	processedSummaries := make([]c.ProcessedSummary, 0)
 	content, err := os.ReadFile(summary.Filepath)
@@ -134,8 +172,9 @@ func processSourceFileAndPersist(
 		logger.Errorf("Reading file error: %v (file: %s)", err, summary.Filepath)
 		return processedSummaries
 	}
+	contentStr := string(content)
 
-	entryRows := make([]idb.EntryRow, 0)
+	entryRows := make([]idb.EntryRow, 0, 4096)
 	groupRows := make([]idb.EntryGroupRow, 0)
 	categoryRows := make([]idb.EntryCategoryRow, 0)
 
@@ -147,7 +186,7 @@ func processSourceFileAndPersist(
 		for _, listTypeObj := range sourceTypeObj.GetListTypes() {
 			listTypeName := listTypeObj.Name
 			mustConsider := listTypeObj.MustConsider
-			validEntries, invalidEntries := extractEntriesByType(logger, string(content), sourceTypeName, listTypeName)
+			validEntries, invalidEntries := extractEntriesByType(logger, contentStr, sourceTypeName, listTypeName)
 			if entriesRepo != nil && sourceID > 0 {
 				genericSourceType := cfg.GetGenericSourceType(sourceTypeName)
 				for _, entry := range validEntries {
@@ -255,15 +294,18 @@ func processSourceFileAndPersist(
 	}
 
 	if entriesRepo != nil && sourceID > 0 {
-		if dbMu != nil {
-			dbMu.Lock()
-		}
 		err := entriesRepo.ReplaceSourceData(ctx, sourceID, entryRows, groupRows, categoryRows)
-		if dbMu != nil {
-			dbMu.Unlock()
-		}
 		if err != nil {
 			logger.Errorf("Persisting processed entries failed for %s: %v", summary.Name, err)
+		} else if downloadsRepo != nil {
+			if summary.Checksum != "" {
+				if setErr := downloadsRepo.SetLastProcessedChecksum(sourceID, summary.Checksum); setErr != nil {
+					logger.Warnf("Failed to update last_processed_checksum for %s: %v", summary.Name, setErr)
+				}
+			}
+			if setErr := downloadsRepo.SetLastProcessedTimestamp(sourceID, u.GetTimestamp()); setErr != nil {
+				logger.Warnf("Failed to update last_processed_timestamp for %s: %v", summary.Name, setErr)
+			}
 		}
 	}
 
@@ -455,15 +497,10 @@ func saveEntries(
 //   - filePath: Path of the file to create
 //   - entries: Entries to write to the file
 func saveToFile(logger *multilog.Logger, filePath string, entries []string) {
-	uniqueEntries := u.RemoveDuplicates(entries)
-	if len(uniqueEntries) == 0 {
+	if len(entries) == 0 {
 		return
 	}
-
-	sorted := slices.Clone(uniqueEntries)
-	slices.Sort(sorted)
-
-	content := strings.Join(sorted, "\n") + "\n"
+	content := strings.Join(entries, "\n") + "\n"
 	err := os.WriteFile(filePath, []byte(content), 0o644)
 	if err != nil {
 		logger.Errorf("Error writing file: %v (path: %s)", err, filePath)
@@ -490,4 +527,47 @@ func generateFileName(logger *multilog.Logger, name, sourceType, listType, entry
 		lt = listType
 	}
 	return fmt.Sprintf("%s_%s_%s_%s_%s.txt", name, sourceType, lt, entryType, hex.EncodeToString(hash[:]))
+}
+
+func canSkipProcessing(
+	ctx context.Context,
+	logger *multilog.Logger,
+	downloadsRepo *idb.DownloadsRepo,
+	entriesRepo *idb.EntriesRepo,
+	sourceID int64,
+	downloadSummary c.DownloadSummary,
+) bool {
+	if downloadSummary.Checksum == "" {
+		return false
+	}
+
+	lastProcessed := downloadsRepo.GetLastProcessedChecksum(sourceID)
+	if lastProcessed == "" || lastProcessed != downloadSummary.Checksum {
+		return false
+	}
+
+	count, err := entriesRepo.CountEntriesForSource(ctx, sourceID)
+	if err != nil {
+		logger.Warnf("Skip-check: entry count failed for source %d (%s): %v; will process",
+			sourceID, downloadSummary.Name, err)
+		return false
+	}
+	if count == 0 {
+		logger.Debugf("Source %s checksum matches but has 0 entries; processing", downloadSummary.Name)
+		return false
+	}
+
+	return true
+}
+
+func getProcessMaxWorkers() int {
+	maxWorkers := runtime.GOMAXPROCS(0)
+	if AppConfig != nil && AppConfig.DNSToolkit.MaxWorkers > 0 {
+		maxWorkers = AppConfig.DNSToolkit.MaxWorkers
+	}
+	return max(maxWorkers, 1)
+}
+
+func init() {
+	processCmd.Flags().Bool("force", false, "Force processing of all sources (ignore last_processed checksum skip)")
 }
