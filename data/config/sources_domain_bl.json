@@ -1254,7 +1254,7 @@
     {
       "name": "PuppyScams",
       "categories": "fake, scam",
-      "disabled": false,
+      "disabled": true,
       "notes": "List of top 100 pet scams is not being shared anymore, https://puppyscams.org/top-100-pet-scams",
       "types": [
         {
@@ -1798,8 +1798,9 @@
     {
       "name": "USOM-Blocklists-domains",
       "categories": "malicious, threat",
+      "disabled": true,
       "license": "BSD 3-Clause",
-      "notes": "Huge list",
+      "notes": "Huge list, no updates, empty list",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [

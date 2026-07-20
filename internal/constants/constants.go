@@ -1,6 +1,7 @@
 package constants
 
 import (
+	"path/filepath"
 	"regexp"
 	"time"
 )
@@ -66,24 +67,97 @@ var (
 )
 
 // Folders - Map of folder names to their respective directories
-var Folders = map[string]string{
-	"download":                DownloadDir,
-	"processed":               ProcessedDir,
-	"consolidated":            ConsolidatedDir,
-	"consolidated_groups":     ConsolidatedGroupsDir,
-	"consolidated_categories": ConsolidatedCategoriesDir,
-	"summary":                 SummaryDir,
-	"overlap":                 OverlapDir,
-	"top":                     TopDir,
-	"archive":                 ArchiveDir,
-	"backup":                  BackupDir,
-	"output":                  OutputDir,
-	"profiles":                ProfilesDir,
-	"output_ignored":          OutputIgnoredDir,
-	"output_groups":           OutputGroupsDir,
-	"output_categories":       OutputCategoriesDir,
-	"output_top":              OutputTopDir,
-	"output_summaries":        OutputSummariesDir,
+var Folders map[string]string
+
+func dataPath(parts ...string) string {
+	allParts := append([]string{SummaryDir}, parts...)
+	return filepath.Join(allParts...)
+}
+
+func RefreshDerivedPaths() {
+	Folders = map[string]string{
+		"download":                DownloadDir,
+		"processed":               ProcessedDir,
+		"consolidated":            ConsolidatedDir,
+		"consolidated_groups":     ConsolidatedGroupsDir,
+		"consolidated_categories": ConsolidatedCategoriesDir,
+		"summary":                 SummaryDir,
+		"overlap":                 OverlapDir,
+		"top":                     TopDir,
+		"archive":                 ArchiveDir,
+		"backup":                  BackupDir,
+		"output":                  OutputDir,
+		"profiles":                ProfilesDir,
+		"output_ignored":          OutputIgnoredDir,
+		"output_groups":           OutputGroupsDir,
+		"output_categories":       OutputCategoriesDir,
+		"output_top":              OutputTopDir,
+		"output_summaries":        OutputSummariesDir,
+	}
+
+	AllowlistFilesMap = map[string]string{
+		SourceTypeDomain:  dataPath("allowlist_domains.txt"),
+		SourceTypeAdguard: dataPath("allowlist_adg.txt"),
+		SourceTypeIpv4:    dataPath("allowlist_ipv4.txt"),
+	}
+
+	CustomAllowlistFilesMap = map[string]string{
+		SourceTypeDomain:  dataPath("custom", "allowlist_domains.txt"),
+		SourceTypeAdguard: dataPath("custom", "allowlist_adg.txt"),
+		SourceTypeIpv4:    dataPath("custom", "allowlist_ipv4.txt"),
+	}
+
+	CustomOverrideFilesMap = map[string]map[string]string{
+		SourceTypeDomain: {
+			ForcedAllow: dataPath("custom", "domain_forced_allow.txt"),
+			ForcedBlock: dataPath("custom", "domain_forced_block.txt"),
+		},
+		SourceTypeAdguard: {
+			ForcedAllow: dataPath("custom", "adguard_forced_allow.txt"),
+			ForcedBlock: dataPath("custom", "adguard_forced_block.txt"),
+		},
+		SourceTypeIpv4: {
+			ForcedAllow: dataPath("custom", "ipv4_forced_allow.txt"),
+			ForcedBlock: dataPath("custom", "ipv4_forced_block.txt"),
+		},
+	}
+
+	SummaryTypesDirMap = map[string]string{
+		SummaryTypeDownload:               DownloadDir,
+		SummaryTypeProcessed:              ProcessedDir,
+		SummaryTypeOverlap:                OverlapDir,
+		SummaryTypeConsolidated:           ConsolidatedDir,
+		SummaryTypeConsolidatedGroups:     ConsolidatedGroupsDir,
+		SummaryTypeConsolidatedCategories: ConsolidatedCategoriesDir,
+		SummaryTypeTop:                    TopDir,
+		SummaryTypeArchive:                ArchiveDir,
+		SummaryTypeOutput:                 OutputDir,
+	}
+
+	SummaryTypesOutputDirMap = map[string]string{
+		SummaryTypeConsolidated:           OutputDir,
+		SummaryTypeConsolidatedGroups:     OutputGroupsDir,
+		SummaryTypeConsolidatedCategories: OutputCategoriesDir,
+		SummaryTypeTop:                    OutputTopDir,
+		SummaryTypeOutput:                 OutputDir,
+	}
+
+	ArchiveFoldersToSkipMap = map[string]bool{
+		DownloadDir:               true,
+		ProcessedDir:              true,
+		ConsolidatedDir:           true,
+		ConsolidatedGroupsDir:     true,
+		ConsolidatedCategoriesDir: true,
+		OverlapDir:                true,
+		TopDir:                    true,
+		ArchiveDir:                true,
+		BackupDir:                 true,
+		ProfilesDir:               true,
+	}
+}
+
+func init() {
+	RefreshDerivedPaths()
 }
 
 // DefaultSummaryFiles - Map of summary types to their default file names
@@ -201,6 +275,10 @@ const (
 
 	ListTypeBlocklist = "blocklist"
 	ListTypeAllowlist = "allowlist"
+
+	ConsolidationTypeGeneral  = "general"
+	ConsolidationTypeGroup    = "group"
+	ConsolidationTypeCategory = "category"
 )
 
 var (
@@ -262,7 +340,7 @@ var SourceTypeRegexMap = map[string]*regexp.Regexp{
 	SourceTypeIpv6:     regexp.MustCompile(`\b([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}\b`),
 	SourceTypeCidrIpv4: regexp.MustCompile(`\b\d{1,3}(\.\d{1,3}){3}/\d{1,2}\b`),
 	SourceTypeDomain: regexp.MustCompile(
-		`^([a-zA-Z0-9_]([a-zA-Z0-9\-_]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})$`,
+		`^([a-zA-Z0-9_]([a-zA-Z0-9\-_]{0,61}[a-zA-Z0-9])?\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})$`, //nolint:lll
 	),
 	SourceTypeIpv4Hostname: regexp.MustCompile(
 		`^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\s+([a-zA-Z0-9_-]+\.)*[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.([a-zA-Z]{2,})$`, // nolint:lll
@@ -302,32 +380,9 @@ var (
 )
 
 var (
-	AllowlistFilesMap = map[string]string{
-		SourceTypeDomain:  "data/allowlist_domains.txt",
-		SourceTypeAdguard: "data/allowlist_adg.txt",
-		SourceTypeIpv4:    "data/allowlist_ipv4.txt",
-	}
-
-	CustomAllowlistFilesMap = map[string]string{
-		SourceTypeDomain:  "data/custom/allowlist_domains.txt",
-		SourceTypeAdguard: "data/custom/allowlist_adg.txt",
-		SourceTypeIpv4:    "data/custom/allowlist_ipv4.txt",
-	}
-
-	CustomOverrideFilesMap = map[string]map[string]string{
-		SourceTypeDomain: {
-			ForcedAllow: "data/custom/domain_forced_allow.txt",
-			ForcedBlock: "data/custom/domain_forced_block.txt",
-		},
-		SourceTypeAdguard: {
-			ForcedAllow: "data/custom/adguard_forced_allow.txt",
-			ForcedBlock: "data/custom/adguard_forced_block.txt",
-		},
-		SourceTypeIpv4: {
-			ForcedAllow: "data/custom/ipv4_forced_allow.txt",
-			ForcedBlock: "data/custom/ipv4_forced_block.txt",
-		},
-	}
+	AllowlistFilesMap       map[string]string
+	CustomAllowlistFilesMap map[string]string
+	CustomOverrideFilesMap  map[string]map[string]string
 )
 
 var (
@@ -517,26 +572,10 @@ var SummaryTypesWithTemplateMap = map[string]string{
 }
 
 // SummaryTypesDirMap maps summary types to their respective directories
-var SummaryTypesDirMap = map[string]string{
-	SummaryTypeDownload:               DownloadDir,
-	SummaryTypeProcessed:              ProcessedDir,
-	SummaryTypeOverlap:                OverlapDir,
-	SummaryTypeConsolidated:           ConsolidatedDir,
-	SummaryTypeConsolidatedGroups:     ConsolidatedGroupsDir,
-	SummaryTypeConsolidatedCategories: ConsolidatedCategoriesDir,
-	SummaryTypeTop:                    TopDir,
-	SummaryTypeArchive:                ArchiveDir,
-	SummaryTypeOutput:                 OutputDir,
-}
+var SummaryTypesDirMap map[string]string
 
 // SummaryTypesOutputDirMap maps summary types to their output directories
-var SummaryTypesOutputDirMap = map[string]string{
-	SummaryTypeConsolidated:           OutputDir,
-	SummaryTypeConsolidatedGroups:     OutputGroupsDir,
-	SummaryTypeConsolidatedCategories: OutputCategoriesDir,
-	SummaryTypeTop:                    OutputTopDir,
-	SummaryTypeOutput:                 OutputDir,
-}
+var SummaryTypesOutputDirMap map[string]string
 
 var SummaryTypesOutputToSkipMap = map[string]bool{
 	SummaryTypeDownload:  true,
@@ -566,18 +605,7 @@ var SummaryTypesOutputSummaryFileToSkipMap = map[string]bool{
 }
 
 // ArchiveFoldersToSkipMap contains top level folders that should be skipped during archiving
-var ArchiveFoldersToSkipMap = map[string]bool{
-	DownloadDir:               true,
-	ProcessedDir:              true,
-	ConsolidatedDir:           true,
-	ConsolidatedGroupsDir:     true,
-	ConsolidatedCategoriesDir: true,
-	OverlapDir:                true,
-	TopDir:                    true,
-	ArchiveDir:                true,
-	BackupDir:                 true,
-	ProfilesDir:               true,
-}
+var ArchiveFoldersToSkipMap map[string]bool
 
 var SummaryTypesToDeleteAfterOutputGenerationMap = map[string]bool{
 	SummaryTypeDownload:               false,
@@ -619,6 +647,7 @@ const (
 	TableConsolidatedEntries  = TablePrefix + "consolidated_entries"
 	TableOverlapResults       = TablePrefix + "overlap_results"
 	TableTopEntries           = TablePrefix + "top_entries"
+	TableResolvedAllow        = TablePrefix + "resolved_allow"
 )
 
-const BulkInsertBatchSize = 500
+const BulkInsertBatchSize = 1000

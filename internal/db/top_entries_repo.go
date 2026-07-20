@@ -170,9 +170,3 @@ func (r *TopEntriesRepo) PersistTopEntries(
 		return nil
 	})
 }
-
-// ClearAllTopEntries removes all rows from the top entries table.
-func (r *TopEntriesRepo) ClearAllTopEntries() error {
-	_, err := r.db.writeConn.Exec("DELETE FROM " + constants.TableTopEntries)
-	return err
-}

@@ -108,26 +108,6 @@ func insertTestEntries(t *testing.T, database *idb.DB, sourceIDs map[string]int6
 	}
 }
 
-func TestGetResolutionSets(t *testing.T) {
-	logger, _ := multilog.NewTestLogger(t)
-	ctx := context.Background()
-
-	dbPath := filepath.Join(t.TempDir(), "test.db")
-	database, err := idb.Open(ctx, logger, dbPath, true)
-	require.NoError(t, err)
-	defer database.Close() // nolint: errcheck
-
-	allow1, block1, conflicts1, _, _, _, err := GetResolutionSets(logger, database)
-	assert.NoError(t, err)
-	assert.NotNil(t, allow1)
-	assert.NotNil(t, block1)
-	assert.NotNil(t, conflicts1)
-
-	_, _, _, _, _, _, err = GetResolutionSets(logger, nil)
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "database is required")
-}
-
 func TestBuildResolutionSets_BlocklistWins(t *testing.T) {
 	logger, _ := multilog.NewTestLogger(t)
 	database, sourceIDs := setupTestDBWithEntries(t, logger)

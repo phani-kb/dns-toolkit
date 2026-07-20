@@ -17,12 +17,16 @@ mkdir -p coverage
 mkdir -p coverage/archive
 
 echo -e "${GREEN}Running tests with coverage...${NC}"
-PROJECT_ROOT=$(pwd)
+SCRIPT_DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+PROJECT_ROOT=$(cd "${SCRIPT_DIR}/.." && pwd)
+cd "${PROJECT_ROOT}"
 
 export DNS_TOOLKIT_TEST_MODE=true
 export DNS_TOOLKIT_TEST_CONFIG_PATH="${PROJECT_ROOT}/testdata/config.yml"
 
-find "${PROJECT_ROOT}/testdata" -type f -name "*.db" -delete
+# rm -rf "${PROJECT_ROOT}/cmd/data" "${PROJECT_ROOT}/cmd/testdata"
+
+# find "${PROJECT_ROOT}/testdata" -type f -name "*.db" -delete
 
 PACKAGES=$(go list ./... | grep -v "/mocks" | grep -v "constants")
 if ! go test -coverprofile=coverage/coverage.out -covermode=atomic $PACKAGES; then

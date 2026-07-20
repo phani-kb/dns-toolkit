@@ -25,6 +25,7 @@ type processedAggregateRow struct {
 	GenericSourceType           string
 	ActualSourceType            string
 	ListType                    string
+	LastProcessedTimestamp      string
 	SourceID                    int64
 	EntryCount                  int
 	Valid                       bool
@@ -46,11 +47,15 @@ func (r *ProcessedRepo) ListProcessedSummaries(processedDir string) ([]c.Process
 			COUNT(*) as entry_count,
 			s.skip_general_consolidation,
 			s.skip_groups_consolidation,
-			s.skip_categories_consolidation
+			s.skip_categories_consolidation,
+			COALESCE(d.last_processed_timestamp, '')
 		FROM ` + constants.TableEntries + ` e
 		INNER JOIN ` + constants.TableSources + ` s ON s.id = e.source_id
+		LEFT JOIN ` + constants.TableDownloads + ` d ON d.source_id = s.id
 		WHERE s.disabled = 0
-		GROUP BY s.id, s.name, e.generic_source_type, e.actual_source_type, e.list_type, e.valid
+		GROUP BY s.id, s.name, e.generic_source_type, e.actual_source_type, e.list_type, e.valid,
+			s.skip_general_consolidation, s.skip_groups_consolidation, s.skip_categories_consolidation,
+			d.last_processed_timestamp
 		ORDER BY s.name, e.actual_source_type, e.list_type, e.valid DESC`)
 	if err != nil {
 		return nil, fmt.Errorf("querying processed summaries: %w", err)
@@ -73,8 +78,9 @@ func (r *ProcessedRepo) ListProcessedSummaries(processedDir string) ([]c.Process
 				return nil, typesErr
 			}
 			summary = &c.ProcessedSummary{
-				Name:  agg.Name,
-				Types: types,
+				Name:                   agg.Name,
+				Types:                  types,
+				LastProcessedTimestamp: agg.LastProcessedTimestamp,
 			}
 			summaryBySourceID[agg.SourceID] = summary
 			orderedSourceIDs = append(orderedSourceIDs, agg.SourceID)
@@ -156,6 +162,7 @@ func scanProcessedAggregateRow(scanner interface{ Scan(dest ...any) error }) (pr
 		&skipGeneral,
 		&skipGroups,
 		&skipCategories,
+		&row.LastProcessedTimestamp,
 	)
 	if err != nil {
 		return processedAggregateRow{}, fmt.Errorf("scanning processed aggregate row: %w", err)

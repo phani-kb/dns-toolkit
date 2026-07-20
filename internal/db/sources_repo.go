@@ -468,8 +468,8 @@ func (r *SourcesRepo) insertContent(tx *sql.Tx, sourceID int64, contentType stri
 	return nil
 }
 
-// ImportSourcesFromConfig imports all sources from a SourcesConfig into the database.
-// Returns (imported count, skipped count, error).
+// ImportSourcesFromConfig imports all sources from a SourcesConfig.
+// Returns the number of sources imported, the number of sources skipped, and an error if any.
 func (r *SourcesRepo) ImportSourcesFromConfig(
 	ctx context.Context,
 	logger *multilog.Logger,
