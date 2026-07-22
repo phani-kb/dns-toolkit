@@ -4,7 +4,6 @@ import (
 	"context"
 	"path/filepath"
 	"strings"
-	"sync"
 	"testing"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
@@ -55,7 +54,7 @@ func TestIsConsolidatedSummaryValid(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := IsConsolidatedSummaryValid(tt.summary)
+			result := isConsolidatedSummaryValid(tt.summary)
 			assert.Equal(t, tt.expected, result)
 		})
 	}
@@ -133,9 +132,7 @@ func TestProcessAllowlists_EmptyDatabase(t *testing.T) {
 
 	genericSourceTypes := []string{"domain"}
 	allowlistEntriesByType := make(map[string]u.StringSet)
-	var allConsolidatedSummaries []c.ConsolidatedSummary
 	resolvedBlockByType := make(map[string]u.StringSet)
-	var persistMu sync.Mutex
 
 	processAllowlists(
 		ctx,
@@ -145,8 +142,6 @@ func TestProcessAllowlists_EmptyDatabase(t *testing.T) {
 		genericSourceTypes,
 		resolvedBlockByType,
 		allowlistEntriesByType,
-		&allConsolidatedSummaries,
-		&persistMu,
 	)
 
 	assert.Contains(t, allowlistEntriesByType, "domain")
@@ -177,12 +172,10 @@ func TestProcessAllowlists_WithEntries(t *testing.T) {
 
 	genericSourceTypes := []string{"domain"}
 	allowlistEntriesByType := make(map[string]u.StringSet)
-	var allConsolidatedSummaries []c.ConsolidatedSummary
 
 	resolvedBlockByType := map[string]u.StringSet{
 		"domain": u.NewStringSet([]string{"allow1.com"}),
 	}
-	var persistMu sync.Mutex
 
 	processAllowlists(
 		ctx,
@@ -192,8 +185,6 @@ func TestProcessAllowlists_WithEntries(t *testing.T) {
 		genericSourceTypes,
 		resolvedBlockByType,
 		allowlistEntriesByType,
-		&allConsolidatedSummaries,
-		&persistMu,
 	)
 
 	domainEntries := allowlistEntriesByType["domain"]
@@ -225,12 +216,10 @@ func TestProcessAllowlists_MustConsiderOverridesResolution(t *testing.T) {
 
 	genericSourceTypes := []string{"domain"}
 	allowlistEntriesByType := make(map[string]u.StringSet)
-	var allConsolidatedSummaries []c.ConsolidatedSummary
 
 	resolvedBlockByType := map[string]u.StringSet{
 		"domain": u.NewStringSet([]string{"important.com"}),
 	}
-	var persistMu sync.Mutex
 
 	processAllowlists(
 		ctx,
@@ -240,25 +229,10 @@ func TestProcessAllowlists_MustConsiderOverridesResolution(t *testing.T) {
 		genericSourceTypes,
 		resolvedBlockByType,
 		allowlistEntriesByType,
-		&allConsolidatedSummaries,
-		&persistMu,
 	)
 
 	// must_consider entries should be kept even if in resolved blocklist
 	domainEntries := allowlistEntriesByType["domain"]
 	assert.Equal(t, 1, domainEntries.Size())
 	assert.True(t, domainEntries.Contains("important.com"))
-}
-
-func TestFilterEntriesWithAllowlist_InConsolidate(t *testing.T) {
-	blockSet := u.NewStringSet([]string{"keep.com", "ignore.com", "another.com"})
-	allowSet := u.NewStringSet([]string{"ignore.com"})
-
-	filtered, ignored := filterEntriesWithAllowlist(blockSet, allowSet)
-
-	assert.Equal(t, 2, filtered.Size())
-	assert.True(t, filtered.Contains("keep.com"))
-	assert.True(t, filtered.Contains("another.com"))
-	assert.Equal(t, 1, ignored.Size())
-	assert.True(t, ignored.Contains("ignore.com"))
 }
