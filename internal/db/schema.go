@@ -7,6 +7,7 @@ import (
 	_ "embed"
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/multilog"
@@ -15,9 +16,17 @@ import (
 //go:embed schema.sql
 var schemaSQL string
 
+var (
+	schemaChecksumOnce  sync.Once
+	schemaChecksumValue string
+)
+
 // SchemaChecksum returns the SHA-256 hash of the embedded schema.sql.
 func SchemaChecksum() string {
-	return fmt.Sprintf("%x", sha256.Sum256([]byte(schemaSQL)))
+	schemaChecksumOnce.Do(func() {
+		schemaChecksumValue = fmt.Sprintf("%x", sha256.Sum256([]byte(schemaSQL)))
+	})
+	return schemaChecksumValue
 }
 
 // EnsureSchema checks if the DB schema matches the embedded schema.sql.

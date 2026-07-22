@@ -107,6 +107,8 @@ func TestIsManualOverride(t *testing.T) {
 
 func TestGetAutomaticDecisions(t *testing.T) {
 	logger, _ := multilog.NewTestLogger(t)
+	cleanup, _ := setupTestEnvironmentForCmdTests(t)
+	defer cleanup()
 
 	result := &ResolutionResult{
 		AllowByType: make(map[string]u.StringSet),

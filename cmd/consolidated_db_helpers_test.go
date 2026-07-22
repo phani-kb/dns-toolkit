@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 	"path/filepath"
-	"sync"
 	"testing"
 
 	"github.com/phani-kb/dns-toolkit/internal/config"
@@ -20,7 +19,7 @@ func TestPersistConsolidatedEntries_Empty(t *testing.T) {
 	ctx := context.Background()
 
 	err := persistConsolidatedEntries(
-		ctx, logger, nil, nil,
+		ctx, logger, nil,
 		u.NewStringSet([]string{}),
 		constants.SourceTypeDomain, constants.ListTypeBlocklist,
 		"general", "", "", true,
@@ -28,7 +27,7 @@ func TestPersistConsolidatedEntries_Empty(t *testing.T) {
 	assert.NoError(t, err)
 
 	err = persistConsolidatedEntries(
-		ctx, logger, nil, nil,
+		ctx, logger, nil,
 		nil,
 		constants.SourceTypeDomain, constants.ListTypeBlocklist,
 		"general", "", "", true,
@@ -46,12 +45,11 @@ func TestPersistConsolidatedEntries_WithEntries(t *testing.T) {
 	defer database.Close() // nolint: errcheck
 
 	repo := idb.NewConsolidatedRepo(database)
-	var mu sync.Mutex
 
 	entries := u.NewStringSet([]string{"test1.com", "test2.com", "test3.com"})
 
 	err = persistConsolidatedEntries(
-		ctx, logger, repo, &mu,
+		ctx, logger, repo,
 		entries,
 		constants.SourceTypeDomain, constants.ListTypeBlocklist,
 		"general", "", "", true,
@@ -74,7 +72,7 @@ func TestPersistConsolidatedEntries_WithGroupAndCategory(t *testing.T) {
 
 	// group
 	err = persistConsolidatedEntries(
-		ctx, logger, repo, nil,
+		ctx, logger, repo,
 		entries,
 		constants.SourceTypeDomain, constants.ListTypeBlocklist,
 		"group", "mini", "", true,
@@ -83,7 +81,7 @@ func TestPersistConsolidatedEntries_WithGroupAndCategory(t *testing.T) {
 
 	// category
 	err = persistConsolidatedEntries(
-		ctx, logger, repo, nil,
+		ctx, logger, repo,
 		entries,
 		constants.SourceTypeDomain, constants.ListTypeAllowlist,
 		"category", "", "ads", true,
@@ -106,9 +104,9 @@ func TestOpenConsolidatedRepo(t *testing.T) {
 	}
 	defer func() { AppConfig = oldAppConfig }()
 
-	database, repo, err := openConsolidatedRepo(ctx, logger, "general")
+	database, repo, err := openConsolidatedRepo(ctx, logger, "general", false)
 	require.NoError(t, err)
-	require.NotNil(t, database)
+	require.NotNil(t, database, "fresh DB should not skip (no fingerprint)")
 	require.NotNil(t, repo)
 	defer database.Close() // nolint: errcheck
 }
