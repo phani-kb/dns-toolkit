@@ -3,7 +3,6 @@ package cmd
 import (
 	"context"
 
-	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/dns-toolkit/internal/db"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
@@ -295,10 +294,6 @@ func processAllowlists(
 		}
 	}
 	logger.Debugf("Finished processing allowlists")
-}
-
-func isConsolidatedSummaryValid(summary c.ConsolidatedSummary) bool {
-	return summary.Count > 0
 }
 
 func init() {

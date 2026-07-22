@@ -6,59 +6,12 @@ import (
 	"strings"
 	"testing"
 
-	c "github.com/phani-kb/dns-toolkit/internal/common"
 	idb "github.com/phani-kb/dns-toolkit/internal/db"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-func TestIsConsolidatedSummaryValid(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name     string
-		summary  c.ConsolidatedSummary
-		expected bool
-	}{
-		{
-			name: "valid summary with count > 0",
-			summary: c.ConsolidatedSummary{
-				Count: 10,
-			},
-			expected: true,
-		},
-		{
-			name: "invalid summary with count = 0",
-			summary: c.ConsolidatedSummary{
-				Count: 0,
-			},
-			expected: false,
-		},
-		{
-			name: "valid summary with large count",
-			summary: c.ConsolidatedSummary{
-				Count: 999999,
-			},
-			expected: true,
-		},
-		{
-			name: "invalid summary with negative count",
-			summary: c.ConsolidatedSummary{
-				Count: -1,
-			},
-			expected: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := isConsolidatedSummaryValid(tt.summary)
-			assert.Equal(t, tt.expected, result)
-		})
-	}
-}
 
 func TestGenerateFileName(t *testing.T) {
 	t.Parallel()
