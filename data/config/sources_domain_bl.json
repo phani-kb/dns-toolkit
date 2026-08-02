@@ -588,6 +588,24 @@
       "website": "https://github.com/DandelionSprout/adfilt"
     },
     {
+      "name": "DoH_VPN_Proxy_Bypass",
+      "categories": "proxy",
+      "frequency": "weekly",
+      "notes": "No easy way to distinguish between DoH and VPN proxy bypass domains",
+      "skip_general_consolidation": true,
+      "skip_groups_consolidation": true,
+      "types": [
+        {
+          "name": "adguard"
+        },
+        {
+          "name": "domain_adguard"
+        }
+      ],
+      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/doh-vpn-proxy-bypass.txt",
+      "website": "https://github.com/hagezi/dns-blocklists"
+    },
+    {
       "name": "Easy Privacy",
       "categories": "privacy, trackers",
       "license": "CC BY-SA 3.0",
@@ -739,7 +757,7 @@
           "name": "domain"
         }
       ],
-      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/native.amazon.txt",
+      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/native.amazon-onlydomains.txt",
       "website": "https://github.com/hagezi/dns-blocklists"
     },
     {
@@ -753,7 +771,7 @@
           "name": "domain"
         }
       ],
-      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/native.apple.txt",
+      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/native.apple-onlydomains.txt",
       "website": "https://github.com/hagezi/dns-blocklists"
     },
     {
@@ -801,7 +819,7 @@
           "name": "domain"
         }
       ],
-      "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/wildcard/gambling-onlydomains.txt",
+      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/gambling-onlydomains.txt",
       "website": "https://github.com/hagezi/dns-blocklists"
     },
     {
@@ -815,7 +833,7 @@
           "name": "domain"
         }
       ],
-      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/native.winoffice.txt",
+      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/native.winoffice-onlydomains.txt",
       "website": "https://github.com/hagezi/dns-blocklists"
     },
     {
@@ -859,7 +877,7 @@
           ]
         }
       ],
-      "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/domains/pro.txt",
+      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/pro-onlydomains.txt",
       "website": "https://github.com/hagezi/dns-blocklists"
     },
     {
@@ -873,7 +891,7 @@
           "name": "domain"
         }
       ],
-      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/domains/native.xiaomi.txt",
+      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/wildcard/native.xiaomi-onlydomains.txt",
       "website": "https://github.com/hagezi/dns-blocklists"
     },
     {

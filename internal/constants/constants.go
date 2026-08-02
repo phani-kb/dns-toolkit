@@ -648,6 +648,8 @@ const (
 	TableOverlapResults       = TablePrefix + "overlap_results"
 	TableTopEntries           = TablePrefix + "top_entries"
 	TableResolvedAllow        = TablePrefix + "resolved_allow"
+	TableScopedAllow          = TablePrefix + "scoped_allow"
+	TableConsolidationState   = TablePrefix + "consolidation_state"
 )
 
 const BulkInsertBatchSize = 1000

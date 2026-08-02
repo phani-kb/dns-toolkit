@@ -22,14 +22,23 @@ var schemaStatusCmd = &cobra.Command{
 	Use:   "status",
 	Short: "Show schema status and table row counts",
 	Run: func(cmd *cobra.Command, args []string) {
+		details, detailsErr := cmd.Flags().GetBool("details")
+		if detailsErr != nil {
+			Logger.Warnf("Failed to parse --details flag (defaulting to false): %v", detailsErr)
+			details = false
+		}
+
 		dbPath := getDBPath()
-		embeddedChecksum := db.SchemaChecksum()
+		expectedChecksum := db.SchemaChecksum()
 
 		fmt.Printf("Database path:     %s\n", dbPath)
-		fmt.Printf("Embedded checksum: %s\n", embeddedChecksum)
 
 		if _, err := os.Stat(dbPath); os.IsNotExist(err) {
-			fmt.Printf("Stored checksum: <none>\n")
+			if details {
+				fmt.Printf("Expected checksum: %s\n", expectedChecksum)
+				fmt.Printf("Applied checksum:  <none>\n")
+				fmt.Printf("Schema objects:    <none>\n")
+			}
 			fmt.Println("Schema: not initialized")
 			os.Exit(0)
 		}
@@ -40,17 +49,52 @@ var schemaStatusCmd = &cobra.Command{
 			os.Exit(1)
 		}
 		defer database.CloseLogError(Logger)
-		storedChecksum := database.StoredChecksum(Logger)
-		fmt.Printf("Stored checksum: %s\n", storedChecksum)
+		appliedChecksum := database.StoredChecksum(Logger)
 
-		switch storedChecksum {
+		if details {
+			fmt.Printf("Expected checksum: %s\n", expectedChecksum)
+			fmt.Printf("Applied checksum:  %s\n", appliedChecksum)
+		}
+
+		status := ""
+		objectsMatch := false
+		objectChecked := false
+
+		switch appliedChecksum {
 		case "":
-			fmt.Println("Schema: not initialized")
+			status = "not initialized"
+			fmt.Printf("Schema: %s\n", status)
 			os.Exit(0)
-		case embeddedChecksum:
-			fmt.Println("Schema: up to date")
+		case expectedChecksum:
+			objectChecked = true
+			liveObjectsChecksum, liveErr := database.LiveSchemaObjectsChecksum()
+			if liveErr != nil {
+				Logger.Errorf("Failed to compute live schema object checksum: %v", liveErr)
+				os.Exit(1)
+			}
+			expectedObjectsChecksum := db.EmbeddedSchemaObjectsChecksum()
+			objectsMatch = liveObjectsChecksum == expectedObjectsChecksum
+
+			if objectsMatch {
+				status = "up to date"
+			} else {
+				status = "drift detected (table/index objects differ from embedded schema)"
+			}
+			fmt.Printf("Schema: %s\n", status)
 		default:
-			fmt.Println("Schema: out of date (will rebuild on next run)")
+			status = "out of date (will rebuild on next run)"
+			fmt.Printf("Schema: %s\n", status)
+		}
+
+		if details {
+			switch {
+			case !objectChecked:
+				fmt.Println("Schema objects: not checked (schema checksum already out of date)")
+			case objectsMatch:
+				fmt.Println("Schema objects: OK")
+			default:
+				fmt.Println("Schema objects: DRIFT")
+			}
 		}
 
 		counts, err := database.TableRowCounts(Logger)
@@ -143,6 +187,8 @@ func getDBPath() string {
 }
 
 func init() {
+	schemaStatusCmd.Flags().Bool("details", false, "Show checksum details")
+
 	schemaRecreateCmd.Flags().Bool("force", false,
 		"Confirm schema recreation (env: DNS_TOOLKIT_FORCE_RECREATE_DB)")
 

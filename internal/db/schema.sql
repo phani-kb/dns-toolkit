@@ -181,30 +181,35 @@ create index if not exists idx_entries_consolidation on dnstk_entries (
   list_type,
   valid,
   entry,
-  source_id
+  source_id,
+  must_consider
 );
 
 -- entry_groups: group membership for processed file batches
 create table if not exists dnstk_entry_groups (
-  id integer primary key,
   source_id integer not null references dnstk_sources (id) on delete cascade,
   source_type text not null,
   list_type text not null,
   group_name text not null,
-  unique (source_id, source_type, list_type, group_name)
-) strict;
+  primary key (source_id, source_type, list_type, group_name)
+) strict,
+without rowid;
+
+create index if not exists idx_entry_groups_join on dnstk_entry_groups (source_id, source_type, list_type);
 
 create index if not exists idx_entry_groups_scope on dnstk_entry_groups (group_name, source_type, list_type, source_id);
 
 -- entry_categories: category tags for processed file batches
 create table if not exists dnstk_entry_categories (
-  id integer primary key,
   source_id integer not null references dnstk_sources (id) on delete cascade,
   source_type text not null,
   list_type text not null,
   category text not null,
-  unique (source_id, source_type, list_type, category)
-) strict;
+  primary key (source_id, source_type, list_type, category)
+) strict,
+without rowid;
+
+create index if not exists idx_entry_categories_join on dnstk_entry_categories (source_id, source_type, list_type);
 
 create index if not exists idx_entry_categories_scope on dnstk_entry_categories (category, source_type, list_type, source_id);
 

@@ -1,12 +1,15 @@
 package db
 
 import (
+	"bufio"
 	"context"
 	"crypto/sha256"
 	"database/sql"
 	_ "embed"
 	"errors"
 	"fmt"
+	"sort"
+	"strings"
 	"sync"
 
 	"github.com/phani-kb/dns-toolkit/internal/constants"
@@ -17,8 +20,10 @@ import (
 var schemaSQL string
 
 var (
-	schemaChecksumOnce  sync.Once
-	schemaChecksumValue string
+	schemaChecksumOnce         sync.Once
+	schemaChecksumValue        string
+	schemaObjectsChecksumOnce  sync.Once
+	schemaObjectsChecksumValue string
 )
 
 // SchemaChecksum returns the SHA-256 hash of the embedded schema.sql.
@@ -27,6 +32,135 @@ func SchemaChecksum() string {
 		schemaChecksumValue = fmt.Sprintf("%x", sha256.Sum256([]byte(schemaSQL)))
 	})
 	return schemaChecksumValue
+}
+
+// EmbeddedSchemaObjectsChecksum returns a checksum of the embedded schema objects
+func EmbeddedSchemaObjectsChecksum() string {
+	schemaObjectsChecksumOnce.Do(func() {
+		keys := schemaTableKeysFromConstants()
+		keys = append(keys, extractSchemaIndexKeys(schemaSQL)...)
+		schemaObjectsChecksumValue = checksumForKeys(keys)
+	})
+	return schemaObjectsChecksumValue
+}
+
+// LiveSchemaObjectsChecksum returns a checksum of the live schema objects
+func (db *DB) LiveSchemaObjectsChecksum() (string, error) {
+	rows, err := db.readConn.Query(`
+		select type, name
+		from sqlite_master
+		where type in ('table', 'index')
+			and sql is not null
+			and name not glob 'sqlite_*'
+			and (
+				(type = 'table' and (name glob ? or name glob ?))
+				or (type = 'index' and (tbl_name glob ? or tbl_name glob ?))
+			)
+			and not (
+				(type = 'table' and name = ?)
+				or (type = 'index' and tbl_name = ?)
+			)
+		order by type, name`,
+		constants.TablePrefix+"*",
+		"_"+constants.TablePrefix+"*",
+		constants.TablePrefix+"*",
+		"_"+constants.TablePrefix+"*",
+		constants.SchemaMetadataTable,
+		constants.SchemaMetadataTable,
+	)
+	if err != nil {
+		return "", fmt.Errorf("querying live schema objects: %w", err)
+	}
+	defer rows.Close() // nolint: errcheck
+
+	keys := make([]string, 0)
+	for rows.Next() {
+		var objType, name string
+		if err := rows.Scan(&objType, &name); err != nil {
+			return "", fmt.Errorf("scanning live schema object: %w", err)
+		}
+		keys = append(keys, strings.ToLower(objType)+":"+strings.ToLower(name))
+	}
+	if err := rows.Err(); err != nil {
+		return "", fmt.Errorf("iterating live schema objects: %w", err)
+	}
+
+	return checksumForKeys(keys), nil
+}
+
+func schemaTableNamesFromConstants() []string {
+	return []string{
+		constants.TableSources,
+		constants.TableTypeNames,
+		constants.TableListTypeNames,
+		constants.TableGroupNames,
+		constants.TableCategoryNames,
+		constants.TableSourceTypes,
+		constants.TableSourceListTypes,
+		constants.TableSourceListTypeNotes,
+		constants.TableSourceListTypeGroups,
+		constants.TableSourceCategories,
+		constants.TableSourceCountries,
+		constants.TableSourceContent,
+		constants.TableSourceFiles,
+		constants.TableDownloads,
+		constants.TableEntries,
+		constants.TableEntryGroups,
+		constants.TableEntryCategories,
+		constants.TableConsolidatedEntries,
+		constants.TableOverlapResults,
+		constants.TableTopEntries,
+		constants.TableResolvedAllow,
+		constants.TableScopedAllow,
+		constants.TableConsolidationState,
+	}
+}
+
+func schemaTableKeysFromConstants() []string {
+	tables := schemaTableNamesFromConstants()
+	keys := make([]string, 0, len(tables))
+	for _, t := range tables {
+		keys = append(keys, "table:"+strings.ToLower(t))
+	}
+	return keys
+}
+
+func extractSchemaIndexKeys(sqlText string) []string {
+	scanner := bufio.NewScanner(strings.NewReader(sqlText))
+	seen := make(map[string]struct{})
+	keys := make([]string, 0)
+
+	for scanner.Scan() {
+		line := strings.ToLower(strings.TrimSpace(scanner.Text()))
+		if line == "" || strings.HasPrefix(line, "--") {
+			continue
+		}
+
+		for _, tok := range strings.Fields(line) {
+			clean := strings.Trim(tok, "(),;\t\n\r\"'`")
+			if !strings.HasPrefix(clean, "idx_") {
+				continue
+			}
+			if _, ok := seen[clean]; ok {
+				continue
+			}
+			seen[clean] = struct{}{}
+			keys = append(keys, "index:"+clean)
+		}
+	}
+
+	return keys
+}
+
+func checksumForKeys(keys []string) string {
+	if len(keys) == 0 {
+		return fmt.Sprintf("%x", sha256.Sum256(nil))
+	}
+
+	sorted := append([]string(nil), keys...)
+	sort.Strings(sorted)
+
+	return fmt.Sprintf("%x", sha256.Sum256([]byte(strings.Join(sorted, "\n"))))
 }
 
 // EnsureSchema checks if the DB schema matches the embedded schema.sql.
