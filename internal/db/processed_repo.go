@@ -203,6 +203,9 @@ func (r *ProcessedRepo) getSourceTypes(sourceID int64) ([]c.SourceType, error) {
 		if listTypeErr != nil {
 			return nil, listTypeErr
 		}
+		if len(listTypes) == 0 {
+			continue // skip source types with no enabled list types
+		}
 		sourceType.ListTypes = listTypes
 		types = append(types, sourceType)
 	}

@@ -474,7 +474,7 @@ func TestProcessSourceFile(t *testing.T) {
 		},
 	}
 
-	processed := processSourceFileAndPersist(context.Background(), logger, summary, tempDir, 0, nil, nil)
+	processed := processSourceFileAndPersist(context.Background(), logger, summary, tempDir, true, 0, nil, nil)
 	if len(processed) == 0 {
 		t.Fatal("Expected at least one processed summary")
 	}
@@ -487,6 +487,46 @@ func TestProcessSourceFile(t *testing.T) {
 	}
 	if len(ps.InvalidFiles) != 1 {
 		t.Errorf("Expected 1 invalid file, got %d", len(ps.InvalidFiles))
+	}
+}
+
+func TestProcessSourceFileWithoutWritingFiles(t *testing.T) {
+	logger, _ := multilog.NewTestLogger(t)
+	tempDir := t.TempDir()
+
+	fileContent := "example.com\ninvalid_domain\n"
+	filePath := filepath.Join(tempDir, "test.txt")
+	err := os.WriteFile(filePath, []byte(fileContent), 0o644)
+	if err != nil {
+		t.Fatalf("Failed to write to file: %v", err)
+	}
+
+	summary := c.DownloadSummary{
+		Name:     "test-source",
+		Filepath: filePath,
+		Types: []c.SourceType{
+			{
+				Name: "domain",
+				ListTypes: []c.ListType{
+					{Name: "blocklist", MustConsider: true},
+				},
+			},
+		},
+	}
+
+	processed := processSourceFileAndPersist(context.Background(), logger, summary, tempDir, false, 0, nil, nil)
+	if len(processed) == 0 {
+		t.Fatal("Expected at least one processed summary")
+	}
+	ps := processed[0]
+	if ps.Name != "test-source" {
+		t.Errorf("Expected summary name 'test-source', got %s", ps.Name)
+	}
+	if len(ps.ValidFiles) != 0 {
+		t.Errorf("Expected 0 valid files when write-files is disabled, got %d", len(ps.ValidFiles))
+	}
+	if len(ps.InvalidFiles) != 0 {
+		t.Errorf("Expected 0 invalid files when write-files is disabled, got %d", len(ps.InvalidFiles))
 	}
 }
 
@@ -767,7 +807,7 @@ func TestProcessAllSources(t *testing.T) {
 				ctx = cancelCtx
 			}
 
-			processAllSources(ctx, logger, processedDir, false)
+			processAllSources(ctx, logger, processedDir, false, true)
 
 			if !tt.expectError {
 				// For tests that expect processed summaries, check if at least one summary was created
@@ -959,12 +999,16 @@ func generateLargeTestContent() string {
 
 	// Add valid domains
 	for i := 1; i <= 5; i++ {
-		content.WriteString("valid" + string(rune('0'+i)) + ".com\n")
+		content.WriteString("valid")
+		content.WriteString(string(rune('0' + i)))
+		content.WriteString(".com\n")
 	}
 
 	// Add invalid entries
 	for i := 1; i <= 5; i++ {
-		content.WriteString("invalid" + string(rune('0'+i)) + "\n")
+		content.WriteString("invalid")
+		content.WriteString(string(rune('0' + i)))
+		content.WriteString("\n")
 	}
 
 	// Add some comments
@@ -1275,7 +1319,7 @@ func TestProcessAllSourcesEdgeCases(t *testing.T) {
 			}
 
 			ctx := context.Background()
-			processAllSources(ctx, logger, processedDir, false)
+			processAllSources(ctx, logger, processedDir, false, true)
 
 			// Cleanup for next test
 			err := os.RemoveAll(filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"]))
