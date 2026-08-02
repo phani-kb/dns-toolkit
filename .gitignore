@@ -70,3 +70,6 @@ testdata/*.md
 testdata/*.txt
 testdata/**/*.txt
 testdata/download/
+testdata/*.db
+testdata/*.db-wal
+testdata/*.db-shm

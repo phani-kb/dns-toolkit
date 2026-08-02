@@ -214,6 +214,28 @@ func TestSourceValidation(t *testing.T) {
 		assert.Error(t, err)
 		assert.Contains(t, err.Error(), "duplicate type")
 	})
+
+	t.Run("url_per_category requires categories", func(t *testing.T) {
+		source := Source{
+			Name:           "test-source",
+			URLPerCategory: "http://example.com/cat.txt",
+			Types:          []c.SourceType{{Name: "domain"}},
+		}
+		err := source.Validate()
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "categories is required")
+	})
+
+	t.Run("content_per_category requires categories", func(t *testing.T) {
+		source := Source{
+			Name:               "test-source",
+			ContentPerCategory: []string{"cat.example"},
+			Types:              []c.SourceType{{Name: "domain"}},
+		}
+		err := source.Validate()
+		assert.Error(t, err)
+		assert.Contains(t, err.Error(), "categories is required")
+	})
 }
 
 // TestSourceFiltering tests filtering sources with various criteria
@@ -871,12 +893,14 @@ func TestLoadSourcesConfigContent(t *testing.T) {
 	assert.False(t, wc.SkipCategoriesConsolidation)
 	assert.True(t, wc.SkipGroupsConsolidation)
 	assert.Empty(t, wc.URLPerCategory)
+	assert.Equal(t, []string{"malware"}, wc.Categories)
 
 	wcc := got["with-content-per-category"]
 	assert.True(t, strings.HasPrefix(wcc.URL, "file://"))
 	assert.False(t, wcc.SkipCategoriesConsolidation)
 	assert.True(t, wcc.SkipGroupsConsolidation)
 	assert.Empty(t, wcc.ContentPerCategory)
+	assert.Equal(t, []string{"malware"}, wcc.Categories)
 
 	wg := got["with-url-per-group"]
 	assert.True(t, strings.HasPrefix(wg.URL, "http://"))

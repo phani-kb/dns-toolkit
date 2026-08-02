@@ -118,6 +118,10 @@ func validateSourcesSchema(configPath string) error {
 }
 
 func validateConfig(configPath string) error {
+	return validateConfigWithSchema(configPath, true)
+}
+
+func validateConfigWithSchema(configPath string, performSchemaValidation bool) error {
 	if validationPerformed {
 		slog.Debug("Skipping validation as it has already been performed")
 		return nil
@@ -126,8 +130,10 @@ func validateConfig(configPath string) error {
 		return fmt.Errorf("config validation error: %s", "config path is empty")
 	}
 
-	if err := validateSourcesSchema(configPath); err != nil {
-		return fmt.Errorf("config validation error: %w", err)
+	if performSchemaValidation {
+		if err := validateSourcesSchema(configPath); err != nil {
+			return fmt.Errorf("config validation error: %w", err)
+		}
 	}
 
 	appConfig, sourcesConfigs, err := config.LoadAppConfig(Logger, configPath)

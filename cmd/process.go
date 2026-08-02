@@ -4,17 +4,16 @@ import (
 	"context"
 	"crypto/md5"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
-	"slices"
+	"runtime"
 	"strings"
-	"sync"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	cfg "github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
+	idb "github.com/phani-kb/dns-toolkit/internal/db"
 	r "github.com/phani-kb/dns-toolkit/internal/processors"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
@@ -27,9 +26,25 @@ var processCmd = &cobra.Command{
 	Use:   "process",
 	Short: "Process downloaded files",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := u.EnsureDirectoryExists(Logger, constants.ProcessedDir); err != nil {
-			Logger.Errorf("Failed to create processed directory: %v", err)
-			os.Exit(1)
+		forceProcess, getBoolErr := cmd.Flags().GetBool("force")
+		if getBoolErr != nil {
+			Logger.Warnf("Failed to parse --force flag (defaulting to false): %v", getBoolErr)
+			forceProcess = false
+		}
+
+		writeFiles, getWriteBoolErr := cmd.Flags().GetBool("write-files")
+		if getWriteBoolErr != nil {
+			Logger.Warnf("Failed to parse --write-files flag (defaulting to false): %v", getWriteBoolErr)
+			writeFiles = false
+		}
+
+		if writeFiles {
+			if err := u.EnsureDirectoryExists(Logger, constants.ProcessedDir); err != nil {
+				Logger.Errorf("Failed to create processed directory: %v", err)
+				os.Exit(1)
+			}
+		} else {
+			Logger.Infof("Processed file output disabled (--write-files=false); persisting entries to DB only")
 		}
 		if err := u.EnsureDirectoryExists(Logger, constants.SummaryDir); err != nil {
 			Logger.Errorf("Failed to create summary directory: %v", err)
@@ -37,7 +52,7 @@ var processCmd = &cobra.Command{
 		}
 
 		ctx := context.Background()
-		processAllSources(ctx, Logger, constants.ProcessedDir)
+		processAllSources(ctx, Logger, constants.ProcessedDir, forceProcess, writeFiles)
 	},
 }
 
@@ -47,95 +62,123 @@ var processCmd = &cobra.Command{
 //   - ctx: Context for cancellation
 //   - logger: Logger for recording operations and errors
 //   - processedDir: Directory to save processed results
-func processAllSources(ctx context.Context, logger *multilog.Logger, processedDir string) {
-	dsf := filepath.Join(constants.SummaryDir, constants.DefaultSummaryFiles["download"])
-	content, err := os.ReadFile(dsf)
+//   - forceProcess: If true, forces processing of all sources regardless of checksum
+//   - writeFiles: If true, writes valid/invalid processed files to disk
+func processAllSources(
+	ctx context.Context,
+	logger *multilog.Logger,
+	processedDir string,
+	forceProcess bool,
+	writeFiles bool,
+) {
+	downloadSummaries, err := loadDownloadSummaries(ctx, logger)
 	if err != nil {
-		logger.Errorf("Error reading %s file: %s", dsf, err)
+		logger.Errorf("Loading download summaries error: %v", err)
 		return
 	}
 
-	var downloadSummaries []c.DownloadSummary
-	err = json.Unmarshal(content, &downloadSummaries)
+	dbPath := getDBPath()
+	database, err := idb.Open(ctx, logger, dbPath, false)
 	if err != nil {
-		logger.Errorf("Parsing download summary error: %v", err)
+		logger.Errorf("Failed to open database(%v): %v", dbPath, err)
+		return
+	}
+	defer database.CloseLogError(logger)
+
+	sourcesRepo := idb.NewSourcesRepo(database)
+	entriesRepo := idb.NewEntriesRepo(database)
+	downloadsRepo := idb.NewDownloadsRepo(database)
+
+	err = entriesRepo.DropSecondaryIndexes(ctx)
+	if err != nil {
+		logger.Errorf("Failed to drop secondary indexes: %v", err)
 		return
 	}
 
-	processedSummariesMap := make(map[string]c.ProcessedSummary)
-	var mu sync.Mutex
-
-	// Create a worker pool for controlled concurrency
-	maxWorkers := AppConfig.DNSToolkit.MaxWorkers
+	maxWorkers := getProcessMaxWorkers()
 	logger.Infof("Using worker pool with %d worker(s) for processing", maxWorkers)
 	workerPool := c.NewDTWorkerPool(maxWorkers)
+
+	skippedCount := 0
+	excludedCount := 0
 
 	for _, summary := range downloadSummaries {
 		if summary.Error != "" {
 			logger.Warnf("Skipping processing for %s: %s", summary.Name, summary.Error)
+			excludedCount++
 			continue
 		}
 		if !cfg.IsEnabledSource(summary.Name, SourcesConfigs, *AppConfig) {
 			logger.Debugf("Skipping processing for %s: source is disabled", summary.Name)
+			excludedCount++
 			continue
 		}
 
-		summary := summary // Create a local copy for goroutine
+		sourceID, sourceIDErr := sourcesRepo.GetSourceIDByName(summary.Name)
+		if sourceIDErr != nil {
+			logger.Warnf(
+				"Source ID lookup failed for %s; processing output will not be persisted to entries tables: %v",
+				summary.Name,
+				sourceIDErr,
+			)
+			sourceID = 0
+		}
+
+		if !forceProcess && sourceID > 0 &&
+			canSkipProcessing(ctx, logger, downloadsRepo, entriesRepo, sourceID, summary) {
+			skippedCount++
+			logger.Infof("Skipping %s (unchanged, entries present)", summary.Name)
+			continue
+		}
+
+		if forceProcess && sourceID > 0 {
+			logger.Debugf("Force processing enabled for %s; ignoring checksum", summary.Name)
+		}
+
+		summary := summary
+		sourceIDLocal := sourceID
 		workerPool.Submit(func() {
-			// Check for context cancellation
 			select {
 			case <-ctx.Done():
 				logger.Warnf("Processing cancelled for %s: %v", summary.Name, ctx.Err())
 				return
 			default:
-				// Continue processing
 			}
 
-			processedSummaries := processSourceFile(ctx, logger, summary, processedDir)
-
-			mu.Lock()
-			for _, processedSummary := range processedSummaries {
-				if existingSummary, exists := processedSummariesMap[summary.Name]; exists {
-					mergeSummaries(&existingSummary, &processedSummary)
-					processedSummariesMap[summary.Name] = existingSummary
-				} else {
-					processedSummariesMap[summary.Name] = processedSummary
-				}
-			}
-			mu.Unlock()
+			_ = processSourceFileAndPersist(
+				ctx,
+				logger,
+				summary,
+				processedDir,
+				writeFiles,
+				sourceIDLocal,
+				entriesRepo,
+				downloadsRepo,
+			)
 		})
 	}
 
 	workerPool.Wait()
 
-	var processedSummaries []c.ProcessedSummary
-	for _, summary := range processedSummariesMap {
-		processedSummaries = append(processedSummaries, summary)
-	}
+	processedCount := len(downloadSummaries) - skippedCount - excludedCount
+	logger.Infof("Process: %d source(s), %d processed, %d skipped (unchanged), %d excluded (disabled/error)",
+		len(downloadSummaries), processedCount, skippedCount, excludedCount)
 
-	summaryFile := filepath.Join(constants.SummaryDir, constants.DefaultSummaryFiles["processed"])
-	_, err = u.SaveSummaries(logger, processedSummaries, summaryFile, c.ProcessedSummaryLessFunc)
+	err = entriesRepo.RecreateSecondaryIndexes(ctx)
 	if err != nil {
-		logger.Errorf("Saving processed summaries error: %v", err)
+		logger.Errorf("Failed to recreate secondary indexes: %v", err)
 	}
 }
 
-// processSourceFile processes a single source file.
-// It reads the file content and processes it according to its source types.
-//
-// Parameters:
-//   - ctx: Context for cancellation
-//   - logger: Logger for recording operations and errors
-//   - summary: Download summary containing file information
-//   - processedDir: Directory to save processed results
-//
-// Returns:
-//   - A ProcessedSummary containing information about the processing results
-func processSourceFile(
-	_ context.Context,
+func processSourceFileAndPersist(
+	ctx context.Context,
 	logger *multilog.Logger,
 	summary c.DownloadSummary,
 	processedDir string,
+	writeFiles bool,
+	sourceID int64,
+	entriesRepo *idb.EntriesRepo,
+	downloadsRepo *idb.DownloadsRepo,
 ) []c.ProcessedSummary {
 	processedSummaries := make([]c.ProcessedSummary, 0)
 	content, err := os.ReadFile(summary.Filepath)
@@ -143,6 +186,11 @@ func processSourceFile(
 		logger.Errorf("Reading file error: %v (file: %s)", err, summary.Filepath)
 		return processedSummaries
 	}
+	contentStr := string(content)
+
+	entryRows := make([]idb.EntryRow, 0, 4096)
+	groupRows := make([]idb.EntryGroupRow, 0)
+	categoryRows := make([]idb.EntryCategoryRow, 0)
 
 	validFiles := make(map[string]c.ProcessedFile)
 	invalidFiles := make(map[string]c.ProcessedFile)
@@ -152,51 +200,90 @@ func processSourceFile(
 		for _, listTypeObj := range sourceTypeObj.GetListTypes() {
 			listTypeName := listTypeObj.Name
 			mustConsider := listTypeObj.MustConsider
-			validEntries, invalidEntries := extractEntriesByType(logger, string(content), sourceTypeName, listTypeName)
-			validFilePath, invalidFilePath := saveEntries(
-				logger,
-				processedDir,
-				summary.Name,
-				sourceTypeName,
-				listTypeName,
-				validEntries,
-				invalidEntries,
-			)
-
-			key := fmt.Sprintf("%s_%s", sourceTypeName, listTypeName)
-			if validFilePath != "" {
-				validFiles[key] = createProcessedFile(
+			validEntries, invalidEntries := extractEntriesByType(logger, contentStr, sourceTypeName, listTypeName)
+			if entriesRepo != nil && sourceID > 0 {
+				genericSourceType := cfg.GetGenericSourceType(sourceTypeName)
+				for _, entry := range validEntries {
+					entryRows = append(entryRows, idb.EntryRow{
+						Entry:             entry,
+						GenericSourceType: genericSourceType,
+						ActualSourceType:  sourceTypeName,
+						ListType:          listTypeName,
+						Valid:             true,
+						MustConsider:      mustConsider,
+					})
+				}
+				for _, entry := range invalidEntries {
+					entryRows = append(entryRows, idb.EntryRow{
+						Entry:             entry,
+						GenericSourceType: genericSourceType,
+						ActualSourceType:  sourceTypeName,
+						ListType:          listTypeName,
+						Valid:             false,
+						MustConsider:      mustConsider,
+					})
+				}
+				for _, group := range listTypeObj.Groups {
+					groupRows = append(groupRows, idb.EntryGroupRow{
+						SourceType: sourceTypeName,
+						ListType:   listTypeName,
+						GroupName:  group,
+					})
+				}
+				for _, category := range summary.Categories {
+					categoryRows = append(categoryRows, idb.EntryCategoryRow{
+						SourceType: sourceTypeName,
+						ListType:   listTypeName,
+						Category:   category,
+					})
+				}
+			}
+			if writeFiles {
+				validFilePath, invalidFilePath := saveEntries(
 					logger,
+					processedDir,
 					summary.Name,
-					validFilePath,
 					sourceTypeName,
 					listTypeName,
 					validEntries,
-					mustConsider,
-					true,
-					listTypeObj.Groups,
-					summary.Categories,
-					summary.SkipGeneralConsolidation,
-					summary.SkipGroupsConsolidation,
-					summary.SkipCategoriesConsolidation,
-				)
-			}
-			if invalidFilePath != "" {
-				invalidFiles[key] = createProcessedFile(
-					logger,
-					summary.Name,
-					invalidFilePath,
-					sourceTypeName,
-					listTypeName,
 					invalidEntries,
-					mustConsider,
-					false,
-					listTypeObj.Groups,
-					summary.Categories,
-					summary.SkipGeneralConsolidation,
-					summary.SkipGroupsConsolidation,
-					summary.SkipCategoriesConsolidation,
 				)
+
+				key := fmt.Sprintf("%s_%s", sourceTypeName, listTypeName)
+				if validFilePath != "" {
+					validFiles[key] = createProcessedFile(
+						logger,
+						summary.Name,
+						validFilePath,
+						sourceTypeName,
+						listTypeName,
+						validEntries,
+						mustConsider,
+						true,
+						listTypeObj.Groups,
+						summary.Categories,
+						summary.SkipGeneralConsolidation,
+						summary.SkipGroupsConsolidation,
+						summary.SkipCategoriesConsolidation,
+					)
+				}
+				if invalidFilePath != "" {
+					invalidFiles[key] = createProcessedFile(
+						logger,
+						summary.Name,
+						invalidFilePath,
+						sourceTypeName,
+						listTypeName,
+						invalidEntries,
+						mustConsider,
+						false,
+						listTypeObj.Groups,
+						summary.Categories,
+						summary.SkipGeneralConsolidation,
+						summary.SkipGroupsConsolidation,
+						summary.SkipCategoriesConsolidation,
+					)
+				}
 			}
 
 			logger.Infof(
@@ -220,6 +307,22 @@ func processSourceFile(
 
 		ps := createSummary(summary.Name, summary.GetSourceTypes(), validFilesArray, invalidFilesArray)
 		processedSummaries = append(processedSummaries, ps)
+	}
+
+	if entriesRepo != nil && sourceID > 0 {
+		err := entriesRepo.ReplaceSourceData(ctx, sourceID, entryRows, groupRows, categoryRows)
+		if err != nil {
+			logger.Errorf("Persisting processed entries failed for %s: %v", summary.Name, err)
+		} else if downloadsRepo != nil {
+			if summary.Checksum != "" {
+				if setErr := downloadsRepo.SetLastProcessedChecksum(sourceID, summary.Checksum); setErr != nil {
+					logger.Warnf("Failed to update last_processed_checksum for %s: %v", summary.Name, setErr)
+				}
+			}
+			if setErr := downloadsRepo.SetLastProcessedTimestamp(sourceID, u.GetTimestamp()); setErr != nil {
+				logger.Warnf("Failed to update last_processed_timestamp for %s: %v", summary.Name, setErr)
+			}
+		}
 	}
 
 	return processedSummaries
@@ -410,15 +513,10 @@ func saveEntries(
 //   - filePath: Path of the file to create
 //   - entries: Entries to write to the file
 func saveToFile(logger *multilog.Logger, filePath string, entries []string) {
-	uniqueEntries := u.RemoveDuplicates(entries)
-	if len(uniqueEntries) == 0 {
+	if len(entries) == 0 {
 		return
 	}
-
-	sorted := slices.Clone(uniqueEntries)
-	slices.Sort(sorted)
-
-	content := strings.Join(sorted, "\n") + "\n"
+	content := strings.Join(entries, "\n") + "\n"
 	err := os.WriteFile(filePath, []byte(content), 0o644)
 	if err != nil {
 		logger.Errorf("Error writing file: %v (path: %s)", err, filePath)
@@ -447,85 +545,47 @@ func generateFileName(logger *multilog.Logger, name, sourceType, listType, entry
 	return fmt.Sprintf("%s_%s_%s_%s_%s.txt", name, sourceType, lt, entryType, hex.EncodeToString(hash[:]))
 }
 
-// mergeSummaries merges two ProcessedSummary objects.
-// It combines their valid and invalid files maps.
-//
-// Parameters:
-//   - existingSummary: The summary to merge into
-//   - newSummary: The summary to merge from
-func mergeSummaries(existingSummary, newSummary *c.ProcessedSummary) {
-	// Correctly merge valid with valid and invalid with invalid
-	// merge the arrays
-	existingSummary.Types = mergeSourceTypes(existingSummary.Types, newSummary.Types)
-	existingSummary.ValidFiles = mergeProcessedFiles(existingSummary.ValidFiles, newSummary.ValidFiles)
-	existingSummary.InvalidFiles = mergeProcessedFiles(existingSummary.InvalidFiles, newSummary.InvalidFiles)
-
-	// Update the timestamp to the latest
-	if newSummary.LastProcessedTimestamp > existingSummary.LastProcessedTimestamp {
-		existingSummary.LastProcessedTimestamp = newSummary.LastProcessedTimestamp
+func canSkipProcessing(
+	ctx context.Context,
+	logger *multilog.Logger,
+	downloadsRepo *idb.DownloadsRepo,
+	entriesRepo *idb.EntriesRepo,
+	sourceID int64,
+	downloadSummary c.DownloadSummary,
+) bool {
+	if downloadSummary.Checksum == "" {
+		return false
 	}
+
+	lastProcessed := downloadsRepo.GetLastProcessedChecksum(sourceID)
+	if lastProcessed == "" || lastProcessed != downloadSummary.Checksum {
+		return false
+	}
+
+	count, err := entriesRepo.CountEntriesForSource(ctx, sourceID)
+	if err != nil {
+		logger.Warnf("Skip-check: entry count failed for source %d (%s): %v; will process",
+			sourceID, downloadSummary.Name, err)
+		return false
+	}
+	if count == 0 {
+		logger.Debugf("Source %s checksum matches but has 0 entries; processing", downloadSummary.Name)
+		return false
+	}
+
+	return true
 }
 
-// mergeSourceTypes combines two slices of SourceType objects,
-// avoiding duplicates by using the name as a unique identifier.
-//
-// Parameters:
-//   - existing: The existing slice of SourceType objects
-//   - new: The new slice of SourceType objects to merge in
-//
-// Returns:
-//   - A merged slice of SourceType objects without duplicates
-func mergeSourceTypes(existing, new []c.SourceType) []c.SourceType {
-	// Create a map for a quick lookup of existing source types by name
-	typeMap := make(map[string]c.SourceType)
-
-	// Add all existing source types to the map
-	for _, t := range existing {
-		typeMap[t.Name] = t
+func getProcessMaxWorkers() int {
+	maxWorkers := runtime.GOMAXPROCS(0)
+	if AppConfig != nil && AppConfig.DNSToolkit.MaxWorkers > 0 {
+		maxWorkers = AppConfig.DNSToolkit.MaxWorkers
 	}
-
-	// Add or overwrite with new source types
-	for _, t := range new {
-		typeMap[t.Name] = t
-	}
-
-	// Convert a map back to slice
-	result := make([]c.SourceType, 0, len(typeMap))
-	for _, t := range typeMap {
-		result = append(result, t)
-	}
-
-	return result
+	return max(maxWorkers, 1)
 }
 
-// mergeProcessedFiles combines two slices of ProcessedFile objects,
-// avoiding duplicates by using the filename as a unique identifier.
-//
-// Parameters:
-//   - existing: The existing slice of ProcessedFile objects
-//   - new: The new slice of ProcessedFile objects to merge in
-//
-// Returns:
-//   - A merged slice of ProcessedFile objects without duplicates
-func mergeProcessedFiles(existing, new []c.ProcessedFile) []c.ProcessedFile {
-	// Create a map for a quick lookup of existing files by filename
-	fileMap := make(map[string]c.ProcessedFile)
-
-	// Add all existing files to the map
-	for _, file := range existing {
-		fileMap[file.Filepath] = file
-	}
-
-	// Add or overwrite with new files
-	for _, file := range new {
-		fileMap[file.Filepath] = file
-	}
-
-	// Convert a map back to slice
-	result := make([]c.ProcessedFile, 0, len(fileMap))
-	for _, file := range fileMap {
-		result = append(result, file)
-	}
-
-	return result
+func init() {
+	processCmd.Flags().Bool("force", false, "Force processing of all sources (ignore last_processed checksum skip)")
+	processCmd.Flags().
+		Bool("write-files", false, "Write valid/invalid processed files to filesystem (entries are always persisted to DB)")
 }

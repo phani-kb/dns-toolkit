@@ -80,7 +80,7 @@ func runArchive(logger *multilog.Logger) {
 		}
 	}()
 
-	summaryDir := AppConfig.DNSToolkit.Folders.Summary
+	summaryDir := constants.SummaryDir
 	processSummaryFiles(logger, summaryDir, archiveSummary, tarWriter)
 
 	foldersToArchive := u.GetFoldersToArchive(logger, constants.Folders)
@@ -164,7 +164,7 @@ func runArchive(logger *multilog.Logger) {
 	}
 
 	summaryFilename := fmt.Sprintf("archive_summary_%s.json", timestamp)
-	archiveDir := AppConfig.DNSToolkit.Folders.Archive
+	archiveDir := constants.ArchiveDir
 	summaryPath := filepath.Join(archiveDir, summaryFilename)
 
 	summaryJSON, err := json.MarshalIndent(archiveSummary, "", "  ")

@@ -286,6 +286,8 @@
     {
       "name": "Firehol_BitcoinNodes_1d",
       "categories": "cryptocurrency",
+      "disabled": true,
+      "notes": "Site unresponsive, download fails.",
       "types": [
         {
           "name": "ipv4"
@@ -691,7 +693,9 @@
     {
       "name": "USOM-Blocklists-ips",
       "categories": "malicious, threat",
+      "disabled": true,
       "license": "BSD 3-Clause",
+      "notes": "No updates, empty list",
       "types": [
         {
           "name": "ipv4"

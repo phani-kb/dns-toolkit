@@ -106,18 +106,12 @@ func setupOutputDirectory(logger *multilog.Logger, opts *ProfileOptions) bool {
 
 // getTestDataDir gets the testdata directory path
 func getTestDataDir(logger *multilog.Logger) string {
-	cwd, err := os.Getwd()
+	projectRoot, err := FindProjectRoot("")
 	if err != nil {
-		logger.Errorf("Failed to get current working directory: %v", err)
+		logger.Errorf("Failed to find project root: %v", err)
 		return ""
 	}
-
-	if filepath.Base(cwd) != "dns-toolkit" {
-		for filepath.Base(cwd) != "dns-toolkit" && cwd != "/" {
-			cwd = filepath.Dir(cwd)
-		}
-	}
-	return filepath.Join(cwd, "testdata")
+	return filepath.Join(projectRoot, "testdata")
 }
 
 // setupBlockProfiling enables block profiling if requested

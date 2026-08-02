@@ -98,6 +98,10 @@ func (s *Source) ValidateWithConfig(appConfig *AppConfig) error {
 		)
 	}
 
+	if (hasURLPerCategory || hasContentPerCategory) && len(s.Categories) == 0 {
+		return fmt.Errorf("categories is required when using url_per_category or content_per_category")
+	}
+
 	if hasURL {
 		for _, ext := range constants.ArchiveExtensions {
 			if strings.HasSuffix(s.URL, ext) {
@@ -435,14 +439,14 @@ func LoadSourcesConfig(logger *multilog.Logger, filePath string) (SourcesConfig,
 
 // GetEnabledSources returns a slice of enabled sources.
 func (sc *SourcesConfig) GetEnabledSources(filters SourceFilters) []Source {
-	uniqueSources := make(map[string]Source)
+	uniqueSources := make(map[string]Source, len(sc.Sources))
 	for _, source := range sc.Sources {
 		if source.IsEnabled() && matchesFilters(source, filters) {
-			key := fmt.Sprintf("%s_%s", source.Name, source.Types[0].Name)
+			key := source.Name + "_" + source.Types[0].Name
 			uniqueSources[key] = source
 		}
 	}
-	var enabledSources []Source
+	enabledSources := make([]Source, 0, len(uniqueSources))
 	for _, source := range uniqueSources {
 		enabledSources = append(enabledSources, source)
 	}
@@ -455,14 +459,14 @@ func (sc *SourcesConfig) GetEnabledSources(filters SourceFilters) []Source {
 // GetSourcesForGeneralConsolidation returns sources that should be included in general consolidation.
 // This excludes sources with SkipGeneralConsolidation=true.
 func (sc *SourcesConfig) GetSourcesForGeneralConsolidation(filters SourceFilters) []Source {
-	uniqueSources := make(map[string]Source)
+	uniqueSources := make(map[string]Source, len(sc.Sources))
 	for _, source := range sc.Sources {
 		if source.ShouldIncludeInGeneralConsolidation() && matchesFilters(source, filters) {
-			key := fmt.Sprintf("%s_%s", source.Name, source.Types[0].Name)
+			key := source.Name + "_" + source.Types[0].Name
 			uniqueSources[key] = source
 		}
 	}
-	var sources []Source
+	sources := make([]Source, 0, len(uniqueSources))
 	for _, source := range uniqueSources {
 		sources = append(sources, source)
 	}
@@ -475,14 +479,14 @@ func (sc *SourcesConfig) GetSourcesForGeneralConsolidation(filters SourceFilters
 // GetSourcesForGroupsConsolidation returns sources that should be included in groups consolidation.
 // This includes all enabled sources, regardless of SkipGeneralConsolidation setting.
 func (sc *SourcesConfig) GetSourcesForGroupsConsolidation(filters SourceFilters) []Source {
-	uniqueSources := make(map[string]Source)
+	uniqueSources := make(map[string]Source, len(sc.Sources))
 	for _, source := range sc.Sources {
 		if source.ShouldIncludeInGroupsConsolidation() && matchesFilters(source, filters) {
-			key := fmt.Sprintf("%s_%s", source.Name, source.Types[0].Name)
+			key := source.Name + "_" + source.Types[0].Name
 			uniqueSources[key] = source
 		}
 	}
-	var sources []Source
+	sources := make([]Source, 0, len(uniqueSources))
 	for _, source := range uniqueSources {
 		sources = append(sources, source)
 	}
@@ -494,14 +498,14 @@ func (sc *SourcesConfig) GetSourcesForGroupsConsolidation(filters SourceFilters)
 
 // GetSourcesForCategoriesConsolidation returns sources that should be included in categories consolidation.
 func (sc *SourcesConfig) GetSourcesForCategoriesConsolidation(filters SourceFilters) []Source {
-	uniqueSources := make(map[string]Source)
+	uniqueSources := make(map[string]Source, len(sc.Sources))
 	for _, source := range sc.Sources {
 		if source.ShouldIncludeInCategoriesConsolidation() && matchesFilters(source, filters) {
-			key := fmt.Sprintf("%s_%s", source.Name, source.Types[0].Name)
+			key := source.Name + "_" + source.Types[0].Name
 			uniqueSources[key] = source
 		}
 	}
-	var sources []Source
+	sources := make([]Source, 0, len(uniqueSources))
 	for _, source := range uniqueSources {
 		sources = append(sources, source)
 	}

@@ -1,0 +1,45 @@
+name: Validate Sources Schema
+
+on:
+  push:
+    paths:
+      - 'data/config/sources*.json'
+      - 'data/config/sources_schema.json'
+      - 'cmd/validate_sources.go'
+      - 'go.mod'
+      - 'go.sum'
+  pull_request:
+    paths:
+      - 'data/config/sources*.json'
+      - 'data/config/sources_schema.json'
+      - 'go.mod'
+      - 'go.sum'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: "validate-sources-${{ github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  validate-sources:
+    name: Validate sources against schema
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+          cache: true
+
+      - name: Validate sources configuration
+        run: |
+          go build ./...
+          go run . validate-sources
+

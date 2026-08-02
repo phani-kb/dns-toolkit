@@ -1,20 +1,21 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
 	cfg "github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
+	"github.com/phani-kb/dns-toolkit/internal/db"
 	d "github.com/phani-kb/dns-toolkit/internal/downloaders"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
-	"github.com/phani-kb/multilog"
-
 	"golang.org/x/time/rate"
 
 	"github.com/spf13/cobra"
@@ -26,6 +27,11 @@ var downloadCmd = &cobra.Command{
 	Use:   "download",
 	Short: "Download enabled sources",
 	Run: func(cmd *cobra.Command, args []string) {
+		ctx := context.Background()
+
+		database := openDB(ctx)
+		defer database.CloseLogError(Logger)
+
 		forceFlag, getBoolErr := cmd.Flags().GetBool("force")
 		if getBoolErr != nil {
 			Logger.Warnf("Failed to parse --force flag (defaulting to false): %v", getBoolErr)
@@ -41,21 +47,6 @@ var downloadCmd = &cobra.Command{
 		if err := u.EnsureDirectoryExists(Logger, constants.SummaryDir); err != nil {
 			Logger.Errorf("Failed to create summary directory: %v", err)
 			os.Exit(1)
-		}
-
-		summaryFile := filepath.Join(constants.SummaryDir, constants.DefaultSummaryFiles["download"])
-		if forceDownload {
-			if _, err := os.Stat(summaryFile); err == nil {
-				Logger.Infof(
-					"Force download enabled. Removing existing summary file to bypass frequency checks: %s",
-					summaryFile,
-				)
-				if rmErr := os.Remove(summaryFile); rmErr != nil {
-					Logger.Warnf("Failed to remove summary file %s: %v", summaryFile, rmErr)
-				}
-			} else {
-				Logger.Infof("Force download enabled. No existing summary file to remove.")
-			}
 		}
 
 		maxRetries := defaultMaxRetries
@@ -79,8 +70,12 @@ var downloadCmd = &cobra.Command{
 			Logger.Warnf("Failed to register domain top downloader: %v", domainTopErr)
 		}
 
-		summaries := make([]c.DownloadSummary, 0)
-		var mu sync.Mutex
+		sourcesRepo := db.NewSourcesRepo(database)
+		downloadsRepo := db.NewDownloadsRepo(database)
+		if err := syncSourcesToDB(ctx, Logger, sourcesRepo, SourcesConfigs); err != nil {
+			Logger.Errorf("Failed to sync source definitions to database: %v", err)
+			os.Exit(1)
+		}
 
 		maxWorkers := runtime.GOMAXPROCS(0)
 		if AppConfig != nil {
@@ -90,8 +85,10 @@ var downloadCmd = &cobra.Command{
 		}
 		maxWorkers = max(maxWorkers, 1)
 		Logger.Infof("Using worker pool with %d worker(s) for downloads", maxWorkers)
-		limiter := createDownloadRateLimiter(maxWorkers)
-		workerPool := c.NewDTWorkerPoolWithLimiter(maxWorkers, limiter)
+		defaultInterval := getDefaultDownloadInterval()
+		defaultBurst := getDefaultDownloadBurst(maxWorkers)
+		defaultLimiter := createDownloadRateLimiter(maxWorkers, defaultInterval, defaultBurst)
+		workerPool := c.NewDTWorkerPool(maxWorkers)
 
 		// Stats to track a download process
 		var totalSources, successCount, failCount, downloadedCount int
@@ -106,6 +103,44 @@ var downloadCmd = &cobra.Command{
 				totalSources++
 				source := source // local copy for goroutine
 				workerPool.Submit(func() {
+					if !strings.HasPrefix(strings.TrimSpace(source.URL), "file://") {
+						if defaultLimiter != nil {
+							if err := defaultLimiter.Wait(context.Background()); err != nil {
+								Logger.Warnf("Rate limiter wait failed for source %s: %v", source.Name, err)
+							}
+						}
+					}
+
+					sourceID, sourceIDErr := sourcesRepo.GetSourceIDByName(source.Name)
+					if sourceIDErr != nil {
+						Logger.Warnf("Failed to get source ID for %s: %v", source.Name, sourceIDErr)
+					}
+
+					persistDownloadSummary := func(summary c.DownloadSummary, persistedPath string) {
+						if sourceID <= 0 {
+							return
+						}
+
+						downloadRow := db.DownloadRow{
+							SourceID:                    sourceID,
+							TypeCount:                   summary.TypeCount,
+							CountToConsider:             summary.CountToConsider,
+							SkipGeneralConsolidation:    summary.SkipGeneralConsolidation,
+							SkipGroupsConsolidation:     summary.SkipGroupsConsolidation,
+							SkipCategoriesConsolidation: summary.SkipCategoriesConsolidation,
+							URL:                         summary.URL,
+							Filepath:                    persistedPath,
+							Frequency:                   summary.Frequency,
+							Checksum:                    summary.Checksum,
+							Error:                       summary.Error,
+							LastDownloadTimestamp:       summary.LastDownloadTimestamp,
+							LastCheckedTimestamp:        summary.LastCheckedTimestamp,
+						}
+						if err := downloadsRepo.UpsertDownload(downloadRow); err != nil {
+							Logger.Warnf("Failed to upsert download record for %s: %v", source.Name, err)
+						}
+					}
+
 					if forceDownload {
 						Logger.Debugf("Force downloading source: %s", source.Name)
 					}
@@ -116,15 +151,21 @@ var downloadCmd = &cobra.Command{
 						statsMutex.Lock()
 						failCount++
 						statsMutex.Unlock()
-
-						mu.Lock()
 						summary := c.DownloadSummary{
-							Name:                 source.Name,
-							Error:                err.Error(),
-							LastCheckedTimestamp: u.GetTimestamp(),
+							Name:                        source.Name,
+							URL:                         source.URL,
+							Frequency:                   source.Frequency,
+							TypeCount:                   source.TypeCount,
+							Types:                       source.Types,
+							CountToConsider:             source.CountToConsider,
+							Categories:                  source.Categories,
+							SkipGeneralConsolidation:    source.SkipGeneralConsolidation,
+							SkipGroupsConsolidation:     source.SkipGroupsConsolidation,
+							SkipCategoriesConsolidation: source.SkipCategoriesConsolidation,
+							Error:                       err.Error(),
+							LastCheckedTimestamp:        u.GetTimestamp(),
 						}
-						summaries = append(summaries, summary)
-						mu.Unlock()
+						persistDownloadSummary(summary, "")
 
 						return
 					}
@@ -173,6 +214,7 @@ var downloadCmd = &cobra.Command{
 						}
 
 						if err != nil {
+							summary.LastCheckedTimestamp = u.GetTimestamp()
 
 							switch e := err.(type) { // wrapped errors handling
 							case *d.HTTPStatusError:
@@ -211,8 +253,12 @@ var downloadCmd = &cobra.Command{
 							shouldReprocess := !fetchSkipped
 
 							if fetchSkipped {
-								// use existing summaryFile variable defined in outer scope to avoid shadowing
-								if prevSummary, err := loadPreviousDownloadSummary(Logger, summaryFile, source.Name); err == nil && prevSummary != nil { // nolint:lll
+								if prevSummary, err := loadPreviousDownloadSummary(
+									Logger,
+									downloadsRepo,
+									source.Name,
+									targetFilePath,
+								); err == nil && prevSummary != nil {
 									if prevSummary.CountToConsider != summary.CountToConsider {
 										Logger.Infof("Count to consider changed for %s: %d -> %d, re-processing...",
 											source.Name, prevSummary.CountToConsider, summary.CountToConsider)
@@ -248,12 +294,11 @@ var downloadCmd = &cobra.Command{
 							}
 						}
 
-						mu.Lock()
-						summaries = append(
-							summaries,
-							summary,
-						)
-						mu.Unlock()
+						persistedPath := summary.Filepath
+						if downloadFile.IsArchive {
+							persistedPath = filePath
+						}
+						persistDownloadSummary(summary, persistedPath)
 					}
 				})
 			}
@@ -263,41 +308,15 @@ var downloadCmd = &cobra.Command{
 
 		Logger.Infof("Download complete: %d sources processed, %d successful (%d downloaded, %d skipped), %d failed",
 			totalSources, successCount, downloadedCount, successCount-downloadedCount, failCount)
-
-		_, err := u.SaveSummaries(Logger, summaries, summaryFile, c.DownloadSummaryLessFunc)
-		if err != nil {
-			Logger.Errorf("Saving summaries error: %v", err)
-		}
 	},
-}
-
-// loadPreviousDownloadSummaries loads the existing download summaries from the summary file
-func loadPreviousDownloadSummary(
-	logger *multilog.Logger,
-	summaryFile string,
-	sourceName string,
-) (*c.DownloadSummary, error) {
-	summary, err := u.GetLastSummary[c.DownloadSummary](logger, summaryFile, sourceName)
-	if err != nil {
-		return nil, fmt.Errorf("failed to get last download summary for %s: %w", sourceName, err)
-	}
-	if summary.Name == "" {
-		return nil, nil
-	}
-	return &summary, nil
 }
 
 func init() {
 	downloadCmd.Flags().Bool("force", false, "Force re-download of all sources (ignores existing summaries)")
 }
 
-func createDownloadRateLimiter(maxWorkers int) *rate.Limiter {
+func createDownloadRateLimiter(maxWorkers int, interval time.Duration, burst int) *rate.Limiter {
 	maxWorkers = max(maxWorkers, 1)
-
-	interval := constants.DownloadInterval
-	if interval <= 0 {
-		return rate.NewLimiter(rate.Inf, maxWorkers)
-	}
 
 	perRequestInterval := interval
 	if maxWorkers > 1 {
@@ -309,6 +328,25 @@ func createDownloadRateLimiter(maxWorkers int) *rate.Limiter {
 
 	limit := rate.Every(perRequestInterval)
 	b := max(maxWorkers, 1)
+	if burst > 0 {
+		b = burst
+	}
 
 	return rate.NewLimiter(limit, b)
+}
+
+func getDefaultDownloadInterval() time.Duration {
+	if AppConfig != nil && AppConfig.DNSToolkit.DownloadRateLimit.IntervalMs > 0 {
+		return time.Duration(AppConfig.DNSToolkit.DownloadRateLimit.IntervalMs) * time.Millisecond
+	}
+
+	return constants.DownloadInterval
+}
+
+func getDefaultDownloadBurst(maxWorkers int) int {
+	if AppConfig != nil && AppConfig.DNSToolkit.DownloadRateLimit.Burst > 0 {
+		return AppConfig.DNSToolkit.DownloadRateLimit.Burst
+	}
+
+	return max(maxWorkers, 1)
 }

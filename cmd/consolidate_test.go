@@ -1,140 +1,17 @@
 package cmd
 
 import (
-	"os"
+	"context"
+	"path/filepath"
 	"strings"
 	"testing"
 
-	c "github.com/phani-kb/dns-toolkit/internal/common"
-	con "github.com/phani-kb/dns-toolkit/internal/consolidators"
-	"github.com/phani-kb/dns-toolkit/internal/constants"
+	idb "github.com/phani-kb/dns-toolkit/internal/db"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
-
-func TestIsConsolidatedSummaryValid(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name     string
-		summary  c.ConsolidatedSummary
-		expected bool
-	}{
-		{
-			name: "valid summary with count > 0",
-			summary: c.ConsolidatedSummary{
-				Count: 10,
-			},
-			expected: true,
-		},
-		{
-			name: "invalid summary with count = 0",
-			summary: c.ConsolidatedSummary{
-				Count: 0,
-			},
-			expected: false,
-		},
-		{
-			name: "valid summary with large count",
-			summary: c.ConsolidatedSummary{
-				Count: 999999,
-			},
-			expected: true,
-		},
-		{
-			name: "invalid summary with negative count",
-			summary: c.ConsolidatedSummary{
-				Count: -1,
-			},
-			expected: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := IsConsolidatedSummaryValid(tt.summary)
-			assert.Equal(t, tt.expected, result)
-		})
-	}
-}
-
-func TestGetFileStrings(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name      string
-		fileInfos []c.FileInfo
-		expected  []string
-	}{
-		{
-			name:      "empty file infos",
-			fileInfos: []c.FileInfo{},
-			expected:  []string{},
-		},
-		{
-			name: "single file info",
-			fileInfos: []c.FileInfo{
-				{
-					Name:       "test.txt",
-					SourceType: "domain",
-					Filepath:   "/path/to/test.txt",
-					Count:      100,
-				},
-			},
-			expected: []string{"test.txt [domain] [/path/to/test.txt] [100]"},
-		},
-		{
-			name: "multiple file infos",
-			fileInfos: []c.FileInfo{
-				{
-					Name:       "file1.txt",
-					SourceType: "domain",
-					Filepath:   "/path/to/file1.txt",
-					Count:      50,
-				},
-				{
-					Name:         "file2.txt",
-					SourceType:   "ipv4",
-					Filepath:     "/path/to/file2.txt",
-					Count:        250,
-					MustConsider: true,
-				},
-				{
-					Name:       "file3.txt",
-					SourceType: "domain",
-					Filepath:   "/path/to/file3.txt",
-					Count:      75,
-				},
-			},
-			expected: []string{
-				"file1.txt [domain] [/path/to/file1.txt] [50]",
-				"file2.txt [ipv4] [/path/to/file2.txt] [250] [must consider]",
-				"file3.txt [domain] [/path/to/file3.txt] [75]",
-			},
-		},
-		{
-			name: "file info with must consider flag",
-			fileInfos: []c.FileInfo{
-				{
-					Name:         "important.txt",
-					SourceType:   "ipv4",
-					Filepath:     "/path/to/important.txt",
-					Count:        500,
-					MustConsider: true,
-				},
-			},
-			expected: []string{"important.txt [ipv4] [/path/to/important.txt] [500] [must consider]"},
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			result := getFileStrings(tt.fileInfos)
-			assert.Equal(t, tt.expected, result)
-		})
-	}
-}
 
 func TestGenerateFileName(t *testing.T) {
 	t.Parallel()
@@ -195,224 +72,120 @@ func TestGenerateFileName(t *testing.T) {
 	}
 }
 
-type mockConsolidator struct {
-	mockEntries u.StringSet
-	mockFiles   []c.FileInfo
-}
-
-func (m *mockConsolidator) Consolidate(_ *multilog.Logger, _ []c.ProcessedFile) (u.StringSet, []c.FileInfo) {
-	return m.mockEntries, m.mockFiles
-}
-
-func (m *mockConsolidator) FilterEntries(
-	_ *multilog.Logger,
-	entries, filterEntries u.StringSet,
-) (u.StringSet, u.StringSet) {
-	if len(filterEntries) == 0 {
-		// No filtering
-		return entries, u.NewStringSet([]string{})
-	}
-
-	filteredSet := u.NewStringSet([]string{})
-	ignoredSet := u.NewStringSet([]string{})
-
-	for entry := range entries {
-		if filterEntries.Contains(entry) {
-			ignoredSet.Add(entry)
-		} else {
-			filteredSet.Add(entry)
-		}
-	}
-
-	return filteredSet, ignoredSet
-}
-
-func (m *mockConsolidator) SaveEntries(_ *multilog.Logger, _ u.StringSet, _ string) error {
-	return nil
-}
-
-func (m *mockConsolidator) IsValid(_ c.ProcessedFile) bool {
-	return true
-}
-
-func (m *mockConsolidator) GetSourceType() string {
-	return "domain"
-}
-
-func (m *mockConsolidator) GetListType() string {
-	return "blocklist"
-}
-
-func TestConsolidateFilesBasedOnSTLT(t *testing.T) {
-	var (
-		mockEntries = u.NewStringSet([]string{"a.com", "b.com"})
-		mockFiles   = []c.FileInfo{{Name: "file1.txt", SourceType: "domain", Filepath: "/tmp/file1.txt", Count: 10}}
-	)
-
-	mock := &mockConsolidator{
-		mockEntries: mockEntries,
-		mockFiles:   mockFiles,
-	}
-
-	var _ con.Consolidator = mock
-
-	testRegistry := con.NewConsolidatorRegistry()
-	testRegistry.RegisterConsolidator("domain", "blocklist", mock)
-
-	origRegistry := con.Consolidators
-	con.Consolidators = testRegistry
-	defer func() { con.Consolidators = origRegistry }()
-
+func TestProcessAllowlists_EmptyDatabase(t *testing.T) {
+	ctx := context.Background()
 	logger := multilog.NewLogger()
-	processedFiles := []c.ProcessedFile{
-		{Valid: true},
-		{Valid: false},
-	}
-	entriesToIgnore := u.NewStringSet([]string{})
+	dbPath := filepath.Join(t.TempDir(), "test_consolidate.db")
+	database, err := idb.Open(ctx, logger, dbPath, true)
+	require.NoError(t, err)
+	defer database.Close() // nolint: errcheck
 
-	gotEntries, gotSummary := consolidateFilesBasedOnSTLT(
-		logger,
-		"domain",
-		"blocklist",
-		true,
-		entriesToIgnore,
-		processedFiles,
-	)
-
-	// When no filtering is applied, all entries should be returned
-	assert.ElementsMatch(t, mockEntries.ToSlice(), gotEntries.ToSlice())
-	assert.Equal(t, "domain", gotSummary.Type)
-	assert.Equal(t, "blocklist", gotSummary.ListType)
-	assert.Equal(t, len(mockFiles), gotSummary.FilesCount)
-	assert.Equal(t, len(mockEntries), gotSummary.Count)
-}
-
-func TestProcessAllowlists(t *testing.T) {
-	// Mock consolidators for allowlist and blocklist
-	allowlistMock := &mockConsolidator{
-		mockEntries: u.NewStringSet([]string{"allow1.com", "allow2.com", "blocked.com"}),
-		mockFiles:   []c.FileInfo{{Name: "allowlist.txt", SourceType: "domain", Count: 3}},
-	}
-
-	blocklistMock := &mockConsolidator{
-		mockEntries: u.NewStringSet([]string{"blocked.com"}),
-		mockFiles:   []c.FileInfo{{Name: "local_blocklist.txt", SourceType: "domain", Count: 1}},
-	}
-
-	// Set up test registry
-	testRegistry := con.NewConsolidatorRegistry()
-	testRegistry.RegisterConsolidator("domain", constants.ListTypeAllowlist, allowlistMock)
-	testRegistry.RegisterConsolidator("domain", constants.ListTypeBlocklist, blocklistMock)
-
-	origRegistry := con.Consolidators
-	con.Consolidators = testRegistry
-	defer func() { con.Consolidators = origRegistry }()
-
-	// Test data
-	processedFiles := []c.ProcessedFile{
-		{
-			Name:              "Regular Allowlist",
-			GenericSourceType: "domain",
-			ListType:          constants.ListTypeAllowlist,
-			Valid:             true,
-		},
-		{
-			Name:              "Local Blocklist", // Name starts with "Local"
-			GenericSourceType: "domain",
-			ListType:          constants.ListTypeBlocklist,
-			Valid:             true,
-		},
-	}
+	entriesRepo := idb.NewEntriesRepo(database)
+	consolidatedRepo := idb.NewConsolidatedRepo(database)
 
 	genericSourceTypes := []string{"domain"}
 	allowlistEntriesByType := make(map[string]u.StringSet)
-	var allConsolidatedSummaries []c.ConsolidatedSummary
-
-	resolvedAllowByType := make(map[string]u.StringSet)
 	resolvedBlockByType := make(map[string]u.StringSet)
 
-	// Execute the function
 	processAllowlists(
+		ctx,
+		logger,
+		entriesRepo,
+		consolidatedRepo,
 		genericSourceTypes,
-		processedFiles,
-		resolvedAllowByType,
 		resolvedBlockByType,
 		allowlistEntriesByType,
-		&allConsolidatedSummaries,
 	)
 
-	// Verify results
-	assert.Len(t, allowlistEntriesByType, 1)
 	assert.Contains(t, allowlistEntriesByType, "domain")
-
-	domainEntries := allowlistEntriesByType["domain"]
-	assert.Equal(t, 3, len(domainEntries)) // should have all 3 entries - allowlists are NOT filtered by blocklists
-	assert.True(t, domainEntries.Contains("allow1.com"))
-	assert.True(t, domainEntries.Contains("allow2.com"))
-	assert.True(t, domainEntries.Contains("blocked.com")) // should NOT be filtered - allowlists override blocklists
-
-	// Check that we have at least one consolidated summary (may be more if includeInvalid is processed)
-	assert.GreaterOrEqual(t, len(allConsolidatedSummaries), 1)
-
-	// Find the summary for allowlist (there might be multiple summaries)
-	var allowlistSummary *c.ConsolidatedSummary
-	for i := range allConsolidatedSummaries {
-		if allConsolidatedSummaries[i].ListType == constants.ListTypeAllowlist {
-			allowlistSummary = &allConsolidatedSummaries[i]
-			break
-		}
-	}
-
-	assert.NotNil(t, allowlistSummary, "Should have an allowlist summary")
-	if allowlistSummary != nil {
-		assert.Equal(t, "domain", allowlistSummary.Type)
-		assert.Equal(t, constants.ListTypeAllowlist, allowlistSummary.ListType)
-	}
+	assert.Equal(t, 0, allowlistEntriesByType["domain"].Size())
 }
 
-func TestIgnoredEntriesAnnotation(t *testing.T) {
-	mock := &mockConsolidator{
-		mockEntries: u.NewStringSet([]string{"keep.com", "ignore.com"}),
-		mockFiles:   []c.FileInfo{{Name: "file1.txt", SourceType: "domain", Filepath: "/tmp/file1.txt", Count: 2}},
+func TestProcessAllowlists_WithEntries(t *testing.T) {
+	ctx := context.Background()
+	logger := multilog.NewLogger()
+	dbPath := filepath.Join(t.TempDir(), "test_consolidate.db")
+	database, err := idb.Open(ctx, logger, dbPath, true)
+	require.NoError(t, err)
+	defer database.Close() // nolint: errcheck
+
+	_, err = database.WriteConn().
+		Exec(`insert into dnstk_sources (name, disabled, skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation) values ('test-source', 0, 0, 0, 0)`)
+	require.NoError(t, err)
+
+	_, err = database.WriteConn().
+		Exec(`insert into dnstk_entries (source_id, entry, generic_source_type, actual_source_type, list_type, valid, must_consider)
+		values (1, 'allow1.com', 'domain', 'domain', 'allowlist', 1, 0),
+		       (1, 'allow2.com', 'domain', 'domain', 'allowlist', 1, 0),
+		       (1, 'must-keep.com', 'domain', 'domain', 'allowlist', 1, 1)`)
+	require.NoError(t, err)
+
+	entriesRepo := idb.NewEntriesRepo(database)
+	consolidatedRepo := idb.NewConsolidatedRepo(database)
+
+	genericSourceTypes := []string{"domain"}
+	allowlistEntriesByType := make(map[string]u.StringSet)
+
+	resolvedBlockByType := map[string]u.StringSet{
+		"domain": u.NewStringSet([]string{"allow1.com"}),
 	}
 
-	testRegistry := con.NewConsolidatorRegistry()
-	testRegistry.RegisterConsolidator("domain", "blocklist", mock)
-
-	origRegistry := con.Consolidators
-	con.Consolidators = testRegistry
-	defer func() { con.Consolidators = origRegistry }()
-
-	origConsolidatedDir := constants.ConsolidatedDir
-	tmpDir := t.TempDir()
-	constants.ConsolidatedDir = tmpDir
-	defer func() { constants.ConsolidatedDir = origConsolidatedDir }()
-
-	logger := multilog.NewLogger()
-
-	entriesToIgnore := u.NewStringSet([]string{"ignore.com"})
-
-	processedFiles := []c.ProcessedFile{{Valid: true}}
-
-	gotEntries, gotSummary := consolidateFilesBasedOnSTLT(
+	processAllowlists(
+		ctx,
 		logger,
-		"domain",
-		"blocklist",
-		true,
-		entriesToIgnore,
-		processedFiles,
+		entriesRepo,
+		consolidatedRepo,
+		genericSourceTypes,
+		resolvedBlockByType,
+		allowlistEntriesByType,
 	)
 
-	assert.Equal(t, 1, len(gotEntries))
-	assert.True(t, gotEntries.Contains("keep.com"))
+	domainEntries := allowlistEntriesByType["domain"]
+	assert.Equal(t, 2, domainEntries.Size())
+	assert.True(t, domainEntries.Contains("allow2.com"))
+	assert.True(t, domainEntries.Contains("must-keep.com"))
+	assert.False(t, domainEntries.Contains("allow1.com"))
+}
 
-	if assert.NotEmpty(t, gotSummary.IgnoredFilepath) {
-		content, err := os.ReadFile(gotSummary.IgnoredFilepath)
-		assert.NoError(t, err)
-		assert.Contains(
-			t,
-			string(content),
-			"ignore.com # ignored: filtered by resolved allowlist (conflict resolution)",
-		)
+func TestProcessAllowlists_MustConsiderOverridesResolution(t *testing.T) {
+	ctx := context.Background()
+	logger := multilog.NewLogger()
+	dbPath := filepath.Join(t.TempDir(), "test_consolidate.db")
+	database, err := idb.Open(ctx, logger, dbPath, true)
+	require.NoError(t, err)
+	defer database.Close() // nolint: errcheck
+
+	_, err = database.WriteConn().
+		Exec(`insert into dnstk_sources (name, disabled, skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation) values ('test-source', 0, 0, 0, 0)`)
+	require.NoError(t, err)
+
+	_, err = database.WriteConn().
+		Exec(`insert into dnstk_entries (source_id, entry, generic_source_type, actual_source_type, list_type, valid, must_consider)
+		values (1, 'important.com', 'domain', 'domain', 'allowlist', 1, 1)`)
+	require.NoError(t, err)
+
+	entriesRepo := idb.NewEntriesRepo(database)
+	consolidatedRepo := idb.NewConsolidatedRepo(database)
+
+	genericSourceTypes := []string{"domain"}
+	allowlistEntriesByType := make(map[string]u.StringSet)
+
+	resolvedBlockByType := map[string]u.StringSet{
+		"domain": u.NewStringSet([]string{"important.com"}),
 	}
+
+	processAllowlists(
+		ctx,
+		logger,
+		entriesRepo,
+		consolidatedRepo,
+		genericSourceTypes,
+		resolvedBlockByType,
+		allowlistEntriesByType,
+	)
+
+	// must_consider entries should be kept even if in resolved blocklist
+	domainEntries := allowlistEntriesByType["domain"]
+	assert.Equal(t, 1, domainEntries.Size())
+	assert.True(t, domainEntries.Contains("important.com"))
 }

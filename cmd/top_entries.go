@@ -1,136 +1,93 @@
 package cmd
 
 import (
-	"os"
-	"runtime"
+	"context"
 
-	cfg "github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
-	"github.com/phani-kb/dns-toolkit/internal/top"
-	u "github.com/phani-kb/dns-toolkit/internal/utils"
+	"github.com/phani-kb/dns-toolkit/internal/db"
 	"github.com/spf13/cobra"
 )
 
 var (
-	minSources       int
-	maxEntries       int
-	cpuProfile       bool
-	memProfile       bool
-	goroutineProfile bool
-	blockProfile     bool
-	profileDir       string
-	maxWorkers       int
+	minSources int
+	maxEntries int
 )
 
 var topEntriesCmd = &cobra.Command{
 	Use:   "top",
 	Short: "Find top entry(s) in each generic source type",
 	Run: func(cmd *cobra.Command, args []string) {
-		Logger.Infof("Profiling configuration: CPU=%v, Memory=%v, Goroutine=%v, Block=%v",
-			cpuProfile, memProfile, goroutineProfile, blockProfile)
+		ctx := context.Background()
 
-		maxWorkers = AppConfig.DNSToolkit.MaxWorkers
-		if maxWorkers <= 0 {
-			maxWorkers = runtime.GOMAXPROCS(0)
-		}
-		Logger.Infof("Using %d worker(s) for top entry(s) processing", maxWorkers)
-
-		if profileDir != "" {
-			if err := os.MkdirAll(profileDir, 0o755); err != nil {
-				Logger.Errorf("Failed to create profile directory %s: %v", profileDir, err)
-				profileDir = ""
-			} else {
-				Logger.Infof("Using profile directory: %s", profileDir)
-			}
-		}
-		if profileDir == "" {
-			profileDir = AppConfig.DNSToolkit.Folders.Profiles
-			if err := os.MkdirAll(profileDir, 0o755); err != nil {
-				Logger.Errorf(
-					"Failed to create default profile directory %s: %v. Profiling might fail.",
-					profileDir,
-					err,
-				)
-			}
+		if maxEntries < 1 {
+			Logger.Errorf("--max-entries must be at least 1, got %d", maxEntries)
+			return
 		}
 
-		stopProfiling := u.StartProfiling(Logger, u.ProfileOptions{
-			CPUProfile:       cpuProfile,
-			MemProfile:       memProfile,
-			GoroutineProfile: goroutineProfile,
-			BlockProfile:     blockProfile,
-			ProfileNameBase:  "top",
-			OutputDir:        profileDir,
-			BlockProfileRate: 1000,
-		})
-
-		profilingEnabled := cpuProfile || memProfile || goroutineProfile || blockProfile
-
-		var mainErr error
-		func() {
-			defer stopProfiling()
-
-			if maxEntries < 1 {
-				Logger.Errorf("Error: maxEntries must be at least 1, got %d", maxEntries)
-				return
-			}
-
-			// Create an instance of the top entries service
-			topService := top.NewDefaultService(constants.TopDir, constants.SummaryDir)
-
-			// Ensure directories exist
-			if err := u.EnsureDirectoryExists(Logger, constants.TopDir); err != nil {
-				Logger.Errorf("Failed to create top entry(s) directory %s: %v", constants.TopDir, err)
-				mainErr = err
-				return
-			}
-			if err := u.EnsureDirectoryExists(Logger, constants.SummaryDir); err != nil {
-				Logger.Errorf("Failed to create summary directory %s: %v", constants.SummaryDir, err)
-				mainErr = err
-				return
-			}
-
-			// Get processed files and generic source types
-			_, genericSourceTypes, processedFiles := cfg.GetProcessedSummaries(Logger, SourcesConfigs, *AppConfig)
-
-			// Determine min sources range
-			minSourcesRange := []int{minSources}
-			if minSources == 0 {
-				minSourcesRange = constants.DefaultMinSourcesRange
-			}
-
-			// Process top entries using the service
-			_, err := topService.ProcessTopEntries(
-				Logger,
-				genericSourceTypes,
-				processedFiles,
-				minSourcesRange,
-				maxEntries,
-				maxWorkers,
-			)
-			if err != nil {
-				Logger.Errorf("Error processing top entries: %v", err)
-				mainErr = err
-			}
-		}()
-
-		if mainErr != nil {
-			Logger.Errorf("Top entry(s) processing finished with error: %v", mainErr)
+		minSourcesRange := []int{minSources}
+		if minSources == 0 {
+			minSourcesRange = constants.DefaultMinSourcesRange
 		}
 
-		if profilingEnabled {
-			Logger.Infof("Analyzing collected profiles...")
-			u.AnalyzeProfiles(Logger, u.ProfileOptions{
-				ProfileNameBase: "top",
-				OutputDir:       profileDir,
-			})
+		database := openDB(ctx)
+		defer database.CloseLogError(Logger)
+
+		topRepo := db.NewTopEntriesRepo(database)
+		entriesRepo := db.NewEntriesRepo(database)
+
+		genericSourceTypes, typesErr := entriesRepo.GetGenericSourceTypes(ctx)
+		if typesErr != nil {
+			Logger.Errorf("Failed to get source types: %v", typesErr)
+			return
 		}
+
+		if len(genericSourceTypes) == 0 {
+			Logger.Infof("No entries found in database")
+			return
+		}
+
+		listTypes := []string{constants.ListTypeBlocklist, constants.ListTypeAllowlist} // TODO: get list from db
+
+		Logger.Infof("Processing top entries: min_sources_range=%v, max_entries=%d", minSourcesRange, maxEntries)
+
+		totalPersisted := 0
+		for _, gst := range genericSourceTypes {
+			for _, listType := range listTypes {
+				for _, minSrc := range minSourcesRange {
+					entries, qErr := topRepo.GetTopEntries(ctx, gst, listType, minSrc, maxEntries)
+					if qErr != nil {
+						Logger.Errorf("Failed to get top entries for %s/%s (min=%d): %v", gst, listType, minSrc, qErr)
+						continue
+					}
+
+					if len(entries) == 0 {
+						Logger.Debugf("No top entries for %s/%s with min_sources=%d", gst, listType, minSrc)
+						continue
+					}
+
+					if pErr := topRepo.PersistTopEntries(ctx, gst, listType, minSrc, entries); pErr != nil {
+						Logger.Errorf(
+							"Failed to persist top entries for %s/%s (min=%d): %v",
+							gst,
+							listType,
+							minSrc,
+							pErr,
+						)
+						continue
+					}
+
+					totalPersisted += len(entries)
+					Logger.Infof("%s %s: %d entries appearing in %d+ sources",
+						gst, listType, len(entries), minSrc)
+				}
+			}
+		}
+
+		Logger.Infof("Top entries complete: %d entries persisted to database", totalPersisted)
 	},
 }
 
 func init() {
-	topEntriesCmd.Flags().IntVarP(&minSources, "min-sources", "m", 0, "Minimum sources (3-12)")
-	topEntriesCmd.Flags().IntVarP(&maxEntries, "max-entries", "x", int(^uint(0)>>1), "Max entries")
-
-	AddProfilingFlags(topEntriesCmd, &cpuProfile, &memProfile, &goroutineProfile, &blockProfile, &profileDir)
+	topEntriesCmd.Flags().IntVarP(&minSources, "min-sources", "m", 0, "Minimum sources (0 = default range 3-12)")
+	topEntriesCmd.Flags().IntVarP(&maxEntries, "max-entries", "x", int(^uint(0)>>1), "Max entries to output")
 }

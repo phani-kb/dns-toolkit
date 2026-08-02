@@ -37,24 +37,30 @@ type FilesChecksumConfig struct {
 	Enabled   bool   `yaml:"enabled"`
 }
 
+type downloadRateLimitConfig struct {
+	IntervalMs int `yaml:"interval_ms,omitempty"`
+	Burst      int `yaml:"burst,omitempty"`
+}
+
 type DatabaseConfig struct {
 	Path string `yaml:"path"`
 }
 
 type DNSToolkitConfig struct {
-	Database                  DatabaseConfig      `yaml:"database,omitempty"`
-	SourceFiles               []string            `yaml:"source_files"`
-	SkipCertVerificationHosts []string            `yaml:"skip_cert_verification_hosts,omitempty"`
-	Folders                   FoldersConfig       `yaml:"folders"`
-	SourceFilters             SourceFilters       `yaml:"source_filters"`
-	FilesChecksum             FilesChecksumConfig `yaml:"files_checksum"`
-	Override                  OverrideConfig      `yaml:"override,omitempty"`
-	MaxWorkers                int                 `yaml:"max_workers"`
-	MaxRetries                int                 `yaml:"max_retries"`
-	SkipUnchangedDownloads    bool                `yaml:"skip_unchanged_downloads"`
-	SkipCertVerification      bool                `yaml:"skip_cert_verification,omitempty"`
-	SkipNameSpecialCharsCheck bool                `yaml:"skip_name_special_chars_check,omitempty"`
-	MinOverlapPercent         float64             `yaml:"min_overlap_percent,omitempty"`
+	Database                  DatabaseConfig          `yaml:"database,omitempty"`
+	SourceFiles               []string                `yaml:"source_files"`
+	SkipCertVerificationHosts []string                `yaml:"skip_cert_verification_hosts,omitempty"`
+	Folders                   FoldersConfig           `yaml:"folders"`
+	SourceFilters             SourceFilters           `yaml:"source_filters"`
+	FilesChecksum             FilesChecksumConfig     `yaml:"files_checksum"`
+	Override                  OverrideConfig          `yaml:"override,omitempty"`
+	DownloadRateLimit         downloadRateLimitConfig `yaml:"download_rate_limit,omitempty"`
+	MaxWorkers                int                     `yaml:"max_workers"`
+	MaxRetries                int                     `yaml:"max_retries"`
+	SkipUnchangedDownloads    bool                    `yaml:"skip_unchanged_downloads"`
+	SkipCertVerification      bool                    `yaml:"skip_cert_verification,omitempty"`
+	SkipNameSpecialCharsCheck bool                    `yaml:"skip_name_special_chars_check,omitempty"`
+	MinOverlapPercent         float64                 `yaml:"min_overlap_percent,omitempty"`
 }
 
 type OverrideConfig struct {

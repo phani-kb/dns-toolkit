@@ -411,13 +411,9 @@ func TestTopSummary_GetName(t *testing.T) {
 func TestTopSummary_MarshalJSON(t *testing.T) {
 	ts := TopSummary{
 		GenericSourceType: "domain",
-		TopEntries: []EntryCountPair{
-			{Entry: "example.com", Count: 5},
-			{Entry: "test.com", Count: 3},
-		},
-		Count:    100,
-		Filepath: "/path/to/file",
-		ListType: "blocklist",
+		Count:             100,
+		Filepath:          "/path/to/file",
+		ListType:          "blocklist",
 	}
 
 	data, err := json.Marshal(ts)
@@ -447,37 +443,50 @@ func TestTopSummary_MarshalJSON(t *testing.T) {
 	assert.False(t, topEntriesExists, "TopEntries should not be in JSON output")
 }
 
-func TestEntryHeap(t *testing.T) {
-	h := &EntryHeap{}
-
-	h.Push(EntryCountPair{Entry: "test1", Count: 5})
-	h.Push(EntryCountPair{Entry: "test2", Count: 3})
-	h.Push(EntryCountPair{Entry: "test3", Count: 7})
-
-	assert.Equal(t, 3, h.Len())
-
-	if h.Len() >= 2 {
-		entry1 := (*h)[0]
-		entry2 := (*h)[1]
-		result := h.Less(0, 1)
-		expected := entry1.Count < entry2.Count
-		assert.Equal(t, expected, result)
+func TestTopSummaryMarshalJSON(t *testing.T) {
+	tests := []struct {
+		name    string
+		summary TopSummary
+		wantErr bool
+	}{
+		{
+			name: "valid top summary",
+			summary: TopSummary{
+				GenericSourceType: "domain",
+				ListType:          "blocklist",
+				MinSources:        3,
+				Count:             1000,
+				Filepath:          "/test/path.txt",
+			},
+			wantErr: false,
+		},
+		{
+			name:    "empty top summary",
+			summary: TopSummary{},
+			wantErr: false,
+		},
 	}
 
-	if h.Len() >= 2 {
-		elem0 := (*h)[0]
-		elem1 := (*h)[1]
-		h.Swap(0, 1)
-		assert.Equal(t, elem0, (*h)[1])
-		assert.Equal(t, elem1, (*h)[0])
-		h.Swap(0, 1)
-	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			data, err := tt.summary.MarshalJSON()
+			if tt.wantErr {
+				assert.Error(t, err)
+			} else {
+				assert.NoError(t, err)
+				assert.NotEmpty(t, data)
 
-	initialLen := h.Len()
-	popped := h.Pop().(EntryCountPair)
-	assert.Equal(t, initialLen-1, h.Len())
-	assert.NotEmpty(t, popped.Entry)
-	assert.Greater(t, popped.Count, 0)
+				var unmarshaled TopSummary
+				err = json.Unmarshal(data, &unmarshaled)
+				assert.NoError(t, err)
+				assert.Equal(t, tt.summary.GenericSourceType, unmarshaled.GenericSourceType)
+				assert.Equal(t, tt.summary.ListType, unmarshaled.ListType)
+				assert.Equal(t, tt.summary.MinSources, unmarshaled.MinSources)
+				assert.Equal(t, tt.summary.Count, unmarshaled.Count)
+				assert.Equal(t, tt.summary.Filepath, unmarshaled.Filepath)
+			}
+		})
+	}
 }
 
 func TestSortingFunctions(t *testing.T) {
@@ -658,53 +667,6 @@ func TestDownloadSummaryToJSON(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			result := tt.summary.ToJSON()
 			assert.JSONEq(t, tt.expected, result)
-		})
-	}
-}
-
-func TestTopSummaryMarshalJSON(t *testing.T) {
-	tests := []struct {
-		name    string
-		summary TopSummary
-		wantErr bool
-	}{
-		{
-			name: "valid top summary",
-			summary: TopSummary{
-				GenericSourceType: "domain",
-				ListType:          "blocklist",
-				MinSources:        3,
-				Count:             1000,
-				Filepath:          "/test/path.txt",
-				TopEntries:        []EntryCountPair{{Entry: "example.com", Count: 5}},
-			},
-			wantErr: false,
-		},
-		{
-			name:    "empty top summary",
-			summary: TopSummary{},
-			wantErr: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			data, err := tt.summary.MarshalJSON()
-			if tt.wantErr {
-				assert.Error(t, err)
-			} else {
-				assert.NoError(t, err)
-				assert.NotEmpty(t, data)
-
-				var unmarshaled TopSummary
-				err = json.Unmarshal(data, &unmarshaled)
-				assert.NoError(t, err)
-				assert.Equal(t, tt.summary.GenericSourceType, unmarshaled.GenericSourceType)
-				assert.Equal(t, tt.summary.ListType, unmarshaled.ListType)
-				assert.Equal(t, tt.summary.MinSources, unmarshaled.MinSources)
-				assert.Equal(t, len(tt.summary.TopEntries), unmarshaled.Count)
-				assert.Equal(t, tt.summary.Filepath, unmarshaled.Filepath)
-			}
 		})
 	}
 }
