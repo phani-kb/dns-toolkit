@@ -99,7 +99,7 @@ func TestProcessAllSourcesUsesDatabaseDownloadSummaries(t *testing.T) {
 	constants.ProcessedDir = processedDir
 	constants.SummaryDir = summaryDir
 
-	processAllSources(ctx, logger, processedDir, false)
+	processAllSources(ctx, logger, processedDir, false, true)
 
 	processedRepo := idb.NewProcessedRepo(database)
 	processedSummaries, err := processedRepo.ListProcessedSummaries(processedDir)

@@ -32,9 +32,19 @@ var processCmd = &cobra.Command{
 			forceProcess = false
 		}
 
-		if err := u.EnsureDirectoryExists(Logger, constants.ProcessedDir); err != nil {
-			Logger.Errorf("Failed to create processed directory: %v", err)
-			os.Exit(1)
+		writeFiles, getWriteBoolErr := cmd.Flags().GetBool("write-files")
+		if getWriteBoolErr != nil {
+			Logger.Warnf("Failed to parse --write-files flag (defaulting to false): %v", getWriteBoolErr)
+			writeFiles = false
+		}
+
+		if writeFiles {
+			if err := u.EnsureDirectoryExists(Logger, constants.ProcessedDir); err != nil {
+				Logger.Errorf("Failed to create processed directory: %v", err)
+				os.Exit(1)
+			}
+		} else {
+			Logger.Infof("Processed file output disabled (--write-files=false); persisting entries to DB only")
 		}
 		if err := u.EnsureDirectoryExists(Logger, constants.SummaryDir); err != nil {
 			Logger.Errorf("Failed to create summary directory: %v", err)
@@ -42,7 +52,7 @@ var processCmd = &cobra.Command{
 		}
 
 		ctx := context.Background()
-		processAllSources(ctx, Logger, constants.ProcessedDir, forceProcess)
+		processAllSources(ctx, Logger, constants.ProcessedDir, forceProcess, writeFiles)
 	},
 }
 
@@ -53,11 +63,13 @@ var processCmd = &cobra.Command{
 //   - logger: Logger for recording operations and errors
 //   - processedDir: Directory to save processed results
 //   - forceProcess: If true, forces processing of all sources regardless of checksum
+//   - writeFiles: If true, writes valid/invalid processed files to disk
 func processAllSources(
 	ctx context.Context,
 	logger *multilog.Logger,
 	processedDir string,
 	forceProcess bool,
+	writeFiles bool,
 ) {
 	downloadSummaries, err := loadDownloadSummaries(ctx, logger)
 	if err != nil {
@@ -138,6 +150,7 @@ func processAllSources(
 				logger,
 				summary,
 				processedDir,
+				writeFiles,
 				sourceIDLocal,
 				entriesRepo,
 				downloadsRepo,
@@ -162,6 +175,7 @@ func processSourceFileAndPersist(
 	logger *multilog.Logger,
 	summary c.DownloadSummary,
 	processedDir string,
+	writeFiles bool,
 	sourceID int64,
 	entriesRepo *idb.EntriesRepo,
 	downloadsRepo *idb.DownloadsRepo,
@@ -224,50 +238,52 @@ func processSourceFileAndPersist(
 					})
 				}
 			}
-			validFilePath, invalidFilePath := saveEntries(
-				logger,
-				processedDir,
-				summary.Name,
-				sourceTypeName,
-				listTypeName,
-				validEntries,
-				invalidEntries,
-			)
-
-			key := fmt.Sprintf("%s_%s", sourceTypeName, listTypeName)
-			if validFilePath != "" {
-				validFiles[key] = createProcessedFile(
+			if writeFiles {
+				validFilePath, invalidFilePath := saveEntries(
 					logger,
+					processedDir,
 					summary.Name,
-					validFilePath,
 					sourceTypeName,
 					listTypeName,
 					validEntries,
-					mustConsider,
-					true,
-					listTypeObj.Groups,
-					summary.Categories,
-					summary.SkipGeneralConsolidation,
-					summary.SkipGroupsConsolidation,
-					summary.SkipCategoriesConsolidation,
-				)
-			}
-			if invalidFilePath != "" {
-				invalidFiles[key] = createProcessedFile(
-					logger,
-					summary.Name,
-					invalidFilePath,
-					sourceTypeName,
-					listTypeName,
 					invalidEntries,
-					mustConsider,
-					false,
-					listTypeObj.Groups,
-					summary.Categories,
-					summary.SkipGeneralConsolidation,
-					summary.SkipGroupsConsolidation,
-					summary.SkipCategoriesConsolidation,
 				)
+
+				key := fmt.Sprintf("%s_%s", sourceTypeName, listTypeName)
+				if validFilePath != "" {
+					validFiles[key] = createProcessedFile(
+						logger,
+						summary.Name,
+						validFilePath,
+						sourceTypeName,
+						listTypeName,
+						validEntries,
+						mustConsider,
+						true,
+						listTypeObj.Groups,
+						summary.Categories,
+						summary.SkipGeneralConsolidation,
+						summary.SkipGroupsConsolidation,
+						summary.SkipCategoriesConsolidation,
+					)
+				}
+				if invalidFilePath != "" {
+					invalidFiles[key] = createProcessedFile(
+						logger,
+						summary.Name,
+						invalidFilePath,
+						sourceTypeName,
+						listTypeName,
+						invalidEntries,
+						mustConsider,
+						false,
+						listTypeObj.Groups,
+						summary.Categories,
+						summary.SkipGeneralConsolidation,
+						summary.SkipGroupsConsolidation,
+						summary.SkipCategoriesConsolidation,
+					)
+				}
 			}
 
 			logger.Infof(
@@ -570,4 +586,6 @@ func getProcessMaxWorkers() int {
 
 func init() {
 	processCmd.Flags().Bool("force", false, "Force processing of all sources (ignore last_processed checksum skip)")
+	processCmd.Flags().
+		Bool("write-files", false, "Write valid/invalid processed files to filesystem (entries are always persisted to DB)")
 }
