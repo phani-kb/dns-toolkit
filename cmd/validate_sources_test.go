@@ -130,3 +130,47 @@ func TestValidateSourcesCommand(t *testing.T) {
 	assert.Contains(t, validateSourcesCmd.Short, "Validate")
 	assert.NotNil(t, validateSourcesCmd.Run)
 }
+
+func TestResolvePathFromProjectRoot(t *testing.T) {
+	tests := []struct {
+		name        string
+		projectRoot string
+		path        string
+		expected    string
+	}{
+		{
+			name:        "absolute path",
+			projectRoot: "/project",
+			path:        "/absolute/path/file.txt",
+			expected:    "/absolute/path/file.txt",
+		},
+		{
+			name:        "relative path",
+			projectRoot: "/project",
+			path:        "relative/file.txt",
+			expected:    "/project/relative/file.txt",
+		},
+		{
+			name:        "empty relative path",
+			projectRoot: "/project",
+			path:        "",
+			expected:    "/project",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := resolvePathFromProjectRoot(tt.projectRoot, tt.path)
+			assert.Equal(t, tt.expected, result)
+		})
+	}
+}
+
+func TestPrintValidationProgress(t *testing.T) {
+	printValidationProgress("test message: %s", "arg")
+}
+
+func TestShouldPrintValidationProgress(t *testing.T) {
+	result := shouldPrintValidationProgress()
+	_ = result
+}

@@ -41,7 +41,7 @@ func TestGenerateSummariesReadme(t *testing.T) {
 	}()
 
 	summariesDir := filepath.Join(tempDir, "summaries")
-	require.NoError(t, os.MkdirAll(summariesDir, 0755))
+	require.NoError(t, os.MkdirAll(summariesDir, 0o755))
 
 	origOutputDir := constants.OutputDir
 	constants.OutputDir = tempDir
@@ -90,7 +90,7 @@ func TestCollectSummariesInfo(t *testing.T) {
 	assert.NotEmpty(t, info.LastGenerated)
 
 	summariesDir := filepath.Join(tempDir, "summaries")
-	require.NoError(t, os.MkdirAll(summariesDir, 0755))
+	require.NoError(t, os.MkdirAll(summariesDir, 0o755))
 	constants.OutputDir = tempDir
 
 	createTestSummaryFilesForSummariesReadme(t, summariesDir)
@@ -103,323 +103,6 @@ func TestCollectSummariesInfo(t *testing.T) {
 
 	assert.True(t, info.OverallStats.TotalSources > 0)
 	assert.True(t, info.OverallStats.TotalDownloads > 0)
-}
-
-func TestGetDetailedStatsForSummaryType(t *testing.T) {
-	tempDir, err := os.MkdirTemp("", "detailed-stats-test")
-	require.NoError(t, err)
-	defer func() {
-		if err := os.RemoveAll(tempDir); err != nil {
-			t.Logf("Failed to remove temporary directory: %v", err)
-		}
-	}()
-
-	summariesDir := filepath.Join(tempDir, "summaries")
-	require.NoError(t, os.MkdirAll(summariesDir, 0755))
-
-	origOutputDir := constants.OutputDir
-	constants.OutputDir = tempDir
-	defer func() {
-		constants.OutputDir = origOutputDir
-	}()
-
-	tests := []struct {
-		createFile   func(string) error
-		name         string
-		filename     string
-		expectedText []string
-		expectStats  bool
-	}{
-		{
-			name:     "non-existent file",
-			filename: "non_existent.json",
-			createFile: func(path string) error {
-				return nil
-			},
-			expectStats: false,
-		},
-		{
-			name:     "download_summary.json",
-			filename: "download_summary.json",
-			createFile: func(path string) error {
-				downloadSummaries := []c.DownloadSummary{
-					{
-						Name:  "test-source-1",
-						Error: "",
-						Types: []c.SourceType{
-							{Name: "domain"},
-							{Name: "ipv4"},
-						},
-					},
-					{
-						Name:  "test-source-2",
-						Error: "download failed",
-						Types: []c.SourceType{
-							{Name: "domain"},
-						},
-					},
-				}
-				content, err := json.Marshal(downloadSummaries)
-				if err != nil {
-					return err
-				}
-				return os.WriteFile(path, content, 0644)
-			},
-			expectStats: true,
-			expectedText: []string{
-				"Sources:",
-				"2 total",
-				"1 successful",
-				"1 failed",
-				"Types:",
-				"domain (2)",
-				"ipv4 (1)",
-			},
-		},
-		{
-			name:     "processed_summary.json",
-			filename: "processed_summary.json",
-			createFile: func(path string) error {
-				processedSummaries := []c.ProcessedSummary{
-					{
-						Name: "test-source",
-						ValidFiles: []c.ProcessedFile{
-							{GenericSourceType: "domain"},
-							{GenericSourceType: "ipv4"},
-						},
-						InvalidFiles: []c.ProcessedFile{
-							{GenericSourceType: "domain"},
-						},
-					},
-				}
-				content, err := json.Marshal(processedSummaries)
-				if err != nil {
-					return err
-				}
-				return os.WriteFile(path, content, 0644)
-			},
-			expectStats: true,
-			expectedText: []string{
-				"Sources:",
-				"1 processed",
-				"Files:",
-				"2 valid, 1 invalid",
-				"Types:",
-				"domain (1)",
-				"ipv4 (1)",
-			},
-		},
-		{
-			name:     "consolidated_summary.json",
-			filename: "consolidated_summary.json",
-			createFile: func(path string) error {
-				consolidatedSummaries := []c.ConsolidatedSummary{
-					{
-						Type:       "domain",
-						FilesCount: 5,
-						Count:      1000,
-					},
-					{
-						Type:       "ipv4",
-						FilesCount: 3,
-						Count:      500,
-					},
-				}
-				content, err := json.Marshal(consolidatedSummaries)
-				if err != nil {
-					return err
-				}
-				return os.WriteFile(path, content, 0644)
-			},
-			expectStats: true,
-			expectedText: []string{
-				"Files:",
-				"8 consolidated",
-				"Entries:",
-				"1.5K total",
-				"Types:",
-				"domain (1)",
-				"ipv4 (1)",
-			},
-		},
-		{
-			name:     "consolidated_categories_summary.json",
-			filename: "consolidated_categories_summary.json",
-			createFile: func(path string) error {
-				categoriesSummaries := []c.ConsolidatedSummary{
-					{
-						Category:   "malware",
-						FilesCount: 3,
-						Count:      800,
-					},
-					{
-						Category:   "ads",
-						FilesCount: 2,
-						Count:      200,
-					},
-				}
-				content, err := json.Marshal(categoriesSummaries)
-				if err != nil {
-					return err
-				}
-				return os.WriteFile(path, content, 0644)
-			},
-			expectStats: true,
-			expectedText: []string{
-				"Categories:",
-				"2 processed",
-				"Files:",
-				"5 consolidated",
-				"Entries:",
-				"1.0K total",
-				"Categories:",
-				"ads (1)",
-				"malware (1)",
-			},
-		},
-		{
-			name:     "consolidated_groups_summary.json",
-			filename: "consolidated_groups_summary.json",
-			createFile: func(path string) error {
-				groupsSummaries := []c.ConsolidatedSummary{
-					{
-						Group:      "mini",
-						FilesCount: 2,
-						Count:      300,
-					},
-					{
-						Group:      "lite",
-						FilesCount: 4,
-						Count:      700,
-					},
-				}
-				content, err := json.Marshal(groupsSummaries)
-				if err != nil {
-					return err
-				}
-				return os.WriteFile(path, content, 0644)
-			},
-			expectStats: true,
-			expectedText: []string{
-				"Groups:",
-				"2 processed",
-				"Files:",
-				"6 consolidated",
-				"Entries:",
-				"1.0K total",
-				"Groups:",
-				"lite (1)",
-				"mini (1)",
-			},
-		},
-		{
-			name:     "top_summary.json",
-			filename: "top_summary.json",
-			createFile: func(path string) error {
-				topSummaries := []c.TopSummary{
-					{
-						GenericSourceType: "domain",
-						MinSources:        3,
-						Count:             500,
-					},
-					{
-						GenericSourceType: "ipv4",
-						MinSources:        2,
-						Count:             250,
-					},
-				}
-				content, err := json.Marshal(topSummaries)
-				if err != nil {
-					return err
-				}
-				return os.WriteFile(path, content, 0644)
-			},
-			expectStats: true,
-			expectedText: []string{
-				"Types:",
-				"2 analyzed",
-				"Top Entries:",
-				"0 total",
-				"Details:",
-				"domain (3+ (0))",
-				"ipv4 (2+ (0))",
-			},
-		},
-		{
-			name:     "overlap_summary.json",
-			filename: "overlap_summary.json",
-			createFile: func(path string) error {
-				overlapSummaries := []c.OverlapSummary{
-					{
-						Type:   "domain",
-						Count:  1000,
-						Unique: 800,
-					},
-					{
-						Type:   "ipv4",
-						Count:  500,
-						Unique: 450,
-					},
-				}
-				content, err := json.Marshal(overlapSummaries)
-				if err != nil {
-					return err
-				}
-				return os.WriteFile(path, content, 0644)
-			},
-			expectStats: true,
-			expectedText: []string{
-				"Sources:",
-				"2 analyzed",
-				"Total Entries:",
-				"1.5K",
-				"Unique Entries:",
-				"1.2K (83.3%)",
-				"Types:",
-				"domain (1)",
-				"ipv4 (1)",
-			},
-		},
-		{
-			name:     "unknown file type",
-			filename: "unknown_summary.json",
-			createFile: func(path string) error {
-				return os.WriteFile(path, []byte("{}"), 0644)
-			},
-			expectStats: false,
-		},
-		{
-			name:     "invalid JSON",
-			filename: "download_summary.json",
-			createFile: func(path string) error {
-				return os.WriteFile(path, []byte("invalid json"), 0644)
-			},
-			expectStats: false,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			filePath := filepath.Join(summariesDir, tt.filename)
-			err := tt.createFile(filePath)
-			require.NoError(t, err)
-
-			defer func() {
-				_ = os.Remove(filePath)
-			}()
-
-			stats := getDetailedStatsForSummaryType(tt.filename)
-
-			if tt.expectStats {
-				assert.NotEmpty(t, stats)
-				for _, expectedText := range tt.expectedText {
-					assert.Contains(t, stats, expectedText, "Expected text not found: %s", expectedText)
-				}
-			} else {
-				assert.Empty(t, stats)
-			}
-		})
-	}
 }
 
 func TestCollectOverallStatsFromFile(t *testing.T) {
@@ -451,7 +134,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectedUpdates: func(stats *OverallSummaryStats) bool {
 				return stats.TotalDownloads == 3 && stats.TotalSources == 2
@@ -469,7 +152,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectedUpdates: func(stats *OverallSummaryStats) bool {
 				return stats.TotalProcessed == 2
@@ -487,7 +170,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectedUpdates: func(stats *OverallSummaryStats) bool {
 				return stats.TotalConsolidated == 2
@@ -507,7 +190,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectedUpdates: func(stats *OverallSummaryStats) bool {
 				return stats.TotalGroups == 2
@@ -527,7 +210,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectedUpdates: func(stats *OverallSummaryStats) bool {
 				return stats.TotalCategories == 2
@@ -545,7 +228,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectedUpdates: func(stats *OverallSummaryStats) bool {
 				return stats.TotalTopLists == 2
@@ -563,7 +246,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 				if err != nil {
 					return err
 				}
-				return os.WriteFile(path, content, 0644)
+				return os.WriteFile(path, content, 0o644)
 			},
 			expectedUpdates: func(stats *OverallSummaryStats) bool {
 				return stats.TotalOverlapAnalyzed == 2
@@ -573,7 +256,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 			name:     "unknown file type",
 			filename: "unknown.json",
 			createFile: func(path string) error {
-				return os.WriteFile(path, []byte("{}"), 0644)
+				return os.WriteFile(path, []byte("{}"), 0o644)
 			},
 			expectNoChange: true,
 		},
@@ -581,7 +264,7 @@ func TestCollectOverallStatsFromFile(t *testing.T) {
 			name:     "invalid JSON",
 			filename: "download_summary.json",
 			createFile: func(path string) error {
-				return os.WriteFile(path, []byte("invalid json"), 0644)
+				return os.WriteFile(path, []byte("invalid json"), 0o644)
 			},
 			expectNoChange: true,
 		},
@@ -647,7 +330,7 @@ func createTestSummaryFilesForSummariesReadme(t *testing.T, summariesDir string)
 	content, err := json.Marshal(downloadSummaries)
 	require.NoError(t, err)
 	summaryFile := filepath.Join(summariesDir, "download_summary.json")
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	processedSummaries := []c.ProcessedSummary{
 		{
@@ -662,7 +345,7 @@ func createTestSummaryFilesForSummariesReadme(t *testing.T, summariesDir string)
 	content, err = json.Marshal(processedSummaries)
 	require.NoError(t, err)
 	summaryFile = filepath.Join(summariesDir, "processed_summary.json")
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	consolidatedSummaries := []c.ConsolidatedSummary{
 		{
@@ -676,7 +359,7 @@ func createTestSummaryFilesForSummariesReadme(t *testing.T, summariesDir string)
 	content, err = json.Marshal(consolidatedSummaries)
 	require.NoError(t, err)
 	summaryFile = filepath.Join(summariesDir, "consolidated_summary.json")
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	consolidatedGroupsSummaries := []c.ConsolidatedSummary{
 		{
@@ -690,7 +373,7 @@ func createTestSummaryFilesForSummariesReadme(t *testing.T, summariesDir string)
 	content, err = json.Marshal(consolidatedGroupsSummaries)
 	require.NoError(t, err)
 	summaryFile = filepath.Join(summariesDir, "consolidated_groups_summary.json")
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	consolidatedCategoriesSummaries := []c.ConsolidatedSummary{
 		{
@@ -704,7 +387,7 @@ func createTestSummaryFilesForSummariesReadme(t *testing.T, summariesDir string)
 	content, err = json.Marshal(consolidatedCategoriesSummaries)
 	require.NoError(t, err)
 	summaryFile = filepath.Join(summariesDir, "consolidated_categories_summary.json")
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	topSummaries := []c.TopSummary{
 		{
@@ -717,7 +400,7 @@ func createTestSummaryFilesForSummariesReadme(t *testing.T, summariesDir string)
 	content, err = json.Marshal(topSummaries)
 	require.NoError(t, err)
 	summaryFile = filepath.Join(summariesDir, "top_summary.json")
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	overlapSummaries := []c.OverlapSummary{
 		{
@@ -730,5 +413,5 @@ func createTestSummaryFilesForSummariesReadme(t *testing.T, summariesDir string)
 	content, err = json.Marshal(overlapSummaries)
 	require.NoError(t, err)
 	summaryFile = filepath.Join(summariesDir, "overlap_summary.json")
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 }

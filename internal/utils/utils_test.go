@@ -290,7 +290,7 @@ func TestShouldDownloadSource(t *testing.T) {
 		}
 		data, err := json.Marshal(summaries)
 		require.NoError(t, err)
-		err = os.WriteFile(tempFile.Name(), data, 0644)
+		err = os.WriteFile(tempFile.Name(), data, 0o644)
 		require.NoError(t, err)
 	}
 
@@ -548,7 +548,7 @@ func TestCopySourceToTarget(t *testing.T) {
 	}(sourceDir)
 
 	sourceFile := sourceDir + "/source.txt"
-	err = os.WriteFile(sourceFile, []byte("test content"), 0644)
+	err = os.WriteFile(sourceFile, []byte("test content"), 0o644)
 	require.NoError(t, err)
 
 	targetDir, err := os.MkdirTemp("", "test_copy_target")
@@ -590,13 +590,13 @@ func TestCopySourceToTargetComprehensive(t *testing.T) {
 	tmpDir := t.TempDir()
 
 	sourceFolder := filepath.Join(tmpDir, "source")
-	err := os.MkdirAll(sourceFolder, 0755)
+	err := os.MkdirAll(sourceFolder, 0o755)
 	require.NoError(t, err)
 
 	sourceFile := "source.txt"
 	sourceContent := "test source content"
 	sourceFilePath := filepath.Join(sourceFolder, sourceFile)
-	err = os.WriteFile(sourceFilePath, []byte(sourceContent), 0644)
+	err = os.WriteFile(sourceFilePath, []byte(sourceContent), 0o644)
 	require.NoError(t, err)
 
 	target := c.DownloadTarget{
@@ -642,7 +642,7 @@ func TestSaveFileErrorCases(t *testing.T) {
 	assert.Error(t, err)
 
 	dirPath := filepath.Join(tmpDir, "directory")
-	err = os.Mkdir(dirPath, 0755)
+	err = os.Mkdir(dirPath, 0o755)
 	require.NoError(t, err)
 
 	reader = strings.NewReader("test content")
@@ -755,7 +755,7 @@ func TestSummaryUtilsErrorHandling(t *testing.T) {
 	}()
 
 	validJSON := `[{"name": "test", "lastDownloadTimestamp": "20230101_120000"}]`
-	err = os.WriteFile(tempFile.Name(), []byte(validJSON), 0644)
+	err = os.WriteFile(tempFile.Name(), []byte(validJSON), 0o644)
 	require.NoError(t, err)
 
 	summary, err := GetLastSummary[c.DownloadSummary](logger, tempFile.Name(), "test")
@@ -797,21 +797,21 @@ func TestExtractArchiveErrorCases(t *testing.T) {
 
 	tmpDir := t.TempDir()
 	invalidPath := filepath.Join(tmpDir, "invalid.xyz")
-	err = os.WriteFile(invalidPath, []byte("not an archive"), 0644)
+	err = os.WriteFile(invalidPath, []byte("not an archive"), 0o644)
 	require.NoError(t, err)
 
 	err = ExtractArchive(logger, invalidPath, t.TempDir())
 	assert.Error(t, err)
 
 	invalidZip := filepath.Join(tmpDir, "invalid.zip")
-	err = os.WriteFile(invalidZip, []byte("not a zip file"), 0644)
+	err = os.WriteFile(invalidZip, []byte("not a zip file"), 0o644)
 	require.NoError(t, err)
 
 	err = ExtractArchive(logger, invalidZip, t.TempDir())
 	assert.Error(t, err)
 
 	invalidTarGz := filepath.Join(tmpDir, "invalid.tar.gz")
-	err = os.WriteFile(invalidTarGz, []byte("not a tar.gz file"), 0644)
+	err = os.WriteFile(invalidTarGz, []byte("not a tar.gz file"), 0o644)
 	require.NoError(t, err)
 
 	err = ExtractArchive(logger, invalidTarGz, t.TempDir())
@@ -839,7 +839,7 @@ func TestGetFileLastModifiedTime(t *testing.T) {
 
 	tmpDir := t.TempDir()
 	filePath := filepath.Join(tmpDir, "test-modified-time.txt")
-	err := os.WriteFile(filePath, []byte("test content"), 0644)
+	err := os.WriteFile(filePath, []byte("test content"), 0o644)
 	require.NoError(t, err)
 
 	modTime, err := GetFileLastModifiedTime(logger, filePath)
@@ -917,19 +917,19 @@ func TestExtractArchiveTarGz(t *testing.T) {
 
 	testContent := "test content for extraction"
 	testDir := filepath.Join(tmpDir, "source")
-	err := os.MkdirAll(testDir, 0755)
+	err := os.MkdirAll(testDir, 0o755)
 	require.NoError(t, err)
 
 	testFilePath := filepath.Join(testDir, "testfile.txt")
-	err = os.WriteFile(testFilePath, []byte(testContent), 0644)
+	err = os.WriteFile(testFilePath, []byte(testContent), 0o644)
 	require.NoError(t, err)
 
 	nestedDir := filepath.Join(testDir, "nested")
-	err = os.MkdirAll(nestedDir, 0755)
+	err = os.MkdirAll(nestedDir, 0o755)
 	require.NoError(t, err)
 
 	nestedFilePath := filepath.Join(nestedDir, "nestedfile.txt")
-	err = os.WriteFile(nestedFilePath, []byte("nested content"), 0644)
+	err = os.WriteFile(nestedFilePath, []byte("nested content"), 0o644)
 	require.NoError(t, err)
 
 	cmd := fmt.Sprintf("cd %s && tar -czf %s source/", tmpDir, tarGzPath)
@@ -960,19 +960,19 @@ func TestExtractArchiveZip(t *testing.T) {
 
 	testContent := "test content for extraction"
 	testDir := filepath.Join(tmpDir, "source")
-	err := os.MkdirAll(testDir, 0755)
+	err := os.MkdirAll(testDir, 0o755)
 	require.NoError(t, err)
 
 	testFilePath := filepath.Join(testDir, "testfile.txt")
-	err = os.WriteFile(testFilePath, []byte(testContent), 0644)
+	err = os.WriteFile(testFilePath, []byte(testContent), 0o644)
 	require.NoError(t, err)
 
 	nestedDir := filepath.Join(testDir, "nested")
-	err = os.MkdirAll(nestedDir, 0755)
+	err = os.MkdirAll(nestedDir, 0o755)
 	require.NoError(t, err)
 
 	nestedFilePath := filepath.Join(nestedDir, "nestedfile.txt")
-	err = os.WriteFile(nestedFilePath, []byte("nested content"), 0644)
+	err = os.WriteFile(nestedFilePath, []byte("nested content"), 0o644)
 	require.NoError(t, err)
 
 	cmd := fmt.Sprintf("cd %s && zip -r %s source/", tmpDir, zipPath)
@@ -1390,7 +1390,7 @@ func TestGetTestDataDir(t *testing.T) {
 
 	_, err := os.Stat(result)
 	if os.IsNotExist(err) {
-		err = os.MkdirAll(result, 0755)
+		err = os.MkdirAll(result, 0o755)
 		assert.NoError(t, err)
 
 		defer func() {
@@ -1511,7 +1511,7 @@ func TestGetFilesInDir(t *testing.T) {
 	tempDir := t.TempDir()
 
 	subDir := filepath.Join(tempDir, "subdir")
-	err := os.MkdirAll(subDir, 0755)
+	err := os.MkdirAll(subDir, 0o755)
 	require.NoError(t, err)
 
 	testFiles := map[string]string{
@@ -1521,7 +1521,7 @@ func TestGetFilesInDir(t *testing.T) {
 
 	for relPath, content := range testFiles {
 		fullPath := filepath.Join(tempDir, relPath)
-		err := os.WriteFile(fullPath, []byte(content), 0644)
+		err := os.WriteFile(fullPath, []byte(content), 0o644)
 		require.NoError(t, err)
 	}
 

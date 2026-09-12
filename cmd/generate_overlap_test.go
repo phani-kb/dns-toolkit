@@ -38,8 +38,8 @@ func TestGenerateDetailedOverlapAnalysis(t *testing.T) {
 
 	summaryDir := filepath.Join(tempDir, "summaries")
 	outputDir := filepath.Join(tempDir, "output")
-	require.NoError(t, os.MkdirAll(summaryDir, 0755))
-	require.NoError(t, os.MkdirAll(outputDir, 0755))
+	require.NoError(t, os.MkdirAll(summaryDir, 0o755))
+	require.NoError(t, os.MkdirAll(outputDir, 0o755))
 
 	origSummaryDir := constants.SummaryDir
 	origOutputDir := constants.OutputDir
@@ -74,7 +74,7 @@ func TestGenerateDetailedOverlapAnalysis(t *testing.T) {
 	content, err := json.Marshal(emptyOverlapSummaries)
 	require.NoError(t, err)
 	summaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles["overlap"])
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	_, err = generateDetailedOverlapAnalysis()
 	assert.Error(t, err)
@@ -225,7 +225,7 @@ func TestOverlapAnalysisWithComplexData(t *testing.T) {
 	}()
 
 	summaryDir := filepath.Join(tempDir, "summaries")
-	require.NoError(t, os.MkdirAll(summaryDir, 0755))
+	require.NoError(t, os.MkdirAll(summaryDir, 0o755))
 
 	origSummaryDir := constants.SummaryDir
 	constants.SummaryDir = summaryDir
@@ -271,7 +271,7 @@ func TestOverlapAnalysisWithComplexData(t *testing.T) {
 	content, err := json.Marshal(overlapSummaries)
 	require.NoError(t, err)
 	summaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles["overlap"])
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 
 	overlapMd, err := generateDetailedOverlapAnalysis()
 	require.NoError(t, err)
@@ -341,7 +341,7 @@ func createTestOverlapSummary(t *testing.T, summaryDir string) {
 	content, err := json.Marshal(overlapSummaries)
 	require.NoError(t, err)
 	summaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles["overlap"])
-	require.NoError(t, os.WriteFile(summaryFile, content, 0644))
+	require.NoError(t, os.WriteFile(summaryFile, content, 0o644))
 }
 
 func TestFilterOverlapSummariesByMinPercent(t *testing.T) {

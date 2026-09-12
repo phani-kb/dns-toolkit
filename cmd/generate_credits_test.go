@@ -195,7 +195,7 @@ Old content here
 ## Installation
 Installation information here.
 `
-		err := os.WriteFile(tempFile, []byte(testContent), 0644)
+		err := os.WriteFile(tempFile, []byte(testContent), 0o644)
 		require.NoError(t, err)
 
 		err = updateReadmeWithCredits(Logger, tempFile)
@@ -225,7 +225,7 @@ Installation information here.
 
 		content, err := os.ReadFile(testFile)
 		require.NoError(t, err)
-		err = os.WriteFile(tempFile, content, 0644)
+		err = os.WriteFile(tempFile, content, 0o644)
 		require.NoError(t, err)
 
 		err = updateReadmeWithCredits(Logger, tempFile)

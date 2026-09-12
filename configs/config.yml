@@ -4,6 +4,7 @@ application:
   description: A toolkit for DNS data processing and analysis.
 dns_toolkit:
   database:
+    type: sqlite
     path: data/dns-toolkit.db
   folders:
     download: data/download
@@ -55,6 +56,9 @@ dns_toolkit:
         path: data/consolidated_blocklist.txt
   max_workers: 3
   max_retries: 3
+  download_rate_limit:
+    interval_ms: 1500
+    burst: 2
   source_filters:
     name:
       contains:

@@ -6,6 +6,8 @@ application:
 dns_toolkit:
   max_retries: 3
   skip_name_special_chars_check: true
+  database:
+    path: testdata/dns-toolkit.db
   folders:
     download: testdata/download
     processed: testdata/processed

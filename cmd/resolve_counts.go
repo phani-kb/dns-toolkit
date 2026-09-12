@@ -1,26 +1,27 @@
 package cmd
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
-	c "github.com/phani-kb/dns-toolkit/internal/common"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
+	"github.com/phani-kb/dns-toolkit/internal/db"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
 	"github.com/phani-kb/multilog"
 )
 
 // ConflictDetail captures entries that need manual review
 type ConflictDetail struct {
-	Entry        string   `json:"entry"`
-	BlockSources []string `json:"block_sources"`
-	AllowSources []string `json:"allow_sources"`
-	BlockCount   int      `json:"block_count"`
-	AllowCount   int      `json:"allow_count"`
+	Entry             string   `json:"entry"`
+	GenericSourceType string   `json:"generic_source_type"`
+	BlockSources      []string `json:"block_sources"`
+	AllowSources      []string `json:"allow_sources"`
+	BlockCount        int      `json:"block_count"`
+	AllowCount        int      `json:"allow_count"`
 }
 
 // OverrideRecord represents a single override decision
@@ -58,52 +59,11 @@ const (
 	ReasonEqualCounts       = "equal_counts"
 )
 
-// ResolveConflictsByCounts builds allowlist and blocklist and JSON summary.
-// Uses count-based resolution: higher count wins, equal counts create conflicts.
-func ResolveConflictsByCounts(
-	logger *multilog.Logger,
-	processedFiles []c.ProcessedFile,
-) (string, string, string, error) {
-	logger.Infof("Resolving conflicts and producing final sets...")
-
-	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap := GetCachedResolutionSets(
-		logger,
-		processedFiles,
-	)
-
-	result := &ResolutionResult{
-		AllowByType: allowByType,
-		BlockByType: blockByType,
-		Conflicts:   conflicts,
-		DetailsMap:  detailsMap,
-	}
-	result.ManualOverride.AllowToBlock = manualAllowToBlock
-	result.ManualOverride.BlockToAllow = manualBlockToAllow
-
-	allowPath, blockPath, err := writeResolvedLists(logger, result)
-	if err != nil {
-		return "", "", "", err
-	}
-
-	overridesPath, err := writeOverrideSummary(logger, result)
-	if err != nil {
-		return allowPath, blockPath, "", err
-	}
-
-	logger.Infof(
-		"Consolidated allowlist (%d), blocklist (%d), overrides (%d)",
-		countSetEntries(result.AllowByType),
-		countSetEntries(result.BlockByType),
-		len(result.DetailsMap),
-	)
-
-	return allowPath, blockPath, overridesPath, nil
-}
-
-// BuildResolutionSets processes files and returns complete resolution results
+// BuildResolutionSets performs count-based resolution using DB queries.
+// It only loads conflicting entries.
 func BuildResolutionSets(
 	logger *multilog.Logger,
-	processedFiles []c.ProcessedFile,
+	database *db.DB,
 ) (
 	map[string]u.StringSet,
 	map[string]u.StringSet,
@@ -111,93 +71,53 @@ func BuildResolutionSets(
 	map[string]struct{},
 	map[string]struct{},
 	map[string]ConflictDetail,
+	error,
 ) {
-	sourceMaps := buildSourceMaps(logger, processedFiles)
-
-	// Resolve by counts
 	result := &ResolutionResult{
 		AllowByType: make(map[string]u.StringSet),
 		BlockByType: make(map[string]u.StringSet),
 		DetailsMap:  make(map[string]ConflictDetail),
 	}
 
-	result.Conflicts = resolveByCounts(logger, sourceMaps, result)
-	logger.Infof("Total conflicts before manual overrides: %d", len(result.Conflicts))
+	entriesRepo := db.NewEntriesRepo(database)
 
-	applyManualOverrides(logger, sourceMaps, result)
-
-	// Filter out manually overridden entries from conflicts
-	result.Conflicts = filterConflictsAfterOverrides(result)
-	logger.Infof("Total conflicts after manual overrides: %d", len(result.Conflicts))
-
-	fillDetailsForResolution(sourceMaps, result)
-
-	return result.AllowByType,
-		result.BlockByType,
-		result.Conflicts,
-		result.ManualOverride.AllowToBlock,
-		result.ManualOverride.BlockToAllow,
-		result.DetailsMap
-}
-
-// SourceMaps contains all source mapping data
-type SourceMaps struct {
-	BlockMap   map[string]map[string]struct{}
-	AllowMap   map[string]map[string]struct{}
-	EntryTypes map[string]map[string]struct{}
-}
-
-func buildSourceMaps(logger *multilog.Logger, processedFiles []c.ProcessedFile) *SourceMaps {
-	maps := &SourceMaps{
-		BlockMap:   make(map[string]map[string]struct{}),
-		AllowMap:   make(map[string]map[string]struct{}),
-		EntryTypes: make(map[string]map[string]struct{}),
+	// query all entries to determine which have sources on both sides
+	allRows, err := entriesRepo.GetAllEntryCounts(context.Background())
+	if err != nil {
+		return nil, nil, nil, nil, nil, nil, fmt.Errorf("querying all entry counts: %w", err)
 	}
 
-	for _, pf := range processedFiles {
-		if !isValidProcessedFile(pf) {
-			continue
-		}
-
-		entries, err := readFileEntries(logger, pf.Filepath)
-		if err != nil {
-			logger.Warnf("Skipping file %s: %v", pf.Filepath, err)
-			continue
-		}
-
-		processFileEntries(maps, entries, pf)
-	}
-
-	return maps
-}
-
-// resolveByCounts performs count-based resolution with single pass
-func resolveByCounts(logger *multilog.Logger, maps *SourceMaps, result *ResolutionResult) []ConflictDetail {
-	conflicts := make([]ConflictDetail, 0)
-
-	allEntries := getAllUniqueEntries(maps.BlockMap, maps.AllowMap)
+	logger.Infof("Total unique entries in database: %d", len(allRows))
 
 	allowWins := 0
 	blockWins := 0
 	equalCounts := 0
-	allowOnlyAdded := 0
+	conflicts := make([]ConflictDetail, 0)
 
-	for entry := range allEntries {
-		blockSources := getSourcesList(maps.BlockMap[entry])
-		allowSources := getSourcesList(maps.AllowMap[entry])
-		blockCount := len(blockSources)
-		allowCount := len(allowSources)
-
-		detail := ConflictDetail{
-			Entry:        entry,
-			BlockSources: blockSources,
-			AllowSources: allowSources,
-			BlockCount:   blockCount,
-			AllowCount:   allowCount,
+	for _, row := range allRows {
+		// get the actual source names for this entry
+		blockSources, allowSources, err2 := entriesRepo.GetSourcesForEntry(
+			context.Background(),
+			row.Entry,
+			row.GenericSourceType,
+		)
+		if err2 != nil {
+			logger.Warnf("Failed to get sources for entry %s: %v", row.Entry, err2)
+			continue
 		}
 
-		result.DetailsMap[entry] = detail
+		detail := ConflictDetail{
+			Entry:             row.Entry,
+			GenericSourceType: row.GenericSourceType,
+			BlockSources:      blockSources,
+			AllowSources:      allowSources,
+			BlockCount:        row.BlockCount,
+			AllowCount:        row.AllowCount,
+		}
 
+		result.DetailsMap[row.Entry] = detail
+
+		// apply threshold logic
 		minAllow := 1
 		minBlock := 1
 		if AppConfig != nil && AppConfig.DNSToolkit.Override.Enabled {
@@ -212,48 +132,61 @@ func resolveByCounts(logger *multilog.Logger, maps *SourceMaps, result *Resoluti
 		}
 
 		switch {
-		case blockCount > allowCount:
-			if allowCount == 0 {
-				addToBlockSets(result, entry, maps.EntryTypes[entry])
+		case row.BlockCount > row.AllowCount:
+			if row.AllowCount == 0 {
+				addToBlockSetsDB(result, row.Entry, row.GenericSourceType)
 				blockWins++
 			} else {
-				if blockCount >= minBlock {
-					addToBlockSets(result, entry, maps.EntryTypes[entry])
+				if row.BlockCount >= minBlock {
+					addToBlockSetsDB(result, row.Entry, row.GenericSourceType)
 					blockWins++
 				} else {
 					conflicts = append(conflicts, detail)
 				}
 			}
-		case allowCount > blockCount:
-			if blockCount == 0 {
-				addToAllowSets(result, entry, maps.EntryTypes[entry])
+		case row.AllowCount > row.BlockCount:
+			if row.BlockCount == 0 {
+				addToAllowSetsDB(result, row.Entry, row.GenericSourceType)
 				allowWins++
 			} else {
-				if allowCount >= minAllow {
-					addToAllowSets(result, entry, maps.EntryTypes[entry])
+				if row.AllowCount >= minAllow {
+					addToAllowSetsDB(result, row.Entry, row.GenericSourceType)
 					allowWins++
 				} else {
 					conflicts = append(conflicts, detail)
 				}
 			}
 		default:
-			if blockCount > 0 { // equal non-zero counts = conflict
+			if row.BlockCount > 0 { // equal non-zero counts = conflict
 				conflicts = append(conflicts, detail)
 				equalCounts++
 			}
 		}
 	}
 
+	result.Conflicts = conflicts
 	logger.Infof(
-		"resolveByCounts: allowWins=%d (both sides), blockWins=%d, allowOnlyAdded=%d, equalCounts=%d, conflicts=%d",
+		"resolveByCounts: allowWins=%d, blockWins=%d, equalCounts=%d, conflicts=%d",
 		allowWins,
 		blockWins,
-		allowOnlyAdded,
 		equalCounts,
 		len(conflicts),
 	)
 
-	return conflicts
+	// apply manual overrides
+	applyManualOverrides(logger, result)
+
+	// filter out manually overridden entries from conflicts
+	result.Conflicts = filterConflictsAfterOverrides(result)
+	logger.Infof("Total conflicts after manual overrides: %d", len(result.Conflicts))
+
+	return result.AllowByType,
+		result.BlockByType,
+		result.Conflicts,
+		result.ManualOverride.AllowToBlock,
+		result.ManualOverride.BlockToAllow,
+		result.DetailsMap,
+		nil
 }
 
 // filterConflictsAfterOverrides removes manually overridden entries from conflicts list
@@ -261,7 +194,7 @@ func filterConflictsAfterOverrides(result *ResolutionResult) []ConflictDetail {
 	filteredConflicts := make([]ConflictDetail, 0)
 
 	for _, conflict := range result.Conflicts {
-		// Skip if this entry was manually overridden
+		// skip if this entry was manually overridden
 		_, isAllowToBlock := result.ManualOverride.AllowToBlock[conflict.Entry]
 		_, isBlockToAllow := result.ManualOverride.BlockToAllow[conflict.Entry]
 
@@ -273,8 +206,8 @@ func filterConflictsAfterOverrides(result *ResolutionResult) []ConflictDetail {
 	return filteredConflicts
 }
 
-// applyManualOverrides applies manual overrides
-func applyManualOverrides(logger *multilog.Logger, maps *SourceMaps, result *ResolutionResult) {
+// applyManualOverrides applies manual overrides.
+func applyManualOverrides(logger *multilog.Logger, result *ResolutionResult) {
 	manualAllowToBlockByType, manualBlockToAllowByType := readCustomOverrides(logger)
 
 	result.ManualOverride.AllowToBlock = make(map[string]struct{})
@@ -282,7 +215,8 @@ func applyManualOverrides(logger *multilog.Logger, maps *SourceMaps, result *Res
 
 	for gst, entries := range manualAllowToBlockByType {
 		for entry := range entries {
-			if hasEntryType(maps.EntryTypes[entry], gst) {
+			// only apply if entry exists in DetailsMap
+			if detail, ok := result.DetailsMap[entry]; ok && detail.GenericSourceType == gst {
 				moveToBlockSet(result, entry, gst)
 				result.ManualOverride.AllowToBlock[entry] = struct{}{}
 			}
@@ -292,7 +226,7 @@ func applyManualOverrides(logger *multilog.Logger, maps *SourceMaps, result *Res
 	// Apply forced allows (takes precedence)
 	for gst, entries := range manualBlockToAllowByType {
 		for entry := range entries {
-			if hasEntryType(maps.EntryTypes[entry], gst) {
+			if detail, ok := result.DetailsMap[entry]; ok && detail.GenericSourceType == gst {
 				moveToAllowSet(result, entry, gst)
 				result.ManualOverride.BlockToAllow[entry] = struct{}{}
 				// Remove from forced block if it exists
@@ -300,50 +234,6 @@ func applyManualOverrides(logger *multilog.Logger, maps *SourceMaps, result *Res
 			}
 		}
 	}
-}
-
-// writeResolvedLists writes the final allow and block lists
-func writeResolvedLists(logger *multilog.Logger, result *ResolutionResult) (string, string, error) {
-	if !emitResolvedLists {
-		return "", "", nil
-	}
-
-	outDir := constants.OutputDir
-	if err := u.EnsureDirectoryExists(logger, outDir); err != nil {
-		return "", "", fmt.Errorf("failed to ensure output dir: %w", err)
-	}
-
-	allowEntries := collectAllEntries(result.AllowByType)
-	allowPath := filepath.Join(outDir, "consolidated_allowlist.txt")
-	resolvedBeforeAllow := len(allowEntries)
-	logger.Infof(
-		"Writing resolved allowlist %s: original=%d resolved_before=%d must_consider_merged=%d resolved_after=%d",
-		allowPath,
-		-1,
-		resolvedBeforeAllow,
-		0,
-		resolvedBeforeAllow,
-	)
-	if err := u.WriteEntriesToFile(logger, allowPath, allowEntries); err != nil {
-		return "", "", fmt.Errorf("failed to write allowlist: %w", err)
-	}
-
-	blockEntries := collectAllEntries(result.BlockByType)
-	blockPath := filepath.Join(outDir, "consolidated_blocklist.txt")
-	resolvedBeforeBlock := len(blockEntries)
-	logger.Infof(
-		"Writing resolved blocklist %s: original=%d resolved_before=%d must_consider_merged=%d resolved_after=%d",
-		blockPath,
-		-1,
-		resolvedBeforeBlock,
-		0,
-		resolvedBeforeBlock,
-	)
-	if err := u.WriteEntriesToFile(logger, blockPath, blockEntries); err != nil {
-		return allowPath, "", fmt.Errorf("failed to write blocklist: %w", err)
-	}
-
-	return allowPath, blockPath, nil
 }
 
 // writeOverrideSummary writes the override summary JSON
@@ -391,89 +281,10 @@ func buildOverrideRecords(logger *multilog.Logger, result *ResolutionResult) []O
 	return overrides
 }
 
-func readFileEntries(logger *multilog.Logger, filepath string) ([]string, error) {
-	entries, _, err := u.ReadEntriesFromFile(logger, filepath)
-	return entries, err
-}
-
-func processFileEntries(maps *SourceMaps, entries []string, pf c.ProcessedFile) {
-	for _, entry := range entries {
-		switch pf.ListType {
-		case constants.ListTypeBlocklist:
-			addToSourceMap(maps.BlockMap, entry, pf.Name)
-		case constants.ListTypeAllowlist:
-			addToSourceMap(maps.AllowMap, entry, pf.Name)
-		}
-
-		addToSourceMap(maps.EntryTypes, entry, pf.GenericSourceType)
-	}
-}
-
-func addToSourceMap(sourceMap map[string]map[string]struct{}, entry, source string) {
-	if sourceMap[entry] == nil {
-		sourceMap[entry] = make(map[string]struct{})
-	}
-	sourceMap[entry][source] = struct{}{}
-}
-
-func getAllUniqueEntries(blockMap, allowMap map[string]map[string]struct{}) map[string]struct{} {
-	entries := make(map[string]struct{})
-	for entry := range blockMap {
-		entries[entry] = struct{}{}
-	}
-	for entry := range allowMap {
-		entries[entry] = struct{}{}
-	}
-	return entries
-}
-
-func getSourcesList(sources map[string]struct{}) []string {
-	if sources == nil {
-		return nil
-	}
-	list := make([]string, 0, len(sources))
-	for source := range sources {
-		list = append(list, source)
-	}
-	sort.Strings(list)
-	return list
-}
-
-func addToBlockSets(result *ResolutionResult, entry string, types map[string]struct{}) {
-	entryTypes := getEntryTypesOrDefault(types)
-	for entryType := range entryTypes {
-		ensureStringSet(result.BlockByType, entryType)
-		result.BlockByType[entryType].Add(entry)
-	}
-}
-
-func addToAllowSets(result *ResolutionResult, entry string, types map[string]struct{}) {
-	entryTypes := getEntryTypesOrDefault(types)
-	for entryType := range entryTypes {
-		ensureStringSet(result.AllowByType, entryType)
-		result.AllowByType[entryType].Add(entry)
-	}
-}
-
-func getEntryTypesOrDefault(types map[string]struct{}) map[string]struct{} {
-	if len(types) > 0 {
-		return types
-	}
-	return map[string]struct{}{constants.SourceTypeDomain: {}}
-}
-
 func ensureStringSet(setMap map[string]u.StringSet, key string) {
 	if setMap[key] == nil {
 		setMap[key] = u.NewStringSet([]string{})
 	}
-}
-
-func hasEntryType(types map[string]struct{}, targetType string) bool {
-	if types == nil {
-		return false
-	}
-	_, exists := types[targetType]
-	return exists
 }
 
 func moveToBlockSet(result *ResolutionResult, entry, gst string) {
@@ -495,34 +306,16 @@ func moveToAllowSet(result *ResolutionResult, entry, gst string) {
 	result.AllowByType[gst].Add(entry)
 }
 
-func countSetEntries(setsByType map[string]u.StringSet) int {
-	total := 0
-	for _, set := range setsByType {
-		if set != nil {
-			total += set.Size()
-		}
-	}
-	return total
+// addToBlockSetsDB adds an entry to block sets.
+func addToBlockSetsDB(result *ResolutionResult, entry, gst string) {
+	ensureStringSet(result.BlockByType, gst)
+	result.BlockByType[gst].Add(entry)
 }
 
-func isValidProcessedFile(pf c.ProcessedFile) bool {
-	return pf.Filepath != "" && pf.Valid
-}
-
-func collectAllEntries(setsByType map[string]u.StringSet) []string {
-	seen := make(map[string]struct{})
-	for _, set := range setsByType {
-		for entry := range set {
-			seen[entry] = struct{}{}
-		}
-	}
-
-	entries := make([]string, 0, len(seen))
-	for entry := range seen {
-		entries = append(entries, entry)
-	}
-	sort.Strings(entries)
-	return entries
+// addToAllowSetsDB adds an entry to allow sets.
+func addToAllowSetsDB(result *ResolutionResult, entry, gst string) {
+	ensureStringSet(result.AllowByType, gst)
+	result.AllowByType[gst].Add(entry)
 }
 
 func getAutomaticDecisions(logger *multilog.Logger, result *ResolutionResult) []OverrideRecord {
@@ -658,37 +451,6 @@ func isManualOverride(entry string, result *ResolutionResult) bool {
 
 func hasSourcesOnBothSides(detail ConflictDetail) bool {
 	return len(detail.BlockSources) > 0 && len(detail.AllowSources) > 0
-}
-
-func fillDetailsForResolution(maps *SourceMaps, result *ResolutionResult) {
-	resolvedEntries := make(map[string]struct{})
-
-	for _, set := range result.AllowByType {
-		for entry := range set {
-			resolvedEntries[entry] = struct{}{}
-		}
-	}
-
-	for _, set := range result.BlockByType {
-		for entry := range set {
-			resolvedEntries[entry] = struct{}{}
-		}
-	}
-
-	for entry := range resolvedEntries {
-		if _, exists := result.DetailsMap[entry]; !exists {
-			blockSources := getSourcesList(maps.BlockMap[entry])
-			allowSources := getSourcesList(maps.AllowMap[entry])
-
-			result.DetailsMap[entry] = ConflictDetail{
-				Entry:        entry,
-				BlockSources: blockSources,
-				AllowSources: allowSources,
-				BlockCount:   len(blockSources),
-				AllowCount:   len(allowSources),
-			}
-		}
-	}
 }
 
 // readCustomOverrides reads manual override files
