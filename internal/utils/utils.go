@@ -535,7 +535,7 @@ func IsDomain(domain string) bool {
 		return false
 	}
 
-	if IsIP(domain) {
+	if looksLikeIPAddressCandidate(domain) && IsIP(domain) {
 		return false
 	}
 
@@ -552,7 +552,7 @@ func IsDomain(domain string) bool {
 		return false
 	}
 
-	if IsIP(asciiDomain) {
+	if looksLikeIPAddressCandidate(asciiDomain) && IsIP(asciiDomain) {
 		return false
 	}
 
@@ -573,6 +573,40 @@ func IsDomain(domain string) bool {
 	}
 
 	if !containsLetter(tld) && !strings.HasPrefix(strings.ToLower(tld), constants.PunycodePrefix) {
+		return false
+	}
+
+	return true
+}
+
+// looksLikeIPAddressCandidate does a character check before ParseIP.
+func looksLikeIPAddressCandidate(s string) bool {
+	if s == "" {
+		return false
+	}
+
+	hasColon := strings.Contains(s, ":") // IPv6
+	hasDot := strings.Contains(s, ".")   // IPv4
+	if !hasColon && !hasDot {
+		return false
+	}
+
+	if !hasColon {
+		for i := 0; i < len(s); i++ {
+			ch := s[i]
+			if (ch >= '0' && ch <= '9') || ch == '.' {
+				continue
+			}
+			return false
+		}
+		return true
+	}
+
+	for i := 0; i < len(s); i++ {
+		ch := s[i]
+		if (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F') || ch == ':' || ch == '.' {
+			continue
+		}
 		return false
 	}
 
@@ -634,7 +668,7 @@ func PickRandomLines(filePath string, maxLines int) ([]string, error) {
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	selectedLines := make([]string, maxLines)
-	for i := 0; i < maxLines; i++ {
+	for i := range maxLines {
 		selectedLines[i] = filteredLines[r.Intn(len(filteredLines))]
 	}
 
@@ -1028,11 +1062,16 @@ func extractTarGz(logger *multilog.Logger, archivePath, destFolder string, targe
 
 		// Determine the correct path for extraction
 		// Ensure the file path does not contain directory traversal elements
-		if strings.Contains(head.Name, "..") {
-			return fmt.Errorf("invalid file path in archive: %s (contains '..')", head.Name)
+		archiveName := filepath.Clean(filepath.FromSlash(head.Name))
+		if !filepath.IsLocal(archiveName) {
+			return fmt.Errorf("invalid file path in archive: %s", head.Name)
 		}
-		if err := validateArchiveFilePath(head.Name); err != nil {
-			return err
+
+		// First try the default path in the destination folder
+		filePath := filepath.Join(destFolder, archiveName)
+
+		if !isWithinDirectory(destFolder, filePath) {
+			return fmt.Errorf("invalid file path in archive: %s", head.Name)
 		}
 
 		// Create the necessary directories
@@ -1237,16 +1276,12 @@ func extractZip(logger *multilog.Logger, archivePath, destFolder string, targetF
 
 // extractZipFile extracts a single file from the zip archive
 func extractZipFile(logger *multilog.Logger, f *zip.File, destFolder, baseName string) error {
-	if err := validateArchiveFilePath(f.Name); err != nil {
-		return err
-	}
-
-	// Explicitly check for directory traversal elements in the file name
-	if strings.Contains(f.Name, "..") {
+	archiveName := filepath.Clean(filepath.FromSlash(f.Name))
+	if !filepath.IsLocal(archiveName) {
 		return fmt.Errorf("invalid file path in archive: %s", f.Name)
 	}
 
-	filePath := filepath.Join(destFolder, f.Name)
+	filePath := filepath.Join(destFolder, archiveName)
 
 	if !isWithinDirectory(destFolder, filePath) {
 		return fmt.Errorf("invalid file path in archive: %s", f.Name)
@@ -1302,7 +1337,7 @@ func copySourceToTargetInternal(logger *multilog.Logger, target c.DownloadTarget
 	sourceFilepath := filepath.Join(target.SourceFolder, target.SourceFile)
 	if _, err := os.Stat(sourceFilepath); err != nil {
 		if os.IsNotExist(err) {
-			logger.Warnf("Source file not found: %s, skipping", sourceFilepath)
+			logger.Warnf("source file not found: %s, skipping", sourceFilepath)
 			return nil
 		}
 		return err
@@ -1432,10 +1467,8 @@ func ShouldDownloadSourceInfo(
 	if elapsed >= threshold {
 		return true, summary.Frequency, lastDownloadTime, 0
 	}
-	remaining := threshold - elapsed
-	if remaining < 0 {
-		remaining = 0
-	}
+	remaining := max(threshold-elapsed, 0)
+
 	return false, summary.Frequency, lastDownloadTime, remaining
 }
 
@@ -1576,6 +1609,7 @@ func ResolveDomainsToIPv4(logger *multilog.Logger, domains []string) ([]string, 
 		ips := resolveDomainIPv4(logger, domain)
 		if len(ips) == 0 {
 			failedDomains = append(failedDomains, domain)
+			logger.Debug("Failed to resolve domain", "domain", domain)
 		} else {
 			ipAddresses = append(ipAddresses, ips...)
 		}
@@ -1617,8 +1651,8 @@ func resolveDomainIPv4(logger *multilog.Logger, domain string) []string {
 //   - A slice of invalid entries (don't match the regex)
 func ExtractEntriesWithRegex(content string, regex *regexp.Regexp) ([]string, []string) {
 	var validEntries, invalidEntries []string
-	lines := strings.Split(content, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(content, "\n")
+	for line := range lines {
 		line = strings.TrimSpace(line)
 		if IsComment(line) {
 			continue
@@ -1635,20 +1669,27 @@ func ExtractEntriesWithRegex(content string, regex *regexp.Regexp) ([]string, []
 
 // ExtractDomains parses content line by line, using IsDomain
 func ExtractDomains(content string) ([]string, []string) {
+	seen := make(map[string]struct{})
 	var validEntries, invalidEntries []string
 	lines := strings.SplitSeq(content, "\n")
 	for line := range lines {
 		line = strings.TrimSpace(line)
-		if IsComment(line) {
+		if line == "" || IsComment(line) {
 			continue
 		}
+		if _, exists := seen[line]; exists {
+			continue
+		}
+		seen[line] = struct{}{}
 		if IsDomain(line) {
 			validEntries = append(validEntries, line)
-		} else if line != "" {
+		} else {
 			invalidEntries = append(invalidEntries, line)
 		}
 	}
-	return RemoveDuplicates(validEntries), RemoveDuplicates(invalidEntries)
+	SortCaseInsensitiveStrings(validEntries)
+	SortCaseInsensitiveStrings(invalidEntries)
+	return validEntries, invalidEntries
 }
 
 func GetFilesInDir(logger *multilog.Logger, dir string, patterns []string) ([]string, error) {

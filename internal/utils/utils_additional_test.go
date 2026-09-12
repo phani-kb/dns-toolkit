@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"archive/zip"
 	"os"
 	"path/filepath"
 	"strings"
@@ -213,6 +214,31 @@ func TestIsDomain(t *testing.T) {
 	}
 }
 
+func TestLooksLikeIPAddressCandidate(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		input    string
+		expected bool
+	}{
+		{input: "", expected: false},
+		{input: "example.com", expected: false},
+		{input: "sub.domain.net", expected: false},
+		{input: "192.168.1.1", expected: true},
+		{input: "10.0.0.1", expected: true},
+		{input: "2001:db8::1", expected: true},
+		{input: "fe80::1", expected: true},
+		{input: "123.abc.45.67", expected: false},
+		{input: "abc:def::1", expected: true},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.input, func(t *testing.T) {
+			assert.Equal(t, tt.expected, looksLikeIPAddressCandidate(tt.input))
+		})
+	}
+}
+
 func TestWriteEntriesToFile(t *testing.T) {
 	t.Parallel()
 
@@ -370,6 +396,30 @@ func TestExtractZipErrorCases(t *testing.T) {
 
 	err = extractZip(logger, invalidFile, tempDir)
 	assert.Error(t, err)
+}
+
+func TestExtractZipRejectsPathTraversal(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger(t)
+	tempDir := t.TempDir()
+	archivePath := filepath.Join(tempDir, "malicious.zip")
+	archiveFile, err := os.Create(archivePath)
+	require.NoError(t, err)
+
+	zipWriter := zip.NewWriter(archiveFile)
+	entry, err := zipWriter.Create("../outside.txt")
+	require.NoError(t, err)
+	_, err = entry.Write([]byte("must not be extracted"))
+	require.NoError(t, err)
+	require.NoError(t, zipWriter.Close())
+	require.NoError(t, archiveFile.Close())
+
+	destFolder := filepath.Join(tempDir, "output")
+	err = extractZip(logger, archivePath, destFolder)
+	assert.Error(t, err)
+	_, err = os.Stat(filepath.Join(tempDir, "outside.txt"))
+	assert.ErrorIs(t, err, os.ErrNotExist)
 }
 
 func createMinimalTarGz(filename string) error {
