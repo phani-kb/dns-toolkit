@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -579,8 +580,7 @@ func TestCopySourceToTarget(t *testing.T) {
 
 	target.SourceFile = "nonexistent.txt"
 	err = CopySourceToTarget(logger, target)
-	assert.Error(t, err)
-	assert.Contains(t, err.Error(), "source file not found")
+	assert.NoError(t, err)
 }
 
 func TestCopySourceToTargetComprehensive(t *testing.T) {
@@ -607,7 +607,7 @@ func TestCopySourceToTargetComprehensive(t *testing.T) {
 	}
 
 	err = CopySourceToTarget(logger, target)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 
 	targetFolder := filepath.Join(tmpDir, "target", "nested")
 	target = c.DownloadTarget{
@@ -623,6 +623,30 @@ func TestCopySourceToTargetComprehensive(t *testing.T) {
 	targetContent, err := os.ReadFile(filepath.Join(targetFolder, "target.txt"))
 	assert.NoError(t, err)
 	assert.Equal(t, sourceContent, string(targetContent))
+}
+
+func TestCopySourceToTargetMissingFile(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger(t)
+	tmpDir := t.TempDir()
+
+	sourceFolder := filepath.Join(tmpDir, "download")
+	err := os.MkdirAll(sourceFolder, 0o755)
+	require.NoError(t, err)
+
+	target := c.DownloadTarget{
+		SourceFolder: sourceFolder,
+		SourceFile:   "missing.csv",
+		TargetFolder: filepath.Join(tmpDir, "target"),
+		TargetFile:   "output.csv",
+	}
+
+	err = CopySourceToTarget(logger, target)
+	assert.NoError(t, err)
+
+	_, err = os.Stat(filepath.Join(tmpDir, "target", "output.csv"))
+	assert.True(t, os.IsNotExist(err))
 }
 
 func TestSaveFileErrorCases(t *testing.T) {
@@ -990,6 +1014,143 @@ func TestExtractArchiveZip(t *testing.T) {
 	nestedExtractedContent, err := os.ReadFile(filepath.Join(outputDir, "source", "nested", "nestedfile.txt"))
 	assert.NoError(t, err)
 	assert.Equal(t, "nested content", string(nestedExtractedContent))
+}
+
+func TestExtractArchiveGz(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger(t)
+
+	tmpDir := t.TempDir()
+
+	gzPath := filepath.Join(tmpDir, "Test.gz")
+	testContent := "test content for gz extraction"
+
+	gzFile, err := os.Create(gzPath)
+	require.NoError(t, err)
+
+	gw := gzip.NewWriter(gzFile)
+	gw.Name = "trails.csv"
+	_, err = gw.Write([]byte(testContent))
+	require.NoError(t, err)
+	require.NoError(t, gw.Close())
+	require.NoError(t, gzFile.Close())
+
+	outputDir := filepath.Join(tmpDir, "output")
+	err = ExtractArchive(logger, gzPath, outputDir)
+	assert.NoError(t, err)
+
+	extractedContent, err := os.ReadFile(filepath.Join(outputDir, "trails.csv"))
+	assert.NoError(t, err)
+	assert.Equal(t, testContent, string(extractedContent))
+
+	subfolderContent, err := os.ReadFile(filepath.Join(outputDir, "Test", "trails.csv"))
+	assert.NoError(t, err)
+	assert.Equal(t, testContent, string(subfolderContent))
+}
+
+func TestExtractArchiveGzNoHeader(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger(t)
+
+	tmpDir := t.TempDir()
+
+	gzPath := filepath.Join(tmpDir, "sample.txt.gz")
+	testContent := "test content without header"
+
+	gzFile, err := os.Create(gzPath)
+	require.NoError(t, err)
+
+	gw := gzip.NewWriter(gzFile)
+	_, err = gw.Write([]byte(testContent))
+	require.NoError(t, err)
+	require.NoError(t, gw.Close())
+	require.NoError(t, gzFile.Close())
+
+	outputDir := filepath.Join(tmpDir, "output")
+	err = ExtractArchive(logger, gzPath, outputDir)
+	assert.NoError(t, err)
+
+	extractedContent, err := os.ReadFile(filepath.Join(outputDir, "sample.txt"))
+	assert.NoError(t, err)
+	assert.Equal(t, testContent, string(extractedContent))
+}
+
+func TestExtractArchiveGzWithTargetFiles(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger(t)
+
+	tmpDir := t.TempDir()
+
+	gzPath := filepath.Join(tmpDir, "Test.gz")
+	testContent := "test content for target file gz extraction"
+
+	gzFile, err := os.Create(gzPath)
+	require.NoError(t, err)
+
+	gw := gzip.NewWriter(gzFile)
+	_, err = gw.Write([]byte(testContent))
+	require.NoError(t, err)
+	require.NoError(t, gw.Close())
+	require.NoError(t, gzFile.Close())
+
+	outputDir := filepath.Join(tmpDir, "output")
+	err = ExtractArchive(logger, gzPath, outputDir, "trails.csv")
+	assert.NoError(t, err)
+
+	extractedContent, err := os.ReadFile(filepath.Join(outputDir, "trails.csv"))
+	assert.NoError(t, err)
+	assert.Equal(t, testContent, string(extractedContent))
+
+	subfolderContent, err := os.ReadFile(filepath.Join(outputDir, "Test", "trails.csv"))
+	assert.NoError(t, err)
+	assert.Equal(t, testContent, string(subfolderContent))
+}
+
+func TestExtractArchiveWithTargetFilesFilter(t *testing.T) {
+	t.Parallel()
+
+	logger := createTestLogger(t)
+
+	tmpDir := t.TempDir()
+
+	testDir := filepath.Join(tmpDir, "source")
+	err := os.MkdirAll(testDir, 0o755)
+	require.NoError(t, err)
+
+	wantedFile := filepath.Join(testDir, "wanted.txt")
+	err = os.WriteFile(wantedFile, []byte("wanted content"), 0o644)
+	require.NoError(t, err)
+
+	unwantedFile := filepath.Join(testDir, "unwanted.txt")
+	err = os.WriteFile(unwantedFile, []byte("unwanted content"), 0o644)
+	require.NoError(t, err)
+
+	tarGzPath := filepath.Join(tmpDir, "test_filter.tar.gz")
+	cmd := fmt.Sprintf("cd %s && tar -czf %s source/", tmpDir, tarGzPath)
+	_, err = exec.Command("bash", "-c", cmd).Output()
+	require.NoError(t, err)
+
+	outputDirTar := filepath.Join(tmpDir, "output_tar")
+	err = ExtractArchive(logger, tarGzPath, outputDirTar, "source/wanted.txt")
+	assert.NoError(t, err)
+
+	assert.FileExists(t, filepath.Join(outputDirTar, "source", "wanted.txt"))
+	assert.NoFileExists(t, filepath.Join(outputDirTar, "source", "unwanted.txt"))
+
+	zipPath := filepath.Join(tmpDir, "test_filter.zip")
+	cmd = fmt.Sprintf("cd %s && zip -r %s source/", tmpDir, zipPath)
+	_, err = exec.Command("bash", "-c", cmd).Output()
+	require.NoError(t, err)
+
+	outputDirZip := filepath.Join(tmpDir, "output_zip")
+	err = ExtractArchive(logger, zipPath, outputDirZip, "source/wanted.txt")
+	assert.NoError(t, err)
+
+	assert.FileExists(t, filepath.Join(outputDirZip, "source", "wanted.txt"))
+	assert.NoFileExists(t, filepath.Join(outputDirZip, "source", "unwanted.txt"))
 }
 
 func TestFindProjectRoot(t *testing.T) {
@@ -1377,7 +1538,7 @@ func TestForceCopySourceToTarget(t *testing.T) {
 
 	target.SourceFile = "nonexistent.txt"
 	err = ForceCopySourceToTarget(logger, target)
-	assert.Error(t, err)
+	assert.NoError(t, err)
 }
 
 func TestGetTestDataDir(t *testing.T) {

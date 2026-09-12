@@ -38,7 +38,6 @@
 @@||view.sentinel.turris.cz^
 @@||vxvault.net^
 @@||warui.intaa.net^
-@@||web.archive.org^
 @@||www.binarydefense.com^
 @@||www.dan.me.uk^
 @@||www.spamhaus.org^

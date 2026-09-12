@@ -1047,6 +1047,7 @@
     {
       "name": "Maltrail_StaticTrails",
       "categories": "malware, threat",
+      "files": "trails.csv",
       "skip_general_consolidation": true,
       "types": [
         {
@@ -1056,7 +1057,18 @@
           "name": "ipv4_find"
         }
       ],
-      "url": "https://raw.githubusercontent.com/stamparm/aux/master/maltrail-static-trails.txt"
+      "url": "https://github.com/stamparm/trails/releases/latest/download/trails.csv.gz"
+    },
+    {
+      "name": "Maltrail_StaticTrails_Domains",
+      "categories": "malware",
+      "skip_general_consolidation": true,
+      "types": [
+        {
+          "name": "domain"
+        }
+      ],
+      "url": "https://github.com/stamparm/trails/releases/latest/download/maltrail-malware-domains.txt"
     },
     {
       "name": "malware-filter_phishing-filter",
@@ -1771,7 +1783,9 @@
       "name": "Ukrainian Security Filter",
       "categories": "malicious, threat",
       "countries": "UA",
+      "disabled": true,
       "license": "GPL-3.0",
+      "notes": "No longer maintained",
       "skip_general_consolidation": true,
       "skip_groups_consolidation": true,
       "types": [

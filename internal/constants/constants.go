@@ -399,7 +399,7 @@ var (
 	}
 )
 
-var ArchiveExtensions = []string{".zip", ".tar.gz"}
+var ArchiveExtensions = []string{".zip", ".tar.gz", ".gz"}
 
 const (
 	SearchProcessedFile    = "processed"

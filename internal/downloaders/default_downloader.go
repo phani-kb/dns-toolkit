@@ -419,7 +419,13 @@ func (d *DefaultDownloader) canSkipDownload(
 
 func (d *DefaultDownloader) handleArchiveFile(logger *multilog.Logger, file c.DownloadFile, filePath string) error {
 	if file.IsArchive {
-		if err := u.ExtractArchive(logger, filePath, file.Folder); err != nil {
+		targetFiles := make([]string, 0, len(file.Targets))
+		for _, target := range file.Targets {
+			if target.SourceFile != "" {
+				targetFiles = append(targetFiles, target.SourceFile)
+			}
+		}
+		if err := u.ExtractArchive(logger, filePath, file.Folder, targetFiles...); err != nil {
 			logger.Errorf("Failed to extract archive: %v", err)
 			return err
 		}

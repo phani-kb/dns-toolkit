@@ -1,6 +1,7 @@
 package downloaders
 
 import (
+	"compress/gzip"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -390,6 +391,53 @@ func TestHandleArchiveFileComprehensive(t *testing.T) {
 
 	err = d.handleArchiveFile(logger, nonArchiveWithTargets, nonArchivePath)
 	assert.NoError(t, err, "Should handle non-archive file with targets without error")
+}
+
+func TestHandleArchiveFileGz(t *testing.T) {
+	t.Parallel()
+
+	logger := setupTestLogger()
+	testDir := setupTestDir(t)
+	defer func() {
+		if err := os.RemoveAll(testDir); err != nil {
+			t.Logf("Failed to remove test directory: %v", err)
+		}
+	}()
+
+	d := NewDefaultDownloaderWithRetries(1)
+
+	gzPath := filepath.Join(testDir, "Test.gz")
+	gzFile, err := os.Create(gzPath)
+	require.NoError(t, err)
+
+	gw := gzip.NewWriter(gzFile)
+	gw.Name = "trails.csv"
+	_, err = gw.Write([]byte("malware1.com,malware\nmalware2.com,malware\n"))
+	require.NoError(t, err)
+	require.NoError(t, gw.Close())
+	require.NoError(t, gzFile.Close())
+
+	archiveFile := c.DownloadFile{
+		Name:      "Test",
+		Folder:    testDir,
+		Filename:  "Test.gz",
+		IsArchive: true,
+		Targets: []c.DownloadTarget{
+			{
+				SourceFolder: testDir,
+				SourceFile:   "trails.csv",
+				TargetFolder: testDir,
+				TargetFile:   "Test-trails.csv",
+			},
+		},
+	}
+
+	err = d.handleArchiveFile(logger, archiveFile, gzPath)
+	assert.NoError(t, err)
+
+	targetContent, err := os.ReadFile(filepath.Join(testDir, "Test-trails.csv"))
+	assert.NoError(t, err)
+	assert.Contains(t, string(targetContent), "malware1.com")
 }
 
 func TestCreateHTTPClient(t *testing.T) {
