@@ -1252,6 +1252,12 @@ func extractZip(logger *multilog.Logger, archivePath, destFolder string, targetF
 	baseName = strings.TrimSuffix(baseName, ".zip")
 
 	for _, f := range r.File {
+		if strings.Contains(f.Name, "..") {
+			return fmt.Errorf("invalid file path in archive: %s", f.Name)
+		}
+		if err := validateArchiveFilePath(f.Name); err != nil {
+			return fmt.Errorf("invalid file path in archive: %w", err)
+		}
 		if f.FileInfo().IsDir() {
 			if len(targetFiles) == 0 {
 				filePath := filepath.Join(destFolder, f.Name)
