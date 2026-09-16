@@ -7,11 +7,12 @@ import (
 )
 
 const (
-	AppName        = "dns-toolkit"
-	AppVersion     = "2.0.0"
-	AppDescription = "A toolkit for DNS data processing and analysis."
-	GitHubRawURL   = "https://raw.githubusercontent.com/phani-kb/dns-toolkit/output"
-	GitHubRepoURL  = "https://github.com/phani-kb/dns-toolkit"
+	AppName           = "dns-toolkit"
+	AppVersion        = "2.0.0"
+	AppDescription    = "A toolkit for DNS data processing and analysis."
+	GitHubRawURL      = "https://raw.githubusercontent.com/phani-kb/dns-toolkit/output"
+	GitHubJSDelivrURL = "https://cdn.jsdelivr.net/gh/phani-kb/dns-toolkit@output"
+	GitHubRepoURL     = "https://github.com/phani-kb/dns-toolkit"
 )
 
 const (
@@ -236,6 +237,20 @@ const (
 	ForcedBlock = "forced_block"
 	ForcedAllow = "forced_allow"
 )
+
+var GroupDisplayNames = map[string]string{
+	GroupMini:   "Light",
+	GroupLite:   "Normal",
+	GroupNormal: "Pro",
+	GroupBig:    "Ultimate",
+}
+
+var GroupOrder = []string{
+	GroupMini,
+	GroupLite,
+	GroupNormal,
+	GroupBig,
+}
 
 const (
 	SourceTypeIpv4                       = "ipv4"
@@ -464,7 +479,7 @@ var (
 	}
 )
 
-var ArchiveExtensions = []string{".zip", ".tar.gz"}
+var ArchiveExtensions = []string{".zip", ".tar.gz", ".gz"}
 
 const (
 	SearchProcessedFile    = "processed"
@@ -645,6 +660,10 @@ const (
 	TableEntryGroups          = TablePrefix + "entry_groups"
 	TableEntryCategories      = TablePrefix + "entry_categories"
 	TableConsolidatedEntries  = TablePrefix + "consolidated_entries"
+	TableSourceEntryCounts    = TablePrefix + "source_entry_counts"
+	TableConsolidatedGeneral  = TablePrefix + "consolidated_general"
+	TableConsolidatedGroup    = TablePrefix + "consolidated_group"
+	TableConsolidatedCategory = TablePrefix + "consolidated_category"
 	TableOverlapResults       = TablePrefix + "overlap_results"
 	TableTopEntries           = TablePrefix + "top_entries"
 	TableResolvedAllow        = TablePrefix + "resolved_allow"
@@ -652,4 +671,4 @@ const (
 	TableConsolidationState   = TablePrefix + "consolidation_state"
 )
 
-const BulkInsertBatchSize = 1000
+const BulkInsertBatchSize = 100

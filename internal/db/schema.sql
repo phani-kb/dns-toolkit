@@ -6,9 +6,7 @@ create table if not exists dnstk_sources (
   url text,
   url_per_category text,
   url_per_group text,
-  frequency text not null default 'daily' check (
-    frequency in ('hourly', 'daily', 'weekly', 'monthly')
-  ),
+  frequency text not null default 'daily' check (frequency in ('hourly', 'daily', 'weekly', 'monthly')),
   license text,
   website text,
   notes text,
@@ -29,10 +27,7 @@ create index if not exists idx_sources_disabled_name on dnstk_sources (disabled,
 create table if not exists dnstk_type_names (id integer primary key, name text not null unique) strict;
 
 -- list_type_names: global registry of list type strings
-create table if not exists dnstk_list_type_names (
-  id integer primary key,
-  name text not null unique check (name in ('blocklist', 'allowlist'))
-) strict;
+create table if not exists dnstk_list_type_names (id integer primary key, name text not null unique check (name in ('blocklist', 'allowlist'))) strict;
 
 -- group_names: global registry of size group strings
 create table if not exists dnstk_group_names (id integer primary key, name text not null unique) strict;
@@ -69,10 +64,7 @@ create index if not exists idx_source_list_types_type_id on dnstk_source_list_ty
 create index if not exists idx_source_list_types_list_type_name_id on dnstk_source_list_types (list_type_name_id);
 
 -- source_list_type_notes: optional per-source-list-type notes (only inserted when non-empty)
-create table if not exists dnstk_source_list_type_notes (
-  source_list_type_id integer primary key references dnstk_source_list_types (id) on delete cascade,
-  notes text not null
-) strict;
+create table if not exists dnstk_source_list_type_notes (source_list_type_id integer primary key references dnstk_source_list_types (id) on delete cascade, notes text not null) strict;
 
 -- source_list_type_groups: which group names a list type belongs to
 create table if not exists dnstk_source_list_type_groups (
@@ -97,7 +89,7 @@ without rowid;
 -- source_countries: 2-letter country codes per source
 create table if not exists dnstk_source_countries (
   source_id integer not null references dnstk_sources (id) on delete cascade,
-  country_code text not null check (length (country_code) = 2),
+  country_code text not null check (length(country_code) = 2),
   primary key (source_id, country_code)
 ) strict,
 without rowid;
@@ -161,13 +153,7 @@ create table if not exists dnstk_entries (
   list_type text not null check (list_type in ('blocklist', 'allowlist')),
   valid integer not null default 1 check (valid in (0, 1)),
   must_consider integer not null default 0 check (must_consider in (0, 1)),
-  unique (
-    source_id,
-    entry,
-    generic_source_type,
-    actual_source_type,
-    list_type
-  )
+  unique (source_id, entry, generic_source_type, actual_source_type, list_type)
 ) strict;
 
 create index if not exists idx_entries_lookup on dnstk_entries (entry, generic_source_type, list_type);
@@ -176,14 +162,7 @@ create index if not exists idx_entries_source on dnstk_entries (source_id, gener
 
 create index if not exists idx_entries_source_type_list on dnstk_entries (source_id, actual_source_type, list_type);
 
-create index if not exists idx_entries_consolidation on dnstk_entries (
-  generic_source_type,
-  list_type,
-  valid,
-  entry,
-  source_id,
-  must_consider
-);
+create index if not exists idx_entries_consolidation on dnstk_entries (generic_source_type, list_type, valid, entry, source_id, must_consider);
 
 -- entry_groups: group membership for processed file batches
 create table if not exists dnstk_entry_groups (
@@ -213,74 +192,65 @@ create index if not exists idx_entry_categories_join on dnstk_entry_categories (
 
 create index if not exists idx_entry_categories_scope on dnstk_entry_categories (category, source_type, list_type, source_id);
 
--- consolidated_entries: deduplicated results after consolidation
-create table if not exists dnstk_consolidated_entries (
-  id integer primary key,
+-- source_entry_counts: per-source processed-entry
+create table if not exists dnstk_source_entry_counts (
+  source_id integer not null references dnstk_sources (id) on delete cascade,
+  generic_source_type text not null,
+  actual_source_type text not null,
+  list_type text not null check (list_type in ('blocklist', 'allowlist')),
+  valid integer not null default 1 check (valid in (0, 1)),
+  must_consider integer not null default 0 check (must_consider in (0, 1)),
+  entry_count integer not null default 0 check (entry_count >= 0),
+  primary key (source_id, generic_source_type, actual_source_type, list_type, valid)
+) strict,
+without rowid;
+
+create index if not exists idx_source_entry_counts_source on dnstk_source_entry_counts (source_id);
+
+-- consolidated_general: consolidated results for general scope
+create table if not exists dnstk_consolidated_general (
   entry text not null,
   generic_source_type text not null,
   list_type text not null check (list_type in ('blocklist', 'allowlist')),
-  consolidation_type text not null,
-  group_name text,
-  category text,
   valid integer not null default 1 check (valid in (0, 1)),
   source_count integer not null default 1 check (source_count >= 0),
-  check (
-    (
-      consolidation_type = 'general'
-      and group_name is null
-      and category is null
-    )
-    or (
-      consolidation_type = 'group'
-      and group_name is not null
-      and category is null
-    )
-    or (
-      consolidation_type = 'category'
-      and group_name is null
-      and category is not null
-    )
-  )
-) strict;
+  primary key (entry, generic_source_type, list_type, valid)
+) strict,
+without rowid;
 
-create index if not exists idx_consolidated_lookup on dnstk_consolidated_entries (
-  entry,
-  generic_source_type,
-  list_type,
-  consolidation_type
-);
+create index if not exists idx_consolidated_general_type on dnstk_consolidated_general (generic_source_type, list_type, valid, entry);
 
-create index if not exists idx_consolidated_type on dnstk_consolidated_entries (
-  consolidation_type,
-  generic_source_type,
-  list_type
-);
+-- consolidated_group: consolidated results for group scope
+create table if not exists dnstk_consolidated_group (
+  entry text not null,
+  generic_source_type text not null,
+  list_type text not null check (list_type in ('blocklist', 'allowlist')),
+  group_name text not null,
+  valid integer not null default 1 check (valid in (0, 1)),
+  source_count integer not null default 1 check (source_count >= 0),
+  primary key (entry, generic_source_type, list_type, group_name, valid)
+) strict,
+without rowid;
 
-create index if not exists idx_consolidated_type_valid_entry on dnstk_consolidated_entries (
-  consolidation_type,
-  generic_source_type,
-  list_type,
-  valid,
-  entry
-);
+create index if not exists idx_consolidated_group_scope on dnstk_consolidated_group (group_name, generic_source_type, list_type, valid, entry);
 
-create index if not exists idx_consolidated_type_valid_group_entry on dnstk_consolidated_entries (
-  consolidation_type,
-  generic_source_type,
-  list_type,
-  valid,
-  group_name,
-  entry
-);
+create index if not exists idx_consolidated_group_type on dnstk_consolidated_group (generic_source_type, list_type, valid, entry);
 
-create index if not exists idx_consolidated_type_valid_category_entry on dnstk_consolidated_entries (
-  consolidation_type,
-  generic_source_type,
-  list_type,
-  valid,
-  category,
-  entry
-);
+-- consolidated_category: consolidated results for category scope
+create table if not exists dnstk_consolidated_category (
+  entry text not null,
+  generic_source_type text not null,
+  list_type text not null check (list_type in ('blocklist', 'allowlist')),
+  category text not null,
+  valid integer not null default 1 check (valid in (0, 1)),
+  source_count integer not null default 1 check (source_count >= 0),
+  primary key (entry, generic_source_type, list_type, category, valid)
+) strict,
+without rowid;
+
+create index if not exists idx_consolidated_category_scope on dnstk_consolidated_category (category, generic_source_type, list_type, valid, entry);
+
+create index if not exists idx_consolidated_category_type on dnstk_consolidated_category (generic_source_type, list_type, valid, entry);
 
 -- overlap_results: overlap analysis between sources
 create table if not exists dnstk_overlap_results (
@@ -309,12 +279,7 @@ create table if not exists dnstk_top_entries (
   list_type text not null,
   source_count integer not null check (source_count >= 0),
   min_sources integer not null check (min_sources >= 0),
-  unique (
-    entry,
-    generic_source_type,
-    list_type,
-    min_sources
-  )
+  unique (entry, generic_source_type, list_type, min_sources)
 ) strict;
 
 create index if not exists idx_top_entries_lookup on dnstk_top_entries (generic_source_type, list_type, min_sources);
@@ -336,12 +301,3 @@ create table if not exists dnstk_scoped_allow (
   primary key (consolidation_type, scope_value, entry)
 ) strict,
 without rowid;
-
--- consolidation_state: tracks fingerprints to skip unchanged consolidation runs (per source type)
-create table if not exists dnstk_consolidation_state (
-  consolidation_type text not null,
-  generic_source_type text not null default '',
-  fingerprint text not null,
-  last_consolidated_at text,
-  primary key (consolidation_type, generic_source_type)
-) strict;

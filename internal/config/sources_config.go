@@ -505,7 +505,7 @@ func (sc *SourcesConfig) GetSourcesForCategoriesConsolidation(filters SourceFilt
 			uniqueSources[key] = source
 		}
 	}
-	sources := make([]Source, 0, len(uniqueSources))
+	var sources []Source
 	for _, source := range uniqueSources {
 		sources = append(sources, source)
 	}

@@ -11,20 +11,23 @@ import (
 	"runtime"
 	"strings"
 
+	"github.com/jmoiron/sqlx"
 	"github.com/phani-kb/multilog"
 	_ "modernc.org/sqlite"
 )
 
+// dsnPragmas are applied per connection.
 const dsnPragmas = "_pragma=journal_mode(WAL)" +
 	"&_pragma=synchronous(NORMAL)" +
 	"&_pragma=busy_timeout(5000)" +
-	"&_pragma=cache_size(-64000)" +
+	"&_pragma=cache_size(-262144)" +
+	"&_pragma=mmap_size(268435456)" +
 	"&_pragma=foreign_keys(ON)" +
 	"&_pragma=temp_store(MEMORY)"
 
 type DB struct {
-	readConn        *sql.DB
-	writeConn       *sql.DB
+	readConn        *sqlx.DB
+	writeConn       *sqlx.DB
 	path            string
 	schemaRecreated bool
 }
@@ -74,7 +77,7 @@ func openConn(dbPath string) (*DB, error) {
 
 	dsn := buildDataSource(dbPath)
 
-	writeConn, err := sql.Open("sqlite", dsn)
+	writeConn, err := sqlx.Open("sqlite", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("opening write connection: %w", err)
 	}
@@ -86,7 +89,7 @@ func openConn(dbPath string) (*DB, error) {
 		return nil, closeOnError(writeConn, "pinging write database", err)
 	}
 
-	readConn, err := sql.Open("sqlite", dsn)
+	readConn, err := sqlx.Open("sqlite", dsn)
 	if err != nil {
 		return nil, closeOnError(writeConn, "opening read connection", err)
 	}
@@ -105,28 +108,43 @@ func openConn(dbPath string) (*DB, error) {
 
 // Close closes the database connection.
 func (db *DB) Close() error {
+	if db == nil {
+		return nil
+	}
 	var errs []error
 	if db.readConn != nil {
 		if err := db.readConn.Close(); err != nil {
 			errs = append(errs, err)
 		}
+		db.readConn = nil
 	}
 	if db.writeConn != nil {
 		if err := db.writeConn.Close(); err != nil {
 			errs = append(errs, err)
 		}
+		db.writeConn = nil
 	}
 	return errors.Join(errs...)
 }
 
 // ReadConn returns the multi-connection read pool.
 func (db *DB) ReadConn() *sql.DB {
-	return db.readConn
+	if db == nil || db.readConn == nil {
+		return nil
+	}
+	return db.readConn.DB
 }
 
 // WriteConn returns the single-connection write pool.
 func (db *DB) WriteConn() *sql.DB {
-	return db.writeConn
+	if db == nil || db.writeConn == nil {
+		return nil
+	}
+	return db.writeConn.DB
+}
+
+func (db *DB) selectRead(ctx context.Context, dest any, query string, args ...any) error {
+	return db.readConn.SelectContext(ctx, dest, query, args...)
 }
 
 // Path returns the database file path.
@@ -157,35 +175,47 @@ func (db *DB) InTransaction(ctx context.Context, fn func(tx *sql.Tx) error) erro
 	return tx.Commit()
 }
 
-// InBulkWriteTransaction executes fn within a write transaction without foreign-key checks
+// InBulkWriteTransaction executes fn within a write transaction.
 func (db *DB) InBulkWriteTransaction(ctx context.Context, fn func(tx *sql.Tx) error) error {
-	if _, err := db.writeConn.ExecContext(ctx, "pragma foreign_keys=off"); err != nil {
-		return fmt.Errorf("disabling foreign keys: %w", err)
-	}
-	txErr := db.InTransaction(ctx, fn)
-	if _, err := db.writeConn.ExecContext(ctx, "pragma foreign_keys=on"); err != nil {
-		return fmt.Errorf("re-enabling foreign keys: %w (tx error: %v)", err, txErr)
-	}
-	return txErr
+	return db.InTransaction(ctx, func(tx *sql.Tx) error {
+		if _, err := tx.ExecContext(ctx, "PRAGMA defer_foreign_keys=ON"); err != nil {
+			return fmt.Errorf("deferring foreign keys: %w", err)
+		}
+		return fn(tx)
+	})
 }
 
 // DropAndRecreateTable drops a table and all its indexes, then recreates it
 func (db *DB) DropAndRecreateTable(ctx context.Context, tableName string) error {
-	if _, err := db.writeConn.ExecContext(ctx, "pragma foreign_keys=off"); err != nil {
-		return fmt.Errorf("disabling foreign keys: %w", err)
+	stmts, err := statementsForTable(schemaSQL, tableName)
+	if err != nil {
+		return err
 	}
-	if _, err := db.writeConn.ExecContext(ctx, "DROP TABLE IF EXISTS "+tableName); err != nil {
-		_, _ = db.writeConn.ExecContext(ctx, "pragma foreign_keys=on") // nolint: errcheck
-		return fmt.Errorf("dropping table %s: %w", tableName, err)
+	if len(stmts) == 0 {
+		if !isValidTableName(tableName) {
+			return fmt.Errorf("refusing to clear unknown table %q", tableName)
+		}
+		_, err := db.writeConn.ExecContext(ctx, "delete from "+tableName)
+		return err
 	}
-	if _, err := db.writeConn.ExecContext(ctx, schemaSQL); err != nil {
-		_, _ = db.writeConn.ExecContext(ctx, "pragma foreign_keys=on") // nolint: errcheck
-		return fmt.Errorf("recreating schema after dropping %s: %w", tableName, err)
-	}
-	if _, err := db.writeConn.ExecContext(ctx, "pragma foreign_keys=on"); err != nil {
-		return fmt.Errorf("re-enabling foreign keys: %w", err)
-	}
-	return nil
+	return db.InTransaction(ctx, func(tx *sql.Tx) error {
+		if _, err := tx.ExecContext(ctx, "PRAGMA defer_foreign_keys=ON"); err != nil {
+			return fmt.Errorf("deferring foreign keys: %w", err)
+		}
+		// drop view first if the object is a view, then table.
+		if _, err := tx.ExecContext(ctx, "drop view if exists "+tableName); err != nil {
+			return fmt.Errorf("dropping view %s: %w", tableName, err)
+		}
+		if _, err := tx.ExecContext(ctx, "drop table if exists "+tableName); err != nil {
+			return fmt.Errorf("dropping table %s: %w", tableName, err)
+		}
+		for _, s := range stmts {
+			if _, err := tx.ExecContext(ctx, s); err != nil {
+				return fmt.Errorf("recreating %s: %w", tableName, err)
+			}
+		}
+		return nil
+	})
 }
 
 // InReadTransaction executes fn within a read-only transaction on the read pool.
@@ -203,11 +233,12 @@ func (db *DB) InReadTransaction(ctx context.Context, fn func(tx *sql.Tx) error) 
 	return tx.Commit()
 }
 
-// CloseLogError closes the DB and logs any error.
+// CloseLogError closes the DB once and logs any error.
 func (db *DB) CloseLogError(logger *multilog.Logger) {
-	if db.Close() != nil {
-		if err := db.Close(); err != nil {
-			logger.Warnf("Error closing database: %v", err)
-		}
+	if db == nil {
+		return
+	}
+	if err := db.Close(); err != nil {
+		logger.Warnf("Error closing database: %v", err)
 	}
 }

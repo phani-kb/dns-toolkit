@@ -97,7 +97,7 @@ var schemaStatusCmd = &cobra.Command{
 			}
 		}
 
-		counts, err := database.TableRowCounts(Logger)
+		counts, err := database.TableRowCounts()
 		if err != nil {
 			Logger.Errorf("Failed to get table counts: %v", err)
 			os.Exit(1)
