@@ -147,6 +147,10 @@ func (db *DB) selectRead(ctx context.Context, dest any, query string, args ...an
 	return db.readConn.SelectContext(ctx, dest, query, args...)
 }
 
+func (db *DB) getRead(ctx context.Context, dest any, query string, args ...any) error {
+	return db.readConn.GetContext(ctx, dest, query, args...)
+}
+
 // Path returns the database file path.
 func (db *DB) Path() string {
 	return db.path

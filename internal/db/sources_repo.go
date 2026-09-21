@@ -57,33 +57,67 @@ type SourceRow struct {
 	Disabled                    bool
 }
 
+type sourceScan struct {
+	License            string `db:"license"`
+	Website            string `db:"website"`
+	DefinitionChecksum string `db:"definition_checksum"`
+	SourceFile         string `db:"source_file"`
+	Notes              string `db:"notes"`
+	URLPerGroup        string `db:"url_per_group"`
+	Frequency          string `db:"frequency"`
+	Name               string `db:"name"`
+	URL                string `db:"url"`
+	URLPerCategory     string `db:"url_per_category"`
+	ID                 int64  `db:"id"`
+	TypeCount          int    `db:"type_count"`
+	CountToConsider    int    `db:"count_to_consider"`
+	Disabled           int    `db:"disabled"`
+	SkipGeneral        int    `db:"skip_general_consolidation"`
+	SkipGroups         int    `db:"skip_groups_consolidation"`
+	SkipCategories     int    `db:"skip_categories_consolidation"`
+}
+
+func (s sourceScan) toRow() SourceRow {
+	return SourceRow{
+		License:                     s.License,
+		Website:                     s.Website,
+		DefinitionChecksum:          s.DefinitionChecksum,
+		SourceFile:                  s.SourceFile,
+		Notes:                       s.Notes,
+		URLPerGroup:                 s.URLPerGroup,
+		Frequency:                   s.Frequency,
+		Name:                        s.Name,
+		URL:                         s.URL,
+		URLPerCategory:              s.URLPerCategory,
+		TypeCount:                   s.TypeCount,
+		ID:                          s.ID,
+		CountToConsider:             s.CountToConsider,
+		SkipCategoriesConsolidation: s.SkipCategories == 1,
+		SkipGroupsConsolidation:     s.SkipGroups == 1,
+		SkipGeneralConsolidation:    s.SkipGeneral == 1,
+		Disabled:                    s.Disabled == 1,
+	}
+}
+
 func (r *SourcesRepo) GetSourceByName(name string) (*SourceRow, error) {
-	row := r.db.readConn.QueryRow(`
-		SELECT id, name, url, url_per_category, url_per_group, frequency, license, website, notes,
+	var scanned sourceScan
+	err := r.db.getRead(context.Background(), &scanned, `
+		select id, name, url, url_per_category, url_per_group, frequency, license, website, notes,
 			type_count, count_to_consider, disabled, skip_general_consolidation, skip_groups_consolidation,
 			skip_categories_consolidation, source_file, definition_checksum
-		FROM `+constants.TableSources+` WHERE name = ?`, name)
-
-	s := &SourceRow{}
-	var disabled, skipGen, skipGrp, skipCat int
-	err := row.Scan(&s.ID, &s.Name, &s.URL, &s.URLPerCategory, &s.URLPerGroup, &s.Frequency,
-		&s.License, &s.Website, &s.Notes, &s.TypeCount, &s.CountToConsider,
-		&disabled, &skipGen, &skipGrp, &skipCat, &s.SourceFile, &s.DefinitionChecksum)
+		from `+constants.TableSources+` WHERE name = ?`, name)
 	if err != nil {
 		return nil, err
 	}
-	s.Disabled = disabled == 1
-	s.SkipGeneralConsolidation = skipGen == 1
-	s.SkipGroupsConsolidation = skipGrp == 1
-	s.SkipCategoriesConsolidation = skipCat == 1
-	return s, nil
+	s := scanned.toRow()
+	return &s, nil
 }
 
 // UpsertSource inserts a source or updates it if it exists by name.
 // Returns the source ID.
 func (r *SourcesRepo) UpsertSource(s *SourceRow) (int64, error) {
 	result, err := r.db.writeConn.Exec(`
-		INSERT INTO `+constants.TableSources+` (name, url, url_per_category, url_per_group, frequency,
+		insert into `+constants.TableSources+` (name, url, url_per_category, url_per_group, frequency,
 			license, website, notes, type_count, count_to_consider, disabled,
 			skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation,
 			source_file, definition_checksum)
@@ -136,7 +170,7 @@ func (r *SourcesRepo) ImportSource(
 	var existingID int64
 	var existingChecksum string
 	err := tx.QueryRow(
-		"SELECT id, definition_checksum FROM "+constants.TableSources+" WHERE name = ? AND source_file = ?",
+		"select id, definition_checksum from "+constants.TableSources+" WHERE name = ? AND source_file = ?",
 		source.Name, sourceFile,
 	).Scan(&existingID, &existingChecksum)
 	if err != nil && err != sql.ErrNoRows {
@@ -150,7 +184,7 @@ func (r *SourcesRepo) ImportSource(
 	// Delete existing source and cascade to related tables
 	if err == nil {
 		deleteResult, deleteErr := tx.Exec(
-			"DELETE FROM "+constants.TableSources+" WHERE id = ?",
+			"delete from "+constants.TableSources+" WHERE id = ?",
 			existingID)
 		if deleteErr != nil {
 			return false, fmt.Errorf("deleting existing source %s: %w", source.Name, deleteErr)
@@ -162,7 +196,7 @@ func (r *SourcesRepo) ImportSource(
 	}
 
 	result, err := tx.Exec(`
-		INSERT INTO `+constants.TableSources+` (name, url, url_per_category, url_per_group, frequency, license,
+		insert into `+constants.TableSources+` (name, url, url_per_category, url_per_group, frequency, license,
 			website, notes, type_count, count_to_consider, disabled,
 			skip_general_consolidation, skip_groups_consolidation,
 			skip_categories_consolidation, source_file, definition_checksum)
@@ -190,7 +224,7 @@ func (r *SourcesRepo) ImportSource(
 	}
 
 	upsertCategoryStmt, err := tx.Prepare(
-		"INSERT INTO " + constants.TableCategoryNames + " (name) VALUES (?) ON CONFLICT(name) DO NOTHING",
+		"insert into " + constants.TableCategoryNames + " (name) VALUES (?) ON CONFLICT(name) DO NOTHING",
 	)
 	if err != nil {
 		return false, fmt.Errorf("preparing category upsert statement: %w", err)
@@ -198,7 +232,7 @@ func (r *SourcesRepo) ImportSource(
 	defer func() { _ = upsertCategoryStmt.Close() }() // nolint: errcheck
 
 	selectCategoryIDStmt, err := tx.Prepare(
-		"SELECT id FROM " + constants.TableCategoryNames + " WHERE name = ?",
+		"select id from " + constants.TableCategoryNames + " WHERE name = ?",
 	)
 	if err != nil {
 		return false, fmt.Errorf("preparing category id lookup statement: %w", err)
@@ -206,7 +240,7 @@ func (r *SourcesRepo) ImportSource(
 	defer func() { _ = selectCategoryIDStmt.Close() }() // nolint: errcheck
 
 	insertSourceCategoryStmt, err := tx.Prepare(
-		"INSERT INTO " + constants.TableSourceCategories + " (source_id, category_name_id) VALUES (?, ?)",
+		"insert into " + constants.TableSourceCategories + " (source_id, category_name_id) VALUES (?, ?)",
 	)
 	if err != nil {
 		return false, fmt.Errorf("preparing source category insert statement: %w", err)
@@ -231,7 +265,7 @@ func (r *SourcesRepo) ImportSource(
 
 	for _, country := range source.Countries {
 		if _, err := tx.Exec(
-			"INSERT INTO "+constants.TableSourceCountries+" (source_id, country_code) VALUES (?, ?)",
+			"insert into "+constants.TableSourceCountries+" (source_id, country_code) VALUES (?, ?)",
 			sourceID, country,
 		); err != nil {
 			return false, fmt.Errorf("inserting country %s for %s: %w", country, source.Name, err)
@@ -250,7 +284,7 @@ func (r *SourcesRepo) ImportSource(
 
 	for _, f := range source.Files {
 		if _, err := tx.Exec(
-			"INSERT INTO "+constants.TableSourceFiles+" (source_id, filename) VALUES (?, ?)",
+			"insert into "+constants.TableSourceFiles+" (source_id, filename) VALUES (?, ?)",
 			sourceID, f,
 		); err != nil {
 			return false, fmt.Errorf("inserting file %s for %s: %w", f, source.Name, err)
@@ -267,21 +301,21 @@ func (r *SourcesRepo) insertSourceTypes(
 	lookupCache *importLookupCache,
 ) error {
 	upsertTypeStmt, err := tx.Prepare(
-		"INSERT INTO " + constants.TableTypeNames + " (name) VALUES (?) ON CONFLICT(name) DO NOTHING",
+		"insert into " + constants.TableTypeNames + " (name) VALUES (?) ON CONFLICT(name) DO NOTHING",
 	)
 	if err != nil {
 		return fmt.Errorf("preparing type upsert statement: %w", err)
 	}
 	defer func() { _ = upsertTypeStmt.Close() }() // nolint: errcheck
 
-	selectTypeIDStmt, err := tx.Prepare("SELECT id FROM " + constants.TableTypeNames + " WHERE name = ?")
+	selectTypeIDStmt, err := tx.Prepare("select id from " + constants.TableTypeNames + " WHERE name = ?")
 	if err != nil {
 		return fmt.Errorf("preparing type id lookup statement: %w", err)
 	}
 	defer func() { _ = selectTypeIDStmt.Close() }() // nolint: errcheck
 
 	insertSourceTypeStmt, err := tx.Prepare(
-		"INSERT INTO " + constants.TableSourceTypes +
+		"insert into " + constants.TableSourceTypes +
 			" (source_id, type_name_id, notes, disabled) VALUES (?, ?, ?, ?)",
 	)
 	if err != nil {
@@ -290,7 +324,7 @@ func (r *SourcesRepo) insertSourceTypes(
 	defer func() { _ = insertSourceTypeStmt.Close() }() // nolint: errcheck
 
 	upsertListTypeStmt, err := tx.Prepare(
-		"INSERT INTO " + constants.TableListTypeNames + " (name) VALUES (?) ON CONFLICT(name) DO NOTHING",
+		"insert into " + constants.TableListTypeNames + " (name) VALUES (?) ON CONFLICT(name) DO NOTHING",
 	)
 	if err != nil {
 		return fmt.Errorf("preparing list type upsert statement: %w", err)
@@ -298,7 +332,7 @@ func (r *SourcesRepo) insertSourceTypes(
 	defer func() { _ = upsertListTypeStmt.Close() }() // nolint: errcheck
 
 	selectListTypeIDStmt, err := tx.Prepare(
-		"SELECT id FROM " + constants.TableListTypeNames + " WHERE name = ?",
+		"select id from " + constants.TableListTypeNames + " WHERE name = ?",
 	)
 	if err != nil {
 		return fmt.Errorf("preparing list type id lookup statement: %w", err)
@@ -306,7 +340,7 @@ func (r *SourcesRepo) insertSourceTypes(
 	defer func() { _ = selectListTypeIDStmt.Close() }() // nolint: errcheck
 
 	insertSourceListTypeStmt, err := tx.Prepare(
-		"INSERT INTO " + constants.TableSourceListTypes +
+		"insert into " + constants.TableSourceListTypes +
 			" (source_type_id, list_type_name_id, disabled, must_consider) VALUES (?, ?, ?, ?)",
 	)
 	if err != nil {
@@ -315,7 +349,7 @@ func (r *SourcesRepo) insertSourceTypes(
 	defer func() { _ = insertSourceListTypeStmt.Close() }() // nolint: errcheck
 
 	insertSourceListTypeNotesStmt, err := tx.Prepare(
-		"INSERT INTO " + constants.TableSourceListTypeNotes + " (source_list_type_id, notes) VALUES (?, ?)",
+		"insert into " + constants.TableSourceListTypeNotes + " (source_list_type_id, notes) VALUES (?, ?)",
 	)
 	if err != nil {
 		return fmt.Errorf("preparing source list type notes insert statement: %w", err)
@@ -323,21 +357,21 @@ func (r *SourcesRepo) insertSourceTypes(
 	defer func() { _ = insertSourceListTypeNotesStmt.Close() }() // nolint: errcheck
 
 	upsertGroupStmt, err := tx.Prepare(
-		"INSERT INTO " + constants.TableGroupNames + " (name) VALUES (?) ON CONFLICT(name) DO NOTHING",
+		"insert into " + constants.TableGroupNames + " (name) VALUES (?) ON CONFLICT(name) DO NOTHING",
 	)
 	if err != nil {
 		return fmt.Errorf("preparing group upsert statement: %w", err)
 	}
 	defer func() { _ = upsertGroupStmt.Close() }() // nolint: errcheck
 
-	selectGroupIDStmt, err := tx.Prepare("SELECT id FROM " + constants.TableGroupNames + " WHERE name = ?")
+	selectGroupIDStmt, err := tx.Prepare("select id from " + constants.TableGroupNames + " WHERE name = ?")
 	if err != nil {
 		return fmt.Errorf("preparing group id lookup statement: %w", err)
 	}
 	defer func() { _ = selectGroupIDStmt.Close() }() // nolint: errcheck
 
 	insertSourceListTypeGroupStmt, err := tx.Prepare(
-		"INSERT INTO " + constants.TableSourceListTypeGroups +
+		"insert into " + constants.TableSourceListTypeGroups +
 			" (source_list_type_id, group_name_id) VALUES (?, ?)",
 	)
 	if err != nil {
@@ -449,7 +483,7 @@ func (r *SourcesRepo) insertContent(tx *sql.Tx, sourceID int64, contentType stri
 		return nil
 	}
 	stmt, err := tx.Prepare(
-		"INSERT INTO " + constants.TableSourceContent + " (source_id, content_type, entry) VALUES (?, ?, ?)",
+		"insert into " + constants.TableSourceContent + " (source_id, content_type, entry) VALUES (?, ?, ?)",
 	)
 	if err != nil {
 		return fmt.Errorf("preparing content insert: %w", err)
@@ -501,7 +535,7 @@ func (r *SourcesRepo) ImportSourcesFromConfig(
 // GetSourceIDByName returns the source ID for a given name, or 0 if not found.
 func (r *SourcesRepo) GetSourceIDByName(name string) (int64, error) {
 	var id int64
-	err := r.db.readConn.QueryRow("SELECT id FROM "+constants.TableSources+" WHERE name = ?", name).Scan(&id)
+	err := r.db.readConn.QueryRow("select id from "+constants.TableSources+" WHERE name = ?", name).Scan(&id)
 	if err == sql.ErrNoRows {
 		return 0, nil
 	}
@@ -510,45 +544,29 @@ func (r *SourcesRepo) GetSourceIDByName(name string) (int64, error) {
 
 // GetEnabledSources returns all enabled sources.
 func (r *SourcesRepo) GetEnabledSources() ([]SourceRow, error) {
-	rows, err := r.db.readConn.Query(`
-		SELECT id, name, url, frequency, disabled, source_file,
+	var scanned []sourceScan
+	if err := r.db.selectRead(context.Background(), &scanned, `
+		select id, name, url, frequency, disabled, source_file,
 			skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation
-		FROM ` + constants.TableSources + ` WHERE disabled = 0
-		ORDER BY name`)
-	if err != nil {
+		from `+constants.TableSources+` WHERE disabled = 0
+		ORDER BY name`); err != nil {
 		return nil, err
 	}
-	defer func() {
-		if closeErr := rows.Close(); closeErr != nil {
-			err = closeErr
-		}
-	}()
-
-	var sources []SourceRow
-	for rows.Next() {
-		s := SourceRow{}
-		var disabled, skipGen, skipGrp, skipCat int
-		if err := rows.Scan(&s.ID, &s.Name, &s.URL, &s.Frequency, &disabled, &s.SourceFile,
-			&skipGen, &skipGrp, &skipCat); err != nil {
-			return nil, err
-		}
-		s.Disabled = disabled == 1
-		s.SkipGeneralConsolidation = skipGen == 1
-		s.SkipGroupsConsolidation = skipGrp == 1
-		s.SkipCategoriesConsolidation = skipCat == 1
-		sources = append(sources, s)
+	sources := make([]SourceRow, 0, len(scanned))
+	for _, s := range scanned {
+		sources = append(sources, s.toRow())
 	}
-	return sources, rows.Err()
+	return sources, nil
 }
 
 func (r *SourcesRepo) GetSourceCount() (int, error) {
 	var count int
-	err := r.db.readConn.QueryRow("SELECT COUNT(*) FROM " + constants.TableSources).Scan(&count)
+	err := r.db.readConn.QueryRow("select count(*) from " + constants.TableSources).Scan(&count)
 	return count, err
 }
 
 func (r *SourcesRepo) ClearAllSources() error {
-	_, err := r.db.writeConn.Exec("DELETE FROM " + constants.TableSources)
+	_, err := r.db.writeConn.Exec("delete from " + constants.TableSources)
 	return err
 }
 
