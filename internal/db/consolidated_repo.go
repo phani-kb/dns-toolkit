@@ -70,6 +70,19 @@ type scopeConfig struct {
 	skipColumn  string
 }
 
+func consolidatedTableFor(consolidationType string) (string, error) {
+	switch consolidationType {
+	case constants.ConsolidationTypeGeneral:
+		return constants.TableConsolidatedGeneral, nil
+	case constants.ConsolidationTypeGroup:
+		return constants.TableConsolidatedGroup, nil
+	case constants.ConsolidationTypeCategory:
+		return constants.TableConsolidatedCategory, nil
+	default:
+		return "", fmt.Errorf("unsupported consolidation type: %s", consolidationType)
+	}
+}
+
 func NewConsolidatedRepo(db *DB) *ConsolidatedRepo {
 	return &ConsolidatedRepo{db: db}
 }
@@ -86,8 +99,8 @@ func (r *ConsolidatedRepo) ComputeConsolidationFingerprint(consolidationType str
 	}
 
 	rows, err := r.db.readConn.Query(`
-		SELECT COALESCE(d.last_processed_checksum, '')
-		FROM ` + constants.TableDownloads + ` d
+		select coalesce(d.last_processed_checksum, '')
+		from ` + constants.TableDownloads + ` d
 		JOIN ` + constants.TableSources + ` s ON s.id = d.source_id
 		WHERE s.disabled = 0 AND s.` + skipCol + ` = 0
 		ORDER BY s.id`,
@@ -166,7 +179,7 @@ func (r *ConsolidatedRepo) SetStoredTypeFingerprint(consolidationType, genericSo
 func (r *ConsolidatedRepo) HasConsolidatedData(consolidationType string) bool {
 	var count int
 	err := r.db.readConn.QueryRow(
-		"SELECT COUNT(1) FROM "+constants.TableConsolidatedEntries+" WHERE consolidation_type = ? LIMIT 1",
+		"select count(1) from "+constants.TableConsolidatedEntries+" WHERE consolidation_type = ? LIMIT 1",
 		consolidationType).Scan(&count)
 	return err == nil && count > 0
 }
@@ -176,7 +189,7 @@ func (r *ConsolidatedRepo) HasConsolidatedData(consolidationType string) bool {
 func (r *ConsolidatedRepo) HasConsolidatedDataForType(consolidationType, genericSourceType string) bool {
 	var count int
 	err := r.db.readConn.QueryRow(
-		"SELECT 1 FROM "+constants.TableConsolidatedEntries+
+		"select 1 from "+constants.TableConsolidatedEntries+
 			" WHERE consolidation_type = ? AND generic_source_type = ? LIMIT 1",
 		consolidationType, genericSourceType).Scan(&count)
 	return err == nil && count > 0
@@ -194,8 +207,8 @@ func (r *ConsolidatedRepo) ComputeTypeFingerprint(consolidationType, genericSour
 	}
 
 	rows, err := r.db.readConn.Query(`
-		SELECT COALESCE(d.last_processed_checksum, '')
-		FROM `+constants.TableDownloads+` d
+		select coalesce(d.last_processed_checksum, '')
+		from `+constants.TableDownloads+` d
 		JOIN `+constants.TableSources+` s ON s.id = d.source_id
 		JOIN `+constants.TableEntries+` e ON e.source_id = s.id
 		WHERE s.disabled = 0 AND s.`+skipCol+` = 0
@@ -232,7 +245,7 @@ func (r *ConsolidatedRepo) ClearConsolidatedRowsForType(
 	ctx context.Context, consolidationType, genericSourceType string,
 ) error {
 	_, err := r.db.writeConn.ExecContext(ctx,
-		"DELETE FROM "+constants.TableConsolidatedEntries+
+		"delete from "+constants.TableConsolidatedEntries+
 			" WHERE consolidation_type = ? AND generic_source_type = ?",
 		consolidationType, genericSourceType)
 	return err
@@ -242,7 +255,7 @@ func (r *ConsolidatedRepo) GetConsolidatedEntries(genericSourceType, listType,
 	consolidationType string, valid bool,
 ) ([]string, error) {
 	rows, err := r.db.readConn.Query(`
-		SELECT entry FROM `+constants.TableConsolidatedEntries+`
+		select entry from `+constants.TableConsolidatedEntries+`
 		WHERE generic_source_type = ? AND list_type = ? AND consolidation_type = ? AND valid = ?
 		ORDER BY entry`,
 		genericSourceType, listType, consolidationType, boolToInt(valid))
@@ -267,7 +280,7 @@ func (r *ConsolidatedRepo) GetConsolidatedCount(genericSourceType, listType,
 ) (int64, error) {
 	var count int64
 	err := r.db.readConn.QueryRow(`
-		SELECT COUNT(*) FROM `+constants.TableConsolidatedEntries+`
+		select count(*) from `+constants.TableConsolidatedEntries+`
 		WHERE generic_source_type = ? AND list_type = ? AND consolidation_type = ? AND valid = ?`,
 		genericSourceType, listType, consolidationType, boolToInt(valid)).Scan(&count)
 	return count, err
@@ -280,11 +293,11 @@ func (r *ConsolidatedRepo) ClearAllConsolidated(ctx context.Context) error {
 // ListConsolidatedGroups returns all distinct groups and categories for a given consolidation type.
 func (r *ConsolidatedRepo) ListConsolidatedGroups(consolidationType string) ([]ConsolidatedGroup, error) {
 	query := `
-		SELECT generic_source_type, list_type, consolidation_type,
-			COALESCE(group_name, '') AS group_name,
-			COALESCE(category, '') AS category,
-			valid, COUNT(*) AS count
-		FROM ` + constants.TableConsolidatedEntries + `
+		select generic_source_type, list_type, consolidation_type,
+			coalesce(group_name, '') as group_name,
+			coalesce(category, '') as category,
+			valid, count(*) as count
+		from ` + constants.TableConsolidatedEntries + `
 		WHERE consolidation_type = ?
 		GROUP BY generic_source_type, list_type, consolidation_type, group_name, category, valid
 		ORDER BY generic_source_type, list_type, group_name, category
@@ -316,7 +329,7 @@ func (r *ConsolidatedRepo) ListConsolidatedGroups(consolidationType string) ([]C
 func (r *ConsolidatedRepo) GetConsolidatedEntriesByGroup(
 	genericSourceType, listType, consolidationType, groupName, category string, valid bool,
 ) ([]string, error) {
-	query := `SELECT entry FROM ` + constants.TableConsolidatedEntries + `
+	query := `select entry from ` + constants.TableConsolidatedEntries + `
 		WHERE generic_source_type = ? AND list_type = ? AND consolidation_type = ? AND valid = ?`
 	args := []any{genericSourceType, listType, consolidationType, boolToInt(valid)}
 
@@ -353,54 +366,80 @@ func (r *ConsolidatedRepo) BulkInsertEntries(ctx context.Context, rows []Consoli
 		return 0, nil
 	}
 
-	const batchSize = constants.BulkInsertBatchSize
+	// Group by consolidation type so each batch targets one physical table.
+	byType := map[string][]ConsolidatedEntryRow{}
+	for _, row := range rows {
+		t := row.ConsolidationType
+		if t == "" {
+			t = constants.ConsolidationTypeGeneral
+		}
+		byType[t] = append(byType[t], row)
+	}
+
 	var inserted int64
 
-	err := r.db.InBulkWriteTransaction(ctx, func(tx *sql.Tx) error {
-		for i := 0; i < len(rows); i += batchSize {
-			end := min(i+batchSize, len(rows))
-			batch := rows[i:end]
-
-			var query strings.Builder
-			query.WriteString(`INSERT INTO ` + constants.TableConsolidatedEntries +
-				` (entry, generic_source_type, list_type, consolidation_type, group_name, category, valid, source_count) VALUES `)
-			args := make([]any, 0, len(batch)*8)
-			for j, row := range batch {
-				if j > 0 {
-					query.WriteString(",")
-				}
-				query.WriteString("(?,?,?,?,?,?,?,?)")
-
-				var groupName, category *string
-				if row.GroupName != "" {
-					groupName = &row.GroupName
-				}
-				if row.Category != "" {
-					category = &row.Category
-				}
-				sourceCount := row.SourceCount
-				if sourceCount <= 0 {
-					sourceCount = 1
-				}
-				args = append(args, row.Entry, row.GenericSourceType, row.ListType,
-					row.ConsolidationType, groupName, category, boolToInt(row.Valid), sourceCount)
+	err := r.db.InTransaction(ctx, func(tx *sql.Tx) error {
+		for ctype, typedRows := range byType {
+			table, err := consolidatedTableFor(ctype)
+			if err != nil {
+				return err
 			}
-
-			result, execErr := tx.ExecContext(ctx, query.String(), args...)
-			if execErr != nil {
-				return fmt.Errorf("batch insert consolidated entries: %w", execErr)
+			cols, toArgs := consolidatedInsertShape(ctype)
+			batchRows := make([][]any, 0, len(typedRows))
+			for _, row := range typedRows {
+				batchRows = append(batchRows, toArgs(row))
 			}
-			affected, _ := result.RowsAffected() // nolint: errcheck
-			inserted += affected
+			n, err := insertRowsBatch(ctx, tx, table, cols, batchRows, true)
+			if err != nil {
+				return fmt.Errorf("batch insert consolidated %s entries: %w", ctype, err)
+			}
+			inserted += n
 		}
 		return nil
 	})
 	return inserted, err
 }
 
+func consolidatedInsertShape(
+	consolidationType string,
+) (cols []string, toArgs func(ConsolidatedEntryRow) []any) {
+	sourceCount := func(row ConsolidatedEntryRow) int {
+		if row.SourceCount <= 0 {
+			return 1
+		}
+		return row.SourceCount
+	}
+	switch consolidationType {
+	case constants.ConsolidationTypeGroup:
+		return []string{"entry", "generic_source_type", "list_type", "group_name", "valid", "source_count"},
+			func(row ConsolidatedEntryRow) []any {
+				return []any{
+					row.Entry, row.GenericSourceType, row.ListType,
+					row.GroupName, boolToInt(row.Valid), sourceCount(row),
+				}
+			}
+	case constants.ConsolidationTypeCategory:
+		return []string{"entry", "generic_source_type", "list_type", "category", "valid", "source_count"},
+			func(row ConsolidatedEntryRow) []any {
+				return []any{
+					row.Entry, row.GenericSourceType, row.ListType,
+					row.Category, boolToInt(row.Valid), sourceCount(row),
+				}
+			}
+	default:
+		return []string{"entry", "generic_source_type", "list_type", "valid", "source_count"},
+			func(row ConsolidatedEntryRow) []any {
+				return []any{
+					row.Entry, row.GenericSourceType, row.ListType,
+					boolToInt(row.Valid), sourceCount(row),
+				}
+			}
+	}
+}
+
 func (r *ConsolidatedRepo) ClearConsolidatedRows(ctx context.Context, consolidationType string) error {
 	_, err := r.db.writeConn.ExecContext(ctx,
-		"DELETE FROM "+constants.TableConsolidatedEntries+" WHERE consolidation_type = ?",
+		"delete from "+constants.TableConsolidatedEntries+" WHERE consolidation_type = ?",
 		consolidationType)
 	return err
 }
@@ -443,7 +482,7 @@ func (r *ConsolidatedRepo) CreateConsolidatedIndexes(ctx context.Context) error 
 
 // LoadResolvedAllowSet clears the helper table and loads the resolved allow set.
 func (r *ConsolidatedRepo) LoadResolvedAllowSet(ctx context.Context, entries []ResolvedAllowEntry) error {
-	if _, err := r.db.writeConn.ExecContext(ctx, "DELETE FROM "+constants.TableResolvedAllow); err != nil {
+	if _, err := r.db.writeConn.ExecContext(ctx, "delete from "+constants.TableResolvedAllow); err != nil {
 		return fmt.Errorf("clearing %s: %w", constants.TableResolvedAllow, err)
 	}
 	if len(entries) == 0 {
@@ -459,7 +498,7 @@ func (r *ConsolidatedRepo) LoadResolvedAllowSet(ctx context.Context, entries []R
 			batch := entries[i:end]
 
 			var q strings.Builder
-			q.WriteString("INSERT OR IGNORE INTO " + constants.TableResolvedAllow +
+			q.WriteString("insert or ignore into " + constants.TableResolvedAllow +
 				" (generic_source_type, entry, must_consider) VALUES ")
 			args := make([]any, 0, len(batch)*cols)
 			for j, e := range batch {
@@ -485,8 +524,8 @@ func (r *ConsolidatedRepo) ConsolidateBlocklistGeneral(
 	var res BlocklistConsolidationResult
 
 	if err := r.db.readConn.QueryRowContext(ctx, `
-		SELECT COUNT(DISTINCT e.entry), COUNT(DISTINCT e.source_id)
-		FROM `+constants.TableEntries+` e
+		select count(distinct e.entry), count(distinct e.source_id)
+		from `+constants.TableEntries+` e
 		JOIN `+constants.TableSources+` s ON s.id = e.source_id
 		WHERE e.generic_source_type = ?
 			AND e.list_type = 'blocklist'
@@ -503,7 +542,7 @@ func (r *ConsolidatedRepo) ConsolidateBlocklistGeneral(
 
 	err := r.db.InTransaction(ctx, func(tx *sql.Tx) error {
 		result, execErr := tx.ExecContext(ctx, `
-			INSERT INTO `+constants.TableConsolidatedEntries+`
+			insert into `+constants.TableConsolidatedEntries+`
 				(entry, generic_source_type, list_type, consolidation_type,
 				 group_name, category, valid, source_count)
 			SELECT e.entry, e.generic_source_type, 'blocklist', 'general',
@@ -552,7 +591,7 @@ func (r *ConsolidatedRepo) ConsolidateScopedAllowlist(
 	groupNameVal, categoryVal := scopedTargetValues(p)
 
 	query := `
-		INSERT INTO ` + constants.TableConsolidatedEntries + `
+		insert into ` + constants.TableConsolidatedEntries + `
 			(entry, generic_source_type, list_type, consolidation_type,
 			 group_name, category, valid, source_count)
 		SELECT e.entry, e.generic_source_type, 'allowlist', ?, ?, ?, ?,
@@ -597,8 +636,8 @@ func (r *ConsolidatedRepo) ConsolidateScopedBlocklist(
 	groupNameVal, categoryVal := scopedTargetValues(p)
 
 	countQuery := `
-		SELECT COUNT(DISTINCT e.entry), COUNT(DISTINCT e.source_id)
-		FROM ` + constants.TableEntries + ` e
+		select count(distinct e.entry), count(distinct e.source_id)
+		from ` + constants.TableEntries + ` e
 		JOIN ` + constants.TableSources + ` s ON s.id = e.source_id
 		JOIN ` + p.JoinTable + ` sc
 			ON sc.source_id = e.source_id
@@ -621,7 +660,7 @@ func (r *ConsolidatedRepo) ConsolidateScopedBlocklist(
 	}
 
 	insertQuery := `
-		INSERT INTO ` + constants.TableConsolidatedEntries + `
+		insert into ` + constants.TableConsolidatedEntries + `
 			(entry, generic_source_type, list_type, consolidation_type,
 			 group_name, category, valid, source_count)
 		SELECT be.entry, be.generic_source_type, 'blocklist', ?, ?, ?, ?,
@@ -684,7 +723,7 @@ func (r *ConsolidatedRepo) GetScopeSourceNames(
 	consolidationType, gst, listType, groupName, category string,
 ) ([]string, error) {
 	var sb strings.Builder
-	sb.WriteString("SELECT DISTINCT s.name FROM " + constants.TableEntries + " e ")
+	sb.WriteString("select distinct s.name from " + constants.TableEntries + " e ")
 	sb.WriteString("JOIN " + constants.TableSources + " s ON s.id = e.source_id ")
 
 	var args []any
@@ -789,8 +828,8 @@ func (r *ConsolidatedRepo) GetAllScopeSourceNames(
 }
 
 func (r *ConsolidatedRepo) getAllGeneralSourceNames(ctx context.Context) (map[ScopeSourceKey][]string, error) {
-	query := `SELECT e.generic_source_type, e.list_type, s.name
-		FROM ` + constants.TableEntries + ` e
+	query := `select e.generic_source_type, e.list_type, s.name
+		from ` + constants.TableEntries + ` e
 		JOIN ` + constants.TableSources + ` s ON s.id = e.source_id
 		WHERE e.valid = 1
 			AND s.disabled = 0
@@ -838,9 +877,9 @@ func (r *ConsolidatedRepo) loadScopedAllowSet(
 	}
 
 	_, err := r.db.writeConn.ExecContext(ctx, `
-		INSERT OR IGNORE INTO dnstk_scoped_allow
+		insert or IGNORE into dnstk_scoped_allow
 			(consolidation_type, scope_value, entry, must_consider)
-		SELECT ?, sc.`+sc.scopeColumn+`, ae.entry, MAX(ae.must_consider)
+		select ?, sc.`+sc.scopeColumn+`, ae.entry, MAX(ae.must_consider)
 		FROM `+constants.TableEntries+` ae
 		JOIN `+constants.TableSources+` s ON s.id = ae.source_id
 		JOIN `+sc.joinTable+` sc
@@ -882,7 +921,7 @@ func (r *ConsolidatedRepo) ConsolidateScopedBlocklistAll(
 	}
 
 	insertQuery := `
-		INSERT INTO ` + constants.TableConsolidatedEntries + `
+		insert into ` + constants.TableConsolidatedEntries + `
 			(entry, generic_source_type, list_type, consolidation_type,
 			 ` + scopeTargetCol + `, ` + otherTargetCol(consolidationType) + `,
 			 valid, source_count)
@@ -938,7 +977,7 @@ func (r *ConsolidatedRepo) ConsolidateScopedAllowlistAll(
 	}
 
 	insertQuery := `
-		INSERT INTO ` + constants.TableConsolidatedEntries + `
+		insert into ` + constants.TableConsolidatedEntries + `
 			(entry, generic_source_type, list_type, consolidation_type,
 			 ` + scopeTargetCol + `, ` + otherTargetCol(consolidationType) + `,
 			 valid, source_count)
