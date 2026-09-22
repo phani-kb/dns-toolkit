@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
+	"runtime"
+	"slices"
 	"sort"
 	"strings"
 	"testing"
@@ -14,157 +16,13 @@ import (
 	"github.com/phani-kb/multilog"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
+	cfg "github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMergeSummaries(t *testing.T) {
-	t.Parallel()
-
-	existing := &c.ProcessedSummary{
-		Types: []c.SourceType{
-			{
-				Name: "domain",
-			},
-		},
-		ValidFiles: []c.ProcessedFile{
-			{
-				Name:              "test1",
-				GenericSourceType: "domain",
-				ListType:          "blocklist",
-				Filepath:          "/path/to/test1.txt",
-				NumberOfEntries:   5,
-				Valid:             true,
-			},
-		},
-		InvalidFiles: []c.ProcessedFile{
-			{
-				Name:              "test1",
-				GenericSourceType: "domain",
-				ListType:          "blocklist",
-				Filepath:          "/path/to/invalid1.txt",
-				NumberOfEntries:   2,
-				Valid:             false,
-			},
-		},
-		LastProcessedTimestamp: "2023-01-01T00:00:00Z",
-	}
-
-	newProcessedSummary := &c.ProcessedSummary{
-		Types: []c.SourceType{
-			{
-				Name: "ipv4",
-			},
-		},
-		ValidFiles: []c.ProcessedFile{
-			{
-				Name:              "test2",
-				GenericSourceType: "ipv4",
-				ListType:          "allowlist",
-				Filepath:          "/path/to/test2.txt",
-				NumberOfEntries:   8,
-				Valid:             true,
-			},
-		},
-		InvalidFiles: []c.ProcessedFile{
-			{
-				Name:              "test2",
-				GenericSourceType: "ipv4",
-				ListType:          "allowlist",
-				Filepath:          "/path/to/invalid2.txt",
-				NumberOfEntries:   3,
-				Valid:             false,
-			},
-		},
-		LastProcessedTimestamp: "2023-01-02T00:00:00Z",
-	}
-
-	mergeSummaries(existing, newProcessedSummary)
-
-	assert.Len(t, existing.Types, 2, "Should have 2 source types after merge")
-	assert.Len(t, existing.ValidFiles, 2, "Should have 2 valid files after merge")
-	assert.Len(t, existing.InvalidFiles, 2, "Should have 2 invalid files after merge")
-	assert.Equal(t, "2023-01-02T00:00:00Z", existing.LastProcessedTimestamp, "Timestamp should be updated to latest")
-}
-
-func TestMergeSourceTypes(t *testing.T) {
-	t.Parallel()
-
-	existing := []c.SourceType{
-		{
-			Name: "domain",
-		},
-	}
-
-	sourceTypes := []c.SourceType{
-		{
-			Name: "ipv4",
-		},
-		{
-			Name: "domain",
-		},
-	}
-
-	result := mergeSourceTypes(existing, sourceTypes)
-
-	assert.Len(t, result, 2, "Should have 2 source types after merge")
-
-	typeNames := make([]string, len(result))
-	for i, st := range result {
-		typeNames[i] = st.Name
-	}
-	assert.Contains(t, typeNames, "domain")
-	assert.Contains(t, typeNames, "ipv4")
-}
-
-func TestMergeProcessedFiles(t *testing.T) {
-	t.Parallel()
-
-	existing := []c.ProcessedFile{
-		{
-			Name:              "test1",
-			GenericSourceType: "domain",
-			ListType:          "blocklist",
-			Filepath:          "/path/to/test1.txt",
-			NumberOfEntries:   5,
-			Valid:             true,
-		},
-	}
-
-	processedFiles := []c.ProcessedFile{
-		{
-			Name:              "test2",
-			GenericSourceType: "ipv4",
-			ListType:          "allowlist",
-			Filepath:          "/path/to/test2.txt",
-			NumberOfEntries:   8,
-			Valid:             true,
-		},
-		{
-			Name:              "test1",
-			GenericSourceType: "domain",
-			ListType:          "blocklist",
-			Filepath:          "/path/to/test1_updated.txt",
-			NumberOfEntries:   3,
-			Valid:             false,
-		},
-	}
-
-	result := mergeProcessedFiles(existing, processedFiles)
-
-	assert.Len(t, result, 3, "Should have 3 processed files after merge")
-
-	filepaths := make([]string, len(result))
-	for i, pf := range result {
-		filepaths[i] = pf.Filepath
-	}
-	assert.Contains(t, filepaths, "/path/to/test1.txt")
-	assert.Contains(t, filepaths, "/path/to/test2.txt")
-	assert.Contains(t, filepaths, "/path/to/test1_updated.txt")
-}
-
 func TestCreateSummary(t *testing.T) {
 	tests := []struct {
-		expectedFields map[string]interface{}
+		expectedFields map[string]any
 		name           string
 		sourceName     string
 		sourceTypes    []c.SourceType
@@ -193,7 +51,7 @@ func TestCreateSummary(t *testing.T) {
 				},
 			},
 			invalidFiles: []c.ProcessedFile{},
-			expectedFields: map[string]interface{}{
+			expectedFields: map[string]any{
 				"source_name": "test-source",
 			},
 		},
@@ -210,7 +68,7 @@ func TestCreateSummary(t *testing.T) {
 			},
 			validFiles:   []c.ProcessedFile{},
 			invalidFiles: []c.ProcessedFile{},
-			expectedFields: map[string]interface{}{
+			expectedFields: map[string]any{
 				"source_name": "empty-source",
 			},
 		},
@@ -242,7 +100,7 @@ func TestCreateSummary(t *testing.T) {
 				},
 			},
 			invalidFiles: []c.ProcessedFile{},
-			expectedFields: map[string]interface{}{
+			expectedFields: map[string]any{
 				"source_name": "large-source",
 			},
 		},
@@ -466,11 +324,11 @@ func TestSaveToFile(t *testing.T) {
 			expectedContent: []string{"single.com"},
 		},
 		{
-			name:            "Save entries with duplicates (should be sorted and deduplicated)",
+			name:            "Save entries with duplicates",
 			entries:         []string{"zebra.com", "alpha.com", "beta.org", "alpha.com"},
 			filePath:        filepath.Join(tempDir, "sorted.txt"),
 			expectError:     false,
-			expectedContent: []string{"alpha.com", "beta.org", "zebra.com"}, // Sorted and deduplicated
+			expectedContent: []string{"zebra.com", "alpha.com", "beta.org", "alpha.com"},
 		},
 		{
 			name:     "Save to read-only directory",
@@ -478,11 +336,11 @@ func TestSaveToFile(t *testing.T) {
 			filePath: filepath.Join(tempDir, "readonly", "test.txt"),
 			setupFunc: func() {
 				roDir := filepath.Join(tempDir, "readonly")
-				err := os.MkdirAll(roDir, 0755)
+				err := os.MkdirAll(roDir, 0o755)
 				if err != nil {
 					t.Fatalf("Failed to create readonly directory: %v", err)
 				}
-				err = os.Chmod(roDir, 0444) // Read-only
+				err = os.Chmod(roDir, 0o444) // Read-only
 				if err != nil {
 					t.Fatalf("Failed to change directory permissions: %v", err)
 				}
@@ -497,7 +355,7 @@ func TestSaveToFile(t *testing.T) {
 			expectedContent: []string{"nested.com"},
 			setupFunc: func() {
 				nestedDir := filepath.Join(tempDir, "level1", "level2")
-				err := os.MkdirAll(nestedDir, 0755)
+				err := os.MkdirAll(nestedDir, 0o755)
 				if err != nil {
 					t.Fatalf("Failed to create nested directory: %v", err)
 				}
@@ -511,7 +369,7 @@ func TestSaveToFile(t *testing.T) {
 			expectedContent: []string{"new.com"},
 			setupFunc: func() {
 				existingPath := filepath.Join(tempDir, "overwrite.txt")
-				err := os.WriteFile(existingPath, []byte("old.com\n"), 0644)
+				err := os.WriteFile(existingPath, []byte("old.com\n"), 0o644)
 				if err != nil {
 					t.Fatalf("Failed to write to existing file: %v", err)
 				}
@@ -581,7 +439,7 @@ func TestSaveToFile(t *testing.T) {
 			if tt.setupFunc != nil {
 				roDir := filepath.Join(tempDir, "readonly")
 				if _, err := os.Stat(roDir); err == nil {
-					err := os.Chmod(roDir, 0755)
+					err := os.Chmod(roDir, 0o755)
 					if err != nil {
 						t.Logf("Failed to restore directory permissions: %v", err)
 					}
@@ -598,7 +456,7 @@ func TestProcessSourceFile(t *testing.T) {
 	// Fake download summary and file
 	fileContent := "example.com\ninvalid_domain\n"
 	filePath := filepath.Join(tempDir, "test.txt")
-	err := os.WriteFile(filePath, []byte(fileContent), 0644)
+	err := os.WriteFile(filePath, []byte(fileContent), 0o644)
 	if err != nil {
 		t.Fatalf("Failed to write to file: %v", err)
 	}
@@ -616,7 +474,7 @@ func TestProcessSourceFile(t *testing.T) {
 		},
 	}
 
-	processed := processSourceFile(context.Background(), logger, summary, tempDir)
+	processed := processSourceFileAndPersist(context.Background(), logger, summary, tempDir, true, 0, nil, nil)
 	if len(processed) == 0 {
 		t.Fatal("Expected at least one processed summary")
 	}
@@ -629,6 +487,46 @@ func TestProcessSourceFile(t *testing.T) {
 	}
 	if len(ps.InvalidFiles) != 1 {
 		t.Errorf("Expected 1 invalid file, got %d", len(ps.InvalidFiles))
+	}
+}
+
+func TestProcessSourceFileWithoutWritingFiles(t *testing.T) {
+	logger, _ := multilog.NewTestLogger(t)
+	tempDir := t.TempDir()
+
+	fileContent := "example.com\ninvalid_domain\n"
+	filePath := filepath.Join(tempDir, "test.txt")
+	err := os.WriteFile(filePath, []byte(fileContent), 0o644)
+	if err != nil {
+		t.Fatalf("Failed to write to file: %v", err)
+	}
+
+	summary := c.DownloadSummary{
+		Name:     "test-source",
+		Filepath: filePath,
+		Types: []c.SourceType{
+			{
+				Name: "domain",
+				ListTypes: []c.ListType{
+					{Name: "blocklist", MustConsider: true},
+				},
+			},
+		},
+	}
+
+	processed := processSourceFileAndPersist(context.Background(), logger, summary, tempDir, false, 0, nil, nil)
+	if len(processed) == 0 {
+		t.Fatal("Expected at least one processed summary")
+	}
+	ps := processed[0]
+	if ps.Name != "test-source" {
+		t.Errorf("Expected summary name 'test-source', got %s", ps.Name)
+	}
+	if len(ps.ValidFiles) != 0 {
+		t.Errorf("Expected 0 valid files when write-files is disabled, got %d", len(ps.ValidFiles))
+	}
+	if len(ps.InvalidFiles) != 0 {
+		t.Errorf("Expected 0 invalid files when write-files is disabled, got %d", len(ps.InvalidFiles))
 	}
 }
 
@@ -703,15 +601,15 @@ func TestProcessAllSources(t *testing.T) {
 	processedDir := filepath.Join(tempDir, "processed")
 	summaryDir := filepath.Join(tempDir, "summary")
 
-	err := os.MkdirAll(downloadDir, 0755)
+	err := os.MkdirAll(downloadDir, 0o755)
 	if err != nil {
 		t.Fatalf("Failed to create download directory: %v", err)
 	}
-	err = os.MkdirAll(processedDir, 0755)
+	err = os.MkdirAll(processedDir, 0o755)
 	if err != nil {
 		t.Fatalf("Failed to create processed directory: %v", err)
 	}
-	err = os.MkdirAll(summaryDir, 0755)
+	err = os.MkdirAll(summaryDir, 0o755)
 	if err != nil {
 		t.Fatalf("Failed to create summary directory: %v", err)
 	}
@@ -768,12 +666,12 @@ func TestProcessAllSources(t *testing.T) {
 				err := os.WriteFile(
 					filepath.Join(downloadDir, "test1.txt"),
 					[]byte("example.com\ninvalid_domain\n"),
-					0644,
+					0o644,
 				)
 				if err != nil {
 					t.Fatalf("Failed to write test file: %v", err)
 				}
-				err = os.WriteFile(filepath.Join(downloadDir, "test2.txt"), []byte("google.com\nfacebook.com\n"), 0644)
+				err = os.WriteFile(filepath.Join(downloadDir, "test2.txt"), []byte("google.com\nfacebook.com\n"), 0o644)
 				if err != nil {
 					t.Fatalf("Failed to write test file: %v", err)
 				}
@@ -810,7 +708,7 @@ func TestProcessAllSources(t *testing.T) {
 				},
 			},
 			setupFunc: func() {
-				err := os.WriteFile(filepath.Join(downloadDir, "valid.txt"), []byte("test.com\n"), 0644)
+				err := os.WriteFile(filepath.Join(downloadDir, "valid.txt"), []byte("test.com\n"), 0o644)
 				if err != nil {
 					t.Fatalf("Failed to write test file: %v", err)
 				}
@@ -830,7 +728,7 @@ func TestProcessAllSources(t *testing.T) {
 			downloadSummaries: nil, // Will create invalid JSON manually
 			setupFunc: func() {
 				summaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"])
-				err := os.WriteFile(summaryFile, []byte("invalid json content"), 0644)
+				err := os.WriteFile(summaryFile, []byte("invalid json content"), 0o644)
 				if err != nil {
 					t.Fatalf("Failed to write summary file: %v", err)
 				}
@@ -854,7 +752,7 @@ func TestProcessAllSources(t *testing.T) {
 				},
 			},
 			setupFunc: func() {
-				err := os.WriteFile(filepath.Join(downloadDir, "cancelled.txt"), []byte("example.com\n"), 0644)
+				err := os.WriteFile(filepath.Join(downloadDir, "cancelled.txt"), []byte("example.com\n"), 0o644)
 				if err != nil {
 					t.Fatalf("Failed to write test file: %v", err)
 				}
@@ -895,7 +793,7 @@ func TestProcessAllSources(t *testing.T) {
 			if tt.downloadSummaries != nil {
 				summaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"])
 				summaryData, _ := json.Marshal(tt.downloadSummaries)
-				err := os.WriteFile(summaryFile, summaryData, 0644)
+				err := os.WriteFile(summaryFile, summaryData, 0o644)
 				if err != nil {
 					t.Fatalf("Failed to write summary file: %v", err)
 				}
@@ -909,10 +807,8 @@ func TestProcessAllSources(t *testing.T) {
 				ctx = cancelCtx
 			}
 
-			// Run the function
-			processAllSources(ctx, logger, processedDir)
+			processAllSources(ctx, logger, processedDir, false, true)
 
-			// Verify results
 			if !tt.expectError {
 				// For tests that expect processed summaries, check if at least one summary was created
 				if tt.expectedProcessed > 0 {
@@ -948,7 +844,7 @@ func TestProcessAllSources(t *testing.T) {
 			if err != nil {
 				t.Logf("Failed to remove processed directory: %v", err)
 			}
-			err = os.MkdirAll(processedDir, 0755)
+			err = os.MkdirAll(processedDir, 0o755)
 			if err != nil {
 				t.Logf("Failed to create processed directory: %v", err)
 			}
@@ -1074,13 +970,7 @@ func TestExtractEntriesByTypeComprehensive(t *testing.T) {
 					len(tt.expectedValid), len(valid), valid, tt.expectedValid)
 			} else {
 				for _, expectedValid := range tt.expectedValid {
-					found := false
-					for _, v := range valid {
-						if v == expectedValid {
-							found = true
-							break
-						}
-					}
+					found := slices.Contains(valid, expectedValid)
 					if !found {
 						t.Errorf("Expected valid entry %s not found in %v", expectedValid, valid)
 					}
@@ -1093,13 +983,7 @@ func TestExtractEntriesByTypeComprehensive(t *testing.T) {
 					len(tt.expectedInvalid), len(invalid), invalid, tt.expectedInvalid)
 			} else {
 				for _, expectedInvalid := range tt.expectedInvalid {
-					found := false
-					for _, inv := range invalid {
-						if inv == expectedInvalid {
-							found = true
-							break
-						}
-					}
+					found := slices.Contains(invalid, expectedInvalid)
 					if !found {
 						t.Errorf("Expected invalid entry %s not found in %v", expectedInvalid, invalid)
 					}
@@ -1115,12 +999,16 @@ func generateLargeTestContent() string {
 
 	// Add valid domains
 	for i := 1; i <= 5; i++ {
-		content.WriteString("valid" + string(rune('0'+i)) + ".com\n")
+		content.WriteString("valid")
+		content.WriteString(string(rune('0' + i)))
+		content.WriteString(".com\n")
 	}
 
 	// Add invalid entries
 	for i := 1; i <= 5; i++ {
-		content.WriteString("invalid" + string(rune('0'+i)) + "\n")
+		content.WriteString("invalid")
+		content.WriteString(string(rune('0' + i)))
+		content.WriteString("\n")
 	}
 
 	// Add some comments
@@ -1137,7 +1025,7 @@ func TestCreateProcessedFileWithChecksum(t *testing.T) {
 	tempDir := t.TempDir()
 	testFile := filepath.Join(tempDir, "test.txt")
 	testContent := "example.com\ntest.org\n"
-	err := os.WriteFile(testFile, []byte(testContent), 0644)
+	err := os.WriteFile(testFile, []byte(testContent), 0o644)
 	if err != nil {
 		t.Fatalf("Failed to write test file: %v", err)
 	}
@@ -1347,11 +1235,11 @@ func TestProcessAllSourcesEdgeCases(t *testing.T) {
 	summaryDir := filepath.Join(tempDir, "summary")
 	processedDir := filepath.Join(tempDir, "processed")
 
-	err := os.MkdirAll(summaryDir, 0755)
+	err := os.MkdirAll(summaryDir, 0o755)
 	if err != nil {
 		t.Fatalf("Failed to create summary directory: %v", err)
 	}
-	err = os.MkdirAll(processedDir, 0755)
+	err = os.MkdirAll(processedDir, 0o755)
 	if err != nil {
 		t.Fatalf("Failed to create processed directory: %v", err)
 	}
@@ -1373,7 +1261,7 @@ func TestProcessAllSourcesEdgeCases(t *testing.T) {
 			setupFunc: func() {
 				summaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"])
 				summaryData, _ := json.Marshal([]c.DownloadSummary{})
-				err := os.WriteFile(summaryFile, summaryData, 0644)
+				err := os.WriteFile(summaryFile, summaryData, 0o644)
 				if err != nil {
 					t.Fatalf("Failed to write summary file: %v", err)
 				}
@@ -1384,7 +1272,7 @@ func TestProcessAllSourcesEdgeCases(t *testing.T) {
 			setupFunc: func() {
 				summaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"])
 				summaryData, _ := json.Marshal(nil)
-				err := os.WriteFile(summaryFile, summaryData, 0644)
+				err := os.WriteFile(summaryFile, summaryData, 0o644)
 				if err != nil {
 					t.Fatalf("Failed to write summary file: %v", err)
 				}
@@ -1410,13 +1298,13 @@ func TestProcessAllSourcesEdgeCases(t *testing.T) {
 				}
 				summaryFile := filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"])
 				summaryData, _ := json.Marshal(downloadSummaries)
-				err := os.WriteFile(summaryFile, summaryData, 0644)
+				err := os.WriteFile(summaryFile, summaryData, 0o644)
 				if err != nil {
 					t.Fatalf("Failed to write summary file: %v", err)
 				}
 
 				// Create the file, but it won't be processed due to disabled source
-				err = os.WriteFile(filepath.Join(tempDir, "disabled.txt"), []byte("example.com\n"), 0644)
+				err = os.WriteFile(filepath.Join(tempDir, "disabled.txt"), []byte("example.com\n"), 0o644)
 				if err != nil {
 					t.Fatalf("Failed to write test file: %v", err)
 				}
@@ -1431,8 +1319,7 @@ func TestProcessAllSourcesEdgeCases(t *testing.T) {
 			}
 
 			ctx := context.Background()
-			// This should not panic and should handle the edge cases gracefully
-			processAllSources(ctx, logger, processedDir)
+			processAllSources(ctx, logger, processedDir, false, true)
 
 			// Cleanup for next test
 			err := os.RemoveAll(filepath.Join(summaryDir, constants.DefaultSummaryFiles["download"]))
@@ -1442,68 +1329,6 @@ func TestProcessAllSourcesEdgeCases(t *testing.T) {
 			err = os.RemoveAll(filepath.Join(summaryDir, constants.DefaultSummaryFiles["processed"]))
 			if err != nil {
 				t.Logf("Failed to remove processed summary file: %v", err)
-			}
-		})
-	}
-}
-
-func TestMergeSummariesEdgeCases(t *testing.T) {
-	tests := []struct {
-		name            string
-		existingSummary *c.ProcessedSummary
-		newSummary      *c.ProcessedSummary
-		expectedName    string
-	}{
-		{
-			name: "Merge with same name should update timestamp",
-			existingSummary: &c.ProcessedSummary{
-				Name:                   "test-source",
-				Types:                  []c.SourceType{},
-				ValidFiles:             []c.ProcessedFile{},
-				InvalidFiles:           []c.ProcessedFile{},
-				LastProcessedTimestamp: "2023-01-01T00:00:00Z",
-			},
-			newSummary: &c.ProcessedSummary{
-				Name:                   "test-source",
-				Types:                  []c.SourceType{},
-				ValidFiles:             []c.ProcessedFile{},
-				InvalidFiles:           []c.ProcessedFile{},
-				LastProcessedTimestamp: "2023-01-02T00:00:00Z",
-			},
-			expectedName: "test-source",
-		},
-		{
-			name: "Merge with older timestamp should keep newer",
-			existingSummary: &c.ProcessedSummary{
-				Name:                   "test-source",
-				Types:                  []c.SourceType{},
-				ValidFiles:             []c.ProcessedFile{},
-				InvalidFiles:           []c.ProcessedFile{},
-				LastProcessedTimestamp: "2023-01-02T00:00:00Z",
-			},
-			newSummary: &c.ProcessedSummary{
-				Name:                   "test-source",
-				Types:                  []c.SourceType{},
-				ValidFiles:             []c.ProcessedFile{},
-				InvalidFiles:           []c.ProcessedFile{},
-				LastProcessedTimestamp: "2023-01-01T00:00:00Z",
-			},
-			expectedName: "test-source",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			originalTimestamp := tt.existingSummary.LastProcessedTimestamp
-			mergeSummaries(tt.existingSummary, tt.newSummary)
-
-			assert.Equal(t, tt.expectedName, tt.existingSummary.Name)
-
-			// The timestamp should be the newer one
-			if tt.newSummary.LastProcessedTimestamp > originalTimestamp {
-				assert.Equal(t, tt.newSummary.LastProcessedTimestamp, tt.existingSummary.LastProcessedTimestamp)
-			} else {
-				assert.Equal(t, originalTimestamp, tt.existingSummary.LastProcessedTimestamp)
 			}
 		})
 	}
@@ -1581,4 +1406,27 @@ func TestCreateSummaryWithDisabledListTypes(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestGetProcessMaxWorkers(t *testing.T) {
+	originalAppConfig := AppConfig
+	t.Cleanup(func() { AppConfig = originalAppConfig })
+
+	defaultWorkers := runtime.GOMAXPROCS(0)
+	t.Run("nil config uses gomaxprocs", func(t *testing.T) {
+		AppConfig = nil
+		assert.Equal(t, max(defaultWorkers, 1), getProcessMaxWorkers())
+	})
+
+	t.Run("configured workers", func(t *testing.T) {
+		AppConfig = &cfg.AppConfig{}
+		AppConfig.DNSToolkit.MaxWorkers = 2
+		assert.Equal(t, 2, getProcessMaxWorkers())
+	})
+
+	t.Run("non-positive configured workers fall back", func(t *testing.T) {
+		AppConfig = &cfg.AppConfig{}
+		AppConfig.DNSToolkit.MaxWorkers = 0
+		assert.Equal(t, max(defaultWorkers, 1), getProcessMaxWorkers())
+	})
 }

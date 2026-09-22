@@ -61,7 +61,7 @@ func TestCanSkipDownload_WithModifiedHeader(t *testing.T) {
 
 	// Setup the summary directory
 	summaryDir := filepath.Join(testDir, "summary")
-	err = os.MkdirAll(summaryDir, 0755)
+	err = os.MkdirAll(summaryDir, 0o755)
 	require.NoError(t, err)
 
 	// Save original and restore after test
@@ -114,7 +114,7 @@ func TestCanSkipDownload_NoLastModifiedHeader(t *testing.T) {
 
 	// Setup the summary directory
 	summaryDir := filepath.Join(testDir, "summary")
-	err = os.MkdirAll(summaryDir, 0755)
+	err = os.MkdirAll(summaryDir, 0o755)
 	require.NoError(t, err)
 
 	// Save original and restore after test
@@ -170,7 +170,7 @@ func TestCanSkipDownload_DifferentFileSize(t *testing.T) {
 
 	// Setup the summary directory
 	summaryDir := filepath.Join(testDir, "summary")
-	err = os.MkdirAll(summaryDir, 0755)
+	err = os.MkdirAll(summaryDir, 0o755)
 	require.NoError(t, err)
 
 	// Save original and restore after test
@@ -248,7 +248,7 @@ func TestDownloadFile_ConnectionErrors(t *testing.T) {
 	}(testDir)
 
 	destDir := filepath.Join(testDir, "dest")
-	err := os.MkdirAll(destDir, 0755)
+	err := os.MkdirAll(destDir, 0o755)
 	assert.NoError(t, err)
 
 	// Test with a connection-refused scenario (invalid port)
@@ -277,7 +277,7 @@ func TestDownloadFile_EdgeCases(t *testing.T) {
 	}(testDir)
 
 	destDir := filepath.Join(testDir, "dest")
-	err := os.MkdirAll(destDir, 0755)
+	err := os.MkdirAll(destDir, 0o755)
 	assert.NoError(t, err)
 
 	t.Run("ZeroSizeFile", func(t *testing.T) {
@@ -307,7 +307,7 @@ func TestDownloadFile_EdgeCases(t *testing.T) {
 	t.Run("EmptyDirectory", func(t *testing.T) {
 		t.Parallel()
 		emptyDir := filepath.Join(testDir, "empty_dir")
-		err := os.MkdirAll(emptyDir, 0755)
+		err := os.MkdirAll(emptyDir, 0o755)
 		assert.NoError(t, err)
 
 		contentStr := "test content"

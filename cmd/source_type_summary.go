@@ -193,7 +193,7 @@ func categorizeFileContent(logger *multilog.Logger, lines []string) string {
 	sb := strings.Builder{}
 	for sourceType, count := range regexCounts {
 		if count > 0 {
-			sb.WriteString(fmt.Sprintf("[%s: %d] ", sourceType, count))
+			_, _ = fmt.Fprintf(&sb, "[%s: %d] ", sourceType, count)
 		}
 	}
 	logger.Debugf("Regex counts:\n%s", sb.String())

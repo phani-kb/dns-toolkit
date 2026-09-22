@@ -67,11 +67,6 @@ func TestGenerateConflictReport_WithConflicts(t *testing.T) {
 		t.Fatalf("failed to write allowlist: %v", err)
 	}
 
-	// processed := []c.ProcessedFile{
-	// 	{Name: "bl-src-1", ListType: constants.ListTypeBlocklist, Filepath: bl, Valid: true},
-	// 	{Name: "al-src-1", ListType: constants.ListTypeAllowlist, Filepath: al, Valid: true},
-	// }
-
 	dataDir := filepath.Join(testDataDir, "data")
 	if err := os.MkdirAll(dataDir, 0o755); err != nil {
 		t.Fatalf("failed to create data dir: %v", err)
@@ -112,4 +107,97 @@ func TestGenerateConflictReport_WithConflicts(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Contains(t, string(content), "common.example.com")
 	}
+}
+
+func TestGenerateConflictReport_WithAutoResolved(t *testing.T) {
+	logger, _ := multilog.NewTestLogger(t)
+
+	cleanup, testDataDir := setupTestEnvironment(t)
+	defer cleanup()
+
+	dataDir := filepath.Join(testDataDir, "data")
+	if err := os.MkdirAll(dataDir, 0o755); err != nil {
+		t.Fatalf("failed to create data dir: %v", err)
+	}
+
+	overrides := []struct {
+		Entry      string   `json:"entry"`
+		Decision   string   `json:"decision"`
+		Reason     string   `json:"reason"`
+		BlockSrcs  []string `json:"block_sources"`
+		AllowSrcs  []string `json:"allow_sources"`
+		BlockCount int      `json:"block_count"`
+		AllowCount int      `json:"allow_count"`
+	}{
+		{
+			Entry:      "block-wins.com",
+			Decision:   "block",
+			Reason:     "More block sources",
+			BlockSrcs:  []string{"src1", "src2"},
+			AllowSrcs:  []string{"src3"},
+			BlockCount: 2,
+			AllowCount: 1,
+		},
+		{
+			Entry:      "allow-wins.com",
+			Decision:   "allow",
+			Reason:     "More allow sources",
+			BlockSrcs:  []string{"src1"},
+			AllowSrcs:  []string{"src2", "src3"},
+			BlockCount: 1,
+			AllowCount: 2,
+		},
+	}
+	confPath := filepath.Join(dataDir, constants.SummaryTypesOutputSummaryFileMap[constants.SummaryTypeOverrides])
+	bb, err := json.MarshalIndent(overrides, "", "  ")
+	if err != nil {
+		t.Fatalf("failed to marshal overrides json: %v", err)
+	}
+	if err := os.WriteFile(confPath, bb, 0o644); err != nil {
+		t.Fatalf("failed to write overrides json: %v", err)
+	}
+
+	path, err := GenerateConflictReport(logger, confPath)
+	assert.NoError(t, err)
+	if assert.NotEmpty(t, path) {
+		content, err := os.ReadFile(path)
+		assert.NoError(t, err)
+		assert.Contains(t, string(content), "Auto-resolved")
+		assert.Contains(t, string(content), "block-wins.com")
+		assert.Contains(t, string(content), "allow-wins.com")
+	}
+}
+
+func TestGenerateConflictReport_EmptyOverrides(t *testing.T) {
+	logger, _ := multilog.NewTestLogger(t)
+
+	cleanup, testDataDir := setupTestEnvironment(t)
+	defer cleanup()
+
+	dataDir := filepath.Join(testDataDir, "data")
+	if err := os.MkdirAll(dataDir, 0o755); err != nil {
+		t.Fatalf("failed to create data dir: %v", err)
+	}
+
+	var overrides []struct {
+		Entry      string   `json:"entry"`
+		Decision   string   `json:"decision"`
+		BlockSrcs  []string `json:"block_sources"`
+		AllowSrcs  []string `json:"allow_sources"`
+		BlockCount int      `json:"block_count"`
+		AllowCount int      `json:"allow_count"`
+	}
+
+	confPath := filepath.Join(dataDir, constants.SummaryTypesOutputSummaryFileMap[constants.SummaryTypeOverrides])
+	bb, err := json.MarshalIndent(overrides, "", "  ")
+	if err != nil {
+		t.Fatalf("failed to marshal overrides json: %v", err)
+	}
+	if err := os.WriteFile(confPath, bb, 0o644); err != nil {
+		t.Fatalf("failed to write overrides json: %v", err)
+	}
+
+	path, err := GenerateConflictReport(logger, confPath)
+	assert.NoError(t, err)
+	assert.Empty(t, path)
 }

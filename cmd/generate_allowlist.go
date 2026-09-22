@@ -93,7 +93,7 @@ func backupExistingFiles(logger *multilog.Logger, overwrite bool) {
 	timestamp := time.Now().Format(constants.TimestampFormat)
 	backupDir := filepath.Join("data", "backup", "allowlist_backup_"+timestamp)
 
-	if err := os.MkdirAll(backupDir, 0755); err != nil {
+	if err := os.MkdirAll(backupDir, 0o755); err != nil {
 		logger.Error("Failed to create backup directory", "error", err)
 		return
 	}
@@ -234,7 +234,7 @@ func writeAllowlistWithStructure(
 	formatFn func(string) string,
 ) error {
 	dir := filepath.Dir(filename)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
@@ -287,7 +287,7 @@ func generateIPv4Addresses(
 	customIPs, customDomains, sourceDomains []string,
 ) error {
 	dir := filepath.Dir(filename)
-	if err := os.MkdirAll(dir, 0755); err != nil {
+	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return fmt.Errorf("failed to create directory: %w", err)
 	}
 

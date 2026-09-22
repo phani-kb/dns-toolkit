@@ -44,15 +44,15 @@ func TestResolveFilePath(t *testing.T) {
 	}()
 
 	goModFile := filepath.Join(tempDir, "go.mod")
-	err = os.WriteFile(goModFile, []byte("module test"), 0644)
+	err = os.WriteFile(goModFile, []byte("module test"), 0o644)
 	require.NoError(t, err)
 
 	testdataDir := filepath.Join(tempDir, "testdata")
-	err = os.MkdirAll(testdataDir, 0755)
+	err = os.MkdirAll(testdataDir, 0o755)
 	require.NoError(t, err)
 
 	testFile := filepath.Join(testdataDir, "testfile.json")
-	err = os.WriteFile(testFile, []byte("{}"), 0644)
+	err = os.WriteFile(testFile, []byte("{}"), 0o644)
 	require.NoError(t, err)
 
 	originalWd, err := os.Getwd()
@@ -67,7 +67,11 @@ func TestResolveFilePath(t *testing.T) {
 	require.NoError(t, err)
 
 	result = resolveFilePath("testfile.json")
-	assert.Equal(t, testFile, result)
+	expectedPath, err := filepath.EvalSymlinks(testFile)
+	require.NoError(t, err)
+	resolvedPath, err := filepath.EvalSymlinks(result)
+	require.NoError(t, err)
+	assert.Equal(t, expectedPath, resolvedPath)
 
 	result = resolveFilePath("nonexistent.json")
 	if filepath.IsAbs(result) {

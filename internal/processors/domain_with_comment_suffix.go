@@ -20,6 +20,8 @@ type DomainWithCommentSuffixProcessor struct {
 	BaseProcessor
 }
 
+var domainWithCommentSuffixRegex = regexp.MustCompile(`([a-zA-Z0-9.-]+)\s*#.*`)
+
 func NewDomainWithCommentSuffixProcessor(sourceType, listType string) *DomainWithCommentSuffixProcessor {
 	return &DomainWithCommentSuffixProcessor{
 		BaseProcessor: NewBaseProcessor(sourceType, listType),
@@ -30,15 +32,13 @@ func (p *DomainWithCommentSuffixProcessor) Process(_ *multilog.Logger, content s
 	var validEntries, invalidEntries []string
 	lines := strings.Split(content, "\n")
 
-	domainWithCommentSuffixRegex := `([a-zA-Z0-9.-]+)\s*#.*`
-
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
 		if utils.IsComment(line) {
 			continue
 		}
 
-		matches := regexp.MustCompile(domainWithCommentSuffixRegex).FindStringSubmatch(line)
+		matches := domainWithCommentSuffixRegex.FindStringSubmatch(line)
 		if len(matches) > 1 {
 			domain := matches[1]
 			// Remove any trailing dots

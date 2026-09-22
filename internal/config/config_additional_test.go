@@ -150,13 +150,13 @@ func TestGetProcessedSummariesForConsolidation(t *testing.T) {
 	}
 
 	summaryFile := filepath.Join(tempDir, constants.DefaultSummaryFiles["processed"])
-	err = os.MkdirAll(filepath.Dir(summaryFile), 0755)
+	err = os.MkdirAll(filepath.Dir(summaryFile), 0o755)
 	require.NoError(t, err)
 
 	summaryData, err := json.Marshal(testSummaries)
 	require.NoError(t, err)
 
-	err = os.WriteFile(summaryFile, summaryData, 0644)
+	err = os.WriteFile(summaryFile, summaryData, 0o644)
 	require.NoError(t, err)
 
 	sourceConfig := SourcesConfig{
@@ -208,7 +208,7 @@ func TestGetProcessedSummariesForConsolidation(t *testing.T) {
 	assert.Nil(t, genericTypes)
 	assert.Nil(t, processedFiles)
 
-	err = os.WriteFile(summaryFile, []byte("invalid json"), 0644)
+	err = os.WriteFile(summaryFile, []byte("invalid json"), 0o644)
 	require.NoError(t, err)
 
 	summaries, genericTypes, processedFiles = GetProcessedSummariesForConsolidation(

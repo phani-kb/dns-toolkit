@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	c "github.com/phani-kb/dns-toolkit/internal/common"
@@ -47,10 +48,14 @@ func (e *CertVerificationError) Error() string {
 }
 
 type DefaultDownloader struct {
-	rnd           *rand.Rand
-	maxRetries    int
-	retryDelay    time.Duration
-	clientTimeout time.Duration
+	rnd                *rand.Rand
+	defaultHTTPClient  *http.Client
+	insecureHTTPClient *http.Client
+	retryDelay         time.Duration
+	clientTimeout      time.Duration
+	maxRetries         int
+	defaultClientOnce  sync.Once
+	insecureClientOnce sync.Once
 }
 
 // NewDefaultDownloaderWithRetries creates a new DefaultDownloader with custom retry
@@ -317,31 +322,45 @@ func (d *DefaultDownloader) createHTTPClient(
 	skipCertHosts []string,
 	parsedURL *url.URL,
 ) *http.Client {
+	if skipCertVerify {
+		for _, host := range skipCertHosts {
+			if strings.Contains(parsedURL.Host, host) {
+				logger.Debugf("Skipping certificate verification for host: %s", parsedURL.Host)
+				d.insecureClientOnce.Do(func() {
+					d.insecureHTTPClient = d.newHTTPClient(logger, true)
+				})
+				return d.insecureHTTPClient
+			}
+		}
+	}
+
+	d.defaultClientOnce.Do(func() {
+		d.defaultHTTPClient = d.newHTTPClient(logger, false)
+	})
+
+	return d.defaultHTTPClient
+}
+
+func (d *DefaultDownloader) newHTTPClient(logger *multilog.Logger, skipTLSVerify bool) *http.Client {
 	jar, jarErr := cookiejar.New(nil)
 	if jarErr != nil {
 		logger.Warnf("Failed to create cookie jar: %v", jarErr)
 	}
 
-	client := &http.Client{
-		Timeout: d.clientTimeout,
-		Jar:     jar,
+	transport := &http.Transport{Proxy: http.ProxyFromEnvironment}
+	if baseTransport, ok := http.DefaultTransport.(*http.Transport); ok {
+		transport = baseTransport.Clone()
 	}
 
-	if skipCertVerify {
-		for _, host := range skipCertHosts {
-			if strings.Contains(parsedURL.Host, host) {
-				logger.Debugf("Skipping certificate verification for host: %s", parsedURL.Host)
-				transport := &http.Transport{
-					TLSClientConfig: &tls.Config{
-						InsecureSkipVerify: true,
-					},
-				}
-				client.Transport = transport
-				break
-			}
-		}
+	if skipTLSVerify {
+		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
-	return client
+
+	return &http.Client{
+		Timeout:   d.clientTimeout,
+		Jar:       jar,
+		Transport: transport,
+	}
 }
 
 func canonicalURLString(u *url.URL) string {

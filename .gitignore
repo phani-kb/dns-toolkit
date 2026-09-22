@@ -57,6 +57,8 @@ data/*.db
 data/*.db-wal
 data/*.db-shm
 
+cmd/data/
+
 # Test files
 testdata/**/*.json
 testdata/**/*.tgz
@@ -69,3 +71,7 @@ testdata/**/*.prof
 testdata/*.md
 testdata/*.txt
 testdata/**/*.txt
+testdata/download/
+testdata/*.db
+testdata/*.db-wal
+testdata/*.db-shm
