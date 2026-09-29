@@ -677,25 +677,22 @@ func TestDownloaderConcurrency_Merged(t *testing.T) {
 	}
 }
 
-func TestNewDefaultDownloaderWithOptions(t *testing.T) {
-	t.Parallel()
+func TestCanonicalURLString(t *testing.T) {
+	assert.Equal(t, "", canonicalURLString(nil))
 
-	// Test with custom values
-	retryDelay := 500 * time.Millisecond
-	clientTimeout := 5 * time.Second
-	maxRetries := 3
+	u, err := url.Parse("https://Example.COM/Path/")
+	require.NoError(t, err)
+	assert.Equal(t, "https://example.com/Path", canonicalURLString(u))
 
-	d := NewDefaultDownloaderWithOptions(maxRetries, retryDelay, clientTimeout)
+	u2, err := url.Parse("https://example.com")
+	require.NoError(t, err)
+	assert.Equal(t, "https://example.com/", canonicalURLString(u2))
 
-	// Verify the downloader was created with the correct values
-	assert.NotNil(t, d)
-	assert.Equal(t, maxRetries, d.maxRetries)
-	assert.Equal(t, retryDelay, d.retryDelay)
-	assert.Equal(t, clientTimeout, d.clientTimeout)
+	u3, err := url.Parse("https://example.com/path?q=1")
+	require.NoError(t, err)
+	assert.Equal(t, "https://example.com/path?q=1", canonicalURLString(u3))
 
-	// Verify the random number generator was initialized
-	assert.NotNil(t, d.rnd)
-
-	// Verify the name is as expected
-	assert.Equal(t, defaultDownloaderName, d.Name())
+	u4, err := url.Parse("https://example.com///")
+	require.NoError(t, err)
+	assert.Equal(t, "https://example.com/", canonicalURLString(u4))
 }

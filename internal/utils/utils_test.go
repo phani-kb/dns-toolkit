@@ -1710,11 +1710,11 @@ func TestIsDomain_IDNA(t *testing.T) {
 		{"ace in middle", "example.xn--fiqs8s", true},
 	}
 
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			got := IsDomain(c.input)
-			if got != c.want {
-				t.Fatalf("IsDomain(%q) = %v, want %v", c.input, got, c.want)
+	for _, cc := range cases {
+		t.Run(cc.name, func(t *testing.T) {
+			got := IsDomain(cc.input)
+			if got != cc.want {
+				t.Fatalf("IsDomain(%q) = %v, want %v", cc.input, got, cc.want)
 			}
 		})
 	}

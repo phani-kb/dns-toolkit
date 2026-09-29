@@ -23,6 +23,231 @@ import (
 
 const defaultMaxRetries = constants.DefaultMaxRetries
 
+type downloadStats struct {
+	mu              sync.Mutex
+	successCount    int
+	failCount       int
+	downloadedCount int
+}
+
+func (s *downloadStats) recordSuccess(downloaded bool) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.successCount++
+	if downloaded {
+		s.downloadedCount++
+	}
+}
+
+func (s *downloadStats) recordFailure() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.failCount++
+}
+
+type downloadJob struct {
+	sourcesRepo   *db.SourcesRepo
+	downloadsRepo *db.DownloadsRepo
+	appConfig     *cfg.AppConfig
+	stats         *downloadStats
+	source        cfg.Source
+	maxRetries    int
+}
+
+// run performs the full download lifecycle for a single source
+func (j *downloadJob) run() {
+	source := j.source
+
+	sourceID, sourceIDErr := j.sourcesRepo.GetSourceIDByName(source.Name)
+	if sourceIDErr != nil {
+		Logger.Warnf("Failed to get source ID for %s: %v", source.Name, sourceIDErr)
+	}
+
+	persist := func(summary c.DownloadSummary, persistedPath string) {
+		if sourceID <= 0 {
+			return
+		}
+
+		downloadRow := db.DownloadRow{
+			SourceID:                    sourceID,
+			TypeCount:                   summary.TypeCount,
+			CountToConsider:             summary.CountToConsider,
+			SkipGeneralConsolidation:    summary.SkipGeneralConsolidation,
+			SkipGroupsConsolidation:     summary.SkipGroupsConsolidation,
+			SkipCategoriesConsolidation: summary.SkipCategoriesConsolidation,
+			URL:                         summary.URL,
+			Filepath:                    persistedPath,
+			Frequency:                   summary.Frequency,
+			Checksum:                    summary.Checksum,
+			Error:                       summary.Error,
+			LastDownloadTimestamp:       summary.LastDownloadTimestamp,
+			LastCheckedTimestamp:        summary.LastCheckedTimestamp,
+		}
+		if err := j.downloadsRepo.UpsertDownload(downloadRow); err != nil {
+			Logger.Warnf("Failed to upsert download record for %s: %v", source.Name, err)
+		}
+	}
+
+	downloadFile, err := source.GetDownloadFile(Logger, constants.DownloadDir)
+	if err != nil {
+		Logger.Errorf("Getting download file error: %v", err)
+		j.stats.recordFailure()
+		summary := c.DownloadSummary{
+			Name:                        source.Name,
+			URL:                         source.URL,
+			Frequency:                   source.Frequency,
+			TypeCount:                   source.TypeCount,
+			Types:                       source.Types,
+			CountToConsider:             source.CountToConsider,
+			Categories:                  source.Categories,
+			SkipGeneralConsolidation:    source.SkipGeneralConsolidation,
+			SkipGroupsConsolidation:     source.SkipGroupsConsolidation,
+			SkipCategoriesConsolidation: source.SkipCategoriesConsolidation,
+			Error:                       err.Error(),
+			LastCheckedTimestamp:        u.GetTimestamp(),
+		}
+		persist(summary, "")
+		return
+	}
+
+	downloader := j.selectDownloader()
+
+	var skipCertVerification bool
+	var skipCertVerificationHosts []string
+	var applicationConfig cfg.ApplicationConfig
+	if j.appConfig != nil {
+		skipCertVerification = j.appConfig.DNSToolkit.SkipCertVerification
+		skipCertVerificationHosts = j.appConfig.DNSToolkit.SkipCertVerificationHosts
+		applicationConfig = j.appConfig.Application
+	}
+
+	filePath, fetchSkipped, err := downloader.Download(
+		Logger,
+		downloadFile,
+		skipCertVerification,
+		skipCertVerificationHosts,
+		applicationConfig,
+	)
+
+	summary := c.DownloadSummary{
+		Name:                        source.Name,
+		URL:                         downloadFile.URL,
+		TypeCount:                   source.TypeCount,
+		Types:                       source.Types,
+		Filepath:                    filePath,
+		Frequency:                   source.Frequency,
+		CountToConsider:             source.CountToConsider,
+		Categories:                  source.Categories,
+		SkipGeneralConsolidation:    source.SkipGeneralConsolidation,
+		SkipGroupsConsolidation:     source.SkipGroupsConsolidation,
+		SkipCategoriesConsolidation: source.SkipCategoriesConsolidation,
+	}
+
+	if err != nil {
+		summary.LastCheckedTimestamp = u.GetTimestamp()
+
+		switch e := err.(type) { // wrapped errors handling
+		case *d.HTTPStatusError:
+			Logger.Errorf("Downloading source %s error: HTTP status %d for %s", source.Name, e.StatusCode, e.URL)
+			summary.Error = e.Error()
+		case *d.CertVerificationError:
+			Logger.Errorf("Downloading source %s error: Certificate verification failed for %s", source.Name, e.Host)
+			summary.Error = e.Error()
+		default:
+			Logger.Errorf("Downloading source %s error: %v", source.Name, err)
+			summary.Error = err.Error()
+		}
+
+		j.stats.recordFailure()
+		persist(summary, filePath)
+		return
+	}
+
+	j.stats.recordSuccess(!fetchSkipped)
+
+	if fetchSkipped {
+		summary.LastCheckedTimestamp = u.GetTimestamp()
+		if info, statErr := os.Stat(filePath); statErr == nil {
+			summary.LastDownloadTimestamp = info.ModTime().Format(constants.TimestampFormat)
+		} else {
+			Logger.Errorf("Getting file info error: %v", statErr)
+		}
+	} else {
+		summary.LastDownloadTimestamp = time.Now().Format(constants.TimestampFormat)
+	}
+
+	j.reprocessTargets(downloader, downloadFile, fetchSkipped, &summary)
+
+	if j.appConfig != nil && j.appConfig.DNSToolkit.FilesChecksum.Enabled {
+		summary.Checksum = u.CalculateChecksum(Logger, filePath, j.appConfig.DNSToolkit.FilesChecksum.Algorithm)
+	}
+
+	persist(summary, filePath)
+}
+
+func (j *downloadJob) reprocessTargets(
+	downloader d.Downloader,
+	downloadFile c.DownloadFile,
+	fetchSkipped bool,
+	summary *c.DownloadSummary,
+) {
+	for _, target := range downloadFile.Targets {
+		targetFilePath := filepath.Join(target.TargetFolder, target.TargetFile)
+
+		shouldReprocess := !fetchSkipped
+
+		if fetchSkipped {
+			if prevSummary, err := loadPreviousDownloadSummary(
+				Logger,
+				j.downloadsRepo,
+				summary.Name,
+				targetFilePath,
+			); err == nil && prevSummary != nil {
+				if prevSummary.CountToConsider != summary.CountToConsider {
+					Logger.Infof("Count to consider changed for %s: %d -> %d, re-processing...",
+						summary.Name, prevSummary.CountToConsider, summary.CountToConsider)
+					shouldReprocess = true
+
+					if downloadFile.IsArchive {
+						Logger.Debugf("Re-extracting archive and copying target file for %s", summary.Name)
+						if copyErr := u.ForceCopySourceToTarget(Logger, target); copyErr != nil {
+							Logger.Errorf("Failed to force re-copy target file for %s: %v", summary.Name, copyErr)
+							summary.Error = fmt.Sprintf("Force re-copy target file error: %v", copyErr)
+							shouldReprocess = false
+						}
+					}
+				}
+			} else if err != nil {
+				Logger.Debugf("Could not load previous summary for %s: %v", summary.Name, err)
+				shouldReprocess = true
+			} else {
+				shouldReprocess = true
+			}
+		}
+
+		if shouldReprocess {
+			if err := downloader.PostDownloadProcess(Logger, targetFilePath, summary.CountToConsider); err != nil {
+				Logger.Errorf("Post download process error for %s: %v", summary.Name, err)
+				summary.Error = fmt.Sprintf("Post-download processing error: %v", err)
+			}
+		}
+	}
+}
+
+func (j *downloadJob) selectDownloader() d.Downloader {
+	name := j.source.Downloader
+	if name != "" {
+		if downloader, exists := d.GetDownloader(name); exists {
+			Logger.Debugf("Using registered downloader %q for %s", name, j.source.Name)
+			return downloader
+		}
+	}
+
+	downloader, _ := d.GetDownloader(d.DefaultDownloaderName())
+	Logger.Debugf("Using default downloader with %d retries for %s", j.maxRetries, j.source.Name)
+	return downloader
+}
+
 var downloadCmd = &cobra.Command{
 	Use:   "download",
 	Short: "Download enabled sources",
@@ -32,13 +257,7 @@ var downloadCmd = &cobra.Command{
 		database := openDB(ctx)
 		defer database.CloseLogError(Logger)
 
-		forceFlag, getBoolErr := cmd.Flags().GetBool("force")
-		if getBoolErr != nil {
-			Logger.Warnf("Failed to parse --force flag (defaulting to false): %v", getBoolErr)
-			forceFlag = false
-		}
-		forceEnv := os.Getenv("DNS_TOOLKIT_FORCE_DOWNLOAD") == "true" || os.Getenv("DNS_TOOLKIT_FORCE_DOWNLOAD") == "1"
-		forceDownload := forceFlag || forceEnv
+		forceDownload := forceDownloadRequested(cmd)
 
 		if err := u.EnsureDirectoryExists(Logger, constants.DownloadDir); err != nil {
 			Logger.Errorf("Failed to create download directory: %v", err)
@@ -58,30 +277,30 @@ var downloadCmd = &cobra.Command{
 		if defaultDownloader == nil {
 			Logger.Warnf("Failed to create default downloader with retry settings")
 		} else {
-			initErr := d.RegisterDownloader(defaultDownloader)
-			if initErr != nil {
+			defaultDownloader.SetForceDownload(forceDownload)
+			if initErr := d.RegisterDownloader(defaultDownloader); initErr != nil {
 				Logger.Warnf("Failed to register default downloader with retry settings: %v", initErr)
 			}
 		}
 
 		domainTopDownloader := d.NewDomainTopDownloaderWithRetries(maxRetries)
-		domainTopErr := d.RegisterDownloader(domainTopDownloader)
-		if domainTopErr != nil {
+		domainTopDownloader.SetForceDownload(forceDownload)
+		if domainTopErr := d.RegisterDownloader(domainTopDownloader); domainTopErr != nil {
 			Logger.Warnf("Failed to register domain top downloader: %v", domainTopErr)
 		}
 
 		sourcesRepo := db.NewSourcesRepo(database)
 		downloadsRepo := db.NewDownloadsRepo(database)
+		defaultDownloader.SetSummaryProvider(downloadsRepo)
+		domainTopDownloader.SetSummaryProvider(downloadsRepo)
 		if err := syncSourcesToDB(ctx, Logger, sourcesRepo, SourcesConfigs); err != nil {
 			Logger.Errorf("Failed to sync source definitions to database: %v", err)
 			os.Exit(1)
 		}
 
 		maxWorkers := runtime.GOMAXPROCS(0)
-		if AppConfig != nil {
-			if AppConfig.DNSToolkit.MaxWorkers > 0 {
-				maxWorkers = AppConfig.DNSToolkit.MaxWorkers
-			}
+		if AppConfig != nil && AppConfig.DNSToolkit.MaxWorkers > 0 {
+			maxWorkers = AppConfig.DNSToolkit.MaxWorkers
 		}
 		maxWorkers = max(maxWorkers, 1)
 		Logger.Infof("Using worker pool with %d worker(s) for downloads", maxWorkers)
@@ -90,9 +309,8 @@ var downloadCmd = &cobra.Command{
 		defaultLimiter := createDownloadRateLimiter(maxWorkers, defaultInterval, defaultBurst)
 		workerPool := c.NewDTWorkerPool(maxWorkers)
 
-		// Stats to track a download process
-		var totalSources, successCount, failCount, downloadedCount int
-		var statsMutex sync.Mutex
+		stats := &downloadStats{}
+		var totalSources int
 
 		for _, sourcesConfig := range SourcesConfigs {
 			var sourceFilters cfg.SourceFilters
@@ -102,6 +320,14 @@ var downloadCmd = &cobra.Command{
 			for _, source := range sourcesConfig.GetEnabledSources(sourceFilters) {
 				totalSources++
 				source := source // local copy for goroutine
+				job := &downloadJob{
+					source:        source,
+					sourcesRepo:   sourcesRepo,
+					downloadsRepo: downloadsRepo,
+					appConfig:     AppConfig,
+					maxRetries:    maxRetries,
+					stats:         stats,
+				}
 				workerPool.Submit(func() {
 					if !strings.HasPrefix(strings.TrimSpace(source.URL), "file://") {
 						if defaultLimiter != nil {
@@ -110,201 +336,16 @@ var downloadCmd = &cobra.Command{
 							}
 						}
 					}
-
-					sourceID, sourceIDErr := sourcesRepo.GetSourceIDByName(source.Name)
-					if sourceIDErr != nil {
-						Logger.Warnf("Failed to get source ID for %s: %v", source.Name, sourceIDErr)
-					}
-
-					persistDownloadSummary := func(summary c.DownloadSummary, persistedPath string) {
-						if sourceID <= 0 {
-							return
-						}
-
-						downloadRow := db.DownloadRow{
-							SourceID:                    sourceID,
-							TypeCount:                   summary.TypeCount,
-							CountToConsider:             summary.CountToConsider,
-							SkipGeneralConsolidation:    summary.SkipGeneralConsolidation,
-							SkipGroupsConsolidation:     summary.SkipGroupsConsolidation,
-							SkipCategoriesConsolidation: summary.SkipCategoriesConsolidation,
-							URL:                         summary.URL,
-							Filepath:                    persistedPath,
-							Frequency:                   summary.Frequency,
-							Checksum:                    summary.Checksum,
-							Error:                       summary.Error,
-							LastDownloadTimestamp:       summary.LastDownloadTimestamp,
-							LastCheckedTimestamp:        summary.LastCheckedTimestamp,
-						}
-						if err := downloadsRepo.UpsertDownload(downloadRow); err != nil {
-							Logger.Warnf("Failed to upsert download record for %s: %v", source.Name, err)
-						}
-					}
-
-					if forceDownload {
-						Logger.Debugf("Force downloading source: %s", source.Name)
-					}
-
-					downloadFile, err := source.GetDownloadFile(Logger, constants.DownloadDir)
-					if err != nil {
-						Logger.Errorf("Getting download file error: %v", err)
-						statsMutex.Lock()
-						failCount++
-						statsMutex.Unlock()
-						summary := c.DownloadSummary{
-							Name:                        source.Name,
-							URL:                         source.URL,
-							Frequency:                   source.Frequency,
-							TypeCount:                   source.TypeCount,
-							Types:                       source.Types,
-							CountToConsider:             source.CountToConsider,
-							Categories:                  source.Categories,
-							SkipGeneralConsolidation:    source.SkipGeneralConsolidation,
-							SkipGroupsConsolidation:     source.SkipGroupsConsolidation,
-							SkipCategoriesConsolidation: source.SkipCategoriesConsolidation,
-							Error:                       err.Error(),
-							LastCheckedTimestamp:        u.GetTimestamp(),
-						}
-						persistDownloadSummary(summary, "")
-
-						return
-					}
-
-					var downloader d.Downloader
-					if specificDownloader, exists := d.GetDownloader(source.Name); exists {
-						downloader = specificDownloader
-						Logger.Debugf("Using registered downloader for %s", source.Name)
-					} else {
-						downloader, _ = d.GetDownloader(d.DefaultDownloaderName())
-						Logger.Debugf("Using default downloader with %d retries for %s", maxRetries, source.Name)
-					}
-
-					var skipCertVerification bool
-					var skipCertVerificationHosts []string
-					var applicationConfig cfg.ApplicationConfig
-
-					if AppConfig != nil {
-						skipCertVerification = AppConfig.DNSToolkit.SkipCertVerification
-						skipCertVerificationHosts = AppConfig.DNSToolkit.SkipCertVerificationHosts
-						applicationConfig = AppConfig.Application
-					}
-
-					filePath, fetchSkipped, err := downloader.Download(
-						Logger,
-						downloadFile,
-						skipCertVerification,
-						skipCertVerificationHosts,
-						applicationConfig,
-					)
-
-					for _, target := range downloadFile.Targets {
-						targetFilePath := filepath.Join(target.TargetFolder, target.TargetFile)
-						summary := c.DownloadSummary{
-							Name:                        source.Name,
-							URL:                         downloadFile.URL,
-							TypeCount:                   source.TypeCount,
-							Types:                       source.Types,
-							Filepath:                    targetFilePath,
-							Frequency:                   source.Frequency,
-							CountToConsider:             source.CountToConsider,
-							Categories:                  source.Categories,
-							SkipGeneralConsolidation:    source.SkipGeneralConsolidation,
-							SkipGroupsConsolidation:     source.SkipGroupsConsolidation,
-							SkipCategoriesConsolidation: source.SkipCategoriesConsolidation,
-						}
-
-						if err != nil {
-							summary.LastCheckedTimestamp = u.GetTimestamp()
-
-							switch e := err.(type) { // wrapped errors handling
-							case *d.HTTPStatusError:
-								Logger.Errorf("Downloading source %s error: HTTP status %d for %s", source.Name, e.StatusCode, e.URL)
-								summary.Error = e.Error()
-							case *d.CertVerificationError:
-								Logger.Errorf("Downloading source %s error: Certificate verification failed for %s", source.Name, e.Host)
-								summary.Error = e.Error()
-							default:
-								Logger.Errorf("Downloading source %s error: %v", source.Name, err)
-								summary.Error = err.Error()
-							}
-
-							statsMutex.Lock()
-							failCount++
-							statsMutex.Unlock()
-						} else {
-							statsMutex.Lock()
-							successCount++
-							if !fetchSkipped {
-								downloadedCount++
-							}
-							statsMutex.Unlock()
-
-							if fetchSkipped {
-								summary.LastCheckedTimestamp = u.GetTimestamp()
-								if info, err := os.Stat(filePath); err == nil {
-									summary.LastDownloadTimestamp = info.ModTime().Format(constants.TimestampFormat)
-								} else {
-									Logger.Errorf("Getting file info error: %v", err)
-								}
-							} else {
-								summary.LastDownloadTimestamp = time.Now().Format(constants.TimestampFormat)
-							}
-
-							shouldReprocess := !fetchSkipped
-
-							if fetchSkipped {
-								if prevSummary, err := loadPreviousDownloadSummary(
-									Logger,
-									downloadsRepo,
-									source.Name,
-									targetFilePath,
-								); err == nil && prevSummary != nil {
-									if prevSummary.CountToConsider != summary.CountToConsider {
-										Logger.Infof("Count to consider changed for %s: %d -> %d, re-processing...",
-											source.Name, prevSummary.CountToConsider, summary.CountToConsider)
-										shouldReprocess = true
-
-										if downloadFile.IsArchive {
-											Logger.Debugf("Re-extracting archive and copying target file for %s", source.Name)
-											if err = u.ForceCopySourceToTarget(Logger, target); err != nil {
-												Logger.Errorf("Failed to force re-copy target file for %s: %v", source.Name, err)
-												summary.Error = fmt.Sprintf("Force re-copy target file error: %v", err)
-												shouldReprocess = false
-											}
-										}
-									}
-								} else if err != nil {
-									Logger.Debugf("Could not load previous summary for %s: %v", source.Name, err)
-									shouldReprocess = true
-								} else {
-									shouldReprocess = true
-								}
-							}
-
-							if shouldReprocess {
-								if err := downloader.PostDownloadProcess(Logger, targetFilePath, summary.CountToConsider); err != nil {
-									Logger.Errorf("Post download process error for %s: %v", source.Name, err)
-									summary.Error = fmt.Sprintf("Post-download processing error: %v", err)
-								}
-							}
-
-							if AppConfig != nil && AppConfig.DNSToolkit.FilesChecksum.Enabled {
-								checksum := u.CalculateChecksum(Logger, filePath, AppConfig.DNSToolkit.FilesChecksum.Algorithm)
-								summary.Checksum = checksum
-							}
-						}
-
-						persistedPath := summary.Filepath
-						if downloadFile.IsArchive {
-							persistedPath = filePath
-						}
-						persistDownloadSummary(summary, persistedPath)
-					}
+					job.run()
 				})
 			}
 		}
 
 		workerPool.Wait()
+
+		stats.mu.Lock()
+		successCount, downloadedCount, failCount := stats.successCount, stats.downloadedCount, stats.failCount
+		stats.mu.Unlock()
 
 		Logger.Infof("Download complete: %d sources processed, %d successful (%d downloaded, %d skipped), %d failed",
 			totalSources, successCount, downloadedCount, successCount-downloadedCount, failCount)
@@ -313,6 +354,16 @@ var downloadCmd = &cobra.Command{
 
 func init() {
 	downloadCmd.Flags().Bool("force", false, "Force re-download of all sources (ignores existing summaries)")
+}
+
+func forceDownloadRequested(cmd *cobra.Command) bool {
+	forceFlag, err := cmd.Flags().GetBool("force")
+	if err != nil {
+		Logger.Warnf("Failed to parse --force flag (defaulting to false): %v", err)
+		forceFlag = false
+	}
+	forceEnv := os.Getenv("DNS_TOOLKIT_FORCE_DOWNLOAD") == "true" || os.Getenv("DNS_TOOLKIT_FORCE_DOWNLOAD") == "1"
+	return forceFlag || forceEnv
 }
 
 func createDownloadRateLimiter(maxWorkers int, interval time.Duration, burst int) *rate.Limiter {

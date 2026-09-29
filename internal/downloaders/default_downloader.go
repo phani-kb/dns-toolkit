@@ -51,11 +51,21 @@ type DefaultDownloader struct {
 	rnd                *rand.Rand
 	defaultHTTPClient  *http.Client
 	insecureHTTPClient *http.Client
+	summaryProvider    SummaryProvider
 	retryDelay         time.Duration
 	clientTimeout      time.Duration
 	maxRetries         int
+	forceDownload      bool
 	defaultClientOnce  sync.Once
 	insecureClientOnce sync.Once
+}
+
+func (d *DefaultDownloader) SetSummaryProvider(provider SummaryProvider) {
+	d.summaryProvider = provider
+}
+
+func (d *DefaultDownloader) SetForceDownload(force bool) {
+	d.forceDownload = force
 }
 
 // NewDefaultDownloaderWithRetries creates a new DefaultDownloader with custom retry
@@ -76,16 +86,6 @@ func NewDefaultDownloaderForTesting(maxRetries int, testRetryDelay time.Duration
 		maxRetries:    maxRetries,
 		retryDelay:    testRetryDelay,
 		clientTimeout: testTimeout,
-	}
-}
-
-// NewDefaultDownloaderWithOptions creates a new DefaultDownloader with fully customizable options
-func NewDefaultDownloaderWithOptions(maxRetries int, retryDelay, clientTimeout time.Duration) *DefaultDownloader {
-	return &DefaultDownloader{
-		rnd:           rand.New(rand.NewSource(time.Now().UnixNano())),
-		maxRetries:    maxRetries,
-		retryDelay:    retryDelay,
-		clientTimeout: clientTimeout,
 	}
 }
 
@@ -170,7 +170,8 @@ func (d *DefaultDownloader) downloadFile(
 	client := d.createHTTPClient(logger, skipCertVerify, skipCertHosts, parsedURL)
 	userAgent := cfg.GetUserAgent(logger, applicationConfig)
 	logger.Debugf("User-Agent: %s", userAgent)
-	if fileExists && d.canSkipDownload(logger, client, userAgent, file, localFileSize, localModTime) {
+	if !d.forceDownload && fileExists &&
+		d.canSkipDownload(logger, client, userAgent, file, localFileSize, localModTime) {
 		archiveErr := d.handleArchiveFile(logger, file, filePath)
 		return filePath, true, archiveErr
 	}
@@ -188,20 +189,10 @@ func (d *DefaultDownloader) downloadFile(
 
 		req.Header.Set("User-Agent", userAgent)
 		resp, err = client.Do(req)
-
-		// If we get a response but encounter an error later, we should still close the body
-		if err == nil && resp != nil && resp.Body != nil {
-			defer func() {
-				if closeErr := resp.Body.Close(); closeErr != nil {
-					logger.Warnf("Failed to close response body: %v", closeErr)
-				}
-			}()
-		}
-
 		if err != nil {
-			var urlErr *url.Error
-			isTLSErr := errors.As(err, &urlErr)
-			if isTLSErr && strings.Contains(urlErr.Error(), "certificate") {
+			var certVerifyErr *tls.CertificateVerificationError
+			isCertError := errors.As(err, &certVerifyErr)
+			if isCertError {
 				certErr := &CertVerificationError{
 					Host: parsedURL.Host,
 					Err:  err,
@@ -213,7 +204,7 @@ func (d *DefaultDownloader) downloadFile(
 				logger.Warnf("Attempt %d: Failed to download file: %v", attempt, err)
 			}
 
-			if isTLSErr && strings.Contains(urlErr.Error(), "certificate") && attempt == 1 {
+			if isCertError && attempt == 1 {
 				logger.Warnf(
 					"Certificate error detected, consider adding %s to skipCertVerificationHosts in config",
 					parsedURL.Host,
@@ -229,7 +220,9 @@ func (d *DefaultDownloader) downloadFile(
 
 		// Check response status
 		if resp != nil && resp.StatusCode == http.StatusTooManyRequests && attempt < d.maxRetries {
-			u.CloseBody(logger, resp.Body)
+			if closeErr := resp.Body.Close(); closeErr != nil {
+				logger.Warnf("Failed to close response body: %v", closeErr)
+			}
 
 			// For 429, use exponential backoff with jitter
 			waitTime := d.retryDelay * time.Duration(1<<uint(attempt))
@@ -251,7 +244,11 @@ func (d *DefaultDownloader) downloadFile(
 		return "", false, lastErr
 	}
 
-	defer u.CloseBody(logger, resp.Body)
+	defer func() {
+		if closeErr := resp.Body.Close(); closeErr != nil {
+			logger.Warnf("Failed to close response body: %v", closeErr)
+		}
+	}()
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		if resp.StatusCode >= 300 && resp.StatusCode < 400 {
@@ -461,20 +458,17 @@ func (d *DefaultDownloader) ShouldDownload(
 	file c.DownloadFile,
 ) bool {
 	filePath := filepath.Join(file.Folder, file.Filename)
-	fileExists := false
-
 	if info, err := os.Stat(filePath); err == nil {
-		fileExists = true
 		logger.Debugf("File %s already exists (size: %d bytes, modified: %s)",
 			filePath, info.Size(), info.ModTime().Format("2006-01-02 15:04:05"))
-	}
-
-	if !fileExists {
+	} else {
 		logger.Debugf("File %s does not exist, should download", filePath)
 		return true
 	}
 
-	shouldDownload, frequency, lastTime, remaining := u.ShouldDownloadSourceInfo(logger, summaryFile, file.Name)
+	summary := d.previousSummary(logger, summaryFile, file.Name)
+
+	shouldDownload, frequency, lastTime, remaining := u.ShouldDownloadFromSummary(logger, summary)
 	if !shouldDownload {
 		remainingStr := remaining.Truncate(time.Second)
 		msg := fmt.Sprintf("%s window not elapsed (remaining %s)", frequency, remainingStr)
@@ -487,11 +481,6 @@ func (d *DefaultDownloader) ShouldDownload(
 		}
 		logger.Debugf("Skipping download for %s %s", file.Name, msg)
 		return false
-	}
-
-	summary, err := u.GetLastSummary[c.DownloadSummary](logger, summaryFile, file.Name)
-	if err != nil {
-		return true
 	}
 
 	if summary.URL != "" && summary.URL != file.URL {
@@ -507,6 +496,22 @@ func (d *DefaultDownloader) ShouldDownload(
 	return true
 }
 
+func (d *DefaultDownloader) previousSummary(
+	logger *multilog.Logger,
+	summaryFile, sourceName string,
+) c.DownloadSummary {
+	if d.summaryProvider != nil {
+		if summary, err := d.summaryProvider.GetLatestDownloadSummary(sourceName); err == nil && summary != nil {
+			return *summary
+		}
+	}
+	summary, err := u.GetLastSummary[c.DownloadSummary](logger, summaryFile, sourceName)
+	if err != nil {
+		return c.DownloadSummary{}
+	}
+	return summary
+}
+
 // Helper function to check if a host is in the skipCertHosts list
 func containsHost(hosts []string, targetHost string) bool {
 	for _, host := range hosts {
@@ -516,5 +521,3 @@ func containsHost(hosts []string, targetHost string) bool {
 	}
 	return false
 }
-
-func init() {}

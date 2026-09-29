@@ -452,7 +452,6 @@ func TestDomainTopDownloader_Download_HTTPError(t *testing.T) {
 func TestDomainTopDownloader_PostDownloadProcess_LargeFile(t *testing.T) {
 	t.Parallel()
 
-	logger := setupTestLogger()
 	testDir := setupTestDir(t)
 	defer func() {
 		if err := os.RemoveAll(testDir); err != nil {
@@ -470,7 +469,7 @@ func TestDomainTopDownloader_PostDownloadProcess_LargeFile(t *testing.T) {
 		_, err := fmt.Fprintf(file, "%d,domain%d.com\n", i, i)
 		require.NoError(t, err)
 	}
-	logger, _ = multilog.NewTestLogger(t)
+	logger, _ := multilog.NewTestLogger(t)
 	defer utils.CloseFile(logger, file)
 
 	downloader := NewDomainTopDownloaderWithRetries(1)
