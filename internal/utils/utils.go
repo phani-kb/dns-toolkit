@@ -373,6 +373,25 @@ func CopyFile(logger *multilog.Logger, src, dst string) error {
 	return nil
 }
 
+// WriteArchiveFile writes the contents of src to destPath.
+func WriteArchiveFile(logger *multilog.Logger, destPath string, src io.Reader) error {
+	if err := os.MkdirAll(filepath.Dir(destPath), os.ModePerm); err != nil {
+		return err
+	}
+
+	outFile, err := os.Create(destPath)
+	if err != nil {
+		return err
+	}
+
+	if _, err := io.Copy(outFile, src); err != nil {
+		CloseFile(logger, outFile)
+		return err
+	}
+
+	return outFile.Close()
+}
+
 func StringInSlice(str string, slice []string) bool {
 	return NewStringSet(slice).Contains(str)
 }
@@ -516,7 +535,7 @@ func IsDomain(domain string) bool {
 		return false
 	}
 
-	if IsIP(domain) {
+	if looksLikeIPAddressCandidate(domain) && IsIP(domain) {
 		return false
 	}
 
@@ -533,7 +552,7 @@ func IsDomain(domain string) bool {
 		return false
 	}
 
-	if IsIP(asciiDomain) {
+	if looksLikeIPAddressCandidate(asciiDomain) && IsIP(asciiDomain) {
 		return false
 	}
 
@@ -554,6 +573,40 @@ func IsDomain(domain string) bool {
 	}
 
 	if !containsLetter(tld) && !strings.HasPrefix(strings.ToLower(tld), constants.PunycodePrefix) {
+		return false
+	}
+
+	return true
+}
+
+// looksLikeIPAddressCandidate does a character check before ParseIP.
+func looksLikeIPAddressCandidate(s string) bool {
+	if s == "" {
+		return false
+	}
+
+	hasColon := strings.Contains(s, ":") // IPv6
+	hasDot := strings.Contains(s, ".")   // IPv4
+	if !hasColon && !hasDot {
+		return false
+	}
+
+	if !hasColon {
+		for i := 0; i < len(s); i++ {
+			ch := s[i]
+			if (ch >= '0' && ch <= '9') || ch == '.' {
+				continue
+			}
+			return false
+		}
+		return true
+	}
+
+	for i := 0; i < len(s); i++ {
+		ch := s[i]
+		if (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F') || ch == ':' || ch == '.' {
+			continue
+		}
 		return false
 	}
 
@@ -615,7 +668,7 @@ func PickRandomLines(filePath string, maxLines int) ([]string, error) {
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 	selectedLines := make([]string, maxLines)
-	for i := 0; i < maxLines; i++ {
+	for i := range maxLines {
 		selectedLines[i] = filteredLines[r.Intn(len(filteredLines))]
 	}
 
@@ -931,29 +984,51 @@ func GetArchiveExtension(uri string) string {
 }
 
 // ExtractArchive extracts the contents of an archive file (either .tar.gz or .zip) to the specified destination folder.
+// If targetFiles are provided, only matching files are extracted.
 //
 // Parameters:
 //   - archivePath: Path to the archive file
 //   - destFolder: Destination directory where the contents will be extracted
+//   - targetFiles: Optional list of specific files to extract from the archive
 //
 // Returns:
 //   - An error object if the extraction fails, nil on success
-func ExtractArchive(logger *multilog.Logger, archivePath, destFolder string) error {
+func ExtractArchive(logger *multilog.Logger, archivePath, destFolder string, targetFiles ...string) error {
 	for _, ext := range constants.ArchiveExtensions {
 		if strings.HasSuffix(archivePath, ext) {
 			switch ext {
 			case ".tar.gz":
-				return extractTarGz(logger, archivePath, destFolder)
+				return extractTarGz(logger, archivePath, destFolder, targetFiles...)
 			case ".zip":
-				return extractZip(logger, archivePath, destFolder)
+				return extractZip(logger, archivePath, destFolder, targetFiles...)
+			case ".gz":
+				return extractGz(logger, archivePath, destFolder, targetFiles...)
 			}
 		}
 	}
 	return fmt.Errorf("unsupported archive format: %s", archivePath)
 }
 
+func matchesTargetFiles(name string, targetFiles []string) bool {
+	if len(targetFiles) == 0 {
+		return true
+	}
+	cleanName := filepath.Clean(strings.TrimPrefix(name, "./"))
+	baseName := filepath.Base(cleanName)
+	for _, target := range targetFiles {
+		cleanTarget := filepath.Clean(strings.TrimPrefix(target, "./"))
+		if cleanName == cleanTarget || baseName == cleanTarget || baseName == filepath.Base(cleanTarget) {
+			return true
+		}
+		if strings.HasSuffix(cleanName, cleanTarget) || strings.HasSuffix(cleanName, "/"+cleanTarget) {
+			return true
+		}
+	}
+	return false
+}
+
 // extractTarGz extracts a .tar.gz archive to the specified destination folder.
-func extractTarGz(logger *multilog.Logger, archivePath, destFolder string) error {
+func extractTarGz(logger *multilog.Logger, archivePath, destFolder string, targetFiles ...string) error {
 	file, err := os.Open(archivePath)
 	if err != nil {
 		return err
@@ -987,15 +1062,13 @@ func extractTarGz(logger *multilog.Logger, archivePath, destFolder string) error
 
 		// Determine the correct path for extraction
 		// Ensure the file path does not contain directory traversal elements
-		if strings.Contains(head.Name, "..") {
-			return fmt.Errorf("invalid file path in archive: %s (contains '..')", head.Name)
-		}
-		if err := validateArchiveFilePath(head.Name); err != nil {
-			return err
+		archiveName := filepath.Clean(filepath.FromSlash(head.Name))
+		if !filepath.IsLocal(archiveName) {
+			return fmt.Errorf("invalid file path in archive: %s", head.Name)
 		}
 
 		// First try the default path in the destination folder
-		filePath := filepath.Join(destFolder, head.Name)
+		filePath := filepath.Join(destFolder, archiveName)
 
 		if !isWithinDirectory(destFolder, filePath) {
 			return fmt.Errorf("invalid file path in archive: %s", head.Name)
@@ -1003,12 +1076,26 @@ func extractTarGz(logger *multilog.Logger, archivePath, destFolder string) error
 
 		// Create the necessary directories
 		if head.Typeflag == tar.TypeDir {
-			if err := os.MkdirAll(filePath, os.ModePerm); err != nil {
-				return err
+			if len(targetFiles) == 0 {
+				filePath := filepath.Join(destFolder, head.Name)
+				if isWithinDirectory(destFolder, filePath) {
+					if err := os.MkdirAll(filePath, os.ModePerm); err != nil {
+						return err
+					}
+				}
 			}
 			continue
 		} else if head.Typeflag == tar.TypeReg {
-			// Ensure parent directory exists
+			if len(targetFiles) > 0 && !matchesTargetFiles(head.Name, targetFiles) {
+				continue
+			}
+
+			filePath := filepath.Join(destFolder, head.Name)
+
+			if !isWithinDirectory(destFolder, filePath) {
+				return fmt.Errorf("invalid file path in archive: %s", head.Name)
+			}
+
 			if err := os.MkdirAll(filepath.Dir(filePath), os.ModePerm); err != nil {
 				return err
 			}
@@ -1080,8 +1167,77 @@ func extractTarGz(logger *multilog.Logger, archivePath, destFolder string) error
 	return nil
 }
 
+// extractGz extracts a .gz archive to the specified destination folder.
+func extractGz(logger *multilog.Logger, archivePath, destFolder string, targetFiles ...string) error {
+	logger.Infof("Extracting %s to %s", archivePath, destFolder)
+	file, err := os.Open(archivePath)
+	if err != nil {
+		return err
+	}
+	defer CloseFile(logger, file)
+
+	gzipReader, err := gzip.NewReader(file)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := gzipReader.Close(); err != nil {
+			logger.Errorf("Closing gzip reader error: %v", err)
+		}
+	}()
+
+	baseName := filepath.Base(archivePath)
+	baseName = strings.TrimSuffix(baseName, ".gz")
+
+	innerFileName := ""
+	if len(targetFiles) > 0 && targetFiles[0] != "" {
+		innerFileName = filepath.Base(targetFiles[0])
+	} else if gzipReader.Name != "" {
+		innerFileName = filepath.Base(gzipReader.Name)
+	} else {
+		innerFileName = baseName
+	}
+
+	if strings.Contains(innerFileName, "..") {
+		return fmt.Errorf(
+			"invalid archive file name: %s (contains '..')",
+			innerFileName,
+		)
+	}
+
+	if err := validateArchiveFilePath(innerFileName); err != nil {
+		return fmt.Errorf("invalid archive file name: %w", err)
+	}
+
+	filePath := filepath.Join(destFolder, innerFileName)
+
+	if !isWithinDirectory(destFolder, filePath) {
+		return fmt.Errorf("invalid file path in archive: %s", innerFileName)
+	}
+
+	if err := WriteArchiveFile(logger, filePath, gzipReader); err != nil {
+		return err
+	}
+
+	if !strings.Contains(baseName, "..") && validateArchiveFilePath(baseName) == nil {
+		subDirPath := filepath.Join(destFolder, baseName)
+		if isWithinDirectory(destFolder, subDirPath) {
+			if err := os.MkdirAll(subDirPath, os.ModePerm); err == nil {
+				subFilePath := filepath.Join(subDirPath, innerFileName)
+				if isWithinDirectory(destFolder, subFilePath) {
+					if err := CopyFile(logger, filePath, subFilePath); err != nil {
+						return err
+					}
+				}
+			}
+		}
+	}
+
+	return nil
+}
+
 // extractZip extracts a .zip archive to the specified destination folder.
-func extractZip(logger *multilog.Logger, archivePath, destFolder string) error {
+func extractZip(logger *multilog.Logger, archivePath, destFolder string, targetFiles ...string) error {
 	r, err := zip.OpenReader(archivePath)
 	if err != nil {
 		return err
@@ -1092,8 +1248,31 @@ func extractZip(logger *multilog.Logger, archivePath, destFolder string) error {
 		}
 	}()
 
+	baseName := filepath.Base(archivePath)
+	baseName = strings.TrimSuffix(baseName, ".zip")
+
 	for _, f := range r.File {
-		if err := extractZipFile(logger, f, destFolder); err != nil {
+		if strings.Contains(f.Name, "..") {
+			return fmt.Errorf("invalid file path in archive: %s", f.Name)
+		}
+		if err := validateArchiveFilePath(f.Name); err != nil {
+			return fmt.Errorf("invalid file path in archive: %w", err)
+		}
+		if f.FileInfo().IsDir() {
+			if len(targetFiles) == 0 {
+				filePath := filepath.Join(destFolder, f.Name)
+				if isWithinDirectory(destFolder, filePath) {
+					if err := os.MkdirAll(filePath, os.ModePerm); err != nil {
+						return err
+					}
+				}
+			}
+			continue
+		}
+		if len(targetFiles) > 0 && !matchesTargetFiles(f.Name, targetFiles) {
+			continue
+		}
+		if err := extractZipFile(logger, f, destFolder, baseName); err != nil {
 			return err
 		}
 	}
@@ -1102,17 +1281,13 @@ func extractZip(logger *multilog.Logger, archivePath, destFolder string) error {
 }
 
 // extractZipFile extracts a single file from the zip archive
-func extractZipFile(logger *multilog.Logger, f *zip.File, destFolder string) error {
-	if err := validateArchiveFilePath(f.Name); err != nil {
-		return err
-	}
-
-	// Explicitly check for directory traversal elements in the file name
-	if strings.Contains(f.Name, "..") {
+func extractZipFile(logger *multilog.Logger, f *zip.File, destFolder, baseName string) error {
+	archiveName := filepath.Clean(filepath.FromSlash(f.Name))
+	if !filepath.IsLocal(archiveName) {
 		return fmt.Errorf("invalid file path in archive: %s", f.Name)
 	}
 
-	filePath := filepath.Join(destFolder, f.Name)
+	filePath := filepath.Join(destFolder, archiveName)
 
 	if !isWithinDirectory(destFolder, filePath) {
 		return fmt.Errorf("invalid file path in archive: %s", f.Name)
@@ -1138,15 +1313,40 @@ func extractZipFile(logger *multilog.Logger, f *zip.File, destFolder string) err
 	}
 	defer CloseBody(logger, rc)
 
-	_, err = io.Copy(outFile, rc)
-	return err
+	if _, err := io.Copy(outFile, rc); err != nil {
+		return err
+	}
+
+	// For files with no directory structure in the archive (just filenames),
+	// also create a copy in a subdirectory named after the archive base name
+	if !strings.Contains(f.Name, "/") && !strings.Contains(f.Name, "\\") && baseName != "" {
+		if !strings.Contains(baseName, "..") && validateArchiveFilePath(baseName) == nil {
+			subDirPath := filepath.Join(destFolder, baseName)
+			if isWithinDirectory(destFolder, subDirPath) {
+				if err := os.MkdirAll(subDirPath, os.ModePerm); err == nil {
+					subFilePath := filepath.Join(subDirPath, f.Name)
+					if isWithinDirectory(destFolder, subFilePath) {
+						if err := CopyFile(logger, filePath, subFilePath); err != nil {
+							return err
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return nil
 }
 
 // copySourceToTargetInternal is the internal implementation for copying files
 func copySourceToTargetInternal(logger *multilog.Logger, target c.DownloadTarget, forceOverwrite bool) error {
 	sourceFilepath := filepath.Join(target.SourceFolder, target.SourceFile)
-	if _, err := os.Stat(sourceFilepath); os.IsNotExist(err) {
-		return fmt.Errorf("source file not found: %s", sourceFilepath)
+	if _, err := os.Stat(sourceFilepath); err != nil {
+		if os.IsNotExist(err) {
+			logger.Warnf("source file not found: %s, skipping", sourceFilepath)
+			return nil
+		}
+		return err
 	}
 	if _, err := os.Stat(target.TargetFolder); os.IsNotExist(err) {
 		if err := os.MkdirAll(target.TargetFolder, os.ModePerm); err != nil {
@@ -1208,37 +1408,34 @@ func IsSkipIP(_ *multilog.Logger, ip string) bool {
 	return false
 }
 
-func ShouldDownloadSource(logger *multilog.Logger, summaryFile string, sourceName string) bool {
-	should, _, _, _ := ShouldDownloadSourceInfo(logger, summaryFile, sourceName)
-	return should
+func parseDownloadTimestamp(ts string) (time.Time, error) {
+	var lastErr error
+	for _, layout := range constants.DownloadTimestampLayouts {
+		parsed, err := time.Parse(layout, ts)
+		if err == nil {
+			return parsed, nil
+		}
+		lastErr = err
+	}
+	return time.Time{}, lastErr
 }
 
-// ShouldDownloadSourceInfo checks if a fresh download should occur for the given source.
-// Returns:
-//
-//	shouldDownload - whether a fresh download should occur
-//	frequencyLabel - daily, weekly or monthly
-//	lastDownloadTime - zero time if not available
-//	remaining - duration until next allowed download (zero if shouldDownload == true)
-func ShouldDownloadSourceInfo(
+// ShouldDownloadFromSummary applies the frequency-window policy to an already
+// loaded download summary, without touching the filesystem. It is the shared
+// core of both the file-based and DB-based skip decisions.
+func ShouldDownloadFromSummary(
 	logger *multilog.Logger,
-	summaryFile string,
-	sourceName string,
+	summary c.DownloadSummary,
 ) (bool, string, time.Time, time.Duration) {
-	summary, err := GetLastSummary[c.DownloadSummary](logger, summaryFile, sourceName)
-	if err != nil {
-		return true, "", time.Time{}, 0
-	}
-
 	lastDownload := summary.LastDownloadTimestamp
 	if lastDownload == "" || lastDownload == "0001-01-01T00:00:00Z" {
 		return true, summary.Frequency, time.Time{}, 0
 	}
 
-	lastDownloadTime, err := time.Parse(constants.TimestampFormat, lastDownload)
+	lastDownloadTime, err := parseDownloadTimestamp(lastDownload)
 	if err != nil {
-		logger.Errorf("Parsing last download timestamp error: %v", err)
-		return false, summary.Frequency, time.Time{}, 0
+		logger.Warnf("Unrecognized last download timestamp %q (%v); downloading", lastDownload, err)
+		return true, summary.Frequency, time.Time{}, 0
 	}
 
 	now := time.Now()
@@ -1273,10 +1470,8 @@ func ShouldDownloadSourceInfo(
 	if elapsed >= threshold {
 		return true, summary.Frequency, lastDownloadTime, 0
 	}
-	remaining := threshold - elapsed
-	if remaining < 0 {
-		remaining = 0
-	}
+	remaining := max(threshold-elapsed, 0)
+
 	return false, summary.Frequency, lastDownloadTime, remaining
 }
 
@@ -1417,6 +1612,7 @@ func ResolveDomainsToIPv4(logger *multilog.Logger, domains []string) ([]string, 
 		ips := resolveDomainIPv4(logger, domain)
 		if len(ips) == 0 {
 			failedDomains = append(failedDomains, domain)
+			logger.Debug("Failed to resolve domain", "domain", domain)
 		} else {
 			ipAddresses = append(ipAddresses, ips...)
 		}
@@ -1458,8 +1654,8 @@ func resolveDomainIPv4(logger *multilog.Logger, domain string) []string {
 //   - A slice of invalid entries (don't match the regex)
 func ExtractEntriesWithRegex(content string, regex *regexp.Regexp) ([]string, []string) {
 	var validEntries, invalidEntries []string
-	lines := strings.Split(content, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(content, "\n")
+	for line := range lines {
 		line = strings.TrimSpace(line)
 		if IsComment(line) {
 			continue
@@ -1476,20 +1672,27 @@ func ExtractEntriesWithRegex(content string, regex *regexp.Regexp) ([]string, []
 
 // ExtractDomains parses content line by line, using IsDomain
 func ExtractDomains(content string) ([]string, []string) {
+	seen := make(map[string]struct{})
 	var validEntries, invalidEntries []string
 	lines := strings.SplitSeq(content, "\n")
 	for line := range lines {
 		line = strings.TrimSpace(line)
-		if IsComment(line) {
+		if line == "" || IsComment(line) {
 			continue
 		}
+		if _, exists := seen[line]; exists {
+			continue
+		}
+		seen[line] = struct{}{}
 		if IsDomain(line) {
 			validEntries = append(validEntries, line)
-		} else if line != "" {
+		} else {
 			invalidEntries = append(invalidEntries, line)
 		}
 	}
-	return RemoveDuplicates(validEntries), RemoveDuplicates(invalidEntries)
+	SortCaseInsensitiveStrings(validEntries)
+	SortCaseInsensitiveStrings(invalidEntries)
+	return validEntries, invalidEntries
 }
 
 func GetFilesInDir(logger *multilog.Logger, dir string, patterns []string) ([]string, error) {
@@ -1524,4 +1727,25 @@ func GetFilesInDir(logger *multilog.Logger, dir string, patterns []string) ([]st
 		return nil, err
 	}
 	return files, nil
+}
+
+// NewTestLogger creates a simple logger for test mode without requiring a config file.
+func NewTestLogger() *multilog.Logger {
+	return multilog.NewLogger()
+}
+
+func SplitAndSortCSV(csv string) []string {
+	if csv == "" {
+		return nil
+	}
+	parts := strings.Split(csv, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			out = append(out, p)
+		}
+	}
+	sort.Strings(out)
+	return out
 }

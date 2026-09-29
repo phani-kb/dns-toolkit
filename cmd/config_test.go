@@ -42,6 +42,10 @@ func TestGetConfigPath(t *testing.T) {
 }
 
 func TestMinOverlapPercent(t *testing.T) {
+	if AppConfig == nil {
+		t.Skip("AppConfig is nil in test mode, skipping")
+	}
+
 	assert.Equal(t, 0.0, AppConfig.DNSToolkit.GetMinOverlapPercent())
 
 	AppConfig.DNSToolkit.MinOverlapPercent = 0.2

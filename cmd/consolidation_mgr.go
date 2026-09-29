@@ -1,40 +1,42 @@
 package cmd
 
 import (
-	c "github.com/phani-kb/dns-toolkit/internal/common"
+	"github.com/phani-kb/dns-toolkit/internal/db"
 	"github.com/phani-kb/multilog"
 )
 
 // ConsolidationManager handles general consolidation conflict resolution
 type ConsolidationManager struct {
-	logger *multilog.Logger
+	logger   *multilog.Logger
+	database *db.DB
 }
 
 // NewConsolidationManager creates a new manager
-func NewConsolidationManager(logger *multilog.Logger) *ConsolidationManager {
+func NewConsolidationManager(logger *multilog.Logger, database *db.DB) *ConsolidationManager {
 	return &ConsolidationManager{
-		logger: logger,
+		logger:   logger,
+		database: database,
 	}
 }
 
-// GenerateConflictReport generates conflict report for general consolidation
-func (cm *ConsolidationManager) GenerateConflictReport(processedFiles []c.ProcessedFile) error {
+// GenerateConflictReport generates conflict report by using resolution sets
+func (cm *ConsolidationManager) GenerateConflictReport() error {
 	cm.logger.Infof("Building resolution sets for conflict report...")
 
-	// Build resolution sets for conflict analysis
-	allowByType, blockByType, conflicts, manualAllowToBlock, manualBlockToAllow, detailsMap := GetCachedResolutionSets(
-		cm.logger,
-		processedFiles,
-	)
-
-	result := &ResolutionResult{
-		AllowByType: allowByType,
-		BlockByType: blockByType,
-		Conflicts:   conflicts,
-		DetailsMap:  detailsMap,
+	result, err := GetResolutionSets(cm.logger, cm.database)
+	if err != nil {
+		return err
 	}
-	result.ManualOverride.AllowToBlock = manualAllowToBlock
-	result.ManualOverride.BlockToAllow = manualBlockToAllow
+
+	return cm.GenerateConflictReportFromResult(result)
+}
+
+// GenerateConflictReportFromResult generates conflict report by using resolution sets
+func (cm *ConsolidationManager) GenerateConflictReportFromResult(result *ResolutionResult) error {
+	if result == nil {
+		cm.logger.Warnf("No resolution result provided, skipping conflict report")
+		return nil
+	}
 
 	overridesPath, err := writeOverrideSummary(cm.logger, result)
 	if err != nil {

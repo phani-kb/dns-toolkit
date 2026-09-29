@@ -68,7 +68,7 @@ func (lt *ListType) Validate() error {
 }
 
 // nolint:lll
-// DownloadSummary represents information about a downloaded DNS blocklist file.
+// DownloadSummary represents information about a downloaded file.
 // It contains metadata about the source, content types, and download status.
 type DownloadSummary struct {
 	Name                        string       `json:"name"`                                    // Name of the source
@@ -79,6 +79,7 @@ type DownloadSummary struct {
 	Error                       string       `json:"error"`                                   // Error message if download failed
 	LastDownloadTimestamp       string       `json:"last_download_timestamp"`                 // Timestamp of the last successful download
 	LastCheckedTimestamp        string       `json:"last_checked_timestamp"`                  // Timestamp when last checked for updates
+	LastProcessedTimestamp      string       `json:"last_processed_timestamp,omitempty"`      // Timestamp of the last successful processing
 	Types                       []SourceType `json:"types"`                                   // Array of entry types (ipv4, domain, etc.)
 	Categories                  []string     `json:"categories,omitempty"`                    // Categories this source belongs to
 	TypeCount                   int          `json:"type_count"`                              // Number of entry types in the source
@@ -116,8 +117,8 @@ func (ds *DownloadSummary) GetName() string {
 func (ds *DownloadSummary) UnmarshalJSON(data []byte) error {
 	type Alias DownloadSummary
 	aux := &struct {
-		Types      interface{} `json:"types"`
-		Categories interface{} `json:"categories"`
+		Types      any `json:"types"`
+		Categories any `json:"categories"`
 		*Alias
 	}{
 		Alias: (*Alias)(ds),
@@ -127,7 +128,6 @@ func (ds *DownloadSummary) UnmarshalJSON(data []byte) error {
 		return err
 	}
 
-	// Initialize Types as an empty slice if it's nil
 	if ds.Types == nil {
 		ds.Types = []SourceType{}
 	}
@@ -136,7 +136,7 @@ func (ds *DownloadSummary) UnmarshalJSON(data []byte) error {
 		ds.Categories = []string{}
 	}
 
-	if v, ok := aux.Categories.([]interface{}); ok {
+	if v, ok := aux.Categories.([]any); ok {
 		for _, item := range v {
 			if category, ok := item.(string); ok {
 				ds.Categories = append(ds.Categories, category)
@@ -144,9 +144,9 @@ func (ds *DownloadSummary) UnmarshalJSON(data []byte) error {
 		}
 	}
 
-	if v, ok := aux.Types.([]interface{}); ok {
+	if v, ok := aux.Types.([]any); ok {
 		for _, item := range v {
-			if typeItem, ok := item.(map[string]interface{}); ok {
+			if typeItem, ok := item.(map[string]any); ok {
 				sourceType := SourceType{}
 
 				// Extract name
@@ -160,9 +160,9 @@ func (ds *DownloadSummary) UnmarshalJSON(data []byte) error {
 				}
 
 				// Extract list_types if present
-				if listTypesRaw, ok := typeItem["list_types"].([]interface{}); ok {
+				if listTypesRaw, ok := typeItem["list_types"].([]any); ok {
 					for _, ltRaw := range listTypesRaw {
-						if ltMap, ok := ltRaw.(map[string]interface{}); ok {
+						if ltMap, ok := ltRaw.(map[string]any); ok {
 							listType := ListType{}
 
 							if name, ok := ltMap["name"].(string); ok {
@@ -178,7 +178,7 @@ func (ds *DownloadSummary) UnmarshalJSON(data []byte) error {
 							}
 
 							// Extract groups if present
-							if groupsRaw, ok := ltMap["groups"].([]interface{}); ok {
+							if groupsRaw, ok := ltMap["groups"].([]any); ok {
 								for _, groupRaw := range groupsRaw {
 									if group, ok := groupRaw.(string); ok {
 										listType.Groups = append(listType.Groups, group)
@@ -242,8 +242,8 @@ type ProcessedFile struct {
 func (pf *ProcessedFile) UnmarshalJSON(data []byte) error {
 	type Alias ProcessedFile
 	aux := &struct {
-		Groups     interface{} `json:"groups"`
-		Categories interface{} `json:"categories"`
+		Groups     any `json:"groups"`
+		Categories any `json:"categories"`
 		*Alias
 	}{
 		Alias: (*Alias)(pf),
@@ -262,7 +262,7 @@ func (pf *ProcessedFile) UnmarshalJSON(data []byte) error {
 	}
 
 	// Handle groups if they exist
-	if v, ok := aux.Groups.([]interface{}); ok {
+	if v, ok := aux.Groups.([]any); ok {
 		for _, item := range v {
 			if group, ok := item.(string); ok {
 				pf.Groups = append(pf.Groups, group)
@@ -271,7 +271,7 @@ func (pf *ProcessedFile) UnmarshalJSON(data []byte) error {
 	}
 
 	// Handle categories if they exist
-	if v, ok := aux.Categories.([]interface{}); ok {
+	if v, ok := aux.Categories.([]any); ok {
 		for _, item := range v {
 			if category, ok := item.(string); ok {
 				pf.Categories = append(pf.Categories, category)
@@ -309,7 +309,7 @@ func (ps *ProcessedSummary) GetName() string {
 // ConsolidatedSummary represents information about consolidated files that combine
 // multiple source files of the same type into a single deduplicated file.
 //
-//nolint:lll
+// nolint:lll
 type ConsolidatedSummary struct {
 	Type                      string   `json:"type"`                            // Type of entries (domain, ipv4, etc.)
 	Filepath                  string   `json:"filepath"`                        // Path to the consolidated file
@@ -363,9 +363,9 @@ func (css *ConsolidatedGroupsSummary) GetName() string {
 
 // ConsolidatedCategoriesSummary represents consolidated summaries grouped by category.
 //
-//nolint:lll
+// nolint:lll
 type ConsolidatedCategoriesSummary struct {
-	Category                  string                `json:"category"`                    // Category name (ads, malware, privacy, etc)
+	Category                  string                `json:"category"`                    // Category name (ads, malware, privacy)
 	LastConsolidatedTimestamp string                `json:"last_consolidated_timestamp"` // When consolidation was completed
 	ConsolidatedSummaries     []ConsolidatedSummary `json:"consolidated_summaries"`      // Consolidated summaries for this category
 }
@@ -495,8 +495,7 @@ func (ts *TopSummary) GetName() string {
 	return ts.GenericSourceType
 }
 
-// MarshalJSON implements custom JSON marshaling for TopSummary to include
-// the count of TopEntries in the JSON output.
+// MarshalJSON implements custom JSON marshaling for TopSummary.
 func (ts *TopSummary) MarshalJSON() ([]byte, error) {
 	type Alias TopSummary
 	return json.Marshal(&struct {
@@ -504,7 +503,7 @@ func (ts *TopSummary) MarshalJSON() ([]byte, error) {
 		Count int `json:"count"`
 	}{
 		Alias: (Alias)(*ts),
-		Count: len(ts.TopEntries),
+		Count: ts.Count,
 	})
 }
 
@@ -512,29 +511,6 @@ func (ts *TopSummary) MarshalJSON() ([]byte, error) {
 type EntryCountPair struct {
 	Entry string `json:"entry"` // The entry text (domain, IP, etc.)
 	Count int    `json:"count"` // Number of sources containing this entry
-}
-
-// EntryHeap is a min-heap of EntryCountPair elements
-type EntryHeap []EntryCountPair
-
-func (h *EntryHeap) Len() int { return len(*h) }
-
-func (h *EntryHeap) Less(i, j int) bool { return (*h)[i].Count < (*h)[j].Count } // Min-heap based on Count
-
-func (h *EntryHeap) Swap(i, j int) { (*h)[i], (*h)[j] = (*h)[j], (*h)[i] }
-
-func (h *EntryHeap) Push(x interface{}) {
-	if ecp, ok := x.(EntryCountPair); ok {
-		*h = append(*h, ecp)
-	}
-}
-
-func (h *EntryHeap) Pop() interface{} {
-	old := *h
-	n := len(old)
-	x := old[n-1]
-	*h = old[0 : n-1]
-	return x
 }
 
 // lessFuncByName is a generic helper function for sorting objects by name.

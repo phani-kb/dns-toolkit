@@ -4,6 +4,7 @@ application:
   description: A toolkit for DNS data processing and analysis.
 dns_toolkit:
   database:
+    type: sqlite
     path: data/dns-toolkit.db
   folders:
     download: data/download
@@ -30,7 +31,6 @@ dns_toolkit:
   files_checksum:
     enabled: true
     algorithm: 'md5' # md5, sha256
-  skip_unchanged_downloads: true
   skip_name_special_chars_check: true
   skip_cert_verification: true
   skip_cert_verification_hosts:
@@ -53,8 +53,11 @@ dns_toolkit:
         path: data/consolidated_allowlist.txt
       - name: blocklist
         path: data/consolidated_blocklist.txt
-  max_workers: 3
+  max_workers: 0
   max_retries: 3
+  download_rate_limit:
+    interval_ms: 1500
+    burst: 2
   source_filters:
     name:
       contains:
