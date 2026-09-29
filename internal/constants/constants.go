@@ -507,6 +507,13 @@ const (
 	IPResolveInterval             = 100 * time.Millisecond
 )
 
+var DownloadTimestampLayouts = []string{
+	TimestampFormat,
+	"2006-01-02 15:04:05",
+	time.RFC3339,
+	time.RFC3339Nano,
+}
+
 var DefaultMinSourcesRange = []int{3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
 
 // CommentPrefixes Comment prefixes used in various formats

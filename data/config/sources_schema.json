@@ -60,6 +60,10 @@
           "type": "string",
           "description": "Additional notes about the source."
         },
+        "downloader": {
+          "type": "string",
+          "description": "Optional downloader to use for this source (e.g., \"tranco\"). Defaults to the standard HTTP downloader."
+        },
         "types": {
           "type": "array",
           "description": "Source type definitions specifying how to process this source.",

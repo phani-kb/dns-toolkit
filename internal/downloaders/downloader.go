@@ -6,6 +6,10 @@ import (
 	"github.com/phani-kb/multilog"
 )
 
+type SummaryProvider interface {
+	GetLatestDownloadSummary(sourceName string) (*c.DownloadSummary, error)
+}
+
 type Downloader interface {
 	// Download is a method to implement the logic to download the file
 	Download(

@@ -52,6 +52,7 @@ type Source struct {
 	License                     string         `json:"license,omitempty"`
 	Website                     string         `json:"website,omitempty"`
 	Notes                       string         `json:"notes,omitempty"`
+	Downloader                  string         `json:"downloader,omitempty"`
 	URLPerCategory              string         `json:"url_per_category,omitempty"`
 	URLPerGroup                 string         `json:"url_per_group,omitempty"`
 	Types                       []c.SourceType `json:"types"`

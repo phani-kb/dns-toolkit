@@ -57,7 +57,6 @@ type DNSToolkitConfig struct {
 	DownloadRateLimit         downloadRateLimitConfig `yaml:"download_rate_limit,omitempty"`
 	MaxWorkers                int                     `yaml:"max_workers"`
 	MaxRetries                int                     `yaml:"max_retries"`
-	SkipUnchangedDownloads    bool                    `yaml:"skip_unchanged_downloads"`
 	SkipCertVerification      bool                    `yaml:"skip_cert_verification,omitempty"`
 	SkipNameSpecialCharsCheck bool                    `yaml:"skip_name_special_chars_check,omitempty"`
 	MinOverlapPercent         float64                 `yaml:"min_overlap_percent,omitempty"`

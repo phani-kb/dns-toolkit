@@ -1,12 +1,18 @@
 package db
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
 	"io"
 	"os"
+	"strings"
+
+	"github.com/jmoiron/sqlx"
 )
+
+const metadataChunkSize = 400
 
 func removeDBFiles(dbPath string) error {
 	paths := []string{dbPath, dbPath + "-wal", dbPath + "-shm"}
@@ -45,4 +51,39 @@ func boolToInt(b bool) int {
 		return 1
 	}
 	return 0
+}
+
+func placeholders(n int) string {
+	if n <= 0 {
+		return ""
+	}
+	return strings.TrimRight(strings.Repeat("?,", n), ",")
+}
+
+func int64Args(ids []int64) []any {
+	args := make([]any, len(ids))
+	for i, id := range ids {
+		args[i] = id
+	}
+	return args
+}
+
+// selectChunked runs query in chunk overs ids
+func selectChunked[T any](
+	ctx context.Context,
+	db *sqlx.DB,
+	ids []int64,
+	query func(n int) string,
+	errLabel string,
+) ([]T, error) {
+	var all []T
+	for i := 0; i < len(ids); i += metadataChunkSize {
+		chunk := ids[i:min(i+metadataChunkSize, len(ids))]
+		var rows []T
+		if err := db.SelectContext(ctx, &rows, query(len(chunk)), int64Args(chunk)...); err != nil {
+			return nil, fmt.Errorf("%s: %w", errLabel, err)
+		}
+		all = append(all, rows...)
+	}
+	return all, nil
 }
