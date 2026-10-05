@@ -64,7 +64,7 @@ func (r *DownloadsRepo) UpsertDownload(d DownloadRow) error {
 
 	table := constants.TableDownloads
 	_, err := r.db.writeConn.Exec(`
-		insert into `+table+` (source_id, url, filepath, frequency, checksum, error,
+		INSERT INTO `+table+` (source_id, url, filepath, frequency, checksum, error,
 			last_download_timestamp, last_checked_timestamp, last_processed_timestamp,
 			type_count, count_to_consider,
 			skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation)
@@ -104,11 +104,11 @@ func (r *DownloadsRepo) GetLatestDownloadSummary(sourceName string) (*c.Download
 		Error                 string `db:"error"`
 	}
 	err := r.db.getRead(context.Background(), &row, `
-		select coalesce(nullif(d.frequency, ''), s.frequency) as frequency,
-			coalesce(d.last_download_timestamp, '') as last_download_timestamp,
-			coalesce(nullif(d.url, ''), s.url) as url,
-			coalesce(d.error, '') as error
-		from `+constants.TableDownloads+` d
+		SELECT COALESCE(NULLIF(d.frequency, ''), s.frequency) AS frequency,
+			COALESCE(d.last_download_timestamp, '') AS last_download_timestamp,
+			COALESCE(NULLIF(d.url, ''), s.url) AS url,
+			COALESCE(d.error, '') AS error
+		FROM `+constants.TableDownloads+` d
 		JOIN `+constants.TableSources+` s ON s.id = d.source_id
 		WHERE s.name = ? LIMIT 1`, sourceName)
 	if err != nil {
@@ -129,7 +129,7 @@ func (r *DownloadsRepo) GetLatestDownloadSummary(sourceName string) (*c.Download
 func (r *DownloadsRepo) GetLastProcessedChecksum(sourceID int64) string {
 	var checksum string
 	err := r.db.getRead(context.Background(), &checksum,
-		"select coalesce(last_processed_checksum, '') from "+constants.TableDownloads+" WHERE source_id = ?",
+		"SELECT COALESCE(last_processed_checksum, '') FROM "+constants.TableDownloads+" WHERE source_id = ?",
 		sourceID)
 	if err != nil {
 		return ""
@@ -183,21 +183,21 @@ func (r *DownloadsRepo) GetDownloadSummaryBySourceName(sourceName, downloadDir s
 }
 
 var downloadSummaryBaseQuery = `
-	select s.id as source_id, s.name as name,
-		coalesce(nullif(d.url, ''), s.url) as url,
-		coalesce(d.filepath, '') as filepath,
-		coalesce(nullif(d.frequency, ''), s.frequency) as frequency,
-		coalesce(d.checksum, '') as checksum,
-		coalesce(d.error, '') as error,
-		coalesce(d.last_download_timestamp, '') as last_download_timestamp,
-		coalesce(d.last_checked_timestamp, '') as last_checked_timestamp,
-		coalesce(d.last_processed_timestamp, '') as last_processed_timestamp,
-		d.type_count as type_count,
-		d.count_to_consider as count_to_consider,
-		d.skip_general_consolidation as skip_general_consolidation,
-		d.skip_groups_consolidation as skip_groups_consolidation,
-		d.skip_categories_consolidation as skip_categories_consolidation
-	from ` + constants.TableDownloads + ` d
+	SELECT s.id AS source_id, s.name AS name,
+		COALESCE(NULLIF(d.url, ''), s.url) AS url,
+		COALESCE(d.filepath, '') AS filepath,
+		COALESCE(NULLIF(d.frequency, ''), s.frequency) AS frequency,
+		COALESCE(d.checksum, '') AS checksum,
+		COALESCE(d.error, '') AS error,
+		COALESCE(d.last_download_timestamp, '') AS last_download_timestamp,
+		COALESCE(d.last_checked_timestamp, '') AS last_checked_timestamp,
+		COALESCE(d.last_processed_timestamp, '') AS last_processed_timestamp,
+		d.type_count AS type_count,
+		d.count_to_consider AS count_to_consider,
+		d.skip_general_consolidation AS skip_general_consolidation,
+		d.skip_groups_consolidation AS skip_groups_consolidation,
+		d.skip_categories_consolidation AS skip_categories_consolidation
+	FROM ` + constants.TableDownloads + ` d
 	INNER JOIN ` + constants.TableSources + ` s ON s.id = d.source_id`
 
 // ListDownloadSummaries returns all persisted download summaries.

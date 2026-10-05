@@ -38,6 +38,15 @@ type EntryCategoryRow struct {
 	Category   string
 }
 
+type SourceCountRow struct {
+	GenericSourceType string
+	ActualSourceType  string
+	ListType          string
+	Valid             bool
+	MustConsider      bool
+	EntryCount        int
+}
+
 // ReplaceSourceData rewrites all processed-entry rows for a source in one transaction.
 func (r *EntriesRepo) ReplaceSourceData(
 	ctx context.Context,
