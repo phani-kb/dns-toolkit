@@ -68,11 +68,15 @@ func (d *DefaultDownloader) SetForceDownload(force bool) {
 	d.forceDownload = force
 }
 
+func normalizeMaxRetries(maxRetries int) int {
+	return max(maxRetries, 1)
+}
+
 // NewDefaultDownloaderWithRetries creates a new DefaultDownloader with custom retry
 func NewDefaultDownloaderWithRetries(maxRetries int) *DefaultDownloader {
 	return &DefaultDownloader{
 		rnd:           rand.New(rand.NewSource(time.Now().UnixNano())),
-		maxRetries:    maxRetries,
+		maxRetries:    normalizeMaxRetries(maxRetries),
 		retryDelay:    retryDelay,
 		clientTimeout: time.Second * constants.DefaultClientTimeoutInSeconds,
 	}
@@ -83,7 +87,7 @@ func NewDefaultDownloaderForTesting(maxRetries int, testRetryDelay time.Duration
 	testTimeout := 500 * time.Millisecond
 	return &DefaultDownloader{
 		rnd:           rand.New(rand.NewSource(time.Now().UnixNano())),
-		maxRetries:    maxRetries,
+		maxRetries:    normalizeMaxRetries(maxRetries),
 		retryDelay:    testRetryDelay,
 		clientTimeout: testTimeout,
 	}
@@ -220,9 +224,7 @@ func (d *DefaultDownloader) downloadFile(
 
 		// Check response status
 		if resp != nil && resp.StatusCode == http.StatusTooManyRequests && attempt < d.maxRetries {
-			if closeErr := resp.Body.Close(); closeErr != nil {
-				logger.Warnf("Failed to close response body: %v", closeErr)
-			}
+			u.CloseBody(logger, resp.Body)
 
 			// For 429, use exponential backoff with jitter
 			waitTime := d.retryDelay * time.Duration(1<<uint(attempt))
@@ -241,14 +243,13 @@ func (d *DefaultDownloader) downloadFile(
 	}
 
 	if resp == nil {
+		if lastErr == nil {
+			lastErr = fmt.Errorf("no download attempts made for %s", file.URL)
+		}
 		return "", false, lastErr
 	}
 
-	defer func() {
-		if closeErr := resp.Body.Close(); closeErr != nil {
-			logger.Warnf("Failed to close response body: %v", closeErr)
-		}
-	}()
+	defer u.CloseBody(logger, resp.Body)
 
 	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 		if resp.StatusCode >= 300 && resp.StatusCode < 400 {
@@ -505,10 +506,7 @@ func (d *DefaultDownloader) previousSummary(
 			return *summary
 		}
 	}
-	summary, err := u.GetLastSummary[c.DownloadSummary](logger, summaryFile, sourceName)
-	if err != nil {
-		return c.DownloadSummary{}
-	}
+	summary, _ := u.GetLastSummary[c.DownloadSummary](logger, summaryFile, sourceName)
 	return summary
 }
 

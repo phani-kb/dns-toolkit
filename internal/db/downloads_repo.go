@@ -62,21 +62,22 @@ func (r *DownloadsRepo) UpsertDownload(d DownloadRow) error {
 	lastCheckedTimestamp := normalizeDownloadTimestampValue(d.LastCheckedTimestamp)
 	lastProcessedTimestamp := normalizeDownloadTimestampValue(d.LastProcessedTimestamp)
 
+	table := constants.TableDownloads
 	_, err := r.db.writeConn.Exec(`
-		insert into `+constants.TableDownloads+` (source_id, url, filepath, frequency, checksum, error,
+		insert into `+table+` (source_id, url, filepath, frequency, checksum, error,
 			last_download_timestamp, last_checked_timestamp, last_processed_timestamp,
 			type_count, count_to_consider,
 			skip_general_consolidation, skip_groups_consolidation, skip_categories_consolidation)
 		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 		ON CONFLICT(source_id) DO UPDATE SET
 			url = excluded.url,
-			filepath = excluded.filepath,
+			filepath = COALESCE(NULLIF(excluded.filepath, ''), `+table+`.filepath),
 			frequency = excluded.frequency,
-			checksum = excluded.checksum,
+			checksum = COALESCE(NULLIF(excluded.checksum, ''), `+table+`.checksum),
 			error = excluded.error,
-			last_download_timestamp = excluded.last_download_timestamp,
-			last_checked_timestamp = excluded.last_checked_timestamp,
-			last_processed_timestamp = excluded.last_processed_timestamp,
+			last_download_timestamp = COALESCE(excluded.last_download_timestamp, `+table+`.last_download_timestamp),
+			last_checked_timestamp = COALESCE(excluded.last_checked_timestamp, `+table+`.last_checked_timestamp),
+			last_processed_timestamp = COALESCE(excluded.last_processed_timestamp, `+table+`.last_processed_timestamp),
 			type_count = excluded.type_count,
 			count_to_consider = excluded.count_to_consider,
 			skip_general_consolidation = excluded.skip_general_consolidation,
@@ -157,6 +158,14 @@ func (r *DownloadsRepo) SetLastProcessedTimestamp(sourceID int64, ts string) err
 		return fmt.Errorf("setting last_processed_timestamp for source %d: %w", sourceID, err)
 	}
 	return nil
+}
+
+// nullableString maps the empty string to SQL NULL.
+func nullableString(s string) any {
+	if s == "" {
+		return nil
+	}
+	return s
 }
 
 // GetDownloadSummaryBySourceName returns all persisted download summaries for a source name.

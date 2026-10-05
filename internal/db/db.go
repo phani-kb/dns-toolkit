@@ -12,8 +12,8 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/phani-kb/multilog"
-	_ "modernc.org/sqlite"
 )
 
 // dsnPragmas are applied per connection.
@@ -77,7 +77,7 @@ func openConn(dbPath string) (*DB, error) {
 
 	dsn := buildDataSource(dbPath)
 
-	writeConn, err := sqlx.Open("sqlite", dsn)
+	writeConn, err := sqlx.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, fmt.Errorf("opening write connection: %w", err)
 	}
@@ -89,7 +89,7 @@ func openConn(dbPath string) (*DB, error) {
 		return nil, closeOnError(writeConn, "pinging write database", err)
 	}
 
-	readConn, err := sqlx.Open("sqlite", dsn)
+	readConn, err := sqlx.Open("sqlite3", dsn)
 	if err != nil {
 		return nil, closeOnError(writeConn, "opening read connection", err)
 	}
@@ -199,7 +199,7 @@ func (db *DB) DropAndRecreateTable(ctx context.Context, tableName string) error 
 		if !isValidTableName(tableName) {
 			return fmt.Errorf("refusing to clear unknown table %q", tableName)
 		}
-		_, err := db.writeConn.ExecContext(ctx, "delete from "+tableName)
+		_, err := db.writeConn.ExecContext(ctx, "DELETE FROM "+tableName)
 		return err
 	}
 	return db.InTransaction(ctx, func(tx *sql.Tx) error {
@@ -210,7 +210,7 @@ func (db *DB) DropAndRecreateTable(ctx context.Context, tableName string) error 
 		if _, err := tx.ExecContext(ctx, "drop view if exists "+tableName); err != nil {
 			return fmt.Errorf("dropping view %s: %w", tableName, err)
 		}
-		if _, err := tx.ExecContext(ctx, "drop table if exists "+tableName); err != nil {
+		if _, err := tx.ExecContext(ctx, "DROP TABLE IF EXISTS "+tableName); err != nil {
 			return fmt.Errorf("dropping table %s: %w", tableName, err)
 		}
 		for _, s := range stmts {

@@ -287,6 +287,10 @@ const (
 	SourceTypeTopDomains                 = "domain_top"
 	SourceTypeDomainCustomHtmlPuppyScams = "domain_custom_html_puppyscams"
 	SourceTypeIpv4FromDomain             = "ipv4_from_domain"
+	SourceTypeClash                      = "clash"
+	SourceTypeSurge                      = "surge"
+	SourceTypeDnsmasq                    = "dnsmasq"
+	SourceTypeBindZone                   = "bind_zone"
 
 	ListTypeBlocklist = "blocklist"
 	ListTypeAllowlist = "allowlist"
@@ -332,6 +336,10 @@ var (
 		SourceTypeTopDomains:                 true,
 		SourceTypeDomainCustomHtmlPuppyScams: true,
 		SourceTypeIpv4FromDomain:             true,
+		SourceTypeClash:                      true,
+		SourceTypeSurge:                      true,
+		SourceTypeDnsmasq:                    true,
+		SourceTypeBindZone:                   true,
 	}
 	ValidListTypes = map[string]bool{
 		ListTypeBlocklist: true,
@@ -391,6 +399,10 @@ var (
 		SourceTypeHostname:        SourceTypeDomain,
 		SourceTypeIpv4RangeExpand: SourceTypeIpv4,
 		SourceTypeIpv4CidrExpand:  SourceTypeIpv4,
+		SourceTypeClash:           SourceTypeDomain,
+		SourceTypeSurge:           SourceTypeDomain,
+		SourceTypeDnsmasq:         SourceTypeDomain,
+		SourceTypeBindZone:        SourceTypeDomain,
 	}
 )
 
@@ -678,4 +690,8 @@ const (
 	TableConsolidationState   = TablePrefix + "consolidation_state"
 )
 
-const BulkInsertBatchSize = 100
+const (
+	BulkInsertBatchSize    = 100
+	ProcessBulkLoadMinRows = 250000
+	ProcessAnalyzeMinRows  = 100000
+)

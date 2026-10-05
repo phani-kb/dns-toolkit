@@ -176,7 +176,7 @@ func (j *downloadJob) run() {
 		summary.LastDownloadTimestamp = time.Now().Format(constants.TimestampFormat)
 	}
 
-	j.reprocessTargets(downloader, downloadFile, fetchSkipped, &summary)
+	j.reprocessTargets(downloader, downloadFile, filePath, fetchSkipped, &summary)
 
 	if j.appConfig != nil && j.appConfig.DNSToolkit.FilesChecksum.Enabled {
 		summary.Checksum = u.CalculateChecksum(Logger, filePath, j.appConfig.DNSToolkit.FilesChecksum.Algorithm)
@@ -188,6 +188,7 @@ func (j *downloadJob) run() {
 func (j *downloadJob) reprocessTargets(
 	downloader d.Downloader,
 	downloadFile c.DownloadFile,
+	filePath string,
 	fetchSkipped bool,
 	summary *c.DownloadSummary,
 ) {

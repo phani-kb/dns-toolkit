@@ -89,7 +89,7 @@ without rowid;
 -- source_countries: 2-letter country codes per source
 create table if not exists dnstk_source_countries (
   source_id integer not null references dnstk_sources (id) on delete cascade,
-  country_code text not null check (length(country_code) = 2),
+  country_code text not null check (length (country_code) = 2),
   primary key (source_id, country_code)
 ) strict,
 without rowid;
