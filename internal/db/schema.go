@@ -195,12 +195,12 @@ func (db *DB) EnsureSchema(ctx context.Context, logger *multilog.Logger, forceRe
 
 func (db *DB) storeSchemaChecksum(checksum string) error {
 	q := fmt.Sprintf(`
-	  create table if not exists %s (
-	   checksum text not null,
-	   applied_at text not null default (datetime('now'))
+	  CREATE TABLE IF NOT EXISTS %s (
+	   checksum TEXT NOT NULL,
+	   applied_at TEXT NOT NULL DEFAULT (datetime('now'))
 	  );
-	  delete from %s;
-	  insert into %s (checksum) values (?);
+	  DELETE FROM %s;
+	  INSERT INTO %s (checksum) VALUES (?);
 	 `, constants.SchemaMetadataTable, constants.SchemaMetadataTable, constants.SchemaMetadataTable)
 
 	if _, err := db.writeConn.Exec(q, checksum); err != nil {
@@ -219,7 +219,7 @@ func (db *DB) storedSchemaChecksum() (string, error) {
 	}
 
 	var checksum string
-	q := fmt.Sprintf("select checksum from %s limit 1", constants.SchemaMetadataTable)
+	q := fmt.Sprintf("SELECT checksum FROM %s LIMIT 1", constants.SchemaMetadataTable)
 	if err := db.readConn.QueryRow(q).Scan(&checksum); err != nil {
 		return "", err
 	}
@@ -247,7 +247,7 @@ func (db *DB) recreateSchema(ctx context.Context, checksum string) error {
 	}
 
 	for _, v := range views {
-		q := "drop view if exists " + v
+		q := "DROP VIEW IF EXISTS " + v
 		if _, err := tx.Exec(q); err != nil {
 			if rbErr := tx.Rollback(); rbErr != nil {
 				return fmt.Errorf("dropping view %s: %w; rollback failed: %v", v, err, rbErr)
@@ -256,7 +256,7 @@ func (db *DB) recreateSchema(ctx context.Context, checksum string) error {
 		}
 	}
 	for _, t := range tables {
-		q := "drop table if exists " + t
+		q := "DROP TABLE IF EXISTS " + t
 		if _, err := tx.Exec(q); err != nil {
 			if rbErr := tx.Rollback(); rbErr != nil {
 				return fmt.Errorf("dropping table %s: %w; rollback failed: %v", t, err, rbErr)
@@ -293,7 +293,7 @@ func (db *DB) listUserViews() ([]string, error) {
 }
 
 func (db *DB) listUserObjects(objType string) ([]string, error) {
-	q := fmt.Sprintf("select name from sqlite_master where type='%s' "+
+	q := fmt.Sprintf("SELECT name FROM sqlite_master WHERE type='%s' "+
 		"AND (name like '%s%%' OR name like '_%s%%') ORDER BY name", objType, constants.TablePrefix, constants.TablePrefix)
 	var names []string
 	if err := db.readConn.SelectContext(context.Background(), &names, q); err != nil {
@@ -382,7 +382,7 @@ func (db *DB) TableRowCounts() (map[string]int64, error) {
 	counts := make(map[string]int64, len(tables))
 	for _, t := range tables {
 		var count int64
-		q := "select count(*) from " + t
+		q := "SELECT COUNT(*) FROM " + t
 		err := db.readConn.QueryRow(q).Scan(&count)
 		if err != nil {
 			counts[t] = -1

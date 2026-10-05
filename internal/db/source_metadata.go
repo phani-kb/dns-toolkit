@@ -33,9 +33,9 @@ func (l SourceMetadataLoader) BatchSourceTypes(sourceIDs []int64) (map[int64][]c
 	}
 	allTypes, err := selectChunked[typeRow](context.Background(), l.readConn, sourceIDs, func(n int) string {
 		return `
-			select st.source_id as source_id, st.id as id, tn.name as name,
-				coalesce(st.notes, '') as notes, st.disabled as disabled
-			from ` + constants.TableSourceTypes + ` st
+			SELECT st.source_id AS source_id, st.id AS id, tn.name AS name,
+				COALESCE(st.notes, '') AS notes, st.disabled AS disabled
+			FROM ` + constants.TableSourceTypes + ` st
 			INNER JOIN ` + constants.TableTypeNames + ` tn ON tn.id = st.type_name_id
 			WHERE st.source_id IN (` + placeholders(n) + `) AND st.disabled = 0
 			ORDER BY st.source_id, st.id`
@@ -85,9 +85,9 @@ func (l SourceMetadataLoader) BatchSourceListTypes(typeIDs []int64) (map[int64][
 	}
 	all, err := selectChunked[ltRow](context.Background(), l.readConn, typeIDs, func(n int) string {
 		return `
-			select slt.source_type_id as source_type_id, slt.id as id, ltn.name as name,
-				coalesce(sltn.notes, '') as notes, slt.disabled as disabled, slt.must_consider as must_consider
-			from ` + constants.TableSourceListTypes + ` slt
+			SELECT slt.source_type_id AS source_type_id, slt.id AS id, ltn.name AS name,
+				COALESCE(sltn.notes, '') AS notes, slt.disabled AS disabled, slt.must_consider AS must_consider
+			FROM ` + constants.TableSourceListTypes + ` slt
 			INNER JOIN ` + constants.TableListTypeNames + ` ltn ON ltn.id = slt.list_type_name_id
 			LEFT JOIN ` + constants.TableSourceListTypeNotes + ` sltn ON sltn.source_list_type_id = slt.id
 			WHERE slt.source_type_id IN (` + placeholders(n) + `) AND slt.disabled = 0
@@ -128,8 +128,8 @@ func (l SourceMetadataLoader) BatchSourceCategories(sourceIDs []int64) (map[int6
 	}
 	rows, err := selectChunked[categoryRow](context.Background(), l.readConn, sourceIDs, func(n int) string {
 		return `
-			select sc.source_id as source_id, cn.name as name
-			from ` + constants.TableSourceCategories + ` sc
+			SELECT sc.source_id AS source_id, cn.name AS name
+			FROM ` + constants.TableSourceCategories + ` sc
 			INNER JOIN ` + constants.TableCategoryNames + ` cn ON cn.id = sc.category_name_id
 			WHERE sc.source_id IN (` + placeholders(n) + `)
 			ORDER BY sc.source_id, cn.name`
@@ -154,7 +154,7 @@ func (l SourceMetadataLoader) BatchSourceFiles(sourceIDs []int64) (map[int64][]s
 		SourceID int64  `db:"source_id"`
 	}
 	rows, err := selectChunked[fileRow](context.Background(), l.readConn, sourceIDs, func(n int) string {
-		return "select source_id, filename from " + constants.TableSourceFiles +
+		return "SELECT source_id, filename FROM " + constants.TableSourceFiles +
 			" WHERE source_id IN (" + placeholders(n) + ") ORDER BY source_id, filename"
 	}, "batch querying source files")
 	if err != nil {
@@ -178,8 +178,8 @@ func (l SourceMetadataLoader) BatchListTypeGroups(ltIDs []int64) (map[int64][]st
 	}
 	rows, err := selectChunked[listTypeGroupRow](context.Background(), l.readConn, ltIDs, func(n int) string {
 		return `
-			select sltg.source_list_type_id as source_list_type_id, gn.name as name
-			from ` + constants.TableSourceListTypeGroups + ` sltg
+			SELECT sltg.source_list_type_id AS source_list_type_id, gn.name AS name
+			FROM ` + constants.TableSourceListTypeGroups + ` sltg
 			INNER JOIN ` + constants.TableGroupNames + ` gn ON gn.id = sltg.group_name_id
 			WHERE sltg.source_list_type_id IN (` + placeholders(n) + `)
 			ORDER BY sltg.source_list_type_id, gn.name`
