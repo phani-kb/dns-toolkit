@@ -4,6 +4,7 @@
       "name": "tranco",
       "categories": "topdomains",
       "count_to_consider": 500,
+      "downloader": "tranco",
       "files": "top-1m.csv",
       "frequency": "weekly",
       "notes": "Reduced to 500, as many conflicts with other sources",

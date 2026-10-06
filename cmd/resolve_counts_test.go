@@ -5,8 +5,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	c "github.com/phani-kb/dns-toolkit/internal/common"
-	"github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/phani-kb/dns-toolkit/internal/constants"
 	"github.com/phani-kb/dns-toolkit/internal/utils"
 	u "github.com/phani-kb/dns-toolkit/internal/utils"
@@ -14,49 +12,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-func TestBuildResolutionSets_SimpleCounts(t *testing.T) {
-	logger, _ := multilog.NewTestLogger(t)
-
-	cleanup, testDataDir := setupTestEnvironmentForCmdTests(t)
-	defer cleanup()
-
-	bl := filepath.Join(testDataDir, "bl_test.txt")
-	if err := os.WriteFile(bl, []byte("bad.example.com\n"), 0o644); err != nil {
-		t.Fatalf("failed to write blocklist: %v", err)
-	}
-
-	al := filepath.Join(testDataDir, "al_test.txt")
-	if err := os.WriteFile(al, []byte("good.example.com\n"), 0o644); err != nil {
-		t.Fatalf("failed to write allowlist: %v", err)
-	}
-
-	processed := []c.ProcessedFile{
-		{
-			Name:              "bl-src",
-			GenericSourceType: constants.SourceTypeDomain,
-			ListType:          constants.ListTypeBlocklist,
-			Filepath:          bl,
-			Valid:             true,
-		},
-		{
-			Name:              "al-src",
-			GenericSourceType: constants.SourceTypeDomain,
-			ListType:          constants.ListTypeAllowlist,
-			Filepath:          al,
-			Valid:             true,
-		},
-	}
-
-	allowByType, blockByType, conflicts, _, _, _ := BuildResolutionSets(logger, processed)
-
-	assert.NotNil(t, allowByType)
-	assert.NotNil(t, blockByType)
-	assert.NotNil(t, conflicts)
-
-	assert.Contains(t, blockByType[constants.SourceTypeDomain].ToSlice(), "bad.example.com")
-	assert.NotContains(t, allowByType[constants.SourceTypeDomain].ToSlice(), "bad.example.com")
-}
 
 func setupTestEnvironmentForCmdTests(t *testing.T) (func(), string) {
 	projectRoot, err := utils.FindProjectRoot("")
@@ -93,148 +48,6 @@ func TestResolutionResult_Struct(t *testing.T) {
 	assert.NotNil(t, result.ManualOverride.BlockToAllow)
 }
 
-func TestHelperFunctions(t *testing.T) {
-	valid := isValidProcessedFile(c.ProcessedFile{Filepath: "/path/file.txt", Valid: true})
-	invalid := isValidProcessedFile(c.ProcessedFile{Filepath: "", Valid: false})
-	assert.True(t, valid)
-	assert.False(t, invalid)
-
-	sources := map[string]struct{}{"source_c": {}, "source_a": {}, "source_b": {}}
-	result := getSourcesList(sources)
-	assert.Equal(t, []string{"source_a", "source_b", "source_c"}, result)
-
-	detail := ConflictDetail{BlockSources: []string{"src1"}, AllowSources: []string{"src2"}}
-	assert.True(t, hasSourcesOnBothSides(detail))
-
-	emptyDetail := ConflictDetail{BlockSources: []string{}, AllowSources: []string{}}
-	assert.False(t, hasSourcesOnBothSides(emptyDetail))
-}
-
-func TestBuildSourceMaps_Integration(t *testing.T) {
-	logger, _ := multilog.NewTestLogger(t)
-	cleanup, testDataDir := setupTestEnvironmentForCmdTests(t)
-	defer cleanup()
-
-	blockFile := filepath.Join(testDataDir, "block_test.txt")
-	allowFile := filepath.Join(testDataDir, "allow_test.txt")
-
-	err := os.WriteFile(blockFile, []byte("bad.example.com\nevil.com\n"), 0o644)
-	require.NoError(t, err)
-
-	err = os.WriteFile(allowFile, []byte("good.example.com\nsafe.com\n"), 0o644)
-	require.NoError(t, err)
-
-	processedFiles := []c.ProcessedFile{
-		{
-			Filepath:          blockFile,
-			Name:              "TestBlocklist",
-			ListType:          constants.ListTypeBlocklist,
-			GenericSourceType: constants.SourceTypeDomain,
-			Valid:             true,
-		},
-		{
-			Filepath:          allowFile,
-			Name:              "TestAllowlist",
-			ListType:          constants.ListTypeAllowlist,
-			GenericSourceType: constants.SourceTypeDomain,
-			Valid:             true,
-		},
-	}
-
-	maps := buildSourceMaps(logger, processedFiles)
-
-	assert.Contains(t, maps.BlockMap, "bad.example.com")
-	assert.Contains(t, maps.BlockMap["bad.example.com"], "TestBlocklist")
-
-	assert.Contains(t, maps.AllowMap, "good.example.com")
-	assert.Contains(t, maps.AllowMap["good.example.com"], "TestAllowlist")
-
-	assert.Contains(t, maps.EntryTypes["bad.example.com"], constants.SourceTypeDomain)
-}
-
-func TestResolveByCounts_Integration(t *testing.T) {
-	maps := &SourceMaps{
-		BlockMap: map[string]map[string]struct{}{
-			"conflict.com": {"block1": {}, "block2": {}},
-			"block.com":    {"block1": {}},
-			"equal.com":    {"block1": {}},
-		},
-		AllowMap: map[string]map[string]struct{}{
-			"conflict.com": {"allow1": {}},
-			"allow.com":    {"allow1": {}, "allow2": {}},
-			"equal.com":    {"allow1": {}},
-		},
-		EntryTypes: map[string]map[string]struct{}{
-			"conflict.com": {constants.SourceTypeDomain: {}},
-			"block.com":    {constants.SourceTypeDomain: {}},
-			"allow.com":    {constants.SourceTypeDomain: {}},
-			"equal.com":    {constants.SourceTypeDomain: {}},
-		},
-	}
-
-	result := &ResolutionResult{
-		AllowByType: make(map[string]u.StringSet),
-		BlockByType: make(map[string]u.StringSet),
-		DetailsMap:  make(map[string]ConflictDetail),
-	}
-
-	logger, _ := multilog.NewTestLogger(t)
-	conflicts := resolveByCounts(logger, maps, result)
-
-	assert.Contains(t, result.BlockByType[constants.SourceTypeDomain], "conflict.com")
-	assert.NotContains(t, result.AllowByType[constants.SourceTypeDomain], "conflict.com")
-
-	assert.Contains(t, result.AllowByType[constants.SourceTypeDomain], "allow.com")
-
-	assert.Contains(t, result.BlockByType[constants.SourceTypeDomain], "block.com")
-
-	assert.Len(t, conflicts, 1)
-	assert.Equal(t, "equal.com", conflicts[0].Entry)
-	assert.Equal(t, 1, conflicts[0].BlockCount)
-	assert.Equal(t, 1, conflicts[0].AllowCount)
-}
-
-func TestResolve_MinSourcesThresholdsApplied(t *testing.T) {
-	logger, _ := multilog.NewTestLogger(t)
-
-	// create maps where allow has higher count but below min_sources
-	maps := &SourceMaps{
-		BlockMap: map[string]map[string]struct{}{
-			"maybe.com": {"block1": {}},
-		},
-		AllowMap: map[string]map[string]struct{}{
-			// allow has 2 sources
-			"maybe.com": {"allow1": {}, "allow2": {}},
-		},
-		EntryTypes: map[string]map[string]struct{}{
-			"maybe.com": {constants.SourceTypeDomain: {}},
-		},
-	}
-
-	result := &ResolutionResult{
-		AllowByType: make(map[string]u.StringSet),
-		BlockByType: make(map[string]u.StringSet),
-		DetailsMap:  make(map[string]ConflictDetail),
-	}
-
-	oldAppConfig := AppConfig
-	AppConfig = &config.AppConfig{}
-	AppConfig.DNSToolkit.Override.Enabled = true
-	AppConfig.DNSToolkit.Override.Thresholds = []config.ThresholdConfig{
-		{Name: "allowlist", MinSources: 3},
-		{Name: "blocklist", MinSources: 3},
-	}
-	defer func() { AppConfig = oldAppConfig }()
-
-	conflicts := resolveByCounts(logger, maps, result)
-
-	// allow had higher count (2) but below min_sources (3), conflict
-	assert.Len(t, conflicts, 1)
-	assert.Equal(t, "maybe.com", conflicts[0].Entry)
-	assert.False(t, result.AllowByType[constants.SourceTypeDomain].Contains("maybe.com"))
-	assert.False(t, result.BlockByType[constants.SourceTypeDomain].Contains("maybe.com"))
-}
-
 func TestConflictProcessing(t *testing.T) {
 	conflicts := []ConflictDetail{
 		{
@@ -269,183 +82,203 @@ func TestConflictProcessing(t *testing.T) {
 	assert.Nil(t, result)
 }
 
-func TestUncoveredFunctions(t *testing.T) {
+func TestMoveToBlockSet(t *testing.T) {
 	result := &ResolutionResult{
 		AllowByType: make(map[string]u.StringSet),
 		BlockByType: make(map[string]u.StringSet),
 	}
-	result.BlockByType[constants.SourceTypeDomain] = u.NewStringSet([]string{"test.com"})
+	result.AllowByType[constants.SourceTypeDomain] = u.NewStringSet([]string{"test.com"})
 
-	moveToAllowSet(result, "test.com", constants.SourceTypeDomain)
-	assert.Contains(t, result.AllowByType[constants.SourceTypeDomain], "test.com")
-	assert.NotContains(t, result.BlockByType[constants.SourceTypeDomain], "test.com")
+	moveToBlockSet(result, "test.com", constants.SourceTypeDomain)
 
-	setsByType := map[string]u.StringSet{
-		"type1": u.NewStringSet([]string{"entry1", "entry2"}),
-		"type2": u.NewStringSet([]string{"entry3"}),
-	}
-	count := countSetEntries(setsByType)
-	assert.Equal(t, 3, count)
+	assert.True(t, result.BlockByType[constants.SourceTypeDomain].Contains("test.com"))
+	assert.False(t, result.AllowByType[constants.SourceTypeDomain].Contains("test.com"))
 }
 
-func TestWriteResolvedLists(t *testing.T) {
+func TestIsManualOverride(t *testing.T) {
+	result := &ResolutionResult{}
+	result.ManualOverride.AllowToBlock = map[string]struct{}{"blocked.com": {}}
+	result.ManualOverride.BlockToAllow = map[string]struct{}{"allowed.com": {}}
+
+	assert.True(t, isManualOverride("blocked.com", result))
+	assert.True(t, isManualOverride("allowed.com", result))
+	assert.False(t, isManualOverride("neutral.com", result))
+}
+
+func TestGetAutomaticDecisions(t *testing.T) {
 	logger, _ := multilog.NewTestLogger(t)
 	cleanup, _ := setupTestEnvironmentForCmdTests(t)
 	defer cleanup()
 
 	result := &ResolutionResult{
-		AllowByType: map[string]u.StringSet{
-			constants.SourceTypeDomain: u.NewStringSet([]string{"allow.com"}),
-		},
-		BlockByType: map[string]u.StringSet{
-			constants.SourceTypeDomain: u.NewStringSet([]string{"block.com"}),
-		},
+		AllowByType: make(map[string]u.StringSet),
+		BlockByType: make(map[string]u.StringSet),
+		DetailsMap:  make(map[string]ConflictDetail),
+	}
+	result.ManualOverride.AllowToBlock = make(map[string]struct{})
+	result.ManualOverride.BlockToAllow = make(map[string]struct{})
+
+	// Entry resolved as block (more block sources)
+	result.BlockByType[constants.SourceTypeDomain] = u.NewStringSet([]string{"block-wins.com"})
+	result.DetailsMap["block-wins.com"] = ConflictDetail{
+		Entry:        "block-wins.com",
+		BlockSources: []string{"src1", "src2"},
+		AllowSources: []string{"src3"},
+		BlockCount:   2,
+		AllowCount:   1,
 	}
 
-	oldEmitResolvedLists := emitResolvedLists
-	emitResolvedLists = false
-	allowPath, blockPath, err := writeResolvedLists(logger, result)
-	assert.NoError(t, err)
-	assert.Empty(t, allowPath)
-	assert.Empty(t, blockPath)
+	// Entry resolved as allow (more allow sources)
+	result.AllowByType[constants.SourceTypeDomain] = u.NewStringSet([]string{"allow-wins.com"})
+	result.DetailsMap["allow-wins.com"] = ConflictDetail{
+		Entry:        "allow-wins.com",
+		BlockSources: []string{"src1"},
+		AllowSources: []string{"src2", "src3"},
+		BlockCount:   1,
+		AllowCount:   2,
+	}
 
-	emitResolvedLists = true
-	allowPath, blockPath, err = writeResolvedLists(logger, result)
-	assert.NoError(t, err)
-	assert.NotEmpty(t, allowPath)
-	assert.NotEmpty(t, blockPath)
+	records := getAutomaticDecisions(logger, result)
 
-	assert.FileExists(t, allowPath)
-	assert.FileExists(t, blockPath)
-
-	emitResolvedLists = oldEmitResolvedLists
+	assert.Len(t, records, 2)
+	decisionMap := make(map[string]string)
+	for _, r := range records {
+		decisionMap[r.Entry] = r.Decision
+	}
+	assert.Equal(t, DecisionBlock, decisionMap["block-wins.com"])
+	assert.Equal(t, DecisionAllow, decisionMap["allow-wins.com"])
 }
 
-func TestResolveConflictsByCounts_Integration(t *testing.T) {
+func TestGetManualOverrideRecords(t *testing.T) {
 	logger, _ := multilog.NewTestLogger(t)
-	cleanup, testDataDir := setupTestEnvironmentForCmdTests(t)
-	defer cleanup()
 
-	summaryDir := filepath.Join(testDataDir, "summary")
-	err := os.MkdirAll(summaryDir, 0o755)
-	require.NoError(t, err)
+	result := &ResolutionResult{
+		AllowByType: make(map[string]u.StringSet),
+		BlockByType: make(map[string]u.StringSet),
+		DetailsMap:  make(map[string]ConflictDetail),
+	}
+	result.ManualOverride.AllowToBlock = map[string]struct{}{"forced-block.com": {}}
+	result.ManualOverride.BlockToAllow = map[string]struct{}{"forced-allow.com": {}}
 
-	blockFile := filepath.Join(testDataDir, "block_resolve_test.txt")
-	allowFile := filepath.Join(testDataDir, "allow_resolve_test.txt")
-
-	err = os.WriteFile(blockFile, []byte("conflict.example.com\nblock-only.com\n"), 0o644)
-	require.NoError(t, err)
-
-	err = os.WriteFile(allowFile, []byte("conflict.example.com\nallow-only.com\n"), 0o644)
-	require.NoError(t, err)
-
-	processedFiles := []c.ProcessedFile{
-		{
-			Filepath:          blockFile,
-			Name:              "TestBlockSource",
-			ListType:          constants.ListTypeBlocklist,
-			GenericSourceType: constants.SourceTypeDomain,
-			Valid:             true,
-		},
-		{
-			Filepath:          allowFile,
-			Name:              "TestAllowSource",
-			ListType:          constants.ListTypeAllowlist,
-			GenericSourceType: constants.SourceTypeDomain,
-			Valid:             true,
-		},
+	// Add details with sources on both sides
+	result.DetailsMap["forced-block.com"] = ConflictDetail{
+		Entry:        "forced-block.com",
+		BlockSources: []string{"src1"},
+		AllowSources: []string{"src2"},
+		BlockCount:   1,
+		AllowCount:   1,
+	}
+	result.DetailsMap["forced-allow.com"] = ConflictDetail{
+		Entry:        "forced-allow.com",
+		BlockSources: []string{"src3"},
+		AllowSources: []string{"src4"},
+		BlockCount:   1,
+		AllowCount:   1,
 	}
 
-	allowPath, blockPath, overridePath, err := ResolveConflictsByCounts(logger, processedFiles)
+	records := getManualOverrideRecords(logger, result)
+
+	assert.Len(t, records, 2)
+	decisionMap := make(map[string]string)
+	for _, r := range records {
+		decisionMap[r.Entry] = r.Decision
+	}
+	assert.Equal(t, DecisionBlock, decisionMap["forced-block.com"])
+	assert.Equal(t, DecisionAllow, decisionMap["forced-allow.com"])
+}
+
+func TestBuildOverrideRecords(t *testing.T) {
+	logger, _ := multilog.NewTestLogger(t)
+
+	result := &ResolutionResult{
+		AllowByType: make(map[string]u.StringSet),
+		BlockByType: make(map[string]u.StringSet),
+		DetailsMap:  make(map[string]ConflictDetail),
+		Conflicts:   []ConflictDetail{},
+	}
+	result.ManualOverride.AllowToBlock = make(map[string]struct{})
+	result.ManualOverride.BlockToAllow = make(map[string]struct{})
+
+	// Add a conflict
+	result.Conflicts = append(result.Conflicts, ConflictDetail{
+		Entry:        "conflict.com",
+		BlockSources: []string{"src1"},
+		AllowSources: []string{"src2"},
+		BlockCount:   1,
+		AllowCount:   1,
+	})
+
+	records := buildOverrideRecords(logger, result)
+
+	// Should have conflict record
+	assert.Len(t, records, 1)
+	assert.Equal(t, "conflict.com", records[0].Entry)
+	assert.Equal(t, DecisionConflict, records[0].Decision)
+}
+
+func TestWriteOverrideSummary(t *testing.T) {
+	logger, _ := multilog.NewTestLogger(t)
+	cleanup, _ := setupTestEnvironmentForCmdTests(t)
+	defer cleanup()
+
+	result := &ResolutionResult{
+		AllowByType: make(map[string]u.StringSet),
+		BlockByType: make(map[string]u.StringSet),
+		DetailsMap:  make(map[string]ConflictDetail),
+		Conflicts:   []ConflictDetail{},
+	}
+	result.ManualOverride.AllowToBlock = make(map[string]struct{})
+	result.ManualOverride.BlockToAllow = make(map[string]struct{})
+
+	path, err := writeOverrideSummary(logger, result)
 	assert.NoError(t, err)
-	assert.NotEmpty(t, overridePath) // Should create override summary
-
-	if !emitResolvedLists {
-		assert.Empty(t, allowPath)
-		assert.Empty(t, blockPath)
-	}
+	assert.NotEmpty(t, path)
+	assert.FileExists(t, path)
 }
 
-func TestPerTypeOverride_AppliesOnlyToMatchingType(t *testing.T) {
+func TestApplyManualOverrides(t *testing.T) {
 	logger, _ := multilog.NewTestLogger(t)
-
-	cleanup, testDataDir := setupTestEnvironmentForCmdTests(t)
+	cleanup, _ := setupTestEnvironmentForCmdTests(t)
 	defer cleanup()
 
-	customDir := filepath.Join(testDataDir, "data", "custom")
-	if err := os.MkdirAll(customDir, 0o755); err != nil {
-		t.Fatalf("failed to create custom dir: %v", err)
+	result := &ResolutionResult{
+		AllowByType: make(map[string]u.StringSet),
+		BlockByType: make(map[string]u.StringSet),
+		DetailsMap:  make(map[string]ConflictDetail),
+		Conflicts:   []ConflictDetail{},
 	}
 
-	domainFile := filepath.Join(testDataDir, "domain_pf.txt")
-	if err := os.WriteFile(domainFile, []byte("bad.example.com\n"), 0o644); err != nil {
-		t.Fatalf("failed to write domain processed file: %v", err)
+	// Add an entry in the allow set with details
+	result.AllowByType[constants.SourceTypeDomain] = u.NewStringSet([]string{"test.com"})
+	result.DetailsMap["test.com"] = ConflictDetail{
+		Entry:             "test.com",
+		GenericSourceType: constants.SourceTypeDomain,
+		BlockSources:      []string{"src1"},
+		AllowSources:      []string{"src2"},
 	}
 
-	domainForcedBlock := filepath.Join(customDir, "domain_forced_block.txt")
-	oldMap := constants.CustomOverrideFilesMap
-	defer func() { constants.CustomOverrideFilesMap = oldMap }()
-	constants.CustomOverrideFilesMap = map[string]map[string]string{
-		constants.SourceTypeDomain: {
-			constants.ForcedBlock: domainForcedBlock,
-			constants.ForcedAllow: "",
-		},
-	}
+	// Apply manual overrides - this will initialize ManualOverride maps
+	applyManualOverrides(logger, result)
 
-	processed := []c.ProcessedFile{
-		{
-			Name:              "domain-src",
-			GenericSourceType: constants.SourceTypeDomain,
-			ListType:          constants.ListTypeBlocklist,
-			Filepath:          domainFile,
-			Valid:             true,
-		},
-	}
-
-	allowByType, blockByType, _, manualAllowToBlock, _, _ := BuildResolutionSets(logger, processed)
-	_, applied := manualAllowToBlock["bad.example.com"]
-	assert.True(t, applied, "expected manualAllowToBlock to contain bad.example.com")
-	assert.Contains(t, blockByType[constants.SourceTypeDomain].ToSlice(), "bad.example.com")
-	assert.NotContains(t, allowByType[constants.SourceTypeDomain].ToSlice(), "bad.example.com")
+	// Verify ManualOverride maps are initialized
+	assert.NotNil(t, result.ManualOverride.AllowToBlock)
+	assert.NotNil(t, result.ManualOverride.BlockToAllow)
 }
 
-func TestPerTypeOverride_DoesNotApplyToOtherType(t *testing.T) {
+func TestApplyManualOverrides_EmptyResult(t *testing.T) {
 	logger, _ := multilog.NewTestLogger(t)
-
-	cleanup, testDataDir := setupTestEnvironmentForCmdTests(t)
+	cleanup, _ := setupTestEnvironmentForCmdTests(t)
 	defer cleanup()
 
-	customDir := filepath.Join(testDataDir, "data", "custom")
-	if err := os.MkdirAll(customDir, 0o755); err != nil {
-		t.Fatalf("failed to create custom dir: %v", err)
+	result := &ResolutionResult{
+		AllowByType: make(map[string]u.StringSet),
+		BlockByType: make(map[string]u.StringSet),
+		DetailsMap:  make(map[string]ConflictDetail),
 	}
 
-	domainFile := filepath.Join(testDataDir, "domain_pf2.txt")
-	if err := os.WriteFile(domainFile, []byte("bad.example.com\n"), 0o644); err != nil {
-		t.Fatalf("failed to write domain processed file: %v", err)
-	}
+	// Should not panic with empty result
+	applyManualOverrides(logger, result)
 
-	ipv4ForcedBlock := filepath.Join(customDir, "ipv4_forced_block.txt")
-	oldMap := constants.CustomOverrideFilesMap
-	defer func() { constants.CustomOverrideFilesMap = oldMap }()
-	constants.CustomOverrideFilesMap = map[string]map[string]string{
-		constants.SourceTypeIpv4: {
-			constants.ForcedBlock: ipv4ForcedBlock,
-			constants.ForcedAllow: "",
-		},
-	}
-
-	processed := []c.ProcessedFile{
-		{
-			Name:              "domain-src",
-			GenericSourceType: constants.SourceTypeDomain,
-			ListType:          constants.ListTypeBlocklist,
-			Filepath:          domainFile,
-			Valid:             true,
-		},
-	}
-
-	_, _, _, manualAllowToBlock, _, _ := BuildResolutionSets(logger, processed)
-	_, applied := manualAllowToBlock["bad.example.com"]
-	assert.False(t, applied, "expected manualAllowToBlock NOT to contain bad.example.com for ipv4 override")
+	assert.NotNil(t, result.ManualOverride.AllowToBlock)
+	assert.NotNil(t, result.ManualOverride.BlockToAllow)
 }

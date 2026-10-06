@@ -26,7 +26,7 @@ func TestAppConfigValidate(t *testing.T) {
 				}
 				vsPath := filepath.Join(projectRoot, "testdata", "valid_sources.json")
 				if _, err := os.Stat(vsPath); err != nil {
-					_ = os.WriteFile(vsPath, []byte(`{"sources":[]}`), 0644)
+					_ = os.WriteFile(vsPath, []byte(`{"sources":[]}`), 0o644)
 				}
 				return AppConfig{
 					Application: ApplicationConfig{

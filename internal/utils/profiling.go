@@ -74,7 +74,7 @@ func getOutputDir(logger *multilog.Logger, outputDir string) string {
 // setupOutputDirectory ensures the output directory exists
 func setupOutputDirectory(logger *multilog.Logger, opts *ProfileOptions) bool {
 	if opts.OutputDir != "" {
-		err := os.MkdirAll(opts.OutputDir, 0755)
+		err := os.MkdirAll(opts.OutputDir, 0o755)
 		if err != nil {
 			logger.Errorf("Failed to create output directory for profiles: %v", err)
 			if os.Getenv(envTestMode) == envTestModeValue {
@@ -83,7 +83,7 @@ func setupOutputDirectory(logger *multilog.Logger, opts *ProfileOptions) bool {
 					return false
 				}
 				logger.Infof("Using testdata directory as fallback for profiles: %s", opts.OutputDir)
-				err = os.MkdirAll(opts.OutputDir, 0755)
+				err = os.MkdirAll(opts.OutputDir, 0o755)
 				if err != nil {
 					return false
 				}
@@ -96,7 +96,7 @@ func setupOutputDirectory(logger *multilog.Logger, opts *ProfileOptions) bool {
 		if opts.OutputDir == "" {
 			return false
 		}
-		err := os.MkdirAll(opts.OutputDir, 0755)
+		err := os.MkdirAll(opts.OutputDir, 0o755)
 		if err != nil {
 			return false
 		}
@@ -106,18 +106,12 @@ func setupOutputDirectory(logger *multilog.Logger, opts *ProfileOptions) bool {
 
 // getTestDataDir gets the testdata directory path
 func getTestDataDir(logger *multilog.Logger) string {
-	cwd, err := os.Getwd()
+	projectRoot, err := FindProjectRoot("")
 	if err != nil {
-		logger.Errorf("Failed to get current working directory: %v", err)
+		logger.Errorf("Failed to find project root: %v", err)
 		return ""
 	}
-
-	if filepath.Base(cwd) != "dns-toolkit" {
-		for filepath.Base(cwd) != "dns-toolkit" && cwd != "/" {
-			cwd = filepath.Dir(cwd)
-		}
-	}
-	return filepath.Join(cwd, "testdata")
+	return filepath.Join(projectRoot, "testdata")
 }
 
 // setupBlockProfiling enables block profiling if requested

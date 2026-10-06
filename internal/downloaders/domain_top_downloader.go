@@ -4,8 +4,6 @@ import (
 	"bufio"
 	"os"
 
-	c "github.com/phani-kb/dns-toolkit/internal/common"
-	cfg "github.com/phani-kb/dns-toolkit/internal/config"
 	"github.com/phani-kb/multilog"
 )
 
@@ -16,20 +14,10 @@ type DomainTopDownloader struct {
 }
 
 // NewDomainTopDownloaderWithRetries creates a new DomainTopDownloader with custom retry settings
-func NewDomainTopDownloaderWithRetries(maxRetries int) Downloader {
+func NewDomainTopDownloaderWithRetries(maxRetries int) *DomainTopDownloader {
 	return &DomainTopDownloader{
 		DefaultDownloader: *NewDefaultDownloaderWithRetries(maxRetries),
 	}
-}
-
-func (d *DomainTopDownloader) Download(
-	logger *multilog.Logger,
-	file c.DownloadFile,
-	skipCertVerify bool,
-	skipCertHosts []string,
-	applicationConfig cfg.ApplicationConfig,
-) (string, bool, error) {
-	return d.DefaultDownloader.Download(logger, file, skipCertVerify, skipCertHosts, applicationConfig)
 }
 
 func (d *DomainTopDownloader) PostDownloadProcess(logger *multilog.Logger, filePath string, count int) error {
@@ -82,5 +70,3 @@ func (d *DomainTopDownloader) PostDownloadProcess(logger *multilog.Logger, fileP
 func (d *DomainTopDownloader) Name() string {
 	return domainTopDownloaderName
 }
-
-func init() {}

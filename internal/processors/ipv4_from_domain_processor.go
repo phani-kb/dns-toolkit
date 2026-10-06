@@ -33,7 +33,12 @@ func (p *Ipv4FromDomainProcessor) Process(logger *multilog.Logger, content strin
 	// resolve IP addresses from domains
 	ipAddresses, failedDomains := utils.ResolveDomainsToIPv4(logger, validEntries)
 	if len(failedDomains) > 0 {
-		logger.Warnf("Failed to resolve %v domains", len(failedDomains))
+		logger.Warnf(
+			"Failed to resolve %v domains [source_type=%s list_type=%s]",
+			len(failedDomains),
+			p.GetSourceType(),
+			p.GetListType(),
+		)
 		invalidEntries = append(invalidEntries, failedDomains...)
 	}
 
