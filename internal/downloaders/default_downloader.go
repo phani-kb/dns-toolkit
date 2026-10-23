@@ -162,6 +162,11 @@ func (d *DefaultDownloader) downloadFile(
 		logger.Errorf("Parsing URL error: %v", err)
 		return "", false, err
 	}
+	requestURL, err := expandURLSecrets(strings.TrimSpace(file.URL))
+	if err != nil {
+		logger.Errorf("Download of %s skipped: %v", file.Name, err)
+		return "", false, err
+	}
 	client := d.createHTTPClient(logger, skipCertVerify, skipCertHosts, parsedURL)
 	userAgent := cfg.GetUserAgent(logger, applicationConfig)
 	logger.Debugf("User-Agent: %s", userAgent)
@@ -174,7 +179,7 @@ func (d *DefaultDownloader) downloadFile(
 	var lastErr error
 
 	for attempt := 1; attempt <= d.maxRetries; attempt++ {
-		req, reqErr := http.NewRequest("GET", file.URL, nil)
+		req, reqErr := http.NewRequest("GET", requestURL, nil)
 		if reqErr != nil {
 			logger.Errorf("Creating request error: %v", reqErr)
 			lastErr = reqErr
@@ -183,6 +188,10 @@ func (d *DefaultDownloader) downloadFile(
 
 		req.Header.Set("User-Agent", userAgent)
 		resp, err = client.Do(req)
+		var reqURLErr *url.Error
+		if errors.As(err, &reqURLErr) {
+			reqURLErr.URL = file.URL
+		}
 
 		// If we get a response but encounter an error later, we should still close the body
 		if err == nil && resp != nil && resp.Body != nil {
@@ -257,7 +266,7 @@ func (d *DefaultDownloader) downloadFile(
 					current := canonicalURLString(resp.Request.URL)
 					targetCanonical := canonicalURLString(target)
 					if current == targetCanonical {
-						loopErr := fmt.Errorf("redirect loop detected for %s", targetCanonical)
+						loopErr := fmt.Errorf("redirect loop detected for %s", file.URL)
 						logger.Errorf("%v", loopErr)
 						return "", false, loopErr
 					}
@@ -381,7 +390,11 @@ func (d *DefaultDownloader) canSkipDownload(
 		return true
 	}
 
-	headReq, err := http.NewRequest("HEAD", file.URL, nil)
+	requestURL, err := expandURLSecrets(strings.TrimSpace(file.URL))
+	if err != nil {
+		return false
+	}
+	headReq, err := http.NewRequest("HEAD", requestURL, nil)
 	if err != nil {
 		return false
 	}

@@ -687,7 +687,7 @@
           "name": "adguard_http_url"
         }
       ],
-      "url": "https://urlhaus.abuse.ch/downloads/text/",
+      "url": "https://urlhaus-api.abuse.ch/v2/files/exports/${ABUSECH_AUTH_KEY}/urls_full.txt",
       "website": "https://urlhaus.abuse.ch"
     },
     {

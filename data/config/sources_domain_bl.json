@@ -316,7 +316,7 @@
     {
       "name": "Blocklists UT1 Publicite",
       "categories": "ads",
-      "disabled": false,
+      "disabled": true,
       "files": "publicite/domains",
       "license": "CC BY-SA 4.0",
       "notes": "100% covered by other sources",
@@ -1680,7 +1680,7 @@
           ]
         }
       ],
-      "url": "https://threatfox.abuse.ch/downloads/hostfile/",
+      "url": "https://threatfox-api.abuse.ch/v2/files/exports/${ABUSECH_AUTH_KEY}/hostfile.txt",
       "website": "https://threatfox.abuse.ch"
     },
     {
@@ -1824,7 +1824,7 @@
           ]
         }
       ],
-      "url": "https://urlhaus.abuse.ch/downloads/hostfile",
+      "url": "https://urlhaus-api.abuse.ch/v2/files/exports/${ABUSECH_AUTH_KEY}/hostfile.txt",
       "website": "https://urlhaus.abuse.ch"
     },
     {

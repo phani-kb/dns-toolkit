@@ -173,6 +173,7 @@ jobs:
       PIPELINE_MODE: ${{ needs.test-and-build.outputs.pipeline-mode }}
       SHOULD_PUBLISH: ${{ needs.test-and-build.outputs.should-publish }}
       DNS_TOOLKIT_FORCE_DOWNLOAD: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.forceDownload || 'false' }}
+      ABUSECH_AUTH_KEY: ${{ secrets.ABUSECH_AUTH_KEY }}
 
     steps:
       - name: Checkout code
